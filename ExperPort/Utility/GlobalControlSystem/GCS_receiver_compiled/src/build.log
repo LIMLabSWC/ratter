@@ -1,0 +1,6 @@
+Warning: Function C:\ratter\ExperPort\FakeRP\isvector.m has the same name as a 
+MATLAB builtin. We suggest you rename the function to avoid a potential name 
+conflict.  
+Warning: Duplicate directory name: 
+C:\ratter\ExperPort\Utility\GlobalControlSystem.  
+mcc -o 'GCS_receiver' -W 'main' -d 'C:\ratter\ExperPort\Utility\GlobalControlSystem\GCS_receiver_compiled\src' -T 'link:exe' 'C:\ratter\ExperPort\Utility\GlobalControlSystem\GCS_receiver.m' -a 'C:\ratter\ExperPort\MySQLUtility\win64\libmysql.dll' -a 'C:\ratter\ExperPort\MySQLUtility\win64\mym.mexw64' -a 'C:\ratter\ExperPort\MySQLUtility\zlibwapi.dll' -a 'C:\ratter\ExperPort\MySQLUtility\bdata.p' -a 'C:\ratter\ExperPort\MySQLUtility\LIBMYSQL.dll' -a 'C:\ratter\ExperPort\MySQLUtility\mym.mexw32' -a 'C:\ratter\ExperPort\MySQLUtility\mym.mexa64' -a 'C:\ratter\ExperPort\MySQLUtility\mym.mexmaci' -a 'C:\ratter\ExperPort\MySQLUtility\mym.mexmaci64' -a 'C:\ratter\ExperPort\MySQLUtility\mym.mexmaci.tiger' -a 'C:\ratter\ExperPort\Utility\GlobalControlSystem\GCS_Message.m' -a 'C:\ratter\ExperPort\Utility\GlobalControlSystem\GCS_Message.fig' -a 'C:\ratter\ExperPort\Utility\GlobalControlSystem\GCS_checkcode.p' -a 'C:\ratter\ExperPort\Utility\AutomatedEmails\senderror_report.m' -a 'C:\ratter\ExperPort\MySQLUtility\get_network_info.m'  
