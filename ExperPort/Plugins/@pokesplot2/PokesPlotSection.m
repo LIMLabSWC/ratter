@@ -154,7 +154,7 @@ try
             %neurobrowser to identify the presence of the PokesPlot window
             SoloParamHandle(obj, ['I_am_' mfilename], 'value', '', 'saveable', true);
             
-            SoloParamHandle(obj, 'my_xyfig', 'value', [x y gcf]);
+            SoloParamHandle(obj, 'my_xyfig', 'value', [x y double(gcf)]);
             if ~exist('PokesPlotShow', 'var') || ~isa(PokesPlotShow, 'SoloParamHandle')
                 ToggleParam(obj, 'PokesPlotShow', 0, x, y, 'OnString', 'PokesPlot showing', ...
                     'OffString', 'PokesPlot hidden', 'TooltipString', 'Show/Hide Pokes Plot window'); next_row(y);
@@ -1105,7 +1105,7 @@ try
             
             %% CASE axpokesplot_callback
         case {'axpokesplot_callback', 'plotclick'}
-            %PokesPlotSection(obj, 'axpokesplot_callback', get(gca,
+            %PokesPlotSection(obj, 'axpokesplot_callback', get(double(gca),
             %'CurrentPoint')
             if nargin==3
                 cp = varargin{1};

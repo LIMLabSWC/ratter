@@ -95,7 +95,7 @@ switch action
   case 'init',
     x = varargin{1}; y = varargin{2};
     
-    SoloParamHandle(obj, 'my_xyfig', 'value', [x y gcf]);
+    SoloParamHandle(obj, 'my_xyfig', 'value', [x y double(gcf)]);
     ToggleParam(obj, 'PreferencesPane', 0, x, y, 'TooltipString', 'Show/Hide Preferences Pane'); next_row(y);
     set_callback(PreferencesPane, {mfilename, 'show_hide'}); %#ok<NODEF> (Defined just above)
 
@@ -266,9 +266,9 @@ switch action
 
     psthC(ev, ts, -t0*1000, t1*1000, 10, msv,0,value(smoother)*1000);
     xlim([t0 t1]);
-    set(gca, 'TickDir', 'out', 'FontSize', 16);
+    set(double(gca), 'TickDir', 'out', 'FontSize', 16);
     xlabel(sprintf('time from %s', value(alignon)))
-    set(get(gca, 'XLabel'), 'Interpreter', 'none');
+    set(get(double(gca), 'XLabel'), 'Interpreter', 'none');
     ylabel('spikes/sec +/- std. err.');
 
 

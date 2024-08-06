@@ -105,7 +105,7 @@ right4little = intersect(went_right, little_tones);
 figure;
 plot(tone_list, sc,'.k');
 hold on; line([mp mp],[0 2], 'Color','r','LineStyle',':');
-set(gca,'YLim',[-1 2],'YTick', [0 1], 'YTickLabel',{'Went R', 'Went L'});
+set(double(gca),'YLim',[-1 2],'YTick', [0 1], 'YTickLabel',{'Went R', 'Went L'});
 title('Side choice as function of tone duration');
 
 2;

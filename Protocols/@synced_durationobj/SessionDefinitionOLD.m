@@ -12,7 +12,7 @@ switch action
         figure(value(myfig));
        
         parentfig_x = x; parentfig_y =  y;
-        SoloParamHandle(obj, 'my_gui_info', 'value', [x y gcf]);
+        SoloParamHandle(obj, 'my_gui_info', 'value', [x y double(gcf)]);
 
         next_row(y);
         PushbuttonParam(obj,'savetom', x, y,'label','SAVE DATA & SETTINGS'); next_row(y);
@@ -56,7 +56,7 @@ switch action
         set(get_ghandle(var_names), 'BackgroundColor', 'w');
         
         % Top Right-hand side: Display sequence of training stages
-       % uicontrol(gcf,'Style','edit','Enable','off','Position',[275 225 370 190]);
+       % uicontrol(double(gcf),'Style','edit','Enable','off','Position',[275 225 370 190]);
        SubheaderParam(obj,'listblock','',0,0);
         set(get_ghandle(listblock), 'Position',[275 225 380 190],'BackgroundColor',[153/255 153/255 155/255]);
         SubheaderParam(obj, 'list_hdr', 'Training Stages', 0, 0);
@@ -248,7 +248,7 @@ switch action
                 [sys host] = system('hostname');
         if  (strcmpi(host(1:4),'cnmc') || strcmpi(host(1:5),'brody')) && isempty(value(training_stages)),
             figure;
-            set(gcf,'Color','r', 'Position',[200 200 500 300]);
+            set(double(gcf),'Color','r', 'Position',[200 200 500 300]);
             t=uicontrol('Position',[0 10 500 200],'Style','text','String',sprintf('Session not automated!\nPlease load settings!\n'),'BackgroundColor','r', 'FontSize',18,'FontWeight','bold');
             error('No training stages loaded; please check settings!');
         end;

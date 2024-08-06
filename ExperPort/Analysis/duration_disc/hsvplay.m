@@ -49,7 +49,7 @@ for k = 1:rows(cmap)
     patch([k k k+1 k+1], [0 1 1 0], cmap(k,:));
     hold on;
 end;
-set(gca,'XTick', 1.5:1:rows(cmap)+0.5,'XTickLabel', 1:rows(cmap), 'YTick',[],...
+set(double(gca),'XTick', 1.5:1:rows(cmap)+0.5,'XTickLabel', 1:rows(cmap), 'YTick',[],...
     'Position',[0.01 0.25 0.95 0.75],'XLim', [1 rows(cmap)+1]);
 title('Colormap');
-set(gcf,'Position', [100 100 1200 50],'Menubar','none','Toolbar','none');
+set(double(gcf),'Position', [100 100 1200 50],'Menubar','none','Toolbar','none');

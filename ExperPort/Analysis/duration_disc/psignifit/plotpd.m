@@ -44,7 +44,7 @@ if iscell(dat)
 	args = [{[]} varargin]; ind = 1;
 	if numbered, args = [{'numbered'} args]; ind = 2; end
 	washeld = ishold;
-	cols = get(gca, 'colororder'); h = {};
+	cols = get(double(gca), 'colororder'); h = {};
 	for i = 1:length(dat)
 		args{ind} = dat{i};
 		h{i} = plotpd(args{:}); hold on
@@ -52,7 +52,7 @@ if iscell(dat)
 		set(h{i}, 'color', col, 'markerfacecolor', col, 'markeredgecolor', col)
 	end
 	if ~washeld, hold off, end
-	if nargout, hOut = h; else figure(gcf), end
+	if nargout, hOut = h; else figure(double(gcf)), end
 	return
 end
 
@@ -95,8 +95,8 @@ if diff(xRange) == 0, xRange = sort([0 2*xRange(1)]); end
 yRange = [min(y)-0.05*yScaling 1.05*yScaling];
 
 if washeld
-	previousXRange = get(gca, 'xlim');
-	previousYRange = get(gca, 'ylim');
+	previousXRange = get(double(gca), 'xlim');
+	previousYRange = get(double(gca), 'ylim');
 	xRange = [min(xRange(1), previousXRange(1)) max(xRange(2), previousXRange(2))];
 	yRange = [min(yRange(1), previousYRange(1)) max(yRange(2), previousYRange(2))];
 else
@@ -104,10 +104,10 @@ else
 end
 
 yRange = [min(max(yRange(1), -0.05*yScaling), 0.45 * yScaling) min(yRange(2), 1.05 * yScaling)];
-if isempty(strmatch('ylim', keys, 'exact')), set(gca, 'ylim', yRange), end
-if diff(xRange) > 0 & isempty(strmatch('xlim', keys, 'exact')), set(gca, 'xlim', xRange), end
+if isempty(strmatch('ylim', keys, 'exact')), set(double(gca), 'ylim', yRange), end
+if diff(xRange) > 0 & isempty(strmatch('xlim', keys, 'exact')), set(double(gca), 'xlim', xRange), end
 
 if numbered
-	for i = length(h):-1:1, set(text(get(h(i), 'xdata') + diff(get(gca, 'xlim'))/50, get(h(i), 'ydata'), num2str(i)), 'color', get(h(i), 'color')); end
+	for i = length(h):-1:1, set(text(get(h(i), 'xdata') + diff(get(double(gca), 'xlim'))/50, get(h(i), 'ydata'), num2str(i)), 'color', get(h(i), 'color')); end
 end
-if nargout, hOut = h;else figure(gcf), end
+if nargout, hOut = h;else figure(double(gcf)), end

@@ -64,7 +64,7 @@ for c = 1:3
 end;
 cums = cums / length(trial_cat);
 
-figure; set(gcf,'Toolbar','none','Position',[  459   779   399   215');
+figure; set(double(gcf),'Toolbar','none','Position',[  459   779   399   215');
 pie(cums, {'Pre-cue','Cue onset', 'Valid'});
 t=title('When does my rat Cout? (%s: %s)', ratname, date);
 set(t,'FontSize',14,'FontWeight','bold');

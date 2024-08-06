@@ -153,7 +153,7 @@ fprintf(1,'Long trials: %1.1f-%1.1f\n',min(long_realtrials), max(long_realtrials
 
 % Plot 1: Pre-post distribution for short and long trials
 figure;
-set(gcf,'Menubar','none','Toolbar','none','Position',[18   392   358   368]);
+set(double(gcf),'Menubar','none','Toolbar','none','Position',[18   392   358   368]);
 
 short_pre = pre(find(sides > 0));
 long_pre = pre(find(sides < 1));
@@ -182,11 +182,11 @@ nlo = hist(long_realtrials);
 maxn = max(max(nsh), max(nlo));
 
 figure;
-set(gcf,'Menubar','none','Toolbar','none','Position',[40 0 358 368]);
+set(double(gcf),'Menubar','none','Toolbar','none','Position',[40 0 358 368]);
 
 subplot(2,1,1);
 hist(short_realtrials);
-set(gca,'XLim',[0.6 1.6],'YLim', [0 1.1*maxn]);
+set(double(gca),'XLim',[0.6 1.6],'YLim', [0 1.1*maxn]);
 hold on;
 line([1 1],[0 1.1*maxn], 'LineStyle',':','Color','r','LineWidth',2);
 line([1.2 1.2],[0 1.1*maxn], 'LineStyle',':','Color','r','LineWidth',2);
@@ -197,7 +197,7 @@ hist(long_realtrials);
 hold on;
 line([1 1],[0 1.1*maxn], 'LineStyle',':','Color','r','LineWidth',2);
 line([1.2 1.2],[0 1.1*maxn], 'LineStyle',':','Color','r','LineWidth',2);
-set(gca,'XLim',[0.6 1.6],'YLim', [0 1.1*maxn]);
+set(double(gca),'XLim',[0.6 1.6],'YLim', [0 1.1*maxn]);
 xlabel('LONG Trial length (Seconds)'); ylabel('# trials');
 title(['Trial length dist''n for short & long tone trials']);
 
@@ -239,11 +239,11 @@ binned_hits_short = 100 - binned_hits_short; % Want frequency going RIGHT
 % Show frequency of side choice for long trials ...
 % -------------------
 figure;
-% set(gcf,'Menubar','none','Toolbar','none');
-set(gcf,'Position',[382 184 823 300]);
+% set(double(gcf),'Menubar','none','Toolbar','none');
+set(double(gcf),'Position',[382 184 823 300]);
 %    subplot(2,2,1);
 %   hist(long_realtrials,numbins);
-%   h = findobj(gca,'Type','patch');
+%   h = findobj(double(gca),'Type','patch');
 %   set(h, 'FaceColor','r');
 %   t=xlabel('Poke duration (seconds)');
 %
@@ -261,10 +261,10 @@ set(gcf,'Position',[382 184 823 300]);
 % Show frequency of side choice for short trials ...
 % -------------------
 % figure;
-%set(gcf,'Menubar','none','Toolbar','none');
+%set(double(gcf),'Menubar','none','Toolbar','none');
 %    subplot(2,2,2);
 %   hist(short_realtrials,numbins);
-%   h = findobj(gca,'Type','patch');
+%   h = findobj(double(gca),'Type','patch');
 %   set(h, 'FaceColor','g');
 %   t = xlabel('Poke duration (seconds)');
 % set(t,'FontSize',14,'FontWeight','bold');
@@ -303,7 +303,7 @@ set(t,'FontSize',14,'FontWeight','bold');
 % s = sprintf('Frequency of error choice ');
 % t=title(s);
 set(t,'FontSize',14,'FontWeight','bold');
-set(gca,'YLim',[0 110],'YTick',0:10:100);
+set(double(gca),'YLim',[0 110],'YTick',0:10:100);
 %
 
 legend({'Long tones','Short tones'});

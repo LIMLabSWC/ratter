@@ -39,7 +39,7 @@ function [hhandles] = hist_cpoke_stats(cpokestats, varargin)
          set(t, 'Interpreter', 'none', ...
                 'HorizontalAlignment', 'right', ...
                 'VerticalAlignment', 'middle', 'Rotation', 90);
-         set(gca, 'Visible', 'off');
+         set(double(gca), 'Visible', 'off');
       end;
       ylim([0 1]); xlim([0 nbars]);
       return;

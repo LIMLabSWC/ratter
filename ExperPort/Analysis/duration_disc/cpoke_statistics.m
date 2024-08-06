@@ -187,7 +187,7 @@ switch action
             bobtime_rel_cue_avg = vertcat(bobtime_rel_cue_avg, [ mean(bobtime_rel_cueonset), std(bobtime_rel_cueonset)]);
             if strcmpi(ratname,'Denethor')
                 figure('ButtonDownFcn', @double_in_size);
-                set(gcf,'Toolbar','none','Position',[x y fig_wt fig_ht]);
+                set(double(gcf),'Toolbar','none','Position',[x y fig_wt fig_ht]);
                 y = y+fig_ht;
                 if (y+fig_ht) > sheight,
                     x = x + fig_wt;
@@ -205,7 +205,7 @@ switch action
                 hold on;
                 hist(bobtime_rel_cueonset,bins);
 
-                set(gca,'YLim',[0 1.1*max(n)], 'XLim', [-1*maxie maxie]);
+                set(double(gca),'YLim',[0 1.1*max(n)], 'XLim', [-1*maxie maxie]);
                 xlabel('Bob time relative to cue onset (seconds); b > 0 => bob BEFORE cue_onset');
                 text(+0.2, 1.05*max(n), 'BEFORE cue starts');
                 text(-0.5, 1.05*max(n), 'AFTER cue starts');
@@ -230,7 +230,7 @@ switch action
 
             if strcmpi(ratname,'Denethor')
                         figure('ButtonDownFcn', @double_in_size);
-                        set(gcf,'Toolbar','none','Position',[x2 y2 fig_wt2 fig_ht2]);
+                        set(double(gcf),'Toolbar','none','Position',[x2 y2 fig_wt2 fig_ht2]);
                         y2 = y2+fig_ht2;
                         if (y2+fig_ht2) > sheight,
                             x2 = x2 + fig_wt2;
@@ -250,12 +250,12 @@ switch action
         end;
 
         % Plot average duration of pre- and post-bob cpoke durations
-        figure; set(gcf,'Menubar','none');
+        figure; set(double(gcf),'Menubar','none');
         subplot(1,2,1); plot(prebob_avg(:,1), 1:rows(prebob_avg), '.r');hold on;
         for r = 1:rows(prebob_avg)
             line(prebob_avg(r,1)+[prebob_avg(r,2) -1*prebob_avg(r,2)], [r r],'Color','r');
         end;
-        set(gca,'YLim', [0 length(ratlist)+1], 'YTick',[]);
+        set(double(gca),'YLim', [0 length(ratlist)+1], 'YTick',[]);
         xlabel('seconds (s.d.)'); ylabel('Individual rats');
         title('Pre-bob cpoke duration: mean & sd');
 
@@ -263,12 +263,12 @@ switch action
         for r = 1:rows(postbob_avg)
             line(postbob_avg(r,1)+[postbob_avg(r,2) -1*postbob_avg(r,2)], [r r],'Color','g');
         end;
-        set(gca,'YLim', [0 length(ratlist)+1], 'YTick',[]);
+        set(double(gca),'YLim', [0 length(ratlist)+1], 'YTick',[]);
         xlabel('seconds (s.d.)'); ylabel('Individual rats');
         title('Post-bob cpoke duration: mean & sd');
 
         % Plot average bobtime relative to cue onset
-        figure; set(gcf,'Menubar','none');
+        figure; set(double(gcf),'Menubar','none');
         maxie=max(bobtime_rel_cue_avg(:,1)) + max(bobtime_rel_cue_avg(:,2));
                         patch([0 maxie maxie 0],[0 0 length(ratlist) length(ratlist)],[1 1 0.8],'EdgeColor','none');
                         hold on;
@@ -279,7 +279,7 @@ switch action
                         text(+0.2, 1.05*length(ratlist), 'BEFORE cue starts');
                 text(-0.5, 1.05*length(ratlist), 'AFTER cue starts');
 
-        set(gca,'YLim', [0 length(ratlist)+1], 'YTick',[]);
+        set(double(gca),'YLim', [0 length(ratlist)+1], 'YTick',[]);
         xlabel('seconds (s.d.)'); ylabel('Individual rats');
         title('Time of bob occurrence relative to cue onset: mean & sd');
 

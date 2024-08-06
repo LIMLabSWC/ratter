@@ -160,7 +160,7 @@ case 'line'
 	if val
 		set(h,'BackgroundColor',[0 1 0],'value',1);
 	else
-		set(h,'BackgroundColor',get(gcf,'color'),'value',0);
+		set(h,'BackgroundColor',get(double(gcf),'color'),'value',0);
 	end
 	% set the line
 	lineobj = get(h,'user');
@@ -193,7 +193,7 @@ case 'trigger'
         set(lineh,'background',[0 1 0]);
         putvalue(line,1);
         putvalue(line,0);
-        set(lineh,'background',get(gcf,'color'));
+        set(lineh,'background',get(double(gcf),'color'));
     end
     
 
@@ -275,7 +275,7 @@ global exper
 			% status panel
 			h = uicontrol(fig,'string',name,'style','toggle','pos',[((m-1)*15)+5 (n*vs) 15 15], ...
 				'value', 0, 'tag', 'line', 'user', line, 'callback', callback, ...
-				'BackgroundColor', get(gcf,'color'));
+				'BackgroundColor', get(double(gcf),'color'));
 			
 			% save a set of handles to the toggles, which in turn
 			% reference the lines

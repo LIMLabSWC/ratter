@@ -26,9 +26,9 @@ else
 end;
 
 
-set(gca,'XLim',[0.5 2.5]);
-set(gca,'XTick',1:2, 'XTickLabel',xt);
-set(gcf,'Position',[440   289   301   445]);
+set(double(gca),'XLim',[0.5 2.5]);
+set(double(gca),'XTick',1:2, 'XTickLabel',xt);
+set(double(gcf),'Position',[440   289   301   445]);
 
 
 function [] = sub__plotgrp(g,xpos)

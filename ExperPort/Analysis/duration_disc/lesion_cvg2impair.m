@@ -117,8 +117,8 @@ end;
 % p2=plot(ones(size(ACx1_freqcvg))*2, ACx1_freqcvg,'.r','MarkerSize',25);
 % p3=plot(ones(size(ACx2_durcvg))*3, ACx2_durcvg,'.b','MarkerSize',25);
 % p4=plot(ones(size(ACx2_freqcvg))*4, ACx2_freqcvg,'.r','MarkerSize',25);
-% set(gca,'XLim',[0 5], 'YLim',[0 1],'XTick',[1:4], 'XTickLabel',{'dur1','freq1','dur2','freq2'});
-% set(gcf,'Position',[200 100 500 730]);
+% set(double(gca),'XLim',[0 5], 'YLim',[0 1],'XTick',[1:4], 'XTickLabel',{'dur1','freq1','dur2','freq2'});
+% set(double(gcf),'Position',[200 100 500 730]);
 % title(sprintf('Acx1&2:Raw weber plots (postpsych=%i)', postpsych));
 
 if strcmpi(area_filter,'ACx')
@@ -268,23 +268,23 @@ if do_regress>0
 end;
 
 
-set(gca,'YLim',yl,'XTick',-0.2:0.2:1, 'XTickLabel',...
+set(double(gca),'YLim',yl,'XTick',-0.2:0.2:1, 'XTickLabel',...
     {'Saline',0:20:100}, ...
     'YTick',0:0.2:1);
 xlabel(sprintf('%s coverage (%%)', area_filter));
 ylabel(ylbl);
-axes__format(gca);
-set(gca,'XLim',[-0.25 1]);
+axes__format(double(gca));
+set(double(gca),'XLim',[-0.25 1]);
 title(sprintf('All %s - postpsych=%i',area_filter, postpsych));
 
 if strcmpi(area_filter,'mPFC')
-    set(gca,'YTick',-0.2:0.2:1);
-    set(gca,'YLim', [-.4 1]);
-    set(gca,'XTick', 0.4:0.1:1, 'XTickLabel', 40:10:100)
-    set(gca,'XLim',[0.4 1]);
+    set(double(gca),'YTick',-0.2:0.2:1);
+    set(double(gca),'YLim', [-.4 1]);
+    set(double(gca),'XTick', 0.4:0.1:1, 'XTickLabel', 40:10:100)
+    set(double(gca),'XLim',[0.4 1]);
 end;
 
-set(gcf,'Position',[150   535   734   336]);
+set(double(gcf),'Position',[150   535   734   336]);
 
 
 

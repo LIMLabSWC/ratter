@@ -31,7 +31,7 @@ GetSoloFunctionArgs;
 switch action,
     
     case 'init', % ----------  INIT  -------------------------
-      fig = gcf;
+      fig = double(gcf);
       SoloParamHandle(obj, 'my_xyfig', 'value', [x y fig]);
 
       NumeditParam(obj, 'Stubbornness', 0,   x, y, 'TooltipString', ...
@@ -151,7 +151,7 @@ switch action,
 
         % ---- Now initialize plot
         
-        oldunits = get(gcf, 'Units'); set(gcf, 'Units', 'normalized');
+        oldunits = get(double(gcf), 'Units'); set(double(gcf), 'Units', 'normalized');
         SoloParamHandle(obj, 'h',  'value', axes('Position', [0.18, 0.88, ...
                             0.8, 0.1])); % axes
 
@@ -198,7 +198,7 @@ switch action,
                             '1', 'Left   ', '2'});
         xlabel('');
 
-        set(gcf, 'Units', oldunits);
+        set(double(gcf), 'Units', oldunits);
 
         % "width", an EditParam to control the # of trials in the plot:
         SoloParamHandle(obj, 'width', 'type', 'edit', 'label', 'ntrials', ...

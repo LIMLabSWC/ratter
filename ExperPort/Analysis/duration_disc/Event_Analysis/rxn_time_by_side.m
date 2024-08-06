@@ -39,7 +39,7 @@ function [out1, out2, out3] = rxn_time_by_side(rat, task, varargin)
   
   if no_plot < 1
   figure; 
-  set(gcf,'Position', [200 200 500 600], 'Menubar','none','Toolbar', ...
+  set(double(gcf),'Position', [200 200 500 600], 'Menubar','none','Toolbar', ...
           'none');
   subplot(2,1,1);
   k = plot(1:length(rl), rl*1000, '.b'); set(k, 'Tag', 'leftie');hold on;
@@ -59,7 +59,7 @@ function [out1, out2, out3] = rxn_time_by_side(rat, task, varargin)
   title(s);
     
   datacursormode on;
-  dcm_obj = datacursormode(gcf);
+  dcm_obj = datacursormode(double(gcf));
 set(dcm_obj, 'SnapToDataVertex', 'on', 'DisplayStyle','datatip');
 set(dcm_obj, 'Updatefcn', {@rxn_time_by_side, 'action', 'update_me'});
 end;

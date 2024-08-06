@@ -89,7 +89,7 @@ wd = 200;ht = 100;
 for idx =1:maxfig
     f=horzcat(f,figure);
     xpos = 10+((idx-1)*wd);
-    set(gcf,'Position',[xpos figy wd 100],'Menubar','none','Toolbar','none','Color',series_cell.bgcolor);
+    set(double(gcf),'Position',[xpos figy wd 100],'Menubar','none','Toolbar','none','Color',series_cell.bgcolor);
 end;
 
 ratcolour = {};
@@ -120,9 +120,9 @@ for fidx = 1:length(f)
     set(0,'CurrentFigure', f(fidx));
     t=title(sprintf('%s %i', series_cell.figtitles, fidx));
     set(t,'FontWeight','bold','FontSize',12);
-    c =get(gca,'Children'); 
-    xlim = get(gca,'XLim');
-    set(gca,'YLim',[0 1]);
+    c =get(double(gca),'Children'); 
+    xlim = get(double(gca),'XLim');
+    set(double(gca),'YLim',[0 1]);
     
     if markdate > 0
 % uncomment this area to display weber ratios beside each psych curve
@@ -135,9 +135,9 @@ for fidx = 1:length(f)
      %  txt = dates{fidx};   
         xlabel('');
         ylabel('');
-        set(gcf,'Color','w');
-        set(gca,'YTick',[], 'YGrid','off');
-        set(gca,'XTick',[], 'XGrid', 'off');
+        set(double(gcf),'Color','w');
+        set(double(gca),'YTick',[], 'YGrid','off');
+        set(double(gca),'XTick',[], 'XGrid', 'off');
     else
         txt = sprintf('%i', length(c));
     end;
@@ -148,7 +148,7 @@ for fidx = 1:length(f)
 end;
 % map colours to rats
 if markdate == 0
-figure;set(gcf,'Position',[1200 100 100 500],'Color',series_cell.bgcolor);
+figure;set(double(gcf),'Position',[1200 100 100 500],'Color',series_cell.bgcolor);
 fnames = fieldnames(ratcolour);
 for idx=1:length(fnames)
     t=text(1, idx, fnames{idx});
@@ -158,5 +158,5 @@ for idx=1:length(fnames)
 end;
 t=title(series_cell.colourtitle);
 set(t,'FontWeight','bold','FontSize',14);
-set(gca,'XLim',[0.5 1.5],'YLim',[0 length(fnames)+1]);
+set(double(gca),'XLim',[0.5 1.5],'YLim',[0 length(fnames)+1]);
 end;

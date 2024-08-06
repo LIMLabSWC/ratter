@@ -85,7 +85,7 @@ function [x, y, z] = SavingSection(obj, action, x, y, varargin)
     case 'init',      % ------------ CASE INIT --------------------
       % Save the figure and the position in the figure where we are
       % going to start adding GUI elements:
-      SoloParamHandle(obj, 'my_gui_info', 'value', [x y gcf]);
+      SoloParamHandle(obj, 'my_gui_info', 'value', [x y double(gcf)]);
       SoloParamHandle(obj, 'data_file', 'value', '');
       
       %Sundeep Tuteja, 22nd December, 2009: Adding a SoloParamHandle called
@@ -344,7 +344,7 @@ function [x, y, z] = SavingSection(obj, action, x, y, varargin)
       end;
     
     case 'reinit',       % ------------ CASE REINIT --------------------
-      currfig = gcf; 
+      currfig = double(gcf); 
 
       % Get the original GUI position and figure:
       x = my_gui_info(1); y = my_gui_info(2); figure(my_gui_info(3));

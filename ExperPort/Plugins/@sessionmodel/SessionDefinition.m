@@ -81,7 +81,7 @@ switch action
         y=varargin{2};
 
         parentfig_x = x; parentfig_y =  y;
-        SoloParamHandle(obj, 'my_gui_info', 'value', [x y gcf]);
+        SoloParamHandle(obj, 'my_gui_info', 'value', [x y double(gcf)]);
 
         % We put two GUI elements in the parent protocol window:
 

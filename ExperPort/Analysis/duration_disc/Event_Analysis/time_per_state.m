@@ -102,7 +102,7 @@ if plot_avgtime > 0
     maxidx = find(n == max(n)); xplode = zeros(size(n)); xplode(maxidx) =1;
 
     p = pie(n,xplode,lbls_duration);
-    toppos = 0.5;% get(gcf,'Position'); toppos = (toppos(2) + toppos(4)) - (0.25 * toppos(4));
+    toppos = 0.5;% get(double(gcf),'Position'); toppos = (toppos(2) + toppos(4)) - (0.25 * toppos(4));
     for k = 2:2:length(p),
         set(p(k-1), 'EdgeColor','none');
         set(p(k),'FontWeight','bold','FontSize',12);%'Position',[-2 toppos 0]);
@@ -110,13 +110,13 @@ if plot_avgtime > 0
     end;
     s = sprintf('%s: %s (%s)\nWhich states does he spend his time in?.', make_title(ratname), make_title(task), date);
     t= title(s); set(t,'FontSize', 16);
-    set(gcf,'Position',[10 50 700 650],'Menubar','none','Toolbar','none');
+    set(double(gcf),'Position',[10 50 700 650],'Menubar','none','Toolbar','none');
     colormap summer;
 
     if pies_only < 1
         subplot(2,1,2);
         bar(1:length(n), n);
-        set(gca,'XTick',1:length(n), 'XTickLabel',titles);
+        set(double(gca),'XTick',1:length(n), 'XTickLabel',titles);
         ylabel('seconds');
         xlabel('states');
         s = sprintf('%s: %s (%s)\nAverage time per state', make_title(ratname), make_title(task), date);
@@ -142,13 +142,13 @@ if plot_totaltime
     end;
     s = sprintf('%s: %s (%s)\nWhich states does he spend his time in (total)?.', make_title(ratname), make_title(task), date);
     t= title(s); set(t,'FontSize', 16);
-    set(gcf,'Position',[10 50 700 650],'Menubar','none','Toolbar','none');
+    set(double(gcf),'Position',[10 50 700 650],'Menubar','none','Toolbar','none');
     colormap summer;
 
     if pies_only < 1
         axes('Position',[0.05 0.1 0.85 0.3]);
         bar(1:length(n_total), n_total);
-        set(gca,'XTick',1:length(n_total), 'XTickLabel',titles);
+        set(double(gca),'XTick',1:length(n_total), 'XTickLabel',titles);
         ylabel('hours');
         xlabel('states');
         s = sprintf('%s: %s (%s)\nTotal time per state', make_title(ratname), make_title(task), date);

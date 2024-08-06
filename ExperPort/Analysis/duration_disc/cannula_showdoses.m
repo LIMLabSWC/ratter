@@ -38,7 +38,7 @@ for r = 1:length(ratlist)
 end;
 
 title('Doses used for each rat');
-set(gca,'XLim',[0 8], 'YLim',[0 0.2]);
+set(double(gca),'XLim',[0 8], 'YLim',[0 0.2]);
 set(0,'CurrentFigure',f1);
 legend(ratlist);
 
@@ -56,7 +56,7 @@ for r = 1:length(ratlist)
 end;
 
 f3=figure; % all rats in one group plotted at single x point
-set(0,'CurrentFigure',f3); set(gcf,'Position',[987   469   261   444]);
+set(0,'CurrentFigure',f3); set(double(gcf),'Position',[987   469   261   444]);
 td = sub__makedensity(durpile); tf = sub__makedensity(freqpile);
 plot(ones(length(durpile))*1, durpile, '.r', 'Color',[1 1 1]*0.5,'MarkerSize',20);
 for d = 1:rows(td)
@@ -68,7 +68,7 @@ for d = 1:rows(tf)
     text(2.2,tf(d,1), sprintf('%i',tf(d,2)),'FOntSize',14,'FontWeight','bold');
 end;
 
-set(gca,'XTick',[1 2], 'XLim',[0 3],'XTickLabel',{'dur','freq'},'YLim', [0 0.2]);
+set(double(gca),'XTick',[1 2], 'XLim',[0 3],'XTickLabel',{'dur','freq'},'YLim', [0 0.2]);
 title('Muscimol doses shown by group');
 
 

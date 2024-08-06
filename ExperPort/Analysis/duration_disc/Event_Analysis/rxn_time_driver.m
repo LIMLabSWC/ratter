@@ -102,16 +102,16 @@ switch action
         if show_average_rxntime
             if ~strcmpi(filter_by_task,'p')
                 figure;
-                set(gcf,'Tag', 'duration_binned_tones');
+                set(double(gcf),'Tag', 'duration_binned_tones');
             end;
             if ~strcmpi(filter_by_task, 'd')
                 figure;
-                set(gcf,'Tag', 'pitch_binned_tones');
+                set(double(gcf),'Tag', 'pitch_binned_tones');
             end;
         end;
         if show_sig_chart
             figure;
-            set(gcf,'Tag','sig_chart');
+            set(double(gcf),'Tag','sig_chart');
         end;
 
         % struct which collect data:
@@ -131,10 +131,10 @@ switch action
         if show_sig_chart
             % format sig_chart
             set(0,'CurrentFigure',findobj('Tag','sig_chart'));
-            set(gcf,'Position',[22 470 474 257],'Toolbar','none');
+            set(double(gcf),'Position',[22 470 474 257],'Toolbar','none');
             xlabel('Logdiffs');
             ylabel('Rats');
-            set(gca,'YTick',0.5:rows(ratlist)-0.5, 'YTickLabel',fieldnames(sig_struct),'YLim',[0 rows(ratlist)]);
+            set(double(gca),'YTick',0.5:rows(ratlist)-0.5, 'YTickLabel',fieldnames(sig_struct),'YLim',[0 rows(ratlist)]);
             hold on;
         end;
 
@@ -420,9 +420,9 @@ if ~strcmpi(filter_by_task,'p')
     mp = sqrt(200*500);
     line([mp mp], [0 rows(ratlist)+1],'LineStyle',':');
     xlabel('Bin centers (milliseconds)'); ylabel('Individual rats');
-    set(gca,'XTickLabel', round(duration_bins*100)/100);
+    set(double(gca),'XTickLabel', round(duration_bins*100)/100);
     title('Duration bins');
-    set(gcf,'Position',[22  1   407   206],'Toolbar','none','Color', duration_colour);
+    set(double(gcf),'Position',[22  1   407   206],'Toolbar','none','Color', duration_colour);
 end;
 
 if ~strcmpi(filter_by_task,'d')
@@ -430,9 +430,9 @@ if ~strcmpi(filter_by_task,'d')
     mp = sqrt(8*16);
     line([mp mp], [0 rows(ratlist)+1],'LineStyle',':');
     xlabel('Bin centers (KHz)'); ylabel('Individual rats');
-    set(gca,'XTickLabel', round(pitch_bins * 100)/100);
+    set(double(gca),'XTickLabel', round(pitch_bins * 100)/100);
     title('Pitch bins');
-    set(gcf,'Position',[22  210   407   206],'Toolbar','none','Color',pitch_colour);
+    set(double(gcf),'Position',[22  210   407   206],'Toolbar','none','Color',pitch_colour);
 end;
 
 
@@ -443,8 +443,8 @@ end;
 function [] = rxngraph__show_individual_rxntimes(filter_by_task, filter_trialtype, indie_tones_allrats, indie_rxns_allrats, numbins, ...
     duration_tally, pitch_tally,duration_mp, pitch_mp,duration_colour, pitch_colour)
 ttype_array = {}; % which tasks to plot
-if ~strcmpi(filter_by_task,'p') && duration_tally > 0, ttype_array{end+1} = 'duration'; figure; set(gcf,'Tag','indiv_duration');end;
-if ~strcmpi(filter_by_task,'d') && pitch_tally > 0, ttype_array{end+1} = 'pitch'; figure; set(gcf,'Tag', 'indiv_pitch'); end;
+if ~strcmpi(filter_by_task,'p') && duration_tally > 0, ttype_array{end+1} = 'duration'; figure; set(double(gcf),'Tag','indiv_duration');end;
+if ~strcmpi(filter_by_task,'d') && pitch_tally > 0, ttype_array{end+1} = 'pitch'; figure; set(double(gcf),'Tag', 'indiv_pitch'); end;
 
 if strcmpi(filter_trialtype,'')
     htype_array = {'hit','miss'};
@@ -499,26 +499,26 @@ for r = 1:length(ttype_array)
     eval(['mp = ' ttype_array{r} '_mp;']);
     line([mp mp],[0 max_y], 'LineStyle', ':','Color','k','LineWidth',2);
 
-    set(gca,'XTickLabel',mybins, 'XTick',x, 'YLim',[min(0,min(rxns_tmp)), max_y], 'XLim',[mybins(1)*0.85 mybins(end)*1.05]);
-    set(gcf,'Toolbar','none','Color',eval([ttype_array{r} '_colour']));
+    set(double(gca),'XTickLabel',mybins, 'XTick',x, 'YLim',[min(0,min(rxns_tmp)), max_y], 'XLim',[mybins(1)*0.85 mybins(end)*1.05]);
+    set(double(gcf),'Toolbar','none','Color',eval([ttype_array{r} '_colour']));
     if strcmpi(ttype_array{r},'duration'),
         xlabel('Tone duration (ms)');
-        set(gcf,'Position',[ 932  0   560   420]);
+        set(double(gcf),'Position',[ 932  0   560   420]);
     else
         xlabel('Tone frequency (KHz)');
-        set(gcf,'Position',[937   310   560   420]);
+        set(double(gcf),'Position',[937   310   560   420]);
     end;
     ylabel('Reaction time (milliseconds)');
 
     % now plot performance stacked on top of the individual
     % reaction time graph
 
-    f=findobj(gcf,'Tag','perf_view');
+    f=findobj(double(gcf),'Tag','perf_view');
     if isempty(f),
         axes('Position',[0.1 0.68 0.8 0.25]);
-        set(gca,'Tag','perf_view');
+        set(double(gca),'Tag','perf_view');
     else
-        set(gcf,'CurrentAxes', f);
+        set(double(gcf),'CurrentAxes', f);
     end;
     [x means sems] = get_bin_perf(eval(['indie_tones_allrats.' ttype_array{r}]), numbins);
     l=errorbar(mybins, means,sems, sems,'.r');
@@ -528,7 +528,7 @@ for r = 1:length(ttype_array)
 
     if strcmpi(ttype_array{r},'duration'), x = x*1000; end;
     if isempty(f)
-        set(gca,'XTick',[],'XLim', [x(1)*0.85 x(end)*1.05], 'XGrid','off',...
+        set(double(gca),'XTick',[],'XLim', [x(1)*0.85 x(end)*1.05], 'XGrid','off',...
             'YLim', [0.4 1],'YTick',0.5:0.2:1,'YTickLabel',50:20:100);
         ylabel('% correct');
     end;
@@ -602,14 +602,14 @@ for r = 1:length(ttype_array)
     if strcmpi(ttype_array{r},'duration'), mybins = round(x);
     else mybins = round(x*10)/10; end;
 
-    set(gca,'XTickLabel',mybins, 'XTick',x,'YLim', [0 max_y]);
-    set(gcf,'Toolbar','none','Color',eval([ttype_array{r} '_colour']));
+    set(double(gca),'XTickLabel',mybins, 'XTick',x,'YLim', [0 max_y]);
+    set(double(gcf),'Toolbar','none','Color',eval([ttype_array{r} '_colour']));
     if strcmpi(ttype_array{r},'duration'),
         xlabel('Tone duration (ms)');
-        set(gcf,'Position',[ 932  0   560   420]);
+        set(double(gcf),'Position',[ 932  0   560   420]);
     else
         xlabel('Tone frequency (KHz)');
-        set(gcf,'Position',[937   310   560   420]);
+        set(double(gcf),'Position',[937   310   560   420]);
     end;
     ylabel('Reaction time (milliseconds)');
     title(sprintf('Reaction times separated by side choice (%s)',ttype_array{r}));
@@ -641,7 +641,7 @@ for r = 1:length(ttype_array)
 
     % graph 1: show cpoke vs rxn time
     figure;
-    set(gcf,'Toolbar','none');
+    set(double(gcf),'Toolbar','none');
     % now on the same graph, show clen for short, versus those for long.
     l=plot(clen(short_idx), rxns_tmp(short_idx), '.b'); % individual
     set(l,'Color',[0.8 0.8 1]);
@@ -654,7 +654,7 @@ for r = 1:length(ttype_array)
     pct = percentile(rxns_tmp,99);
     set(l,'MarkerSize',20);
     hold on;
-    set(gca,'XTick',0:0.2:max(clen)+0.2,'XLim',[0 max(clen)+0.2], 'YLim', [0 pct]);
+    set(double(gca),'XTick',0:0.2:max(clen)+0.2,'XLim',[0 max(clen)+0.2], 'YLim', [0 pct]);
     xlabel('Center poke length (seconds)');
     ylabel('Reaction time (milliseconds)');
     legend({'tones < mp','tones > mp','Overall avg'});
@@ -678,7 +678,7 @@ for r = 1:length(ttype_array)
         %   set(l,'Color',[1 0.8 0.8]);
         title('Center poke length for MISSED trials');
         legend({'Tones < MP', 'Tones > MP'});
-        set(gcf,'Toolbar','none');set(gca,'XTick',[1 2], 'XLim',[0 3], 'XTickLabel', {'"Short" Miss', '"Long" Miss'});
+        set(double(gcf),'Toolbar','none');set(double(gca),'XTick',[1 2], 'XLim',[0 3], 'XTickLabel', {'"Short" Miss', '"Long" Miss'});
     end;
 
 
@@ -743,15 +743,15 @@ hold on;
 % see overlap between reaction times for 'short' and 'long' trials
 % plot histograms showing distribution of reaction times
 hist(rxns_tmp(long_idx));
-p=findobj(gca,'Type','patch');
+p=findobj(double(gca),'Type','patch');
 for idx=1:length(pct_array)
     t=sprintf('pct%i', pctl(idx));
-    p=setdiff(p,findobj(gca,'Tag',t));
+    p=setdiff(p,findobj(double(gca),'Tag',t));
 end;
 set(p,'FaceColor', [1 0 0],'EdgeColor',[1 0 0],'facealpha',0.75);
 hold on;
 hist(rxns_tmp(short_idx));
-p=findobj(gca,'Type','patch');
+p=findobj(double(gca),'Type','patch');
 set(p,'facealpha',0.25, 'EdgeColor','none');
 title('Distribution of rxn times for short and long trials');
 
@@ -772,12 +772,12 @@ r=max(rxns_tmp);
 line([0 r],[0.25*maxie 0.25*maxie],'Color','k','LineStyle',':');
 line([0 r],[0.75*maxie 0.75*maxie],'Color','k','LineStyle',':');
 
-set(gca,'YLim',[-0.1*maxie maxie], 'YTick', 0:0.2*maxie:maxie,'YTickLabel',0:20:100);
+set(double(gca),'YLim',[-0.1*maxie maxie], 'YTick', 0:0.2*maxie:maxie,'YTickLabel',0:20:100);
 
 xlabel('Reaction time (seconds)');
 ylabel('% responding ''Left''');
 title('% left as function of rxn time');
-uicontrol(gcf,'Position',[20 5 140 20],'String',fname,'Style','text','FontSize',12)
+uicontrol(double(gcf),'Position',[20 5 140 20],'String',fname,'Style','text','FontSize',12)
 
 
 
@@ -792,14 +792,14 @@ uicontrol(gcf,'Position',[20 5 140 20],'String',fname,'Style','text','FontSize',
 %             if ~strcmpi(filter_by_task,'d') && pitch_tally > 0, ttype_array{end+1} = 'pitch'; end;
 %             % individual plots for duration and pitch
 %             for r = 1:length(ttype_array)
-%                 figure;set(gcf,'Toolbar','none','Color',eval([ttype_array{r} '_colour']));
+%                 figure;set(double(gcf),'Toolbar','none','Color',eval([ttype_array{r} '_colour']));
 %                 eval(['rdiff_tmp = rxn_differences.' ttype_array{r} '*1000;']);
 %                 mean_rxn = mean(rdiff_tmp);
 %                 sem_rxn = std(rdiff_tmp) / rows(rdiff_tmp)-1;
 %                 l=errorbar(1:length(mean_rxn), mean_rxn,sem_rxn, sem_rxn,'.r');
 %
 %                 set(l,'MarkerSize',20);
-%                 set(gca,'XTickLabel',2:1:length(mean_rxn)+1, 'XTick',1:1:length(mean_rxn));
+%                 set(double(gca),'XTickLabel',2:1:length(mean_rxn)+1, 'XTick',1:1:length(mean_rxn));
 %                 xlabel('Bin K (of (BinK - BinK-1)');
 %                 ylabel('milliseconds');
 %                 title(sprintf('Mean adjacent differences in reaction time (%s)', ttype_array{r}));
@@ -815,20 +815,20 @@ uicontrol(gcf,'Position',[20 5 140 20],'String',fname,'Style','text','FontSize',
 %             if ~strcmpi(filter_by_task,'d') && pitch_tally > 0, ttype_array{end+1} = 'pitch'; end;
 %             % individual plots for duration and pitch
 %             for r = 1:length(ttype_array)
-%                 figure; set(gcf,'Toolbar','none','Color',eval([ttype_array{r} '_colour']));
+%                 figure; set(double(gcf),'Toolbar','none','Color',eval([ttype_array{r} '_colour']));
 %                 eval(['rcum_tmp = rxn_cum.' ttype_array{r} '*1000;']);
 %                 mean_rxn = mean(rcum_tmp); sem_rxn = std(rcum_tmp) / rows(rcum_tmp)-1;
 %                 l=errorbar(1:length(mean_rxn), mean_rxn,sem_rxn, sem_rxn,'.r');
 %
 %                 set(l,'MarkerSize',20);
 %                 eval(['mybins = round(' ttype_array{r} '_bins*100)/100;']);
-%                 set(gca,'XTickLabel',1:1:length(mean_rxn), 'XTick',1:1:length(mean_rxn), 'XTickLabel', mybins);
+%                 set(double(gca),'XTickLabel',1:1:length(mean_rxn), 'XTick',1:1:length(mean_rxn), 'XTickLabel', mybins);
 %                 if strcmpi(ttype_array{r},'duration'),
 %                     xlabel('Bins (milliseconds)');
-%                     set(gcf,'Position',[430  10   651   280]);
+%                     set(double(gcf),'Position',[430  10   651   280]);
 %                 else
 %                     xlabel('Bins (KHz)');
-%                     set(gcf,'Position',[428   319   651   280]);
+%                     set(double(gcf),'Position',[428   319   651   280]);
 %                 end;
 %                 ylabel('milliseconds');
 %                 title(sprintf('Mean reaction time for each bin (%s)', ttype_array{r}));

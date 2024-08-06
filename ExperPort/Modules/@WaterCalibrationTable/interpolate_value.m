@@ -132,7 +132,7 @@ if isempty(wt),
     t = NaN; errnum = 1;
     message = sprintf('No valve named "%s" found in table. It appears that calibration has never been performed. Please close and calibrate before trying again.', valve); % <~> slightly more informative
     if gui_warning,
-        fnum = gcf;
+        fnum = double(gcf);
         errordlg(message, 'Water Calibration Table Manager');
         error(message); %#ok<SPERR>
         figure(fnum);
@@ -149,7 +149,7 @@ if length(find(now - dates <= maxdays_warning)) == 0
     message = sprintf(['Most recent calibration measurement for %s was ' ...
         '%g days ago. This is only a warning.'], valve, most_recent);
     if gui_warning,
-        fnum = gcf;
+        fnum = double(gcf);
         errordlg(message, 'Water Calibration Table Manager');
         figure(fnum);
     end;
@@ -166,7 +166,7 @@ if isempty(wt),
     message = sprintf(['No calibration measurements for %s less than ' ...
         '%g days old. Please close, calibrate, and try again.'], valve, maxdays_error);
     if gui_warning,
-        fnum = gcf;
+        fnum = double(gcf);
         errordlg(message, 'Water Calibration Table Manager');
         error(message); %#ok<SPERR>
         figure(fnum);
@@ -184,7 +184,7 @@ if ~use_low_and_high
         message = sprintf(['No calibration measurements for %s less than ' ...
             'a factor of %g away. Please close, calibrate, and try again.'], valve, maxdistance);
         if gui_warning,
-            fnum = gcf;
+            fnum = double(gcf);
             errordlg(message, 'Water Calibration Table Manager');
             error(message); %#ok<SPERR>
             figure(fnum);
@@ -208,7 +208,7 @@ if use_mostrecent_day_only == 1
         message = sprintf(['No calibration measurements for %s less than ' ...
             '%g days old. Please close, calibrate, and try again.'], valve, maxdays_error);
         if gui_warning,
-            fnum = gcf;
+            fnum = double(gcf);
             errordlg(message, 'Water Calibration Table Manager');
             error(message); %#ok<SPERR>
             figure(fnum);

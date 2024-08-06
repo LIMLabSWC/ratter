@@ -98,7 +98,7 @@ switch action,
         return;
     end;
 
-    SoloParamHandle(obj, [tname 'my_gui_info'], 'value', [x y gcf]);
+    SoloParamHandle(obj, [tname 'my_gui_info'], 'value', [x y double(gcf)]);
     
     
     ToggleParam(obj, [tname 'soundtable_show'], 0, x, y, ...
@@ -107,7 +107,7 @@ switch action,
        'TooltipString', 'Show/Hide Sound Table window'); next_row(y);
     set_callback(eval([tname 'soundtable_show']), {mfilename, 'show_hide', tname;}); 
     
-    screen_size = get(0, 'ScreenSize'); fig = gcf;
+    screen_size = get(0, 'ScreenSize'); fig = double(gcf);
     SoloParamHandle(obj, [tname 'soundtablefig'], ...
         'value', figure('Position', [200 screen_size(4)-740, 700 500], ...
         'closerequestfcn', [mfilename '(' class(obj) ', ''hide'', ''' tname ''');'], 'MenuBar', 'none', ...

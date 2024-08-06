@@ -32,7 +32,7 @@ switch action,
     % to allow direct placing of SoloParamHandles on indicated figures,
     % instead of it being by default always the current figure. Oh well.
     % Fix later. [CDB]
-    currfig = gcf; f = get(get_ghandle(protocol_list), 'Parent');
+    currfig = double(gcf); f = get(get_ghandle(protocol_list), 'Parent');
     while ~strcmp(get(f, 'Type'), 'figure') && f~=0, f = get(f, 'Parent'); end;
     delete(protocol_list);
     

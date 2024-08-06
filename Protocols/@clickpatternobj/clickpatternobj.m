@@ -108,7 +108,7 @@ x = 1; y = 1;                     % Initial position on main GUI window
 [x, y] = TimesSection(obj, 'init', x, y);
 
 
-figpos = get(gcf, 'Position');
+figpos = get(double(gcf), 'Position');
 HeaderParam(obj, 'prot_title', 'Click Pattern Discrimination', ...
             x, y, 'position', [10 figpos(4)-25, 400 20]);
 numeditparam(obj,'click1',.5,420,440);

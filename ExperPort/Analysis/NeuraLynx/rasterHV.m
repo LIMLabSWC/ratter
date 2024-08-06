@@ -100,7 +100,7 @@ for ci = 1:numel(n_cnd),
 	%	set(hh(2:3), 'LineStyle', '--', 'LineWidth', 0.5);
 	end;
 	
-	set(gca, 'XLim', [-pre,post], 'YLim', [-300 300]);
+	set(double(gca), 'XLim', [-pre,post], 'YLim', [-300 300]);
 	
 	legstr{ci} = [num2str(n_cnd(ci)) ', n=' num2str(sampz)];
 end;

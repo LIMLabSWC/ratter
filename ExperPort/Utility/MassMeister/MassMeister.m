@@ -48,7 +48,7 @@ end
 function MassMeister_OpeningFcn(hObject, eventdata, handles, varargin) %#ok<INUSL>
 handles.output = hObject;
 
-set(gcf,'name','MassMesiter V2.3');
+set(double(gcf),'name','MassMesiter V2.3');
 set(handles.date_text,'string',datestr(now,'yyyy-mm-dd'));
 handles.groups = get(handles.session_list,'string');
 handles = get_newrats( handles);

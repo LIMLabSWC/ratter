@@ -27,7 +27,7 @@ switch tiletype
         ypos = 200; xpos =0;
         for idx =1:length(kids)
             set(0,'CurrentFigure', kids(idx));
-            set(gcf,'Position',[xpos ypos wd ht],'Menubar','none','Toolbar','none'); refresh;
+            set(double(gcf),'Position',[xpos ypos wd ht],'Menubar','none','Toolbar','none'); refresh;
             xpos = xpos+wd+10;
             if xpos > SCREEN__WD - (wd+10), xpos=10; ypos = ypos + ht + 10; end;
         end;
@@ -36,7 +36,7 @@ switch tiletype
         for idx =1:length(kids)
                        set(0,'CurrentFigure', kids(idx));
             fprintf(1,'\tTHIS x,y: %i, %i\n', xpos, ypos);                           
-            set(gcf,'Position',[xpos ypos wd ht],'Menubar','none','Toolbar','none'); refresh;
+            set(double(gcf),'Position',[xpos ypos wd ht],'Menubar','none','Toolbar','none'); refresh;
             ypos = ypos-(2.5*ht);
             if ypos < 10, ypos = SCREEN__HT - 10; xpos = xpos+wd+10;end;
             fprintf(1,'next x,y: %i, %i\n', xpos, ypos);    
@@ -46,7 +46,7 @@ switch tiletype
         ypos= 0;        xpos = 10;        
         for idx =length(kids):-1:1
                         set(0,'CurrentFigure', kids(idx));
-            set(gcf,'Position',[xpos ypos wd ht],'Menubar','none','Toolbar','none'); refresh;
+            set(double(gcf),'Position',[xpos ypos wd ht],'Menubar','none','Toolbar','none'); refresh;
             ypos = ypos+(ht+10);
             if ypos > SCREEN__HT - 10, ypos = SCREEN__HT - 10; xpos = xpos+wd+10;end;
         end;        

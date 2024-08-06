@@ -53,7 +53,7 @@ if ~isempty(sens)
 	if length(i) > 12, set(h{2}, 'marker', 'none', 'color', [1 1 0], 'linewidth', 2), end
 end
 if ~isempty(est), h{3} = line(est(1), est(2), 'marker', '^', 'markersize', 12, 'markerfacecolor', [1 0 0], 'markeredgecolor', [0 0 0], 'linewidth', 1); end
-set(gca, 'plotboxaspectratio', [1 1 1], 'fontweight', 'bold')
+set(double(gca), 'plotboxaspectratio', [1 1 1], 'fontweight', 'bold')
 xlabel('\alpha'), ylabel('\beta')
 
 if ~isempty(lims)
@@ -61,4 +61,4 @@ if ~isempty(lims)
 	h{5} = psycherrbar(nan, lims(:,2), (min(xlim) + min(sim(:, 1)))/2, 'v', 'color', [0.8 0.4 0], 'marker', 'none');
 end
 
-if nargout, hOut = h; else figure(gcf), end
+if nargout, hOut = h; else figure(double(gcf)), end

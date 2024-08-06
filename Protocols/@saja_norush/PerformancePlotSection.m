@@ -52,13 +52,13 @@ switch action
     MaxTrialsLocal = varargin{3};
     LegendStrings = varargin{4};
     
-    SoloParamHandle(obj, 'my_gui_info', 'value', [xpos ypos gcf]);
+    SoloParamHandle(obj, 'my_gui_info', 'value', [xpos ypos double(gcf)]);
 
-    MyFigPosition = get(gcf,'Position');
+    MyFigPosition = get(double(gcf),'Position');
 
     MarkerSize = 4;
  
-    oldunits = get(gcf, 'Units'); set(gcf, 'Units', 'normalized');
+    oldunits = get(double(gcf), 'Units'); set(double(gcf), 'Units', 'normalized');
     SoloParamHandle(obj, 'hAxesPerf', 'saveable', 0, 'value', axes('Position', [0.1, 0.52, 0.8, 0.24]));
     ColorType1 = 'c';%[153,157,84]/255;
     ColorType2 = 'm';%[19,255,103]/255;
@@ -144,7 +144,7 @@ switch action
     xpos = mn; ypos = mx;                     % Return these values
     
   case 'reinit',
-    currfig = gcf;
+    currfig = double(gcf);
 
     % Get the original GUI position and figure:
     xpos = my_gui_info(1); ypos = my_gui_info(2); figure(my_gui_info(3));

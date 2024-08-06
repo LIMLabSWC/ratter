@@ -45,7 +45,7 @@ switch action
     SoloParamHandle(obj, 'ShowLoop'); ShowLoop.value = SLoop;
 
     SoloParamHandle(obj, 'I_am_SoundControlSection');
-    SoloParamHandle(obj, 'my_xyfig', 'value', [x y gcf]);
+    SoloParamHandle(obj, 'my_xyfig', 'value', [x y double(gcf)]);
     
     %----------------------------------------------------------------------
     %
@@ -277,7 +277,7 @@ case 'set_loop'
   %              REINIT
   % ------------------------------------------------------------------    
   case 'reinit'
-    currfig = gcf;
+    currfig = double(gcf);
     
     feval(mfilename, obj, 'close');
     

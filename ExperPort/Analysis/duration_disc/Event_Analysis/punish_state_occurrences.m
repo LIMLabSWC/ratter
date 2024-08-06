@@ -18,10 +18,10 @@ end;
 
 figure; plot(itidur/60,'.b'); title(sprintf('%s:%s (%s)',ratname, indate, statename));
 blah = max(itidur/60);
-set(gca,'YTick', [0 0.5 1 2 5 10], 'YGrid','on');
-set(gca,'YLim',[0 blah+5]);
+set(double(gca),'YTick', [0 0.5 1 2 5 10], 'YGrid','on');
+set(double(gca),'YLim',[0 blah+5]);
 ylabel('minutes'); xlabel('trial #');
-set(gcf,'Position',[440 500 700 230]);
-axes__format(gca);
+set(double(gcf),'Position',[440 500 700 230]);
+axes__format(double(gca));
 
 fprintf(1,'Minutes spent in ITI = %1.2f', sum(itidur) / 60);

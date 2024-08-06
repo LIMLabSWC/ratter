@@ -59,7 +59,7 @@ switch action
     % going to start adding GUI elements:
     xpos = varargin{1};
     ypos = varargin{2};
-    SoloParamHandle(obj, 'my_gui_info', 'value', [xpos ypos gcf]);
+    SoloParamHandle(obj, 'my_gui_info', 'value', [xpos ypos double(gcf)]);
 
     % ----------------- Speaker calibration data ------------------
     SettingsDir = fullfile(Solo_rootdir,'Settings');
@@ -344,7 +344,7 @@ switch action
     
     
   case 'reinit',
-    currfig = gcf;
+    currfig = double(gcf);
 
     % Get the original GUI position and figure:
     xpos = my_gui_info(1); ypos = my_gui_info(2); figure(my_gui_info(3));

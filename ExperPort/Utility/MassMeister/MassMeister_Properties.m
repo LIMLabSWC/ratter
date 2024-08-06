@@ -116,12 +116,12 @@ properties.threshold = str2num(get(handles.threshold_edit,'string'));
 properties.error     = str2num(get(handles.error_edit,    'string'));
     
 save(handles.file,'properties');    
-close(gcf);
+close(double(gcf));
 
 % --- Executes on button press in cancel_button.
 function cancel_button_Callback(hObject, eventdata, handles)
 
-close(gcf);
+close(double(gcf));
 
 
 

@@ -32,7 +32,7 @@ plot(ones(size(drugp_fedtofasted)), drugp_fedtofasted, 'o'); hold on;
 %line([0.8 1.2], [mean(drugp_fedtofasted) mean(drugp_fedtofasted)], 'LineWidth',2);
 plot(ones(size(drugp_fedtofasted)) .* 2, met_fedtofasted, 'o'); 
 %line([1.8 2.2], [mean(met_fedtofasted) mean(met_fedtofasted)], 'LineWidth',2);
-set(gca,'XLim',[0 3],'YTick',[0.2 0.5 1],'YLim', [0 1.5],'XTick',[1 2], 'XTickLabel', {'Drug P', 'Metabolite M'});
+set(double(gca),'XLim',[0 3],'YTick',[0.2 0.5 1],'YLim', [0 1.5],'XTick',[1 2], 'XTickLabel', {'Drug P', 'Metabolite M'});
 ylabel('Fed / Fasted');
 title('AUC for Fed/Fasted');
 

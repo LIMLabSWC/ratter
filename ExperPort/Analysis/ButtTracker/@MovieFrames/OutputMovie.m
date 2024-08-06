@@ -47,7 +47,7 @@ figpos=get(fig,'position');
 set(fig,'position',[figpos(1:2) sizemult*[obj.Width obj.Height]]);
 himg=imagesc(zeros(obj.Height,obj.Width));
 colormap gray;
-set(gca,'clim',[0 255],'position',[0 0 1 1]);
+set(double(gca),'clim',[0 255],'position',[0 0 1 1]);
 if isempty(props)
   props.clr=[0.95 0.28 0.32];
   props.lw=4;
@@ -96,7 +96,7 @@ for ich=1:nchunks
       'string',sprintf('phi = %3.1f',obj.Angle(ind)));
 %     set(hphi,'string', sprintf('phi = %3.1f',obj.Angle(ind)) );
     drawnow;
-    aviframe = getframe(gca);
+    aviframe = getframe(double(gca));
     aviobj   = addframe(aviobj,aviframe);
   end
   

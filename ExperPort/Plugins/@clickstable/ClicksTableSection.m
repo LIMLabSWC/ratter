@@ -22,7 +22,7 @@ sound_defaults   = {0.4,    100,    0.5,   0};
 switch action
    %% case init
    case 'init',
-      SoloParamHandle(obj, 'my_gui_info', 'value', [x y gcf], 'saveable', 0);
+      SoloParamHandle(obj, 'my_gui_info', 'value', [x y double(gcf)], 'saveable', 0);
       
       ToggleParam(obj, 'showhide_clicks_table', 1, x, y, 'OnString', 'Showing Clicks Table', ...
          'OffString', 'Hiding Clicks Table'); next_row(y);
@@ -50,7 +50,7 @@ switch action
    case 'nSounds',
       if nSounds > existing_nSounds,        %#ok<NODEF>
          % If asking for more sounds than exist, make them:
-         orig_fig = gcf;
+         orig_fig = double(gcf);
          my_window_visibility = get(my_window_info(3), 'Visible');
          x = my_window_info(1); y = my_window_info(2); figure(my_window_info(3));
          set(my_window_info(3), 'Visible', my_window_visibility);
@@ -195,7 +195,7 @@ switch action
       
    %% case close
    case 'close'
-      currfig = gcf;
+      currfig = double(gcf);
       
       % Get the original GUI position and figure:
       x = my_gui_info(1); y = my_gui_info(2); figure(my_gui_info(3));
@@ -215,7 +215,7 @@ switch action
          
    %% case reinit
    case 'reinit',
-      currfig = gcf;
+      currfig = double(gcf);
       
       % Get the original GUI position and figure:
       x = my_gui_info(1); y = my_gui_info(2); figure(my_gui_info(3));

@@ -66,7 +66,7 @@ end;
 if graphic==0, return; end;
 
 figure;
-set(gcf,'Position',[100 200 200*maxdays 300]);
+set(double(gcf),'Position',[100 200 200*maxdays 300]);
 axes('Position',[0.05 0.1 0.9 0.85]);
 
 clr='b';
@@ -78,9 +78,9 @@ for p=1:maxdays
 end;
 xlabel('Trial #');
 ylabel('hit rate');
-set(gca,'XLim', [0 length(hh)],'YLim',[45 100]);
+set(double(gca),'XLim', [0 length(hh)],'YLim',[45 100]);
 
 text(10, 95, ratname,'FontSize', 18, 'FontWeight','bold');
 
-axes__format(gca);
-set(gcf,'Toolbar','none');
+axes__format(double(gca));
+set(double(gcf),'Toolbar','none');

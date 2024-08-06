@@ -23,9 +23,9 @@ pairs={'pre'        2;...
 }; parseargs(varargin,pairs);
 
 
-set(gcf, 'Renderer',renderer);
+set(double(gcf), 'Renderer',renderer);
 
-set(gcf,'Color','w')
+set(double(gcf),'Color','w')
 hold on
 
 
@@ -68,7 +68,7 @@ if ~meanflg,
     end
 end;
 hold off
-set(gca,'FontSize',20);
+set(double(gca),'FontSize',20);
 
 xlabel('Time from {\bfREF}  in Seconds')
 ylabel('Firing Rate (Hz \pm Std. Err.)')

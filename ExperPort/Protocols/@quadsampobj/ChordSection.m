@@ -42,7 +42,7 @@ GetSoloFunctionArgs;
 
 switch action,
     case 'init'
-        fig = gcf; rpbox('InitRP3StereoSound');
+        fig = double(gcf); rpbox('InitRP3StereoSound');
         global fake_rp_box;
         if fake_rp_box==2, % If on RT Linux rigs, we can set sample rate
             rpbox('setsoundmachine', ...

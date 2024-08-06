@@ -76,7 +76,7 @@ subplot(2,1,1); hold on;
 title([ratname ' average in ' num2str(length(session)) ' sessions'], 'FontSize', 20);
 text(0.5, 50, ['P = ' num2str(p)], 'FontSize',20);
 if norm, y_lim = [0.6 1.3]; else, y_lim = [40 100]; end;
-set(gca,'XLim', [0 8],'YLim',y_lim); 
+set(double(gca),'XLim', [0 8],'YLim',y_lim); 
 h1 = errorbar(X1, Y11, err11, '-oc','MarkerSize', 10);
 h2 = errorbar(X2, Y12, err12, '-og','MarkerSize', 10);
 subplot(2,1,2); hold on;
@@ -84,7 +84,7 @@ b1 = bar(X1, Y21); set(b1, 'FaceColor', 'none', 'EdgeColor', 'c');
 b2 = bar(X2, Y22); set(b2, 'FaceColor', 'none', 'EdgeColor', 'g');
 errorbar(X1, Y21, err21, 'LineStyle','none','Color','c');
 errorbar(X2, Y22, err22, 'LineStyle','none','Color','g');
-set(gca,'XLim', [0 8],'YLim', [0 100]);
+set(double(gca),'XLim', [0 8],'YLim', [0 100]);
 
 
 

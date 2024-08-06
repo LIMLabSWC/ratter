@@ -307,12 +307,12 @@ line([0 length(final__xcomm)+1], [mp mp], 'LineStyle',':','Color', [0.3 0.3 0.3]
 t=title(sprintf('%s: 25,50,75%% points on psych curve\n%s to %s', ratname, dates{1}, dates{end}));
 set(t,'FontSize',16,'FontWeight','bold');
 
-set(gca,'YTick',ytk,'YTickLabel', ytklbl,'YLim', ylim,'XLim', [0 length(final__xcomm)+1]);
+set(double(gca),'YTick',ytk,'YTickLabel', ytklbl,'YLim', ylim,'XLim', [0 length(final__xcomm)+1]);
 % final__xcomm = mybase.^final__xcomm;
 % final__xmid = mybase.^final__xmid;
 % final__xfin = mybase.^final__xfin;
 
-sign_fname(gcf,mfilename);
+sign_fname(double(gcf),mfilename);
 
 
 % ---------------------------------------------------------
@@ -332,7 +332,7 @@ end;
 
 figure;
 
-set(gcf,'Position', [140 400 1000 310]);
+set(double(gcf),'Position', [140 400 1000 310]);
 axes('Position', [0.08 0.15 0.86 0.7]);
 grey = [1 1 1] * 0.5;
 newr = [1 0.4 0.4];
@@ -347,7 +347,7 @@ set(h1, 'Marker','*','MarkerSize',msize*0.7,'Color', grey,'LineStyle','none');
 set(h2, 'Marker', '.', 'MarkerSize', msize*0.75','Color',newr,'LineStyle','none');
 
 ax1 = ax(1); ax2 = ax(2); hold on;
-set(gcf,'CurrentAxes',ax2); hold on;
+set(double(gcf),'CurrentAxes',ax2); hold on;
 
 plot(ax2, 1:length(mx), mx,'.', 'MarkerSize', msize*0.75','Color',newr,'LineStyle','none');
 line([0 length(mx)+1], [0.1 0.1], 'Color', newr,'LineWidth',2,'LineStyle',':'); 
@@ -355,7 +355,7 @@ text( length(mx)+0.5, 0.15, '10%','FontAngle','italic','FontWeight','bold','Font
 line([0 length(mx)+1], [0.9 0.9], 'Color', newr,'LineWidth',2,'LineStyle',':'); 
 text( length(mx)+0.5, 0.85, '90%','FontAngle','italic','FontWeight','bold','FontSize',14,'Color',newr); 
 
-set(gcf,'CurrentAxes',ax1); hold on;
+set(double(gcf),'CurrentAxes',ax1); hold on;
 
 % if markbreak > 0 && length(dates) > 1 % mark data following break in different colour
 %     bcolor = [1 1 1] * 0;

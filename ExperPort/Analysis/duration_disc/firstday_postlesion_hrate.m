@@ -24,7 +24,7 @@ if length(numt) < 2
     [s p]=permutationtest_diff(dh, fh);
     fprintf(1,'sig:%i, p=%1.2f\n', s, p);
 
-    set(gca,'YLim',[0 1.2],'YTick',0.2:.2:1,'YTickLabel',20:20:100);
+    set(double(gca),'YLim',[0 1.2],'YTick',0.2:.2:1,'YTickLabel',20:20:100);
 else
     %
     %     figure;
@@ -37,9 +37,9 @@ else
     %     end;
     %
     %     colorbar;
-    %     set(gca,'YLim',[0 1]);
-    %     set(gca,'XTick', 1.5:1:length(numt)+1,'XTickLabel',numt);
-    %     set(gcf,'Position',[100 100 800 150]);
+    %     set(double(gca),'YLim',[0 1]);
+    %     set(double(gca),'XTick', 1.5:1:length(numt)+1,'XTickLabel',numt);
+    %     set(double(gcf),'Position',[100 100 800 150]);
     
     numt=[-50 numt];
 
@@ -54,13 +54,13 @@ else
     [xpos] = makebargroups(data,clr, 'errtype','iqr','what2show','median');
 
     line([0 xpos(end)+1],[0.5 0.5],'LineStyle',':','Color',[1 1 1]*0.5,'LineWidth',2);
-    set(gca,'XTickLabel',[numt]);
-    set(gca,'YLim',[0 1.2], 'YTick',0:0.2:1,'YTickLabel',0:20:100);
+    set(double(gca),'XTickLabel',[numt]);
+    set(double(gca),'YLim',[0 1.2], 'YTick',0:0.2:1,'YTickLabel',0:20:100);
     ylabel('% Correct');
     title([area_filter ': First X post-lesion trials']);
 
-    axes__format(gca);
-    set(gcf,'Position',[123   495   978   310]);
+    axes__format(double(gca));
+    set(double(gcf),'Position',[123   495   978   310]);
 end;
 
 

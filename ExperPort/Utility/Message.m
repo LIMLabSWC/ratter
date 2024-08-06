@@ -3,7 +3,7 @@ function message(module,text,type)
 h = findobj(findobj('tag',module),'tag','message');
 
 % make clicking on the message box clear it
-set(h,'buttondownfcn','set(gcbo,''string'','''',''backgroundcolor'',get(gcf,''color''));');
+set(h,'buttondownfcn','set(gcbo,''string'','''',''backgroundcolor'',get(double(gcf),''color''));');
 if isempty(h)
    % if none exists, try to find a message box for the general experiment
    h = findobj(findobj('tag','exper'),'tag','message');
@@ -50,7 +50,7 @@ case 'normal'
    
 otherwise
    if ~isempty(h)
-      set(h,'string',text,'backgroundcolor',get(gcf,'color'));   
+      set(h,'string',text,'backgroundcolor',get(double(gcf),'color'));   
    else
       disp([text ': ' module]);
    end

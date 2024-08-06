@@ -20,7 +20,7 @@ function [hrate] = hit_n_bias(rat, task, varargin)
   end;
   
   figure;
-  set(gcf,'Menubar','none', 'Toolbar','none');
+  set(double(gcf),'Menubar','none', 'Toolbar','none');
   s = sprintf('%s: Bias (%s to %s)', rat, from, to);
   subplot(2,1,1);
   plot(1:length(bs), bs, '.b');

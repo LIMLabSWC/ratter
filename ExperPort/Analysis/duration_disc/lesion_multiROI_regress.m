@@ -92,11 +92,11 @@ imp=[dimp; fimp];
 % text(acx(r)+0.015,hpc(r),nm{r},'FontSize', 10);
  end;
  fprintf(1,'ACx-HPc: %1.2f\n', p(1,2));
- axes__format(gca);
- set(gca,'YLim',[-0.03 0.2], ...
+ axes__format(double(gca));
+ set(double(gca),'YLim',[-0.03 0.2], ...
      'XLim',[-0.02 1], ...
      'ZLim',[-0.02 1]);
-%   set(gca,'YLim',[-0.03 0.2]);
+%   set(double(gca),'YLim',[-0.03 0.2]);
  zlabel('IMPAIR');
  xlabel('ACx'); ylabel('Hpc');
  
@@ -111,10 +111,10 @@ plot3(acx,s1,imp,'.k');p=corrcoef(acx,s1);
  fprintf(1,'ACx-s1: %1.2f\n', p(1,2));
  xlabel('ACx'); ylabel('S1');
  zlabel('IMP');
- set(gca,'YLim',[-0.03, 0.8]);
- set(gca,'XLim',[-0.02,1]);
- set(gca,'ZLim',[-0.01 1],'ZTick',0:0.2:1);
- axes__format(gca);
+ set(double(gca),'YLim',[-0.03, 0.8]);
+ set(double(gca),'XLim',[-0.02,1]);
+ set(double(gca),'ZLim',[-0.01 1],'ZTick',0:0.2:1);
+ axes__format(double(gca));
  
  
 %  plot(acx,hpc,'ACx-vs-hpc'); p=corrcoef(acx,hpc);

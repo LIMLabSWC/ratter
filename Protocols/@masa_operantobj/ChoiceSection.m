@@ -7,7 +7,7 @@ GetSoloFunctionArgs;
 %   'Vpd_RightMin', 'Vpd_RightMax'})
 switch action,
     case 'init',
-        fig=gcf;
+        fig=double(gcf);
         %init window for Vpd Resluts
         MenuParam(obj, 'ResultWindow', {'view', 'hidden'},2,x,y);
         next_row(y);

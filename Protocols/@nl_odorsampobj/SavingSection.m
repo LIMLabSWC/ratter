@@ -42,7 +42,7 @@ function [x, y] = SavingSection(obj, action, x, y)
     case 'init',      % ------------ CASE INIT --------------------
       % Save the figure and the position in the figure where we are
       % going to start adding GUI elements:
-      SoloParamHandle(obj, 'my_gui_info', 'value', [x y gcf]);
+      SoloParamHandle(obj, 'my_gui_info', 'value', [x y double(gcf)]);
       
       EditParam(obj, 'ratname', 'ninglong', x, y); next_row(y, 1.5);
       
@@ -88,7 +88,7 @@ function [x, y] = SavingSection(obj, action, x, y)
     
     
     case 'reinit',       % ------------ CASE REINIT --------------------
-      currfig = gcf; 
+      currfig = double(gcf); 
 
       % Get the original GUI position and figure:
       x = my_gui_info(1); y = my_gui_info(2); figure(my_gui_info(3));

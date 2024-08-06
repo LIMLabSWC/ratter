@@ -48,7 +48,7 @@ switch action,
   case 'init',      % ------------ CASE INIT --------------------
                     % Save the figure and the position in the figure where we are
                     % going to start adding GUI elements:
-                    %SoloParamHandle(obj, 'my_gui_info', 'value', [x y gcf]);
+                    %SoloParamHandle(obj, 'my_gui_info', 'value', [x y double(gcf)]);
 
     x = varargin{1};
     y = varargin{2};
@@ -69,9 +69,9 @@ switch action,
         NtrialsToPlot = 50;
     end
 
-    MyFigPosition = get(gcf,'Position');
+    MyFigPosition = get(double(gcf),'Position');
     MarkerSize = 6;
-    oldunits = get(gcf, 'Units'); set(gcf, 'Units', 'normalized');
+    oldunits = get(double(gcf), 'Units'); set(double(gcf), 'Units', 'normalized');
     SoloParamHandle(obj, 'hAxesSides', 'saveable', 0, 'value', axes('Position', [0.1, 0.65, 0.8, 0.28])); % axes
                                                                                             %SoloParamHandle(obj, 'hAxesSides',  'value', axes('Position', [x,y, 0.8, 0.12])); % axes
     SoloParamHandle(obj, 'bdot', 'saveable', 0, 'value',...
@@ -113,7 +113,7 @@ switch action,
     set(value(hAxesSides), 'YTick', [-2 -1 0 1 2 3], 'YTickLabel', {'Seq B-A' 'Seq C-B', 'Seq A-C', 'Seq C-A','Seq B-C','Seq A-B'});
     y = y + round(0.12*MyFigPosition(4));
     next_row(y,2);
-    set(gcf, 'Units', oldunits);
+    set(double(gcf), 'Units', oldunits);
     ylim([-2.5,3.5]);
     xlim([1,100]);
     

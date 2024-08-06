@@ -155,13 +155,13 @@ switch action
 
 
         figure;
-        set(gcf,'Toolbar','none','Position',[100 200 800 500]);
+        set(double(gcf),'Toolbar','none','Position',[100 200 800 500]);
 
         % plot tone loc and go loc
         axes('Position',[0.1 0.1 0.8 0.1]);
         l=plot(1:length(Tone_Loc),Tone_Loc, '.b',1:length(GO_Loc),GO_Loc,'-g');
         for idx = 1:length(l),(set(l(idx),'LineWidth',2)); end;
-        set(gca,'YLim',[-1 2],'YTick',[0 1],'YTickLabel',{'off','on'},'Color',[1 1 0.8]);
+        set(double(gca),'YLim',[-1 2],'YTick',[0 1],'YTickLabel',{'off','on'},'Color',[1 1 0.8]);
         draw_separators(numtrials,-1, 2);
         t=ylabel(sprintf('Loc\nswitch'));
         set(t,'FontWeight','bold','FontSize',10);
@@ -173,8 +173,8 @@ switch action
         set(l,'LineWidth',2);
         maxie=max(max(go_spl),max(tone_spl));
         draw_separators(numtrials,0,maxie);
-        set(gca,'GridLineStyle','none','XTick',[]);
-        set(gca,'YLim',[0 maxie+5],'YTick',25:25:75,'Color',[1 1 0.8]);
+        set(double(gca),'GridLineStyle','none','XTick',[]);
+        set(double(gca),'YLim',[0 maxie+5],'YTick',25:25:75,'Color',[1 1 0.8]);
         draw_separators(numtrials,0,maxie+5);
         t=ylabel(sprintf('SPL\n'));
         set(t,'FontWeight','bold','FontSize',10);
@@ -185,8 +185,8 @@ switch action
         set(l,'LineWidth',2);
         title('SPL_mix');
         draw_separators(numtrials,0,max(vpd));
-        set(gca,'GridLineStyle','none','YTick',[],'XTick',[]);
-        set(gca,'YLim',[-1 2],'YTick',[0 1],'YTickLabel',{'off','on'});
+        set(double(gca),'GridLineStyle','none','YTick',[],'XTick',[]);
+        set(double(gca),'YLim',[-1 2],'YTick',[0 1],'YTickLabel',{'off','on'});
         draw_separators(numtrials,-1, 2);
         t=ylabel(sprintf('SPLmix\nswitch'));
         set(t,'FontWeight','bold','FontSize',10);
@@ -194,8 +194,8 @@ switch action
         % plot tone duration
         axes('Position',[0.1 0.4 0.8 0.15]);
         %         l=plot(1:length(dur_short),dur_short,'.r', 1:length(dur_long), dur_long,'-b');
-        %         set(gca,'GridLineStyle','none','XTick',[]);
-        %         set(gca,'YLim',[-0.1 0.6],'YTick',0:0.2:0.6);
+        %         set(double(gca),'GridLineStyle','none','XTick',[]);
+        %         set(double(gca),'YLim',[-0.1 0.6],'YTick',0:0.2:0.6);
         %         t=ylabel(sprintf('Cue\ndur (s)'));
         %         set(t,'FontWeight','bold','FontSize',10);
 
@@ -206,8 +206,8 @@ switch action
         %         for i=1:length(idx)
         %             line([idx(i)+1 idx(i)+1], [0 1],'Color','b','LineWidth',2);
         %         end;
-        set(gca,'GridLineStyle','none','XTick',[]);
-        set(gca,'YLim',[0 1],'YTick',0.25:0.25:1);
+        set(double(gca),'GridLineStyle','none','XTick',[]);
+        set(double(gca),'YLim',[0 1],'YTick',0.25:0.25:1);
         t=ylabel('LeftProb');
         set(t,'FontWeight','bold','FontSize',10);
 
@@ -218,8 +218,8 @@ switch action
         %         axes('Position',[0.1 0.55 0.8 0.1]);
         %         l=plot(1:length(vpd),vpd, '.k');set(l,'Color',[0.3 0.3 0.3]);
         %         draw_separators(numtrials,0,max(vpd));
-        %         set(gca,'GridLineStyle','none','XTick',[]);
-        %         set(gca,'YTick',0:0.2:1.5,'YLim',[0 max(vpd)+0.2]);
+        %         set(double(gca),'GridLineStyle','none','XTick',[]);
+        %         set(double(gca),'YTick',0:0.2:1.5,'YLim',[0 max(vpd)+0.2]);
         %         t=ylabel('VPD (seconds)');
         %         set(t,'FontWeight','bold','FontSize',10);
         %                     text(1,max(vpd)+0.05,sprintf('%s (%i)', dates{1},1));
@@ -239,7 +239,7 @@ switch action
         set(t,'FontWeight','bold','FontSize',14);
 
 
-        child = get(gcf,'Children');
+        child = get(double(gcf),'Children');
         for cidx=1:length(child), if strcmpi(get(child(cidx),'Type'),'axes'),
                 set(child(cidx),'XLim',[1 length(logdiff)]);
             end;
@@ -252,7 +252,7 @@ switch action
         fprintf(1,'Date range: %s  to %s\n', dates{1},dates{end});
         fprintf(1,'%s\n',repmat(b,1,llen));
 
-        set(gcf,'Position', [-1296         355        2339         535]);
+        set(double(gcf),'Position', [-1296         355        2339         535]);
 
     case 'load_sharpening'
         ratrow = rat_task_table(ratname);
@@ -298,7 +298,7 @@ switch action
 
         % Start plotting
         figure;
-        set(gcf,'Toolbar','none','Position',[100 200 1000 500]);
+        set(double(gcf),'Toolbar','none','Position',[100 200 1000 500]);
 
         t= sum(numtrials);
 
@@ -310,12 +310,12 @@ switch action
         plot(cuesep,'-b');
 
         ylabel(sprintf('Cue separation (%s)', myunits));
-        set(gca,'XLim',[1 t],'FontSize',18,'FontWeight','bold', 'YLim',[min(cuesep)*0.9 max(cuesep)*1.1],...
+        set(double(gca),'XLim',[1 t],'FontSize',18,'FontWeight','bold', 'YLim',[min(cuesep)*0.9 max(cuesep)*1.1],...
             'YGrid','on');
-        ylim = get(gca,'YLim');
+        ylim = get(double(gca),'YLim');
         draw_separators(numtrials,ylim(1),ylim(2));
 
-        %         plot(blocks_switch,'-g'); set(gca,'YLim',[-1 2], 'YTick',[0 1],'YTickLabel',{'off','on'});
+        %         plot(blocks_switch,'-g'); set(double(gca),'YLim',[-1 2], 'YTick',[0 1],'YTickLabel',{'off','on'});
         % plot logdiff
         logaxes=axes('Position',[0.05 0.25 0.9 0.3]);
         patch([0 0 t t], [0 0.7 0.7 0],[1 1 0.6],'EdgeColor','none');hold on;
@@ -323,7 +323,7 @@ switch action
         ylabel('Logdiff');
         line([1 sum(numtrials)],[0.7 0.7],'LineStyle',':','Color',[0.7 0.4 0],'LineWidth',2);
         draw_separators(numtrials,0,1);
-        set(gca,'XLim',[1 t],'FontSize',18,'FontWeight','bold',...
+        set(double(gca),'XLim',[1 t],'FontSize',18,'FontWeight','bold',...
             'YGrid', 'on','YLim', [0.4 0.9],'YTick', [0.5 0.7],...
             'XTick',[]);
 
@@ -331,8 +331,8 @@ switch action
         axes('Position',[0.05 0.55 0.9 0.37]);
         hh_chunks=sub__plot_hitrate(dates,hit_history, numtrials,fromnum);
         draw_separators(numtrials,0,1);
-        set(gca,'XLim',[1 t],'FontSize',18,'FontWeight','bold');
-        set(gca,'YTick',0.5:0.25:1, 'YTickLabel',50:25:100,'XTick',[],'YLim',[0.75 1]);
+        set(double(gca),'XLim',[1 t],'FontSize',18,'FontWeight','bold');
+        set(double(gca),'YTick',0.5:0.25:1, 'YTickLabel',50:25:100,'XTick',[],'YLim',[0.75 1]);
         [allcontigsof7 contigpos goodcontig dto7 dtopsych] = sub__get_7_breakpoint(hh_chunks, logdiff, cumtrials);
         fprintf('%s:\n\tTotal days=%i\n\t# contigs of 0.7:%i\n\tDays to learn 0.7=%i\n\tFrom there to psych=%i\n\n',...
             ratname,  length(numtrials), length(allcontigsof7),dto7, dtopsych);
@@ -343,7 +343,7 @@ switch action
 %        figure; hist(allcontigsof7);
         
         % paint contigs on logaxis
-        set(gcf,'CurrentAxes', logaxes);
+        set(double(gcf),'CurrentAxes', logaxes);
         hold on;
         for k = 1:rows(contigpos)
             idx = contigpos(k,1):contigpos(k,2);
@@ -446,10 +446,10 @@ for k = 1:length(numchunks)
     end;
 end;
 
-xlim =get(gca,'XLim');
-line(get(gca,'XLim'), [0.8 0.8], 'LineStyle',':','Color','k');
-line(get(gca,'XLim'), [0.9 0.9], 'LineStyle',':','Color','b');
-set(gca,'YLim',[0.5 1.1]);
+xlim =get(double(gca),'XLim');
+line(get(double(gca),'XLim'), [0.8 0.8], 'LineStyle',':','Color','k');
+line(get(double(gca),'XLim'), [0.9 0.9], 'LineStyle',':','Color','b');
+set(double(gca),'YLim',[0.5 1.1]);
 
 function [allcontigsof7 contigpos goodcontig dto7 dtopsych] = sub__get_7_breakpoint(hh_chunks, logdiff,cumtrials)
 

@@ -65,7 +65,7 @@ if get(handles.cancel_button,'value') == 1
 else
     varargout{1} = get(handles.script_text,'string');
 end
-close(gcf);
+close(double(gcf));
 
 
 function script_text_Callback(hObject, eventdata, handles)

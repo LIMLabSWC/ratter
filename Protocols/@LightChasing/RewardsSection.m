@@ -70,7 +70,7 @@ switch action
 % -----------------------------------------------------------------------
 
   case 'reinit',
-    currfig = gcf;
+    currfig = double(gcf);
     
     % Get the original GUI position and figure:
     x = my_gui_info(1); y = my_gui_info(2); figure(my_gui_info(3));

@@ -43,7 +43,7 @@ switch action
   case 'init',
     % Save the figure and the position in the figure where we are
     % going to start adding GUI elements:
-    SoloParamHandle(obj, 'my_gui_info', 'value', [x y gcf]);
+    SoloParamHandle(obj, 'my_gui_info', 'value', [x y double(gcf)]);
 
     % Max times same side can appear
     MenuParam(obj, 'MaxSame', {'1', '2', '3', '4', '5', '6', '7', '8', 'Inf'}, 3, ...
@@ -61,7 +61,7 @@ switch action
     
     
     % plot of side choices history at top of window
-    pos = get(gcf, 'Position');
+    pos = get(double(gcf), 'Position');
     SoloParamHandle(obj, 'myaxes', 'saveable', 0, 'value', axes);
     set(value(myaxes), 'Units', 'pixels');
     set(value(myaxes), 'Position', [90 pos(4)-200 pos(3)-130 160]);
@@ -271,7 +271,7 @@ switch action
 % -----------------------------------------------------------------------
 
   case 'reinit',
-    currfig = gcf;
+    currfig = double(gcf);
     
     % Get the original GUI position and figure:
     x = my_gui_info(1); y = my_gui_info(2); figure(my_gui_info(3));

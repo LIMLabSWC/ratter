@@ -42,7 +42,7 @@ ptclrs = {[1 0 0],[0 1 0],[0 0 0.5],[1 1 1]*0.5}; % colours go in reverse order 
 % now plot bars
 barweb(avgt, vart);
 
-xpos = barweb_change_colour(gca,clrs, 'none',1); % xpos is in reverse order of series
+xpos = barweb_change_colour(double(gca),clrs, 'none',1); % xpos is in reverse order of series
 series_order = {'base', 'nond','saline','musc'};
 for k = 1:length(series_order)
     hold on;
@@ -51,8 +51,8 @@ for k = 1:length(series_order)
     plot(ones(size(currser))*xpos(mypos), currser,'.k','MarkerSize',15,'Color', ptclrs{mypos},'LineWidth',2);
 end;
 ylabel('Trials in a session');
-set(gca,'XTick',[]);
-set(gcf,'Color',[1 1 1]*0.8);
+set(double(gca),'XTick',[]);
+set(double(gcf),'Color',[1 1 1]*0.8);
 
 title(ratname);
-axes__format(gca);
+axes__format(double(gca));

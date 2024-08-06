@@ -18,5 +18,5 @@ k=plot(l, score,'.b');
 %     set(l,'Color',rand(1,3));
 % end;
 title(sprintf('for h=%i',currh));
-set(gcf,'Position',[100 hidx*200 200 200]);
+set(double(gcf),'Position',[100 hidx*200 200 200]);
 end;

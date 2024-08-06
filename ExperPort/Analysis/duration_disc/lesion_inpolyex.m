@@ -285,9 +285,9 @@ plot(pts_array(idx_rt,1), pts_array(idx_rt,2),'+r','MarkerSize',msize,'LineWidth
 plot(pts_array(both,1), pts_array(both,2),'+g','MarkerSize',msize,'LineWidth',lwdth);
 
 % resize figure to make it square
-xlim = get(gca,'XLim'); ylim = get(gca,'YLim');
-set(gcf,'Position',[200 200 diff(xlim)*3 diff(ylim)*3]);
-set(gca,'Position',[0.07 0.05 0.9 0.9]);
+xlim = get(double(gca),'XLim'); ylim = get(double(gca),'YLim');
+set(double(gcf),'Position',[200 200 diff(xlim)*3 diff(ylim)*3]);
+set(double(gca),'Position',[0.07 0.05 0.9 0.9]);
 
 end; 
 

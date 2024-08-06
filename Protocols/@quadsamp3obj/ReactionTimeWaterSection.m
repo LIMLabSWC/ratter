@@ -41,7 +41,7 @@ function [x, y] = ReactionTimeWaterSection(obj, action, x, y)
     case 'init',
       % Save the figure and the position in the figure where we are
       % going to start adding GUI elements:
-      fig = gcf;
+      fig = double(gcf);
       SoloParamHandle(obj, 'my_gui_info', 'value', [x y fig]);
 
       ToggleParam(obj, 'RT_Water_btn', 0, x, y, ...
@@ -195,7 +195,7 @@ function [x, y] = ReactionTimeWaterSection(obj, action, x, y)
 
       
     case 'reinit',
-      currfig = gcf; 
+      currfig = double(gcf); 
 
       % Get the original GUI position and figure:
       x = my_gui_info(1); y = my_gui_info(2); origfig = my_gui_info(3);

@@ -102,7 +102,7 @@ plot(x_s,y_s-delta','k:');
 plot(x_s,y_s+delta','k:');
 ylim([0 1]);
 ylabel('% went right')
-set(gca,'YTickLabel',[0:10:100]);
+set(double(gca),'YTickLabel',[0:10:100]);
 if nargout>=1
     varargout{1}=S;
 end

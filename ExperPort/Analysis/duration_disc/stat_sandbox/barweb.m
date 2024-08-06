@@ -122,7 +122,7 @@ else
         xpos = horzcat(xpos, x(1));
 		handles.errors(i) = errorbar(x, barvalues(:,i), errors(:,i), 'k', 'linestyle', 'none');
 	end
-	set(gcf, 'color', 'white')
+	set(double(gcf), 'color', 'white')
 
 	if ~isempty(bw_title)
 		handles.title = title(bw_title, 'fontsize',14);
@@ -140,19 +140,19 @@ else
 		handles.ylabel = [];
 	end
 
-	set(gca, 'xticklabel', groupnames, 'box', 'off', 'ticklength', [0 0], 'fontsize', 12, 'xtick',1:numgroups);
+	set(double(gca), 'xticklabel', groupnames, 'box', 'off', 'ticklength', [0 0], 'fontsize', 12, 'xtick',1:numgroups);
 	if isequal(gridstatus, 'x')
-		set(gca,'xgrid','on');
-		set(gca,'ygrid','off');
+		set(double(gca),'xgrid','on');
+		set(double(gca),'ygrid','off');
 	elseif isequal(gridstatus, 'y')
-		set(gca,'xgrid','off');
-		set(gca,'ygrid','on');
+		set(double(gca),'xgrid','off');
+		set(double(gca),'ygrid','on');
 	elseif isequal(gridstatus, 'xy')
-		set(gca,'xgrid','on');
-		set(gca,'ygrid','on');
+		set(double(gca),'xgrid','on');
+		set(double(gca),'ygrid','on');
 	else
-		set(gca,'xgrid','off');
-		set(gca,'ygrid','off');
+		set(double(gca),'xgrid','off');
+		set(double(gca),'ygrid','off');
 	end
 
 	xlim([0.5 numgroups-change_axis+0.5]);
@@ -164,7 +164,7 @@ else
 		handles.legend = [];
 	end
 	
-	handles.ca = gca;
+	handles.ca = double(gca);
 
 	hold off
 end

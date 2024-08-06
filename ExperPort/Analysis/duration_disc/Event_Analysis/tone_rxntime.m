@@ -141,7 +141,7 @@ clen = cpoke_array(:,2) - cpoke_array(:,1);
 
 % start plotting -------------------
 
-figure; set(gcf,'Toolbar','none','Position', [360   609   375   249]);
+figure; set(double(gcf),'Toolbar','none','Position', [360   609   375   249]);
 
 if separate_hit_miss < 1
     if numbins < 1
@@ -260,7 +260,7 @@ else
     xlabel('Frequency (KHz)');
 end;
 ylabel('Reaction time (s)');
-set(gca,'YLim',[0 0.6]);
+set(double(gca),'YLim',[0 0.6]);
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Helper functions

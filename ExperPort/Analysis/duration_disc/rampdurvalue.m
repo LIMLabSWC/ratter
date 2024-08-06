@@ -15,7 +15,7 @@ end;
 
 figure;
 plot(1:length(megard), megard*1000,'.b');
-set(gca,'XTickLabel', dates,'XTick', 1:rows(dates),'XLim', [0 rows(dates)+1],'YTick',0:2:60,'YTickLabel',0:2:60,'YLim',[0 60]);
+set(double(gca),'XTickLabel', dates,'XTick', 1:rows(dates),'XLim', [0 rows(dates)+1],'YTick',0:2:60,'YTickLabel',0:2:60,'YLim',[0 60]);
 xlabel('Session date');
 ylabel('Ramp duration value (s)');
 

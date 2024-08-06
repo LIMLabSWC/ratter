@@ -80,8 +80,8 @@ eval('h = MainPsychoPlot(shape, params, col, washeld, dataRange, dat, thresholds
 if ~washeld, hold off, end
 error(lasterr)
 
-if ~isempty(cat(1, h{:})), set(gca, 'tag', 'psychoplot'), end
-if nargout, hOut = h; else figure(gcf), end
+if ~isempty(cat(1, h{:})), set(double(gca), 'tag', 'psychoplot'), end
+if nargout, hOut = h; else figure(double(gcf)), end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function h = MainPsychoPlot(shape, params, col, washeld, dataRange, dat, thresholds, lims, worst, levels, varargin)
@@ -105,7 +105,7 @@ if ~isempty(thresholds) & ~isempty(levels)
 	if ~isempty(worst)
 		col = GetNextItemColor(col, washeld, 'userdata', 'psychoplot_worst_bar');
 		lasterr('')
-		eval('ans = get(gca, ''color''); if isstr(ans), get(gcf, ''color''); end', '');
+		eval('ans = get(double(gca), ''color''); if isstr(ans), get(double(gcf), ''color''); end', '');
 		if isempty(lasterr)
 			worstCol = (0.45 * col + 0.55 * ans); worstLineStyle = '-';
 		else
@@ -130,6 +130,6 @@ end
 function col = GetNextItemColor(col, holdon, varargin)
 
 if isempty(col)
-	col = holdon * length(findobj(gca, varargin{:}));
-	ans = get(gca, 'colororder'); col = ans(1+rem(col, size(ans, 1)), :);
+	col = holdon * length(findobj(double(gca), varargin{:}));
+	ans = get(double(gca), 'colororder'); col = ans(1+rem(col, size(ans, 1)), :);
 end

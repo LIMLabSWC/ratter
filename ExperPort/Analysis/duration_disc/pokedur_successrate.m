@@ -47,7 +47,7 @@ function [] = pokedur_successrate(rat, task,varargin)
   idx_crosschk = [];
   
   figure;
-  set(gcf,'Menubar','none','Toolbar','none');
+  set(double(gcf),'Menubar','none','Toolbar','none');
   numbins = 10;
   binwidth = (max(trial_length) - min(trial_length)) / numbins;
   [n,x] = hist(trial_length,numbins);
@@ -89,7 +89,7 @@ title(s);
   line([min(trial_length) max(trial_length)], [0.8 0.8], 'LineStyle',':', 'Color','r');
   xlabel('Cin duration (seconds)');
   ylabel(sprintf('Avg hit rate for trials\n with above binned length'));
-  set(gca,'YLim',[0.7 1.1]);
+  set(double(gca),'YLim',[0.7 1.1]);
  
   
    s = sprintf('%s: %s (%s)\nHit rate for binned trial duration segments', make_title(rat), make_title(task), date);

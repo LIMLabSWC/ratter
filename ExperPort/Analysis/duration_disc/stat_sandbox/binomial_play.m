@@ -84,7 +84,7 @@ for nk = 1:length(n)
 %     title(sprintf('p-value of different hit rates\nNull is chance performance (n=%i)',n(nk)));
 %     t=xlabel('Rat''s hit rate');set(t,'FontSize',14,'FontWeight','bold');
 %     t=ylabel('p-value for one-tailed t-test');set(t,'FontSize',14,'FontWeight','bold');
-%     set(gca,'YLim',[0 0.2],'YTick', 0:0.05:0.2);
+%     set(double(gca),'YLim',[0 0.2],'YTick', 0:0.05:0.2);
 
 end;
 
@@ -94,7 +94,7 @@ plot(n,vals_75,'.r');
 t=xlabel('Session size (n)');set(t,'FontSize',14, 'FontWeight','bold');
 t=ylabel('Smallest hit rate with p-value < 0.05');set(t,'FontWeight','bold','FontSize',14);
 legend({'Chance','75%'});
-set(gca,'YLim',[0.5 1]);
+set(double(gca),'YLim',[0.5 1]);
 
 
 % Returns the small hit rate for which p value is < 0.05

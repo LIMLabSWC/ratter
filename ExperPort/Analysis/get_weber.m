@@ -39,7 +39,7 @@ if graphic > 0
     end;
     
     xlbls = round(xlbls * 10)/ 10;
-    set(gca,'XLim',[min(x) max(x)], 'XTick',figaxis,'XTickLabel', xlbls);
+    set(double(gca),'XLim',[min(x) max(x)], 'XTick',figaxis,'XTickLabel', xlbls);
 end;
 
 % Finally, plot threshold limits and calculate Weber ratio

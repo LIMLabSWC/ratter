@@ -9,11 +9,11 @@ datafields = {'sides','tones_list','pitch_low','pitch_high','pitch_psych','block
 get_fields(ratname, 'from',dt, 'to',dt, 'datafields',datafields);
 
 figure;
-set(gcf,'Position',[200 200 800 300]);
+set(double(gcf),'Position',[200 200 800 300]);
 subplot(2,1,1);
 plot(1:length(sides), sides, '.r'); hold on;
 plot(1:length(sides), sides, '-b');
-set(gca,'YLim',[-1 2]);
+set(double(gca),'YLim',[-1 2]);
 
 title('Trial sides');
 xlabel('trial#');

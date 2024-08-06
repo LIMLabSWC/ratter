@@ -27,13 +27,13 @@ switch action,
 
         % --- Now initialize plot
         
-        oldunits = get(gcf, 'Units'); set(gcf, 'Units', 'normalized');
+        oldunits = get(double(gcf), 'Units'); set(double(gcf), 'Units', 'normalized');
         SoloParamHandle(obj, 'h', 'value', axes('Position', [0.06, 0.75, 0.8, 0.1])); % axes
         SoloParamHandle(obj, 'p', 'value', plot(1, 1, 'k.')); hold on; % black dots
         SoloParamHandle(obj, 'o', 'value', plot(1, 1, 'ro'));          % next trial indicator
         set_saveable({h;p;o}, 0);
         xlabel('trial num');
-        set(gcf, 'Units', oldunits);
+        set(double(gcf), 'Units', oldunits);
         width = SidesSection(obj, 'get_width');
         add_callback(width, {'VpdsSection', 'update_plot'});
         

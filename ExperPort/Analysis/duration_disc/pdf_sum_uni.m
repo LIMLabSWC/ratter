@@ -70,7 +70,7 @@ function [zarray pdf_z] = pdf_sum_uni(x_min, x_max, y_min, y_max, varargin)
       hist(pdf_z);
       
   figure;
-  set(gcf,'Menubar','none','Toolbar','none');
+  set(double(gcf),'Menubar','none','Toolbar','none');
   subplot(2,1,1);
   plot(zarray, pdf_z,'-b');
   xlabel('Values of z = x+y');
@@ -78,7 +78,7 @@ function [zarray pdf_z] = pdf_sum_uni(x_min, x_max, y_min, y_max, varargin)
   title('prob. density function of two cts uniform distributions');
   
   subplot(2,1,2);
-  set(gcf,'Menubar','none','Toolbar','none');
+  set(double(gcf),'Menubar','none','Toolbar','none');
   plot(points_a(:,1), points_a(:,2),'.r'); hold on;
   plot(points_b(:,1), points_b(:,2),'.g');
   xlabel('x'); ylabel('y');

@@ -356,7 +356,7 @@ function [] = update_centerpokes_plot
         n = CenterPokeDurations(u);  [n, x] = hist(n, 0:0.001:max(n)); n = 100*cumsum(n)/length(u);
         plot(n, x); set(h2, 'Tag', 'CenterPokesHist');
         gridpts = [0 25 50 75 95]; % must always contain 0
-        set(gca, 'XTick', gridpts, 'XGrid', 'on', 'Xlim', gridpts([1 end])); 
+        set(double(gca), 'XTick', gridpts, 'XGrid', 'on', 'Xlim', gridpts([1 end])); 
         
         p = zeros(size(gridpts)); p(1) = 1; empty_flag = 0;
         for i=2:length(gridpts),
@@ -366,7 +366,7 @@ function [] = update_centerpokes_plot
             end;
         end;
         if ~empty_flag,
-            if min(diff(x(p)))>0, set(gca, 'YTick', x(p), 'Ygrid', 'on', 'YLim', x(p([1 end]))); end;
+            if min(diff(x(p)))>0, set(double(gca), 'YTick', x(p), 'Ygrid', 'on', 'YLim', x(p([1 end]))); end;
         end;
     end;
     return;

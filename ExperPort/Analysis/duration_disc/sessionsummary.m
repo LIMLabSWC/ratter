@@ -37,7 +37,7 @@ switch action
         figure;
         ht = 700; clr = [255 206 86] ./255;
         hdr_clr = [53 109 86]./255; hdr_txt = [1 1 1];
-        set(gcf,'Name','Behaviour View', 'Menubar','none', ...
+        set(double(gcf),'Name','Behaviour View', 'Menubar','none', ...
             'Position',[20   181   400   ht],'Color',clr,'Tag','sessiondriver');
 
         x =80;
@@ -170,7 +170,7 @@ switch action
 
         ratrow = rat_task_table(r{idx});
         timeout_count(r{idx},ratrow{1,2}, dstr);
-        set(gcf,'Tag','sessionview');
+        set(double(gcf),'Tag','sessionview');
 
     case 'dailydrink'
         % get ratname
@@ -186,7 +186,7 @@ switch action
 
         ratrow = rat_task_table(r{idx});
         licking_during_reward(r{idx}, dstr);
-        set(gcf,'Tag','sessionview');
+        set(double(gcf),'Tag','sessionview');
         
         
     case 'sessionbbspl'
@@ -202,7 +202,7 @@ switch action
         end;
 
         session_corr(r{idx}, dstr);
-        set(gcf,'Tag','sessionview');
+        set(double(gcf),'Tag','sessionview');
 
     case 'cbk_mode'
         h = get(findobj('Tag','dopt'),'SelectedObject');
@@ -215,11 +215,11 @@ switch action
         end;
         tic
         session_view(r{idx},dstr);
-        set(gcf,'Tag','sessionview');
+        set(double(gcf),'Tag','sessionview');
         tm = toc;
         fprintf(1,'%1.2f seconds\n', tm);
         licking_during_reward(r{idx}, dstr);
-        set(gcf,'Tag','sessionview','Position',[463 571 565 145]);
+        set(double(gcf),'Tag','sessionview','Position',[463 571 565 145]);
                 
 
     case 'showpokes'
@@ -233,7 +233,7 @@ switch action
         end;
         robj = findobj('Tag','ratname'); r = get(robj,'String'); idx = get(robj,'Value');
         pokeviewer(r{idx},dstr,'init');
-        set(gcf,'Menubar','figure');
+        set(double(gcf),'Menubar','figure');
 
     case 'change_doption'
         h = get(findobj('Tag','dopt'),'SelectedObject');
@@ -281,9 +281,9 @@ switch action
         robj = findobj('Tag','ratname'); r = get(robj,'String'); idx = get(robj,'Value');
         psychometric_curve(r{idx},dstr);
 %   compare_mypsych_psignifit(r{idx},dstr); 
-%   set(gcf,'Menubar','figure');
-%   k= get(gca,'Children'); set(k(4),'LineWidth',2);
-         set(gcf,'Tag', 'dailypsych');
+%   set(double(gcf),'Menubar','figure');
+%   k= get(double(gca),'Children'); set(k(4),'LineWidth',2);
+         set(double(gcf),'Tag', 'dailypsych');
 
     case 'surgeryeffect'
         robj = findobj('Tag','ratname'); r = get(robj,'String'); idx = get(robj,'Value');
@@ -340,7 +340,7 @@ switch action
 
         robj = findobj('Tag','ratname'); r = get(robj,'String'); idx = get(robj,'Value');
         triallen_influence(r{idx},'from', from, 'to',to);
-        set(gcf,'Tag','sessionview');
+        set(double(gcf),'Tag','sessionview');
 
     case  'psychnums'
         fromobj = findobj('Tag','fromdate'); from = get(fromobj,'String');
@@ -374,7 +374,7 @@ switch action
 
         robj = findobj('Tag','ratname'); r = get(robj,'String'); idx = get(robj,'Value');
         psych_pooled_oversessions(r{idx},'from',from,'to',to, 'daily_bin_variability', 1);
-        set(gcf,'Tag','sessionview','Menubar','figure');
+        set(double(gcf),'Tag','sessionview','Menubar','figure');
 
     case 'psychends'
         fromobj = findobj('Tag','fromdate'); from = get(fromobj,'String');

@@ -2,7 +2,7 @@ function x = GetPopupmenuItem(tag,fig)
 % return the currently selected string from a popupmenu item
 
     if nargin < 2
-        fig = gcf;
+        fig = double(gcf);
     end
    ui = findobj(fig,'style','popupmenu','tag',tag);
    if ishandle(ui)

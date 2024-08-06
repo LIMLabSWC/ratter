@@ -114,9 +114,9 @@ switch action
         plot(ones(size(un_before))*1, un_before,'.b');
         hold on;
         plot(ones(size(un_after))*2, un_after,'.r');
-        if length(un_before)+length(un_after) > 2, set(gca,'Color','y'); end;
-        set(gcf,'Menubar','none','ToolBar','none','Position',[182 536 400 100]);
-        set(gca,'XLim',[0 3], 'XTick', [1 2], 'XTickLabel',{'before','after'},'YLim',[0 1],'YTick',0.2:0.2:0.8);
+        if length(un_before)+length(un_after) > 2, set(double(gca),'Color','y'); end;
+        set(double(gcf),'Menubar','none','ToolBar','none','Position',[182 536 400 100]);
+        set(double(gca),'XLim',[0 3], 'XTick', [1 2], 'XTickLabel',{'before','after'},'YLim',[0 1],'YTick',0.2:0.2:0.8);
 
         [means_before sd_before] = get_session_hrates(hit_history_before,numtrials_before);
         [means_after sd_after] = get_session_hrates(hit_history_after,numtrials_after);
@@ -132,7 +132,7 @@ switch action
         barweb([mean(hh_bef) mean(hh_aft)], ...
             [sem_before sem_after]);
         
-        c = get(gca,'Children');
+        c = get(double(gca),'Children');
         for idx= 1:2        
             if strcmpi(get(c(idx),'Type'),'hggroup')
                 set(c(idx),'LineWidth',3);
@@ -146,9 +146,9 @@ switch action
         set(t,'FontSize',16,'FontWeight','bold');
         end;        
         ht = max(mean(hh_bef)+sem_before,mean(hh_aft)+sem_after);
-        set(gca,'XLim',[0 2],'XTIck',[],'FontSize',16,'FontWeight','bold',...
+        set(double(gca),'XLim',[0 2],'XTIck',[],'FontSize',16,'FontWeight','bold',...
             'YLim',[0 ht*1.3],'YTick',[0:0.2:1], 'YTickLabel',0:20:100);
-        set(gcf,'Position',[587   431   403   314],'Toolbar','none');
+        set(double(gcf),'Position',[587   431   403   314],'Toolbar','none');
         
     %   [sig p]= permutationtest_diff(means_before, means_after,'alphaval',0.05);
 %sig=1;p=0.04;
@@ -161,9 +161,9 @@ switch action
         end;
         ylabel('% Correct');
         set(t,'FontSize',28,'FontWeight','bold');
-        set(get(gca,'YLabel'),'FontSize',30);
-        set(get(gca,'title'), 'FontSize', 24);
-        set(gca,'FontSize',30);
+        set(get(double(gca),'YLabel'),'FontSize',30);
+        set(get(double(gca),'title'), 'FontSize', 24);
+        set(double(gca),'FontSize',30);
 
         % Now also show influence of trial length on responses
 %         if strcmpi(task(1:3),'dur')

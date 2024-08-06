@@ -51,9 +51,9 @@ ylabel('First psych trial');
 xlabel('Session #');
 title(ratname);
 
-axes__format(gca);
+axes__format(double(gca));
 
-set(gcf,'Position',[200 200 800 300]);
-set(gca,'YLim',[0 300], 'XLim', [max(1, offset-9) min(offset+10, offset+length(n2))] );
-set(gca,'XTick', 1:offset+length(n2), 'XTickLabel', [-1*offset:-1 1:length(n2)]);
-sign_fname(gcf,mfilename);
+set(double(gcf),'Position',[200 200 800 300]);
+set(double(gca),'YLim',[0 300], 'XLim', [max(1, offset-9) min(offset+10, offset+length(n2))] );
+set(double(gca),'XTick', 1:offset+length(n2), 'XTickLabel', [-1*offset:-1 1:length(n2)]);
+sign_fname(double(gcf),mfilename);

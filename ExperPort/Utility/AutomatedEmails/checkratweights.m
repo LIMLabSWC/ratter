@@ -266,7 +266,7 @@ try
             end
             
             if ~isempty(tempdata);
-                f = figure('color','w'); set(gca,'fontsize',18); hold on;
+                f = figure('color','w'); set(double(gca),'fontsize',18); hold on;
                 c = jet(length(tempdata));
                 name = cell(0);
                 for r = 1:length(tempdata);
@@ -285,7 +285,7 @@ try
                         name{r} = tempdata{r}.ratname; 
                     end
                 end
-                legend(gca,name,'Location','EastOutside');
+                legend(double(gca),name,'Location','EastOutside');
                 xlabel(['Days Prior to ',datestr(now,29)]);
                 ylabel('Rat Mass, grams'); pause(0.1);
 

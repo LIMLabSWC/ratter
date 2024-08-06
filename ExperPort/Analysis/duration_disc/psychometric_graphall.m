@@ -50,9 +50,9 @@ for i = start_ind:rows(dates)
                     'pitches', pitches, ... 
                     'binmin', binmin, 'binmax', binmax, 'binsamp', binsamp);
                 if noplot == 0
-                savefig(gcf, ['smallpsych_' dates{i}], ...
+                savefig(double(gcf), ['smallpsych_' dates{i}], ...
                    rat, 'preset', 'singlepsych');
-%                savefig(gcf, [ rat '_psych_' dates{i} '.eps']);       
+%                savefig(double(gcf), [ rat '_psych_' dates{i} '.eps']);       
 
                 end;
         end;

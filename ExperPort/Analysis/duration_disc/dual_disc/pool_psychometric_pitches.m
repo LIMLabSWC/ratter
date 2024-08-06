@@ -105,7 +105,7 @@ bias = 2^(xmid)-2^(mp);
 
 % Plotting begins here ---------------------------
 fig = figure;
-%set(gcf,'Menubar','none', 'Toolbar','none');
+%set(double(gcf),'Menubar','none', 'Toolbar','none');
 curr_x = 0.05; curr_width = 0.4;
 if nodist == 0
     axes('Position', [curr_x 0.3 curr_width 0.6]);
@@ -164,8 +164,8 @@ for k = 1:length(bins)-1
 end;
 
 axis([log2(binmin)-0.1 log2(binmax)+0.1 0 1.1])
-set(gca,'XTick', log2(bins(1:end-1)),'YTick', 0:0.2:1, 'YTickLabel',[0,20,40,60,80,100]);
-set(gca, 'XTickLabel',lbl);
+set(double(gca),'XTick', log2(bins(1:end-1)),'YTick', 0:0.2:1, 'YTickLabel',[0,20,40,60,80,100]);
+set(double(gca), 'XTickLabel',lbl);
 
 t = xlabel('Tone frequency (KHz)'); set(t,'FontSize',16,'FontWeight','bold');
 t = ylabel('freqency of reporting "High" (%)'); set(t,'FontSize',16,'FontWeight','bold');

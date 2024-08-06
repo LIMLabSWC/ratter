@@ -285,7 +285,7 @@ switch action
         'check_next_trial_ready', [0.7 0.7 0.7]);
     
   case 'reinit',
-    currfig = gcf;
+    currfig = double(gcf);
 
     % Delete all SoloParamHandles who belong to this object and whose
     % fullname starts with the name of this mfile:

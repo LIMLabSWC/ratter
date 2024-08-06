@@ -27,7 +27,7 @@ end;
 
 sub__plotbasic(lesion_yesno, task,slice_interval, atlas_beginpos);
 title(figtitle);
-set(gca,'Position',[0.07 0.1 0.85 0.8]);
+set(double(gca),'Position',[0.07 0.1 0.85 0.8]);
 
 function [] = sub__plotbasic(in,task,slice_interval, atlas_beginpos)
 
@@ -108,16 +108,16 @@ xtklbls = atlas_beginpos:-1: atlas_beginpos - (length(xtks)-1);
 
 % text(1, numrats+1.5, 'Rostral','FontSize', 18,'FontWEight','bold');
 % text(vallen+1, numrats+1.5, 'Caudal','FontSize', 18,'FontWEight','bold');
-set(gca,'YTick', 1.5:1:numrats+0.5, 'YTickLabel', ylbls,...
+set(double(gca),'YTick', 1.5:1:numrats+0.5, 'YTickLabel', ylbls,...
 'XTick', xtks, 'XTickLabel', xtklbls,'Position',[0.2 0.2 0.75 0.8]);
  %   'XTick',1.5:1:vallen+0.5, 'XTickLabel', 1:vallen);
-set(gcf,'Position', [200 200 200+((vallen+1)*30) 200+((numrats+1)*20)]);
+set(double(gcf),'Position', [200 200 200+((vallen+1)*30) 200+((numrats+1)*20)]);
 
 xlabel('mm caudal to Bregma');
-axes__format(gca);
+axes__format(double(gca));
 
-set(gca,'YLim',[1 numrats+1]);
-set(gca,'XLim',[1 vallen+2]);
+set(double(gca),'YLim',[1 numrats+1]);
+set(double(gca),'XLim',[1 vallen+2]);
 
 
 function [] = sub__clr_a_row(yval, sum2mark, totalval)

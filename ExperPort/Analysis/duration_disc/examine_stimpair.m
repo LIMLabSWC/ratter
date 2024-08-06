@@ -50,7 +50,7 @@ function [] = examine_stimpair(rat, task, index, varargin)
   
   
   figure;
-  set(gcf,'Menubar','none','Toolbar','none');
+  set(double(gcf),'Menubar','none','Toolbar','none');
   s = sprintf('%s (%s to %s)\nPerformance for idx: %1.1f', rat, from, to, ...
               index);
   
@@ -69,5 +69,5 @@ function [] = examine_stimpair(rat, task, index, varargin)
   xlabel('Session #');
   ylabel('Left or right hit rate');
   legend({'Left', '', 'Right'}, 'Location', 'NorthWest');
-  set(gca, 'Xlim', [ 0 length(dates)+1 ], 'YLim', [0 1.5]);
+  set(double(gca), 'Xlim', [ 0 length(dates)+1 ], 'YLim', [0 1.5]);
   title(s);

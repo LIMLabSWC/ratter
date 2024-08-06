@@ -37,12 +37,12 @@ wasHeld=ishold;
 if ~ishold, cla, end
 hold on
 
-old_xLim = get(gca, 'xlim');
-old_yLim = get(gca, 'ylim');
+old_xLim = get(double(gca), 'xlim');
+old_yLim = get(double(gca), 'ylim');
 [keys, values, lineOpts, err] = filteraxesprops(varargin);
 error(err)
-xLim = get(gca, 'xlim');
-yLim = get(gca, 'ylim');
+xLim = get(double(gca), 'xlim');
+yLim = get(double(gca), 'ylim');
 if ~wasHeld
 	if isempty(strmatch('xlim', keys, 'exact'))
 		lasterr('')
@@ -53,18 +53,18 @@ if ~wasHeld
 	if isempty(strmatch('ylim', keys, 'exact'))
 		yLim = yScaling * [min(params(:,3))-0.05 1.05];
 	end
-	set(gca, 'xlim', xLim, 'ylim', yLim)
+	set(double(gca), 'xlim', xLim, 'ylim', yLim)
 end
 x = [min(xLim):(diff(xLim)/500):max(xLim)];
 x = repmat(x, size(params, 1), 1);
 y = yScaling * psi(shape, params, x);
-figure(gcf)
+figure(double(gcf))
 lasterr('')
 eval('h = plot(x'', y'', lineOpts{:});', '');
 error(lasterr)
 if wasHeld
-	set(gca, 'xLim', [min([xLim(1) old_xLim(1)]) max([xLim(2) old_xLim(2)])])
-	set(gca, 'yLim', [min([yLim(1) old_yLim(1)]) max([yLim(2) old_yLim(2)])])
+	set(double(gca), 'xLim', [min([xLim(1) old_xLim(1)]) max([xLim(2) old_xLim(2)])])
+	set(double(gca), 'yLim', [min([yLim(1) old_yLim(1)]) max([yLim(2) old_yLim(2)])])
 else
 	hold off
 end

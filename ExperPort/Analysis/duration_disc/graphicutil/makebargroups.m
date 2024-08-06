@@ -95,4 +95,4 @@ end;
 
 toffset= cols(data)+2;
 gnum=rows(data);
-set(gca,'XLim',[-1 xpos+1], 'XTick', startpos+1:toffset: toffset*(gnum-1)+1);
+set(double(gca),'XLim',[-1 xpos+1], 'XTick', startpos+1:toffset: toffset*(gnum-1)+1);

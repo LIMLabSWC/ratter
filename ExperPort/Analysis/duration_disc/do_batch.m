@@ -30,7 +30,7 @@ function [output_txt] = rxn_times_by_side(rat, task, varargin)
   end;
   
   figure; 
-  set(gcf,'Position', [200 200 500 300], 'Menubar','none','Toolbar','none');
+  set(double(gcf),'Position', [200 200 500 300], 'Menubar','none','Toolbar','none');
   k = plot(1:length(rl), rl*1000, '.b'); set(k, 'Tag', 'leftie');hold on;
   k = plot(1:length(rr), rr*1000, '.r'); set(k, 'Tag', 'rightie');
   xlabel('Session #');
@@ -40,7 +40,7 @@ function [output_txt] = rxn_times_by_side(rat, task, varargin)
   title(s);
     
   datacursormode on;
-  dcm_obj = datacursormode(gcf);
+  dcm_obj = datacursormode(double(gcf));
 set(dcm_obj, 'SnapToDataVertex', 'on', 'DisplayStyle','datatip');
 set(dcm_obj, 'Updatefcn', {@do_batch, 'action', 'update_me'});
 

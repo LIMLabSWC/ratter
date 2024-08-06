@@ -33,6 +33,6 @@ twixt_sum = sum(tm_twixt);
 fprintf(1,'Total: %2.1f sec, %2.1f min\n', tlen_sum, tlen_sum/60);
 fprintf(1,'Time between trials: %2.1f sec, %2.1f min\n', twixt_sum, twixt_sum/60);
 
-axes__format(gca);
-set(gcf,'Position',[100 200 500 200]);
+axes__format(double(gca));
+set(double(gcf),'Position',[100 200 500 200]);
 

@@ -51,7 +51,7 @@ z=(y-mn)/se;
 y=z;
 imagesc(y);
 %se=stderr(dV);
-%h=gcf;
+%h=double(gcf);
 %shadeplot(xax, y-se,y+se,{ [.8 .8 .8 ] h 1})
 %hold on
 %surf(xax,1:numel(ref),y);

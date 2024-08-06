@@ -33,9 +33,9 @@ for r = 1:length(ratset)
 end;
 
 figure;
-subplot(3,1,1); plot(itilen,'.k'); ylabel('iti len');title(mytitle); sub__format(gca, ratset);
-subplot(3,1,2); plot(itireinit,'.k'); ylabel('itireinit');title(mytitle);sub__format(gca, ratset);
-subplot(3,1,3); plot(extraiti,'.k'); ylabel('extraiti');title(mytitle);sub__format(gca, ratset);
+subplot(3,1,1); plot(itilen,'.k'); ylabel('iti len');title(mytitle); sub__format(double(gca), ratset);
+subplot(3,1,2); plot(itireinit,'.k'); ylabel('itireinit');title(mytitle);sub__format(double(gca), ratset);
+subplot(3,1,3); plot(extraiti,'.k'); ylabel('extraiti');title(mytitle);sub__format(double(gca), ratset);
 
 
 % gets name of latest settings file for rat
@@ -69,6 +69,6 @@ fullname = [rat_dir fullname];
 
 function [] = sub__format(ax, ratlist)
 c = get(ax,'Children'); x = get(c(1),'XData');
-set(gca,'XTick', 1:length(x), 'XTickLabel', ratlist, 'XLim',[0 length(x)+1]); 
+set(double(gca),'XTick', 1:length(x), 'XTickLabel', ratlist, 'XLim',[0 length(x)+1]); 
 xlabel('ratname'); 
-axes__format(gca);
+axes__format(double(gca));

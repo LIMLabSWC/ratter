@@ -26,7 +26,7 @@ if graphic == 0, return;end;
 figure;
 subplot(1,2,1);
 plot(xx,yy,'.b'); hold on;
-set(gca,'YLim',[0 1]);
+set(double(gca),'YLim',[0 1]);
 plot(xx(tmp:tmp+1), yy(tmp:tmp+1),'.r');
 text(xx(5), 0.9, sprintf('%f',s),'FontSize',14);
 

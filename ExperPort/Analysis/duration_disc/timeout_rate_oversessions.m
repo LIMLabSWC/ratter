@@ -168,7 +168,7 @@ if graphic == 0, return; end;
 % Plot "Average # timeouts / trial"
 
 figure;
-set(gcf,'Position',[56   574   600   198]);
+set(double(gcf),'Position',[56   574   600   198]);
 msize = 24;
 
 if split_by_side > 0
@@ -200,30 +200,30 @@ end;
 line([0 length(dates)+1], [1 1], 'LineStyle',':', 'Color', [1 0.5 0],'LineWidth',2);
 line([0 length(dates)+1], [2 2], 'LineStyle',':', 'Color', [1 0 0],'LineWidth',2);
 
-set(gca,'XTickLabel', sub__trimdates(dates),'XTick', 1:1:length(dates), 'XLim', [0 length(dates)+1]);
+set(double(gca),'XTickLabel', sub__trimdates(dates),'XTick', 1:1:length(dates), 'XLim', [0 length(dates)+1]);
 ymax = max(1, max(max(to_array__left), max(to_array__right))*1.2);
-set(gca,'YLim',[0 ymax]);
+set(double(gca),'YLim',[0 ymax]);
 
 t=xlabel('Day #');
 t=ylabel('Avg # timeouts per trial');
 
-axes__format(gca);
-set(gca,'FontSize', 14);
-set(gca,'Position',[0.1 0.17 0.8 0.7]);
-set(gcf,'Position',[ 56         417        1118         355]);   
+axes__format(double(gca));
+set(double(gca),'FontSize', 14);
+set(double(gca),'Position',[0.1 0.17 0.8 0.7]);
+set(double(gcf),'Position',[ 56         417        1118         355]);   
 
-sign_fname(gcf,mfilename);
+sign_fname(double(gcf),mfilename);
 
 
 %---------------------------------------------------------------------
 % Plot "Pct NO TO"
 
 figure;
-set(gcf,'Position',[200 200 600 200],'Toolbar','none','Menubar','none');
+set(double(gcf),'Position',[200 200 600 200],'Toolbar','none','Menubar','none');
 plot(pct_noto*100,'.b','MarkerSize',msize,'COlor', 'k');
 
-set(gca,'XTickLabel', sub__trimdates(dates),'XTick', 1:1:length(dates), 'XLim', [0 length(dates)+1]);
-set(gca,'YLim',[40 100],'YTick',50:25:100);
+set(double(gca),'XTickLabel', sub__trimdates(dates),'XTick', 1:1:length(dates), 'XLim', [0 length(dates)+1]);
+set(double(gca),'YLim',[40 100],'YTick',50:25:100);
 
 line([0 length(dates)+1], [50 50], 'LineStyle',':', 'Color', [1 0 0],'LineWidth',2);
 line([0 length(dates)+1], [75 75], 'LineStyle',':', 'Color', [1 0 0],'LineWidth',2);
@@ -231,12 +231,12 @@ line([0 length(dates)+1], [75 75], 'LineStyle',':', 'Color', [1 0 0],'LineWidth'
 
 t=xlabel('Day #');
 t=ylabel('% trials with no timeouts'); 
-axes__format(gca);
-set(get(gca,'YLabel'),'FontSize', 14);set(get(gca,'XLabel'),'FontSize', 14);
-set(gca,'FontSize', 14);
-set(gca,'Position',[0.1 0.17 0.8 0.7]);
+axes__format(double(gca));
+set(get(double(gca),'YLabel'),'FontSize', 14);set(get(double(gca),'XLabel'),'FontSize', 14);
+set(double(gca),'FontSize', 14);
+set(double(gca),'Position',[0.1 0.17 0.8 0.7]);
 t=title(sprintf('%s: % trials with no timeout\n%s to %s', ratname, dates{1}, dates{end}));
-sign_fname(gcf,mfilename);
+sign_fname(double(gcf),mfilename);
 
 
 

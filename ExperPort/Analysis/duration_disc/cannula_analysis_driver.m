@@ -84,10 +84,10 @@ switch action
         text(1.5, 0.97, 'Duration', 'Color', [1 0.5 0],'FontSize',14,'FontWeight','bold');
         text(1.5, 0.9, 'Frequency', 'Color', [0 0 0.5],'FontSize',14,'FontWeight','bold');
 
-        set(gca,'YLim',[0.65 1],'XLim',[0.8 2.2],'XTickLabel',{'Saline','Muscimol'}, 'XTick',1:2);
+        set(double(gca),'YLim',[0.65 1],'XLim',[0.8 2.2],'XTickLabel',{'Saline','Muscimol'}, 'XTick',1:2);
         ylabel('Psych hit rate');
-        set(gcf,'Position',[ 560   413   350   471]);
-        axes__format(gca);
+        set(double(gcf),'Position',[ 560   413   350   471]);
+        axes__format(double(gca));
 
         % now plot group average
         msize =20;
@@ -155,10 +155,10 @@ switch action
         text(1.5, 0.97, 'Duration', 'Color', [1 0.5 0],'FontSize',14,'FontWeight','bold');
         text(1.5, 0.97, 'Frequency', 'Color', [0 0 0.5],'FontSize',14,'FontWeight','bold');
 
-        set(gca,'YLim',[0.65 1],'XLim',[0.8 2.2],'XTickLabel',{'no infusion','Muscimol'}, 'XTick',1:2);
+        set(double(gca),'YLim',[0.65 1],'XLim',[0.8 2.2],'XTickLabel',{'no infusion','Muscimol'}, 'XTick',1:2);
         ylabel('Psych hit rate');
-        set(gcf,'Position',[ 560   413   350   471]);
-        axes__format(gca);
+        set(double(gcf),'Position',[ 560   413   350   471]);
+        axes__format(double(gca));
 
         % now plot group average
         msize =20;
@@ -277,9 +277,9 @@ switch action
         %          'Color', [1 1 1]*0.5);
 
 
-%         set(gca,'XLim',[0.5 2.5], 'XTick', [1 2], 'XTickLabel', {'dur','freq'}); 
-%        set(gca,'YLim', [-0.2 0.2],'Ytick', -0.1:0.05:0.2, 'YTickLabel',-10:5:20);
-        axes__format(gca);
+%         set(double(gca),'XLim',[0.5 2.5], 'XTick', [1 2], 'XTickLabel', {'dur','freq'}); 
+%        set(double(gca),'YLim', [-0.2 0.2],'Ytick', -0.1:0.05:0.2, 'YTickLabel',-10:5:20);
+        axes__format(double(gca));
         ylabel(ylbl);
         uicontrol('Tag', 'figname', 'Style','text', 'String', ['Cannula_muscfromsal_' mymetric], 'Visible','off');
 
@@ -340,10 +340,10 @@ switch action
         text(2.5, 0.97, 'Duration', 'Color', [1 0.5 0],'FontSize',14,'FontWeight','bold');
         text(2.4, 0.99, 'Frequency', 'Color', [0 0 0.5],'FontSize',14,'FontWeight','bold');
 
-        set(gca,'YLim',[0.65 1],'XLim',[0.8 3.2],'XTickLabel',{'no infusion','Saline','Muscimol'}, 'XTick',1:3);
+        set(double(gca),'YLim',[0.65 1],'XLim',[0.8 3.2],'XTickLabel',{'no infusion','Saline','Muscimol'}, 'XTick',1:3);
         ylabel({'% correct', '(psychometric trials)'});
-        set(gcf,'Position',[ 560   413   350   471]);
-        axes__format(gca);
+        set(double(gcf),'Position',[ 560   413   350   471]);
+        axes__format(double(gca));
 
         % now plot group average
         msize =28;
@@ -364,7 +364,7 @@ switch action
             '.k','Color', [0 0 0.5],'MarkerSize', msize, 'LineWidth',2);
         plot(1:3, [mean(n) mean(s) mean(m)], '-k','Color', [0 0 0.5],'MarkerSize', msize, 'LineWidth',lwdth);
 
-        set(gca,'YTick',0.65:0.05:1,'YTickLabel', 65:5:100);
+        set(double(gca),'YTick',0.65:0.05:1,'YTickLabel', 65:5:100);
         uicontrol('Tag', 'figname', 'Style','text', 'String', 'cannula_all_thress', 'Visible','off');
 
 
@@ -458,14 +458,14 @@ switch action
             xlabel('dose');
             ylabel(currm);
 
-            set(gcf,'Position',[rand(1,1)*0.75*sw   rand(1,1)*0.75*sh   616   225]);
-            axes__format(gca);
-            set(gca,'XLim',[0 0.1]);
+            set(double(gcf),'Position',[rand(1,1)*0.75*sw   rand(1,1)*0.75*sh   616   225]);
+            axes__format(double(gca));
+            set(double(gca),'XLim',[0 0.1]);
             str = eval(['metrics.' currm ';']);
             if ~isempty(str)
                 yl1 = eval(['metrics.' currm '.miny;']);
                 yl2 = eval(['metrics.' currm '.maxy;']);
-                set(gca,'YLim', [yl1 yl2]);
+                set(double(gca),'YLim', [yl1 yl2]);
             end;
             title(currm);
         end;

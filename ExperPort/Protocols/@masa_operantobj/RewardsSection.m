@@ -19,7 +19,7 @@ GetSoloFunctionArgs;
 
 switch action,
     case 'init',
-        fig=gcf;
+        fig=double(gcf);
         MenuParam(obj, 'RewardPlots', {'view', 'hidden'}, 1, x,y); next_row(y);
         set_callback(RewardPlots, {'RewardsSection', 'view'});
         oldx=x; oldy=y; x=1; y=1;

@@ -29,7 +29,7 @@ switch action,
 % $$$        end;
      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-        fig = gcf; % This is the protocol's main window, to which we add a menu:
+        fig = double(gcf); % This is the protocol's main window, to which we add a menu:
         MenuParam(obj, 'CurrentTrialPokes', {'hidden', 'view'}, 2, x, y); next_row(y);
 
         next_row(y,0.5);

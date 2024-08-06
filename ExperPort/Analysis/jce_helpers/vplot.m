@@ -51,14 +51,14 @@ end
 % in plot.
 xlim=seeOrigin([min(vecs(1,:)) (max(vecs(1,:)))]);
 ylim=seeOrigin([min(vecs(2,:)) (max(vecs(2,:)))]);
-x2=get(gca,'XLim');
-y2=get(gca,'YLim');
+x2=get(double(gca),'XLim');
+y2=get(double(gca),'YLim');
 xlim=[min([xlim x2]) max([xlim x2])];
 ylim=[min([ylim y2]) max([ylim y2])];
-set(gca, 'XLim', xlim);
-set(gca, 'YLim', ylim);
+set(double(gca), 'XLim', xlim);
+set(double(gca), 'YLim', ylim);
 axis equal
-xhairs(gca)
+xhairs(double(gca))
 
 
 function y=row(x)

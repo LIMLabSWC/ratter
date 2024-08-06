@@ -80,7 +80,7 @@ longclr=[0 0 0.5];
 
 if showplot > 0
     figure;
-    set(gcf,'Menubar','none','Toolbar','none');
+    set(double(gcf),'Menubar','none','Toolbar','none');
     plot(threshrange, pr_short_correct,'-b', 'LineWidth', 2,'Color', shortclr); hold on;
     plot(threshrange, pr_long_correct, '-g','LineWidth',2,'Color',longclr);
     plot(threshrange, pr_short_correct,'.b', 'MarkerSize', 20,'Color', shortclr);
@@ -97,10 +97,10 @@ if showplot > 0
     ylabel('%(correct)');
    % legend({'Short','Long'});
 
-    set(gca,'YLim', [0 1.2], 'XLim', [min(short_trials) max(long_trials)], 'XTick',[min(short_trials):0.2:max(long_trials)]);
-    set(gca,'YTick', 0:0.25:1, 'YTickLabel',0:25:100);
-    axes__format(gca);
-    set(gcf,'Position',[ 245   426   768   254]);
+    set(double(gca),'YLim', [0 1.2], 'XLim', [min(short_trials) max(long_trials)], 'XTick',[min(short_trials):0.2:max(long_trials)]);
+    set(double(gca),'YTick', 0:0.25:1, 'YTickLabel',0:25:100);
+    axes__format(double(gca));
+    set(double(gcf),'Position',[ 245   426   768   254]);
     uicontrol('Tag', 'figname', 'Style','text', 'String', 'choiceprobability', 'Visible','off');
 
     % Figure 2 - Graphically shows overlap and duration which maximises sum
@@ -109,7 +109,7 @@ if showplot > 0
     line([min(short_trials) max(short_trials)],[1 1] ,'Color', shortclr,'LineWidth',4);
     hold on;
     line([min(long_trials) max(long_trials)], [2 2],'Color', longclr,'LineWidth',4);
-    set(gca,'XLim', [min(short_trials)-0.2 max(long_trials)+0.2], ...
+    set(double(gca),'XLim', [min(short_trials)-0.2 max(long_trials)+0.2], ...
         'YTickLabel',{},'YTick',[], ...
         'XTick', min(short_trials):0.2:max(long_trials));
     ff=0.01;
@@ -118,9 +118,9 @@ if showplot > 0
              2.8-[0 0.08 0],'r', 'EdgeColor','none');
     end;
     xlabel('Trial length (s)');
-    set(gca,'YLim',[0 3]);
-    axes__format(gca);
-    set(gcf,'Position',[54    82   766   266]);
+    set(double(gca),'YLim',[0 3]);
+    axes__format(double(gca));
+    set(double(gcf),'Position',[54    82   766   266]);
     title('Overlap of short & long trial durations');
       uicontrol('Tag', 'figname', 'Style','text', 'String', 'triallength_overlap', 'Visible','off');
     
@@ -131,7 +131,7 @@ end;
 % duration to make decisions
 if showdiff > 1
     figure;
-    %  set(gcf,'Menubar','none','Toolbar','none');
+    %  set(double(gcf),'Menubar','none','Toolbar','none');
     % first plot what happens if rat is timing sound
 
     line([min(threshrange)-0.5 max(threshrange)+0.5],[1.2 1.2], 'Color','k','LineWidth',2);
@@ -147,14 +147,14 @@ if showdiff > 1
     plot(long_thresh, zeros(size(long_thresh)), '-g', 'LineWidth', 2,'MarkerSize',10);
     t = xlabel('Trial length (s)'); set(t, 'FontSize',fsize, 'FontWeight', 'bold');
     t = ylabel('p(reporting "Short")');set(t, 'FontSize',fsize, 'FontWeight', 'bold');
-    set(gca,'XLim',[min(threshrange)-0.2 max(threshrange) + 0.2], 'YLim', [-0.1 1.8], ...
+    set(double(gca),'XLim',[min(threshrange)-0.2 max(threshrange) + 0.2], 'YLim', [-0.1 1.8], ...
         'YTick',0:0.5:1, 'YTickLabel',0:0.5:1);
-    axes__format(gca);
+    axes__format(double(gca));
     title('If timing SOUND duration');
 
 
     figure;    
-    % set(gcf,'Menubar','none','Toolbar','none');
+    % set(double(gcf),'Menubar','none','Toolbar','none');
     % first plot what happens if rat is timing poke duration
     line([min(threshrange)-0.5 max(threshrange)+0.5],[1.2 1.2], 'Color','k','LineWidth',2);
     line([min(short_trials) max(short_trials)],[1.4 1.4], 'Color','b','LineWidth',4);
@@ -176,11 +176,11 @@ if showdiff > 1
 
     line([max(short_trials)*f max(short_trials)*f], [0 1.6], 'LineWidth',2,'LineStyle',':','Color','r');
 
-    set(gca,'XLim',[min(threshrange)-0.2 max(threshrange) + 0.2], 'YLim', [-0.1 1.8], ...
+    set(double(gca),'XLim',[min(threshrange)-0.2 max(threshrange) + 0.2], 'YLim', [-0.1 1.8], ...
         'YTick',0:0.5:1, 'YTickLabel',0:0.5:1);
 
     t = xlabel('Trial length (s)'); set(t, 'FontSize',fsize, 'FontWeight', 'bold');
-    axes__format(gca);
+    axes__format(double(gca));
     title('If timing TRIAL duration');
 end;
 

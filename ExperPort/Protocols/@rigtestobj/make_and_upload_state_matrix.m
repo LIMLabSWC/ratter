@@ -9,7 +9,7 @@ switch action
         SoloParamHandle(obj, 'RampDur', 'value', 0.05);
         SoloParamHandle(obj, 'SPL', 'value', 65);
         SoloParamHandle(obj,'sound_len', 'value', 0);
-        fig = gcf; rpbox('InitRP3StereoSound'); figure(fig);
+        fig = double(gcf); rpbox('InitRP3StereoSound'); figure(fig);
 
         make_and_upload_state_matrix(obj, 'stop_matrix');
         return;

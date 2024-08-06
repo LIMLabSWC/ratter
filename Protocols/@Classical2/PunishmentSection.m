@@ -54,7 +54,7 @@ switch action
   case 'init',
     % Save the figure and the position in the figure where we are
     % going to start adding GUI elements:
-    SoloParamHandle(obj, 'my_gui_info', 'value', [x y gcf], 'saveable', 0);
+    SoloParamHandle(obj, 'my_gui_info', 'value', [x y double(gcf)], 'saveable', 0);
 
     NumeditParam(obj, 'DrinkTime', 20, x, y, 'TooltipString', sprintf('\nTime over which drinking is ok')); next_row(y);
     ToggleParam(obj, 'WarningSoundPanel', 1, x, y, 'OnString', 'warn show', 'OffString', 'warn hide', 'position', [x y 80 20]); 
@@ -62,7 +62,7 @@ switch action
     NumeditParam(obj, 'DangerDur',15, x, y, 'labelfraction', 0.6, 'TooltipString', sprintf('\nDuration of post-drink period where poking is punished'), 'position', [x+140 y 60 20]); next_row(y);
     set_callback(WarningSoundPanel, {mfilename, 'WarningSoundPanel'});
       % start subpanel
-      oldx = x; oldy = y; oldfigure = gcf;
+      oldx = x; oldy = y; oldfigure = double(gcf);
       SoloParamHandle(obj, 'WarningSoundPanelFigure', 'saveable', 0, 'value', figure('Position', [120 120 430 156]));
       sfig = value(WarningSoundPanelFigure);
       set(sfig, 'MenuBar', 'none', 'NumberTitle', 'off', ...
@@ -110,7 +110,7 @@ switch action
     %          REINIT
     %---------------------------------------------------------------
   case 'reinit',
-    currfig = gcf;
+    currfig = double(gcf);
 
     % Get the original GUI position and figure:
     x = my_gui_info(1); y = my_gui_info(2); figure(my_gui_info(3));

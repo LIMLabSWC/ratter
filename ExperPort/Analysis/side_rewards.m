@@ -78,7 +78,7 @@ if windows > 0
         xlabel('Trial #');
         title(sprintf('%s: %s (%s)\nSide rewards: n=%i', ...
                 make_title(rat), make_title(task), date, length(hh)));
-       % set(gca, 'Position', [200 153 314 247]);
+       % set(double(gca), 'Position', [200 153 314 247]);
        axis([0 length(hh)+(windows/2) 0 110]);
 
     end;

@@ -202,7 +202,7 @@ switch action,
 
 
 
-    figpos = get(gcf, 'Position');
+    figpos = get(double(gcf), 'Position');
     HeaderParam(obj, 'prot_title', 'Multipokes3', ...
             x, y, 'position', [10 figpos(4)-25, 600 20]);
     

@@ -128,7 +128,7 @@ switch action
         
         
         % Save the figure and the position in the figure where we are going to start adding GUI elements:
-        SoloParamHandle(obj, 'my_gui_info', 'value', [x y gcf]);
+        SoloParamHandle(obj, 'my_gui_info', 'value', [x y double(gcf)]);
         
         ToggleParam(obj, 'WaterShow', 0, x, y, 'OnString', 'WaterExtras Showing', ...
             'OffString', 'WaterExtras Hidden', 'TooltipString', 'Show/Hide Water Valves panel');
@@ -164,13 +164,13 @@ switch action
         
         
         
-        SoloParamHandle(obj, 'my_xyfig', 'value', [x y gcf]);
+        SoloParamHandle(obj, 'my_xyfig', 'value', [x y double(gcf)]);
         
         
         SoloParamHandle(obj, 'myfig', 'value', figure('Position', [ 226   671   233    65], ...
             'closerequestfcn', [mfilename '(' class(obj) ', ''hide'');'], 'MenuBar', 'none', ...
             'Name', mfilename), 'saveable', 0);
-        set(gcf, 'Visible', 'off');
+        set(double(gcf), 'Visible', 'off');
         
         
         nx=10; ny=10;
@@ -344,7 +344,7 @@ switch action
         
     case 'reinit',
         %% reinit
-        currfig = gcf;
+        currfig = double(gcf);
         
         % Get the original GUI position and figure:
         x = my_gui_info(1); y = my_gui_info(2); figure(my_gui_info(3));

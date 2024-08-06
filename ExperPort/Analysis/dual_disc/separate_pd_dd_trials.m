@@ -66,9 +66,9 @@ end;
     if plot_single
         if (pd_y == 1.02) && (dd_y == 1.03)
             axis([0 maxie lower_bound upper_bound]);
-            set(gca, 'YTick', [1 1.01 1.02 1.03],'YLim', [0.99 1.04], 'YTickLabel', {'Miss', 'Hit', 'PD Trial', 'DD Trial'});
+            set(double(gca), 'YTick', [1 1.01 1.02 1.03],'YLim', [0.99 1.04], 'YTickLabel', {'Miss', 'Hit', 'PD Trial', 'DD Trial'});
         else
-            set(gca, 'YTick', [pd_y, dd_y], 'YTickLabel', {'PD Trial', 'DD Trial'});
+            set(double(gca), 'YTick', [pd_y, dd_y], 'YTickLabel', {'PD Trial', 'DD Trial'});
         end;
     else
         axis([0 maxie 0.6 1.2]);

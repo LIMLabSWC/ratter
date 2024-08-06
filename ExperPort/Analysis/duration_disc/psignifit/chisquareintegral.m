@@ -22,7 +22,7 @@ if isstr(val)
 		y = (df/2 - 1) * log(val/2) - val/2 - log(2) - gammaln(df/2);
 		y(isnan(y)) = -inf;
 		h = line(val, exp(y), 'linewidth', 2);
-		figure(gcf)
+		figure(double(gcf))
 		if nargout, cp = h; end
 		return
 	else

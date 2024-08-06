@@ -98,7 +98,7 @@ switch action
         % main console
         figure; ht = 400; wd = 600;
         clr = [1 1 1] * 0.3;  %[247 117 148] ./ 255;
-        set(gcf,'Tag', 'lesionviewer_main', 'Color', clr, ...
+        set(double(gcf),'Tag', 'lesionviewer_main', 'Color', clr, ...
             'Position', [10 30 wd ht],'Menubar','none','Toolbar','none');
 
         % make controls for main figure
@@ -377,15 +377,15 @@ switch action
         % val 1 -3d plot
         % ---------------
         if val == 1
-            figure; set(gcf,'Position',[ 197 561  1402 380],'Toolbar','none','Tag','bar3d_pctcvg');
+            figure; set(double(gcf),'Position',[ 197 561  1402 380],'Toolbar','none','Tag','bar3d_pctcvg');
             subplot(1,2,1);
             bar3(xl,'detached');
-            set(gca,'XTickLabel', xlbls, 'YTickLabel',ylbls);xlabel('Rat name');ylabel('ROI');zlabel('% coverage');
+            set(double(gca),'XTickLabel', xlbls, 'YTickLabel',ylbls);xlabel('Rat name');ylabel('ROI');zlabel('% coverage');
             title('LEFT');
 
             subplot(1,2,2);
             bar3(xr,'detached');
-            set(gca,'XTickLabel', xlbls, 'YTickLabel',ylbls);xlabel('Rat name');ylabel('ROI');zlabel('% coverage');
+            set(double(gca),'XTickLabel', xlbls, 'YTickLabel',ylbls);xlabel('Rat name');ylabel('ROI');zlabel('% coverage');
             title('RIGHT');
 
             % --------------------------------------
@@ -401,7 +401,7 @@ switch action
             cmap = colormap;
 
             for q = 1:length(roiset)
-                figure; set(gcf,'Position',[posx posy wd ht],'Toolbar','none','Menubar','figure');
+                figure; set(double(gcf),'Position',[posx posy wd ht],'Toolbar','none','Menubar','figure');
                 subplot(2,1,1);
 
                 for l = 25:25:100, line([0 length(rnames)+1], [l l],'LineStyle',':','COlor',[1 1 1]*0.3); hold on; end;
@@ -411,17 +411,17 @@ switch action
                 end;
 
                 xlabel('Rat name'); ylabel('LEFT');
-                set(gca,'XTick', 1:cols(xl), 'XTickLabel', abbrev_rnames,'XLim',[0 length(rnames)+1],...
+                set(double(gca),'XTick', 1:cols(xl), 'XTickLabel', abbrev_rnames,'XLim',[0 length(rnames)+1],...
                     'YLim',[0 100],'YTick', 0:25:100);
-                title(sprintf('%s % Coverage', qnames{q})); axes__format(gca);
+                title(sprintf('%s % Coverage', qnames{q})); axes__format(double(gca));
 
                 subplot(2,1,2);
                 for l = 25:25:100, line([0 length(rnames)+1], [l l],'LineStyle',':','COlor',[1 1 1]*0.3); hold on; end;
                 plot(1:cols(xr), xr(q,:), '.r', 'MarkerSize', msize);
                 xlabel('Rat name'); ylabel('RIGHT');
-                set(gca, 'XLim',[0 cols(xr)+1], 'XTick', 1:cols(xr), 'XTickLabel', abbrev_rnames,...
+                set(double(gca), 'XLim',[0 cols(xr)+1], 'XTick', 1:cols(xr), 'XTickLabel', abbrev_rnames,...
                     'YLim',[0 100],'YTick', 0:25:100);
-                title(sprintf('%s % Coverage', qnames{q})); axes__format(gca);
+                title(sprintf('%s % Coverage', qnames{q})); axes__format(double(gca));
 
                 posx = posx+ wd+ 20;
                 if posx > 1000, posx = 200; posy = posy+ht+50; end;
@@ -438,7 +438,7 @@ switch action
             for h = 1:2
 
                 % left hem first
-                figure; set(gcf,'Position',[300 hempos(h) 850 240],'Toolbar','none','Menubar','figure','Tag', 'bar_pctcvg');
+                figure; set(double(gcf),'Position',[300 hempos(h) 850 240],'Toolbar','none','Menubar','figure','Tag', 'bar_pctcvg');
                 xmax = (3*length(qnames)-1)+1;
                 line([0 xmax], [50 50], 'LineStyle', ':','Color',[1 1 1]*0.3,'LineWidth',4);
 
@@ -462,10 +462,10 @@ switch action
                 ylabel('% coverage');
                 text(xmax-3, 95, 'Duration','Color', durclr, 'FontSize',14, 'FontAngle', 'italic','FontWeight','bold');
                 text(xmax-3, 85, 'Frequency','Color', freqclr, 'FontSize',14, 'FontAngle', 'italic','FontWeight','bold');
-                set(gca,'XTick', 1:3:xmax, 'XTickLabel', qnames,'XLim',[0 xmax],'YLim',[0 100],'YTick',0:20:100);
+                set(double(gca),'XTick', 1:3:xmax, 'XTickLabel', qnames,'XLim',[0 xmax],'YLim',[0 100],'YTick',0:20:100);
                 title(hemname{h},'Color','k');
 
-                axes__format(gca);
+                axes__format(double(gca));
                 uicontrol('Tag', 'figname', 'Style','text', 'String', sprintf('roi_pctcvg_%s',hemname{h}), 'Visible','off');
             end;
             % ----------------------------
@@ -481,7 +481,7 @@ switch action
                 curr = eval([hset{h} 'grped;']);
 
                 % left hem first
-                figure; set(gcf,'Position',[100 hempos(h) 200*length(qnames) 240],'Toolbar','none','Menubar','figure','Tag', 'bar_pctcvg');
+                figure; set(double(gcf),'Position',[100 hempos(h) 200*length(qnames) 240],'Toolbar','none','Menubar','figure','Tag', 'bar_pctcvg');
                 axes('Position', [0.05 0.1 0.93 0.78]);
                 xmax = ((3*length(qnames)*numgrps)-1)+1;
                 line([0 xmax], [50 50], 'LineStyle', ':','Color',[1 1 1]*0.3,'LineWidth',4);hold on;
@@ -526,9 +526,9 @@ switch action
                     currx = currx+1;
                 end;
                 title(hemname{h});
-                set(gca,'XTick',xtk, 'XTickLabel', repmat(1:4,1, length(qnames)), 'YTick', 0:25:100);
+                set(double(gca),'XTick',xtk, 'XTickLabel', repmat(1:4,1, length(qnames)), 'YTick', 0:25:100);
                 ylabel('% coverage');
-                axes__format(gca);
+                axes__format(double(gca));
                 uicontrol('Tag', 'figname', 'Style','text', 'String', sprintf('mmwise_roi_pctcvg_%s',hemname{h}), 'Visible','off');
             end;
         end;
@@ -609,14 +609,14 @@ switch action
         xlbls{end+1} = sprintf('%s(%i%%)', 'The rest', round(dur__pieceopie(end)*100));
 
         figure;
-        set(gca,'Position',[0.01 0.01 0.95 0.95]);
+        set(double(gca),'Position',[0.01 0.01 0.95 0.95]);
         p= pie(dur__pieceopie ,xlbls);
-        c = get(gca,'Children');
+        c = get(double(gca),'Children');
         for k =1:length(c), if strcmpi(get(c(k),'Type'), 'text'), set(c(k),'FontWeight','bold','FontSize',18), end; end;
 
         title('Duration');
-        axes__format(gca);
-        set(gcf,'Position',[440 24 800 700]);
+        axes__format(double(gca));
+        set(double(gcf),'Position',[440 24 800 700]);
 
         2;
         % frequency pie
@@ -629,10 +629,10 @@ switch action
         xlbls{end+1} = sprintf('%s(%i%%)', 'The rest', round(freq__pieceopie(end)*100));
         pie(freq__pieceopie, xlbls);
         title('Frequency');
-        axes__format(gca);
-        c = get(gca,'Children');
+        axes__format(double(gca));
+        c = get(double(gca),'Children');
         for k =1:length(c), if strcmpi(get(c(k),'Type'), 'text'), set(c(k),'FontWeight','bold','FontSize',18), end; end;
-        set(gcf,'Position',[440 24 800 700]);
+        set(double(gcf),'Position',[440 24 800 700]);
 
 
         2;
@@ -662,7 +662,7 @@ switch action
         % set up figure, axes, tickmarks etc.,
 
         figure;
-        set(gcf,'Tag', 'sumcvg');
+        set(double(gcf),'Tag', 'sumcvg');
         ax_right=axes('Units','normalized', 'Position', [0.07 0.1 0.89 0.37],'Tag', 'axR');
         if summing_show_average > 0
             sub__maketicks(xtks,maxslice);
@@ -708,7 +708,7 @@ switch action
                     err_below = (qt(2,:) - qt(1,:))*100; err_above= (qt(3,:) - qt(2,:))*100;
                 end;
 
-                set(gcf,'CurrentAxes',ax_left);
+                set(double(gcf),'CurrentAxes',ax_left);
                 nanspots = sum(isnan(eval([str{t} 'avg.L']))); nannie = find(nanspots >= ceil(rows(eval([str{t} 'avg.L']))/2));
 
                 %p=errorbar(1:length(curr), curr, err_below, err_above, ...
@@ -751,7 +751,7 @@ switch action
 
                 %                 curr = ( nanmean(eval([str{t} 'avg.R'])) ./ totalroisum.R ) * 100;
                 %                 sd = ( nanstd(eval([str{t} 'avg.R'])) ./ totalroisum.R ) * 100;
-                set(gcf,'CurrentAxes',ax_right);
+                set(double(gcf),'CurrentAxes',ax_right);
                 nanspots = sum(isnan(eval([str{t} 'avg.R']))); nannie = find(nanspots >= ceil(rows(eval([str{t} 'avg.R']))/2));
 
                 %                p=errorbar(1:length(curr), curr, err_below, err_above, ...
@@ -773,7 +773,7 @@ switch action
                 nannie_R = union(nannie_R, nannie);
             end;
             uicontrol('Style','text','String', 'X: data from < 3 rats in either/both groups', 'Position', [15 5 250 10],...
-                'FontWeight','bold','FontSize', 12,'BackgroundColor',get(gcf,'Color'));
+                'FontWeight','bold','FontSize', 12,'BackgroundColor',get(double(gcf),'Color'));
 
             % if showing individual trends
         else
@@ -799,7 +799,7 @@ switch action
                 uicontrol('Style','checkbox','String', [ratname '_R'],  'FontWeight','bold', 'ForegroundColor', 'w', 'Position',[925 chkpos-200 100 30],'BackgroundColor', clr, 'Callback',{'lesion_group_cvgdistr','action','toggle_indie_trend'},'Value',1);
                 chkpos = chkpos-30;
 
-                set(gcf,'CurrentAxes',ax_left);
+                set(double(gcf),'CurrentAxes',ax_left);
                 if strcmpi(showopt(1:3),'pct')
                     currL = (eval(['ratsum.' ratname '.L;']) ./ totalroisum.L)*100;
                     currR = (eval(['ratsum.' ratname '.R;']) ./ totalroisum.R)*100;
@@ -812,7 +812,7 @@ switch action
                                plot(currL,'.r', 'Color', clr,'MarkerSize',20);
                 %                set(p,'Tag', [curr_rat 'L'],'ButtonDownFcn', {@lesion_group_cvgdistr, 'action','show_slice','roi',roi});
 
-                set(gcf,'CurrentAxes',ax_right);
+                set(double(gcf),'CurrentAxes',ax_right);
                 p=plot(currR,'-r', 'Color', clr,'LineWidth',2,'Marker','.','MarkerSize',msize,'Tag', [ratname '_R']); hold on;
                plot(currR,'.r', 'Color', clr,'MarkerSize',20); hold on;
                 % set(p,'Tag', [curr_rat 'R'],'ButtonDownFcn', {@lesion_group_cvgdistr, 'action','show_slice','roi',roi});
@@ -844,29 +844,29 @@ switch action
         end;
 
         % more axis formatting
-        set(gcf,'CurrentAxes',ax_left); ylabel({ylbl,'(Left)'});
-        set(gca,'XLim',[firstx-0.5 lastx+1],'XTick',xtks, 'XTickLabel', [],'YLim',[0 ymax],'YTick',ytk,'Tag','axL');
+        set(double(gcf),'CurrentAxes',ax_left); ylabel({ylbl,'(Left)'});
+        set(double(gca),'XLim',[firstx-0.5 lastx+1],'XTick',xtks, 'XTickLabel', [],'YLim',[0 ymax],'YTick',ytk,'Tag','axL');
 
         str=  [str ')'];
 % 
-%         set(gcf,'CurrentAxes',ax_left); title(str);
-%         set(gca,'XLim',[-0.5 maxslice+1],'XTick',xtks, 'XTickLabel', [],'YLim',[0 ymax],'YTick',ytk,'Tag','axL');
-       axes__format(gca);   
+%         set(double(gcf),'CurrentAxes',ax_left); title(str);
+%         set(double(gca),'XLim',[-0.5 maxslice+1],'XTick',xtks, 'XTickLabel', [],'YLim',[0 ymax],'YTick',ytk,'Tag','axL');
+       axes__format(double(gca));   
 
-        set(gcf,'CurrentAxes',ax_right); ylabel({ylbl,'(Right)'});
-       set(gca,'XLim',[firstx-0.5 lastx+1]);
-%       set(gca,'XTick', 1:lastx);
-       set(gca,'XTick',xtks, 'XTickLabel', xtklbls,'YLim',[0 ymax],'YTick',ytk,'Tag','axR');
+        set(double(gcf),'CurrentAxes',ax_right); ylabel({ylbl,'(Right)'});
+       set(double(gca),'XLim',[firstx-0.5 lastx+1]);
+%       set(double(gca),'XTick', 1:lastx);
+       set(double(gca),'XTick',xtks, 'XTickLabel', xtklbls,'YLim',[0 ymax],'YTick',ytk,'Tag','axR');
 
-        axes__format(gca);
+        axes__format(double(gca));
         xlabel('mm AP from bregma');
 
-        set(gcf,'Position',[554 30        1046         400],'Toolbar','none');
+        set(double(gcf),'Position',[554 30        1046         400],'Toolbar','none');
 
         % plot difference in % coverage between the two groups
         if (summing_show_average > 0) && length(ratset) > 5
             figure;
-            set(gcf,'Tag', 'cvg_diffgrps');
+            set(double(gcf),'Tag', 'cvg_diffgrps');
             ax_right=axes('Units','normalized', 'Position', [0.07 0.1 0.89 0.37],'Tag', 'axR');
             sub__maketicks(xtks,maxslice,-100:25:100, [],100);
 
@@ -939,7 +939,7 @@ switch action
                 end;
             end;
 
-            set(gcf,'CurrentAxes',ax_left);
+            set(double(gcf),'CurrentAxes',ax_left);
             p=plot(curr,'-r', 'Color', 'r','LineWidth',3,'Marker','.','MarkerSize',msize+5); hold on;
             sigpos = find(sigdiff==1);
             plot(sigpos, 80*ones(length(sigpos),1), '*r', 'MarkerSize', msize,'LineWidth', 3);
@@ -963,7 +963,7 @@ switch action
             yvals = sumcurr(nannie_L); yvals(isnan(yvals) > 0) = 0;
             plot(nannie_L, yvals,'xk', 'MarkerSize',15,'LineWidth',2);
             uicontrol('Style','text','String', 'X: data from < 3 rats in either/both groups', 'Position', [15 5 250 10],...
-                'FontWeight','bold','FontSize', 12,'BackgroundColor',get(gcf,'Color'));
+                'FontWeight','bold','FontSize', 12,'BackgroundColor',get(double(gcf),'Color'));
 
             % Now repeat for RIGHT HEMISPHERE
 
@@ -1032,7 +1032,7 @@ switch action
                 end;
             end;
 
-            set(gcf,'CurrentAxes',ax_right);
+            set(double(gcf),'CurrentAxes',ax_right);
             p=plot(curr,'-r', 'Color', 'r','LineWidth',3,'Marker','.','MarkerSize',msize+5); hold on;
             sigpos = find(sigdiff==1);
 
@@ -1057,22 +1057,22 @@ switch action
             plot(nannie_R, yvals,'xk', 'MarkerSize',15,'LineWidth',2);
 
             % more axis formatting
-            set(gcf,'CurrentAxes',ax_left);
+            set(double(gcf),'CurrentAxes',ax_left);
             ylabel('LEFT (% cvg)');
-            set(gca,'XLim',[-0.5 maxslice+1],'XTick',xtks, 'XTickLabel', [],'YLim',[-105 105],'YTick',-100:25:100,'Tag','axL');
+            set(double(gca),'XLim',[-0.5 maxslice+1],'XTick',xtks, 'XTickLabel', [],'YLim',[-105 105],'YTick',-100:25:100,'Tag','axL');
             str = 'Freq coverage - Dur coverage (';
             for q = 1:length(roiset), str = [str roiset{q}]; if q < length(roiset), str = [str ', ']; end; end;
             str=  [str ')'];
-            set(gcf,'CurrentAxes',ax_left); title(str);
-            axes__format(gca);
+            set(double(gcf),'CurrentAxes',ax_left); title(str);
+            axes__format(double(gca));
 
-            set(gcf,'CurrentAxes',ax_right);
+            set(double(gcf),'CurrentAxes',ax_right);
             ylabel('RIGHT (% cvg)');
-            set(gca,'XLim',[-0.5 maxslice+1],'XTick',xtks, 'XTickLabel', xtklbls,'YLim',[-105 105],'YTick',-100:25:100,'Tag','axR');
-            axes__format(gca);
+            set(double(gca),'XLim',[-0.5 maxslice+1],'XTick',xtks, 'XTickLabel', xtklbls,'YLim',[-105 105],'YTick',-100:25:100,'Tag','axR');
+            axes__format(double(gca));
 
 
-            set(gcf,'Position',[790 700 1046  400], 'Toolbar','none');
+            set(double(gcf),'Position',[790 700 1046  400], 'Toolbar','none');
             uicontrol('Tag', 'figname', 'Style','text', 'String', 'Freq_minus_dur_cvg', 'Visible','off');
         end;
 
@@ -1098,7 +1098,7 @@ switch action
 
             % set up figure, axes, tickmarks etc.,
             figure;
-            set(gcf,'Tag', roi);
+            set(double(gcf),'Tag', roi);
             ax_right=axes('Units','normalized', 'Position', [0.1 0.1 0.89 0.42],'Tag', 'axR');
 
             % mark patch where roi doesn't exist
@@ -1139,39 +1139,39 @@ switch action
                 clr = diffclrs(r,:);
                 curr_rat = ratset{r};
 
-                set(gcf,'CurrentAxes',ax_left);
+                set(double(gcf),'CurrentAxes',ax_left);
                 curr = lftbuff(r,:)*100;
                 p=plot(curr,'-r', 'Color', clr,'LineWidth',lwdth,'Marker','.','MarkerSize',msize); hold on;
                 set(p,'Tag', [curr_rat 'L'],'ButtonDownFcn', {@lesion_group_cvgdistr, 'action','show_slice','roi',roi});
 
-                set(gcf,'CurrentAxes',ax_right);
+                set(double(gcf),'CurrentAxes',ax_right);
                 curr = rtbuff(r,:)*100;
                 p=plot(curr,'-r', 'Color', clr,'LineWidth',lwdth,'Marker','.','MarkerSize',msize); hold on;
                 set(p,'Tag', [curr_rat 'R'],'ButtonDownFcn', {@lesion_group_cvgdistr, 'action','show_slice','roi',roi});
             end;
 
             % more axis formatting
-            set(gcf,'CurrentAxes',ax_left);
+            set(double(gcf),'CurrentAxes',ax_left);
             patch([-0.3 -0.3 0.5 0.5], [0 105 105 0],[1 1 0.8],'EdgeColor','none');
             text(0, 25, roi,'FOntSize', 18, 'FontWeight','bold','Rotation',90);
             ylabel('LEFT');
-            set(gca,'XLim',[-0.5 maxslice+1],'XTick',xtks, 'XTickLabel', [],'YLim',[0 105],'YTick',0:25:100,'Tag','axL');
-            axes__format(gca);
+            set(double(gca),'XLim',[-0.5 maxslice+1],'XTick',xtks, 'XTickLabel', [],'YLim',[0 105],'YTick',0:25:100,'Tag','axL');
+            axes__format(double(gca));
 
-            set(gcf,'CurrentAxes',ax_right);
+            set(double(gcf),'CurrentAxes',ax_right);
             ylabel('RIGHT');
             patch([-0.3 -0.3 0.5 0.5], [0 105 105 0],[1 1 0.8],'EdgeColor','none');
             text(0, 25, roi,'FOntSize', 18, 'FontWeight','bold','Rotation',90);
-            set(gca,'XLim',[-0.5 maxslice+1],'XTick',xtks, 'XTickLabel', xtklbls,'YLim',[0 105],'YTick',0:25:100,'Tag','axR');
-            axes__format(gca);
+            set(double(gca),'XLim',[-0.5 maxslice+1],'XTick',xtks, 'XTickLabel', xtklbls,'YLim',[0 105],'YTick',0:25:100,'Tag','axR');
+            axes__format(double(gca));
 
-            set(gcf,'Position',[ 33 (340*(m-1))-110        720         330],...
+            set(double(gcf),'Position',[ 33 (340*(m-1))-110        720         330],...
                 'Menubar','none','Toolbar','none');
         end;
 
         % interpolate individual coverages to cover the NaN points
     case 'interpolate_indie'
-        kids = get(gcf,'Children');
+        kids = get(double(gcf),'Children');
         t = findobj('Tag','interp_method'); ipopt = get(t,'String'); ipval = get(t,'Value'); interp_method = ipopt{ipval};
 
         out = lesion_group_cvgdistr(0,0,'action','compute_roi_points', 'all_slices_interpolated', all_slices_interpolated);
@@ -1179,7 +1179,7 @@ switch action
 
         for k = 1:length(kids)
             if strcmpi(get(kids(k),'Type'),'axes')
-                set(gcf,'CurrentAxes', kids(k));
+                set(double(gcf),'CurrentAxes', kids(k));
                 axkids = get(kids(k), 'Children');
                 for a = 1:length(axkids)
                     t = get(axkids(a),'Tag');
@@ -1237,7 +1237,7 @@ switch action
         xtklbls = atlas_beginpos:-1: atlas_beginpos - (length(xtks)-1);
         msize=10;lwdth=1;
 
-        figure;  set(gcf,'Position',[565         643        1033         232],...
+        figure;  set(double(gcf),'Position',[565         643        1033         232],...
             'Toolbar','none');
 
         %         ax_left=axes('Position', [0.07 0.55 0.8 0.37], 'Tag', 'ax_roi_L');
@@ -1263,32 +1263,32 @@ switch action
             uicontrol('Style','checkbox','String', [roi '_R'],  'FontWeight','bold', 'ForegroundColor', 'w', 'Position',[925 chkpos-200 100 30],'BackgroundColor', clr, 'Callback',{'lesion_group_cvgdistr','action','toggle_indie_trend'},'Value',1);
             chkpos = chkpos-30;
 
-            %   set(gcf,'CurrentAxes', ax_left);
+            %   set(double(gcf),'CurrentAxes', ax_left);
             %   p=plot(curr.areapts__L,'-r', 'Color', clr,'LineWidth',2,'Marker','.','MarkerSize',msize, 'Tag', [roi '_L']); hold on;
-            set(gcf,'CurrentAxes', ax_right);
+            set(double(gcf),'CurrentAxes', ax_right);
             p=plot(curr.areapts__R,'-r', 'Color', clr,'LineWidth',2,'Marker','.','MarkerSize',msize, 'Tag', [roi '_R']); hold on;
             maxpts = max(maxpts, max(curr.areapts__R));
         end;
 
-        %         set(gcf,'CurrentAxes',ax_left);
-        %         set(gca,'XLim',[-0.5 maxslice+1],'XTick',xtks, 'XTickLabel', xtklbls);
-        %         axes__format(gca);
+        %         set(double(gcf),'CurrentAxes',ax_left);
+        %         set(double(gca),'XLim',[-0.5 maxslice+1],'XTick',xtks, 'XTickLabel', xtklbls);
+        %         axes__format(double(gca));
 
-        set(gcf,'CurrentAxes',ax_right);
-        set(gca,'XLim',[-0.5 maxslice+1]);
-        set(gca,'XTick',1:1:maxslice);
+        set(double(gcf),'CurrentAxes',ax_right);
+        set(double(gca),'XLim',[-0.5 maxslice+1]);
+        set(double(gca),'XTick',1:1:maxslice);
         %'XTick',0:maxslice, 'XTickLabel', xtklbls,
-        set(gca,'YLim', [0 1.05*maxpts]);
+        set(double(gca),'YLim', [0 1.05*maxpts]);
         title('ROI total point count');
-      %  axes__format(gca);
+      %  axes__format(double(gca));
 
     case 'show_slice'
         ratname = get(firstarg,'Tag');
-        roi = get(gcf,'Tag');
-        xpos = get(gca,'CurrentPoint');
+        roi = get(double(gcf),'Tag');
+        xpos = get(double(gca),'CurrentPoint');
         xpos = round(xpos(1,1));
 
-        cf = gcf;
+        cf = double(gcf);
 
         f=findobj('Tag', 'lesion_cvgdistr_gruntwork');
         if isempty(f), f=figure; end;
@@ -1301,9 +1301,9 @@ switch action
             'slices', xpos,'hem', hem,...
             'graphic_gruntwork',1, 'verbose_gruntwork', 1,'usefig_gruntwork', f);
 
-        pos = get(gcf,'Position');
-        set(gcf,'Position',[803 -78 pos(3) pos(4)],'Menubar','none','Toolbar','none');
-        set(gcf,'Tag', 'lesion_cvgdistr_gruntwork');
+        pos = get(double(gcf),'Position');
+        set(double(gcf),'Position',[803 -78 pos(3) pos(4)],'Menubar','none','Toolbar','none');
+        set(double(gcf),'Tag', 'lesion_cvgdistr_gruntwork');
         set(0,'CurrentFigure', cf);
 
         figure(f);
@@ -1655,7 +1655,7 @@ yip = newy;
 
 %         if ~(clr_by_grp >0|| summing_show_average>0)
 %             % legend
-%             figure; set(gcf,'Position',[766   639   128   215],'Menubar','none','TOolbar','none');
+%             figure; set(double(gcf),'Position',[766   639   128   215],'Menubar','none','TOolbar','none');
 %             axes('Position',[0.01 0.01 0.95 0.96], 'XTick',[], 'YTick',[]);
 %             for k =1:length(ratset)
 %                 patch([0 0 1 1], [k k+1 k+1 k], diffclrs(k,:), 'EdgeColor','none');

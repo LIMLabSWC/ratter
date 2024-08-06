@@ -12,7 +12,7 @@ switch action,
 	
 	case 'init'
 		
-		SoloParamHandle(obj, 'my_gui_info', 'value', [x y gcf], 'saveable', 0);
+		SoloParamHandle(obj, 'my_gui_info', 'value', [x y double(gcf)], 'saveable', 0);
 		y0 = y;
  
         [x, y] = AntibiasSectionAthena(obj,     'init', x, y);
@@ -423,7 +423,7 @@ switch action,
 			'fullname', ['^' mfilename]);
 
 	case 'reinit',
-		currfig = gcf;
+		currfig = double(gcf);
 		
 		% Get the original GUI position and figure:
 		x = my_gui_info(1); y = my_gui_info(2); figure(my_gui_info(3));

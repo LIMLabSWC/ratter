@@ -119,7 +119,7 @@ for i = 1:2
 end
 
 if ~iscellstr(varargin), error('non-string arguments are only allowed in the first two positions'), end
-if isempty(mainAxis), mainAxis = gca; end
+if isempty(mainAxis), mainAxis = double(gca); end
 
 hiddenHandleSetting = get(0, 'showhiddenhandles');
 set(0, 'showhiddenhandles', 'on')
@@ -196,7 +196,7 @@ if isempty(position)
 		position = [p(1)/p(3), p(2)/p(4)];
 	end
 end
-oldAxis = gca;
+oldAxis = double(gca);
 
 h = existingKey;
 fontProps = {'fontname', 'fontunits', 'fontsize', 'fontweight', 'fontangle'};
@@ -284,14 +284,14 @@ function PickUpAxis
 
 hiddenHandleSetting = get(0, 'showhiddenhandles');
 set(0, 'showhiddenhandles', 'on')
-eligible = findobj(gcf, 'type', 'axes', 'tag', 'key');
+eligible = findobj(double(gcf), 'type', 'axes', 'tag', 'key');
 set(0, 'showhiddenhandles', hiddenHandleSetting)
 
 if isempty(eligible), return, end
-oldFigUnits = get(gcf, 'units');
-set(gcf, 'units', 'pixels')
-click = get(gcf, 'currentpoint');
-set(gcf, 'units', oldFigUnits)
+oldFigUnits = get(double(gcf), 'units');
+set(double(gcf), 'units', 'pixels')
+click = get(double(gcf), 'currentpoint');
+set(double(gcf), 'units', oldFigUnits)
 for i = 1:length(eligible)
 	h = eligible(1);
 	oldAxUnits = get(h, 'units');
@@ -304,22 +304,22 @@ for i = 1:length(eligible)
 end
 if isempty(eligible), return, end
 set(h, 'tag', 'moving key', 'handlevisibility', 'on')
-set(gcf, 'windowbuttonmotionfcn', ['key(NaN, ''drag'', [' num2str(round(localClick)) '])'])
-set(gcf, 'windowbuttonupfcn', ['key(NaN, ''drop'', ''' oldAxUnits ''')'])
-set(gcf, 'pointer', 'fleur')
+set(double(gcf), 'windowbuttonmotionfcn', ['key(NaN, ''drag'', [' num2str(round(localClick)) '])'])
+set(double(gcf), 'windowbuttonupfcn', ['key(NaN, ''drop'', ''' oldAxUnits ''')'])
+set(double(gcf), 'pointer', 'fleur')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function DragAxis(localClick)
 
-oldFigUnits = get(gcf, 'units');
-set(gcf, 'units', 'pixels')
-pointer = get(gcf, 'currentpoint');
-ans = get(gcf, 'position'); bounds = ans(3:4);
-set(gcf, 'units', oldFigUnits)
+oldFigUnits = get(double(gcf), 'units');
+set(double(gcf), 'units', 'pixels')
+pointer = get(double(gcf), 'currentpoint');
+ans = get(double(gcf), 'position'); bounds = ans(3:4);
+set(double(gcf), 'units', oldFigUnits)
 
 
-h = findobj(gcf, 'type', 'axes', 'tag', 'moving key');
-if isempty(h), set(gcf, 'windowbuttonmotionfcn', '', 'windowbuttonupfcn', ''), return, end
+h = findobj(double(gcf), 'type', 'axes', 'tag', 'moving key');
+if isempty(h), set(double(gcf), 'windowbuttonmotionfcn', '', 'windowbuttonupfcn', ''), return, end
 set(h(2:end), 'tag', 'key', 'units', 'normalized', 'drawmode', 'normal', 'handlevisibility', 'off')
 h = h(1);
 set(h, 'units', 'pixels', 'drawmode', 'fast')
@@ -331,9 +331,9 @@ set(h, 'position', position)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function DropAxis(oldUnits)
 
-set(gcf, 'pointer', 'arrow')
-set(gcf, 'windowbuttonmotionfcn', '', 'windowbuttonupfcn', '')
-h = findobj(gcf, 'type', 'axes', 'tag', 'moving key');
+set(double(gcf), 'pointer', 'arrow')
+set(double(gcf), 'windowbuttonmotionfcn', '', 'windowbuttonupfcn', '')
+h = findobj(double(gcf), 'type', 'axes', 'tag', 'moving key');
 if isempty(h), return, end
 set(h(2:end), 'tag', 'key', 'units', 'normalized', 'drawmode', 'normal', 'handlevisibility', 'off')
 h = h(1);

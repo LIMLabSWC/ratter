@@ -53,7 +53,7 @@ switch action
     % going to start adding GUI elements:
     x = varargin{1};
     y = varargin{2};
-    SoloParamHandle(obj, 'my_gui_info', 'value', [x y gcf]);
+    SoloParamHandle(obj, 'my_gui_info', 'value', [x y double(gcf)]);
 
     % -- Anti-bias method --
     MenuParam(obj, 'AntiBiasMethod', {'none','repeat mistake'}, 'none', ...
@@ -157,7 +157,7 @@ switch action
     
     
   case 'reinit',
-    currfig = gcf;
+    currfig = double(gcf);
 
     % Get the original GUI position and figure:
     x = my_gui_info(1); y = my_gui_info(2); figure(my_gui_info(3));

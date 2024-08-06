@@ -169,9 +169,9 @@ Y = cell2mat(score_blk(2:end,3)); Y_lft = cell2mat(score_blk(2:end,5)); Y_rt = c
 h4 = plot(X,Y,'co-','MarkerFaceColor',[.5 .9 .7],'MarkerEdgeColor','k','MarkerSize',10); hold on;
 h5 = plot(X,Y_lft,'*','Color',[.1 .5 .9],'MarkerSize',10);
 h6 = plot(X,Y_rt,'*','Color',[.9 .1 .1],'MarkerSize',10);
-set(gca,'Xlim',[0 length(Trials)+5], 'YLim',[0 100], 'YGrid', 'on');
-set(get(gca,'XLabel'),'String','Trials','FontSize',18);
-set(get(gca,'YLabel'),'String','Correct Choice %','FontSize',18);
+set(double(gca),'Xlim',[0 length(Trials)+5], 'YLim',[0 100], 'YGrid', 'on');
+set(get(double(gca),'XLabel'),'String','Trials','FontSize',18);
+set(get(double(gca),'YLabel'),'String','Correct Choice %','FontSize',18);
     
 
 

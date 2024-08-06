@@ -217,7 +217,7 @@ if psych_only > 0
 
 
     figure;
-    set(gcf,'Toolbar','none','Position',[360   545   460   313]);
+    set(double(gcf),'Toolbar','none','Position',[360   545   460   313]);
 
     toosmall=find(nshort<5); 
     xsh2=xshort;xsh2(toosmall)=NaN;
@@ -246,10 +246,10 @@ if psych_only > 0
     x=xlabel('Trial length(s)');set(x,'FontSize',16,'FontWeight','bold');
     y=ylabel('% reported "Short"');set(y,'FontSize',16,'FontWeight','bold');
     % legend({'tones < mp','tones >mp'});
-    set(gca,'XLim',[minnie*0.9 maxie*1.1], 'YLim',[-5 105],'FontSize',16,'FontWeight','bold');
+    set(double(gca),'XLim',[minnie*0.9 maxie*1.1], 'YLim',[-5 105],'FontSize',16,'FontWeight','bold');
     uicontrol('Tag', 'figname', 'Style','text', 'String', sprintf('%s_%s_triallen',ratname,use_dateset), 'Visible','off');
 
-    pos = get(gcf,'Position');
+    pos = get(double(gcf),'Position');
     uicontrol('Style','text','String', sprintf('%s - %s: Psych only', from,to), 'Position', [0.01*pos(3) 0.02*pos(4), 150 15],'FontWeight','bold','FontSize',12);
 
 else   % -------------- BRANCH 2: Use all trials in session
@@ -362,16 +362,16 @@ for g = 1:length(unld)
         w=get(0,'ScreenSize');
         if graphic > 0
             figure;
-            %set(gcf, 'Position', [10 g*300, 0.9*1000, 220]);
-            set(gcf, 'Position', [10 g*300, 0.9*1200, 220]);
-            %            set(gcf,'Menubar','none','Toolbar','none');
+            %set(double(gcf), 'Position', [10 g*300, 0.9*1000, 220]);
+            set(double(gcf), 'Position', [10 g*300, 0.9*1200, 220]);
+            %            set(double(gcf),'Menubar','none','Toolbar','none');
 
             %             axes('position',[0.04 0.2 0.15 0.5]);
             %             hist(short_realtrials);
-            %             p=findobj(gca,'Type','patch'); set(p,'FaceColor', [1 0 0],'EdgeColor',[1 0 0],'facealpha',0.75);
+            %             p=findobj(double(gca),'Type','patch'); set(p,'FaceColor', [1 0 0],'EdgeColor',[1 0 0],'facealpha',0.75);
             %             hold on;
             %             hist(long_realtrials);
-            %             p=findobj(gca,'Type','patch');
+            %             p=findobj(double(gca),'Type','patch');
             %             set(p,'facealpha',0.25, 'EdgeColor','none');
             %
             %             title('Trial length distribution');
@@ -381,7 +381,7 @@ for g = 1:length(unld)
 
             %             t=text(0.1, 10,sprintf('n=%i',length(long_realtrials))); set(t,'Color',rightcolour);
             %             text(0.1, 5,sprintf('n=%i',length(short_realtrials)), 'Color', leftcolour);
-            %             ymax = get(gca,'Position'); xmax=get(gca,'XLim');
+            %             ymax = get(double(gca),'Position'); xmax=get(double(gca),'XLim');
             %             text(0.1, 15, sprintf('n=%i',length(idx)), 'Color','k','FontWeight','bold','FontSize',12);
 
         end;
@@ -454,7 +454,7 @@ for g = 1:length(unld)
             if abs(corrlong(1,2) > 0.55), set(t,'BackgroundColor','y'); end;
 
             % axes formatting
-            set(gca,'YLim',[0 110],'YTick',0:20:100,...
+            set(double(gca),'YLim',[0 110],'YTick',0:20:100,...
                 'FontSize',14,'FontWeight','bold',...
                 'XLim',xlim);
             t=xlabel('Trial length (seconds)');
@@ -472,18 +472,18 @@ for g = 1:length(unld)
         if show_monotonicity_hist > 0
             axes('position',[0.8 0.55 0.15 0.3]);
             [slope dist] = monotonicity_test(xshort, sd_hit_short,'figtitle', 'Monotonicity test:SHORT','newfig',0);
-            set(gca,'YTIck',[],'XTick',[]); xlabel('');
-            if dist > 2, set(gca,'Color', 'y');end;
+            set(double(gca),'YTIck',[],'XTick',[]); xlabel('');
+            if dist > 2, set(double(gca),'Color', 'y');end;
             if verbose > 0
                 fprintf(1,'\nMonotonicity distance: %1.1f', dist);
             end;
             axes('position',[0.8 0.05 0.15 0.3]);
             [slope dist] = monotonicity_test(xlong, sd_hit_long,'figtitle', 'Monotonicity test:LONG','newfig',0);
-            if dist > 2, set(gca,'Color','y'); end;
+            if dist > 2, set(double(gca),'Color','y'); end;
             if verbose >0
                 fprintf(1,'\nMonotonicity distance: %1.1f', dist);
             end;
-            set(gca,'YTIck',[],'XTick',[]); xlabel('');
+            set(double(gca),'YTIck',[],'XTick',[]); xlabel('');
         else
             [shortslope shortdist] = monotonicity_test(xshort, sd_hit_short,'graphic',0);
             [longslope longdist] = monotonicity_test(xlong, sd_hit_long,'graphic',0);

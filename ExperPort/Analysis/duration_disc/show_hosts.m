@@ -79,6 +79,6 @@ else
 %         set(l,'Color', rand(1,3)); hold on;
 %     end;
 % 
-%     set(gca, 'XTickLabel', dates,'YTick', 1:1:20,'YLim',[1 20]);
+%     set(double(gca), 'XTickLabel', dates,'YTick', 1:1:20,'YLim',[1 20]);
 %     legend(ratlist);
 end;

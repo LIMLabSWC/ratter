@@ -154,12 +154,12 @@ if graphic > 0
     plot(pts_array(both,1), pts_array(both,2),'+g','MarkerSize',msize,'LineWidth',lwdth);
 
     % resize figure to make it square
-    xlim = get(gca,'XLim'); ylim = get(gca,'YLim');
-    set(gcf,'Position',[200 200 diff(xlim)*3 diff(ylim)*3]);
-    set(gca,'Position',[0.07 0.05 0.9 0.9]);
+    xlim = get(double(gca),'XLim'); ylim = get(double(gca),'YLim');
+    set(double(gcf),'Position',[200 200 diff(xlim)*3 diff(ylim)*3]);
+    set(double(gca),'Position',[0.07 0.05 0.9 0.9]);
 
     t=title(sprintf('%s: Lesion overlap for %s: %s%s', ratname, brainarea,slicenum, hem));
-    axes__format(gca,12);
+    axes__format(double(gca),12);
 end;
 
 area_per_pt = pt_side ^ 2;

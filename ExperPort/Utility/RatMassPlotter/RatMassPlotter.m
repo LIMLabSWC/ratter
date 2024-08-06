@@ -144,7 +144,7 @@ ratnums = get(handles.ratlist,'value');
 ratnames = allrats(ratnums);
 axes(handles.axes1);
 handles = update_plot(handles);
-set(gca,'xtick',handles.datecenter,'xticklabel',handles.datelabels);
+set(double(gca),'xtick',handles.datecenter,'xticklabel',handles.datelabels);
 
 if length(ratnames) == 1
     cnorm = [0 0 0];
@@ -188,7 +188,7 @@ for i = 1:length(ratnames);
     
     M(1) = min([M(1),min(x.mass),min(x.anomalous)]);
     M(2) = max([M(2),max(x.mass),max(x.anomalous)]);
-    set(gca,'ylim',[M(1)-5,M(2)+5]);
+    set(double(gca),'ylim',[M(1)-5,M(2)+5]);
     handles = update_xlim(handles);
     pause(0.1);
 end
@@ -199,9 +199,9 @@ end
 
 ylabel('Mass, grams')
 
-%set(gca,'fontsize',10); 
+%set(double(gca),'fontsize',10); 
 %legend(ratnames,'Location','EastOutside');
-%set(gca,'fontsize',16);
+%set(double(gca),'fontsize',16);
 %handles = update_stats(handles);
 
 

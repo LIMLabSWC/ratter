@@ -121,7 +121,7 @@ handles  = [];
 colors  = [0 0 1 ; 1 0 1 ; 1 0 0 ; 0 1 0; 1 1 0; 0 1 1; 0 0 0; 0.5 0.5 0.5]; 
 
 if isempty(fignum),                                                         %#ok<NODEF>
-  figure; fignum = gcf;
+  figure; fignum = double(gcf);
 end;
 if ~ishandle(fignum), 
   figure(fignum); 

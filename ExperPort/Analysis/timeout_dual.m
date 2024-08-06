@@ -25,7 +25,7 @@ for ctr = 1:maxie-1
     labels{ctr} = num2str(ctr);
 end;
 labels{maxie} = 'PD Trial'; labels{maxie+1} = 'DD Trial';
-set(gca, 'YTick', [1:maxie+1], 'YTickLabel', labels);
+set(double(gca), 'YTick', [1:maxie+1], 'YTickLabel', labels);
 
 % STEP 3: Get switch points to analyse chunk-by-chunk
 [first_dd, first_pd] = get_task_switches(trials, t_pd);

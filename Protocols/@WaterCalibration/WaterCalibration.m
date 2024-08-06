@@ -341,7 +341,7 @@ switch action
         set_callback({PulseNumber,DefaultDuration,LowTarget,HighTarget,Tolerance,InterPulseInt},...
             {mfilename,'update_preference_values'});
         
-        c = get(gcf,'children');
+        c = get(double(gcf),'children');
         for i=1:length(c); set(c(i),'BackgroundColor',[1 1 1],'FontSize',12); end
         set(value(PreferencePanel), 'Visible', 'off');
          

@@ -94,7 +94,7 @@ close all;
     hold on;
     plot(bins, p,'.k','MarkerSize',20); 
     plot(bins, ylin,'.r','MarkerSize',20); 
-    set(gca,'YLim',[0 1]);
+    set(double(gca),'YLim',[0 1]);
     text(bins(1), 0.9, sprintf('Q=%2.3f', qlin));
     title('Linear');
     
@@ -103,11 +103,11 @@ close all;
     hold on;
     plot(bins, p,'.k','MarkerSize',20); 
     plot(bins, ysig,'.b', 'MarkerSize',20);
-    set(gca,'YLim',[0 1]);
+    set(double(gca),'YLim',[0 1]);
         text(bins(1), 0.9, sprintf('Q=%2.3f', qsig));
     title('Sigmoidal');
     
-    set(gcf,'Position',[124   501   888   363]);    
+    set(double(gcf),'Position',[124   501   888   363]);    
     
     fig=figure; 
     subplot(1,2,1);
@@ -136,5 +136,5 @@ h=kstest(x, [x probs']);
 if h>0, txt='NOT Normal'; else txt='Normal'; end;
 text(mean(x(1:2)), max(x)*0.9, txt,'FontWeight','bold');    
 
-set(gca,'XLim',[min(x)-(0.1*min(x)) max(x)+(0.1*max(x))]);
-set(gca,'YLim', get(gca,'XLim'));
+set(double(gca),'XLim',[min(x)-(0.1*min(x)) max(x)+(0.1*max(x))]);
+set(double(gca),'YLim', get(double(gca),'XLim'));

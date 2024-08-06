@@ -16,7 +16,7 @@ GetSoloFunctionArgs;
 switch action
     case 'init',
         
-        fig=gcf; %main figure of Masa_Wighholding protocol
+        fig=double(gcf); %main figure of Masa_Wighholding protocol
         MenuParam(obj, 'Beginner', {'Yes', 'No'}, 1, x, y);next_row(y);
         set_callback(Beginner, {'BeginnerSection', 'beginner'});
         SubHeaderParam(obj, 'BeginnerSection', 'Beginner Section', x, y);

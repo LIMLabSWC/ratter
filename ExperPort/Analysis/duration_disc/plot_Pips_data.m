@@ -11,7 +11,7 @@ subplot(2,1,1);
 l=plot(tone_loc,'-b'); 
 set(l,'LineWidth', 2); hold on;
 l=plot(go_loc,'-.g'); set(l,'LineWidth',2, 'Color', [0 0.6 0]);
-set(gca,'YLim',[-1 2],'YTick',[0 1],'YTickLabel',{'off','on'});
+set(double(gca),'YLim',[-1 2],'YTick',[0 1],'YTickLabel',{'off','on'});
 ylabel('Localization');
 xlabel('Trial #');
 
@@ -40,7 +40,7 @@ for i=2:length(numtrials)
     line([cumtrials(i-1) cumtrials(i-1)], [0 1.5], 'LineStyle','-','Color','k');
 end;
 
-set(gca,'YLim',[0 1], 'YTick',0:0.2:1, 'YTickLabel', 0:20:100);
+set(double(gca),'YLim',[0 1], 'YTick',0:0.2:1, 'YTickLabel', 0:20:100);
 
 ylabel('Hit rate');
 xlabel('Trial #');

@@ -25,7 +25,7 @@ switch action,
       'Name', mfilename), 'saveable', 0);
     screen_size = get(0, 'ScreenSize');
     set(value(myfig),'Position',[1 screen_size(4)-740, 1000 1000]); % put fig at top right
-    set(gcf, 'Visible', 'off');
+    set(double(gcf), 'Visible', 'off');
     x=10;y=10;
       
     SoloParamHandle(obj, 'ax', 'saveable', 0, ...
@@ -211,7 +211,7 @@ switch action,
 
       
       if numClass > existing_numClass,        %#ok<NODEF>
-         orig_fig = gcf;
+         orig_fig = double(gcf);
          my_window_visibility = get(my_window_info(3), 'Visible');
          x = my_window_info(1); y = my_window_info(2); figure(my_window_info(3));
          set(my_window_info(3), 'Visible', my_window_visibility);
@@ -274,7 +274,7 @@ switch action,
       
     %% Case PsychClass
     case 'PsychClass' 
-         orig_fig = gcf;
+         orig_fig = double(gcf);
          my_window_visibility = get(my_window_info(3), 'Visible');
          x = my_window_info(1); y = my_window_info(2); figure(my_window_info(3));
          set(my_window_info(3), 'Visible', my_window_visibility);

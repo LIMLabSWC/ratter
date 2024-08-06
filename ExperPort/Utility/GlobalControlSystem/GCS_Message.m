@@ -55,7 +55,7 @@ MS = char(varargin{1}{2});
 
 set(handles.message_text,'string',MS);
 handles.ID = varargin{1}{3};
-set(gcf,'visible','on');
+set(double(gcf),'visible','on');
 handles.message_received = 0;
 handles.mode = 'reading';
 
@@ -75,7 +75,7 @@ if ischar(varargin{1}{3})
 else
     try %#ok<TRYNC>
         pause(1);
-        jf=get(gcf,'JavaFrame');
+        jf=get(double(gcf),'JavaFrame');
         pause(1);
         javaMethod('setAlwaysOnTop', jf.fFigureClient.getWindow, 1);
     end
@@ -102,7 +102,7 @@ if strcmp(get(handles.message_text,'style'),'edit') == 1
         pause(0.1);
     end
     varargout{1} = get(handles.message_text,'string');
-    close(gcf);
+    close(double(gcf));
 else
     varargout{1} = hObject;
 end
@@ -125,7 +125,7 @@ else
     
     try
         pause(1);
-        jf=get(gcf,'JavaFrame');
+        jf=get(double(gcf),'JavaFrame');
         pause(1);
         javaMethod('setAlwaysOnTop', jf.fFigureClient.getWindow, 1);
     end

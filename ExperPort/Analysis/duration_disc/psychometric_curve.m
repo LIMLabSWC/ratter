@@ -330,7 +330,7 @@ if weber == -1
         if nodist == 0
             subplot(1,2,1); hist(logtones, mybins);
             x=xlabel(hist__xlbl);set(x,'FontSize',16,'FontWeight','bold');
-            set(gca,'XTick', mybins, 'XTickLabel', hist__xtklbl,...
+            set(double(gca),'XTick', mybins, 'XTickLabel', hist__xtklbl,...
                 'XLim', [mybins(1)*0.99 1.01*mybins(end)], 'YLim', [0 1.1*max(tally)],...
                 'FontSize', 16, 'FontWeight','bold');
             y=ylabel('Sample size (n)');set(y,'FontSize',16,'FontWeight','bold');
@@ -341,10 +341,10 @@ if weber == -1
         end;
         l=plot(mybins, pct, '.r');
         if chitest_sig > 0,
-            set(gca,'BackgroundColor','y');
+            set(double(gca),'BackgroundColor','y');
         end;
         set(l,'MarkerSize',18);
-        set(gca,'XTick',psych__xtick,'XLim', xlim, 'XTickLabel', psych__xtklbl, ...
+        set(double(gca),'XTick',psych__xtick,'XLim', xlim, 'XTickLabel', psych__xtklbl, ...
             'YTick',0:0.25:1, 'YTickLabel', 0:25:100, 'YLim',[0 1], ...
             'FontSize',18,'FontWeight','bold');
         xlabel(psych__xlbl);
@@ -358,7 +358,7 @@ if weber == -1
     bfit = betahat;
     bias=0;
 
-    sign_fname(gcf, mfilename);
+    sign_fname(double(gcf), mfilename);
     fprintf(1,'******\n');
     return;
 end;
@@ -425,7 +425,7 @@ if nodist==0
         lbl{k} = sprintf(hist__lblfmt, bins(k));
     end;
     x=xlabel(hist__xlbl);set(x,'FontSize',16,'FontWeight','bold');
-    set(gca,'XTick', mybins, 'XTickLabel', hist__xtklbl,...
+    set(double(gca),'XTick', mybins, 'XTickLabel', hist__xtklbl,...
         'XLim', [mybins(1)*0.99 1.01*mybins(end)], 'YLim', [0 1.1*max(tally)],...
         'FontSize', 16, 'FontWeight','bold');
     y=ylabel('Sample size (n)');set(y,'FontSize',16,'FontWeight','bold');
@@ -459,7 +459,7 @@ end;
 l=plot(xx, yy, '-r');
 set(l,'LineWidth',2,'Color',curvecolour);
 %         if chitest_sig > 0,
-%             set(gca,'BackgroundColor','y');
+%             set(double(gca),'BackgroundColor','y');
 %         end;
 line([log_mp log_mp],[0 1], 'LineStyle',':','Color','k','LineWidth',2); % intended midpoint
 
@@ -484,7 +484,7 @@ end;
 text(xlim(end)*offset, 0.1, sprintf(flpstatus), 'Color', [0 0 1],'FontWeight','bold','FontSize', 16);
 
 if dont_format_axes == 0
-    set(gca,'XTick',psych__xtick,'XLim', xlim, 'XTickLabel', psych__xtklbl, ...
+    set(double(gca),'XTick',psych__xtick,'XLim', xlim, 'XTickLabel', psych__xtklbl, ...
         'YTick',0:0.25:1, 'YTickLabel', 0:25:100, 'YLim',[0 1], ...
         'FontSize',18,'FontWeight','bold');
     xlabel(psych__xlbl);
@@ -511,8 +511,8 @@ else
     assignin('caller', 'bins', returnbins);
 end;
 
-%sign_fname(gcf, mfilename);
+%sign_fname(double(gcf), mfilename);
 fprintf(1,'******\n');
 
 
-set(gcf,'Menubar','figure');
+set(double(gcf),'Menubar','figure');

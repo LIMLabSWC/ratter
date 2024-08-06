@@ -46,7 +46,7 @@ zlims = zlims + (min(zvals)-1);
 end;
 
 
-figure; set(gcf,'Position',[100 100 300 300]);
+figure; set(double(gcf),'Position',[100 100 300 300]);
 % plot the brain coordinates
 % for q= 1:length(coord_set)
 %     curr = coord_set{q}; curr(end+1,:) = curr(1,:); %curr = curr';
@@ -82,7 +82,7 @@ fprintf(1,'done.\n');
 %colorbar;
 title(sprintf('threshed at %1.2f', t));
 view(-2,20);
-set(gcf,'Position',[150   538   470   183]);
+set(double(gcf),'Position',[150   538   470   183]);
 %end;
 
 

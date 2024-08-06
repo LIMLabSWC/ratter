@@ -169,7 +169,7 @@ case 'send'
 	if GetParam(me,'send')
 		SetParamUI(me,'send','background',[0 1 0]);
 	else
-		SetParamUI(me,'send','background',get(gcf,'color'));
+		SetParamUI(me,'send','background',get(double(gcf),'color'));
 	end
 	
 	

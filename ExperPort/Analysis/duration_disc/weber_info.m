@@ -21,14 +21,14 @@ function [] = weber_info(rat, fname)
   wb = cell2mat(vals(2:end, 2));
   
   figure;
-  set(gcf,'Menubar', 'none','Toolbar','none', 'Position', [100 100 600 ...
+  set(double(gcf),'Menubar', 'none','Toolbar','none', 'Position', [100 100 600 ...
                       400], 'Name', 'Psychometric Data Summary');
  
   
   % Plot 1 - raw plot
   axes('Position',[0.1 0.5 0.35 0.4]); 
   plot(1:length(wb), wb, '.b', 1:length(wb), wb, '-r');
-  lims = get(gca, 'XLim');
+  lims = get(double(gca), 'XLim');
   hold on; line([0 lims(2)], [mean(wb)-std(wb) mean(wb)-std(wb)], 'Color','k', ...
                 'LineStyle', ':');
   
@@ -41,7 +41,7 @@ function [] = weber_info(rat, fname)
   axes('Position', [0.55 0.5 0.35 0.4]); dwb = abs(diff(wb));
   plot(1:length(wb)-1, dwb, '.b', 1:length(wb)-1, dwb, ...
        '-r');
-  lims = get(gca, 'XLim');
+  lims = get(double(gca), 'XLim');
   hold on; line([0 lims(2)], [mean(dwb)-std(dwb) mean(dwb)-std(dwb)], 'Color','k', ...
                 'LineStyle', ':');
   

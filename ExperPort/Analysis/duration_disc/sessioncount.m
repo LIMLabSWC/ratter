@@ -20,11 +20,11 @@ for r = 1:length(ratlist)
     [t_pre from_pre to_pre]= session_tally(ratlist{r}, 'infile', infile_before);
     [t_post from_post to_post] = session_tally(ratlist{r}, 'infile', infile_after);
 
-    figure; set(gcf,'Menubar','none','Toolbar','none');
+    figure; set(double(gcf),'Menubar','none','Toolbar','none');
     l=plot([1 2], [t_pre t_post], '.b'); set(l,'MarkerSize',20);
     title(sprintf('%s: Pre: (%s-%s)\nPost: (%s-%s)', ratlist{r}, from_pre, to_pre, ...
         from_post, to_post));
-    set(gcf,'Position', [xStart yStart wt ht]);
-    set(gca,'XLim',[0 3], 'XTick', [1 2], 'XTickLabel',{'before','after'},'YLim', [0 30]);
+    set(double(gcf),'Position', [xStart yStart wt ht]);
+    set(double(gca),'XLim',[0 3], 'XTick', [1 2], 'XTickLabel',{'before','after'},'YLim', [0 30]);
     xStart = xStart + (wt*1.1);
 end;

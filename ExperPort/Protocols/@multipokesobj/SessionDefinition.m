@@ -8,7 +8,7 @@ switch action
     case 'init'   % ------- CASE 'INIT' ----------
         figure(value(myfig));
         parentfig_x = x; parentfig_y =  y;
-        SoloParamHandle(obj, 'my_gui_info', 'value', [x y gcf]);
+        SoloParamHandle(obj, 'my_gui_info', 'value', [x y double(gcf)]);
 
         ToggleParam(obj, 'session_show', 0, x, y, ...
                     'position', [x y 100 20], ...

@@ -337,7 +337,7 @@ if (sum(psychflag) > 0) || (ignore_trialtype > 0)
     
     if graphic > 0
             if isafter > 0
-                psych_plotbeforeafter(out,'r','fig', gcf, 'usefig', 1, ...
+                psych_plotbeforeafter(out,'r','fig', double(gcf), 'usefig', 1, ...
                     'ylbl_pos',0.2,'daily_bin_variability',daily_bin_variability,...
                     'patch_bounds',0);
             else
@@ -355,8 +355,8 @@ if (sum(psychflag) > 0) || (ignore_trialtype > 0)
     end;
 
     if ~justgetdata
-        set(gcf,'Position',[0    140   530   250],'Color', bgcolor);
-        set(gca,'XTick', logbins, 'XTickLabel', xtklbl,'YTick',0:0.25:1,'YTickLabel',0:25:100,...
+        set(double(gcf),'Position',[0    140   530   250],'Color', bgcolor);
+        set(double(gca),'XTick', logbins, 'XTickLabel', xtklbl,'YTick',0:0.25:1,'YTickLabel',0:25:100,...
             'FontWeight','bold', 'YLim',[0 1], 'XLim', [logbins(1) logbins(3)]);
         xm = overall_xmid; xc = overall_xc; xf = overall_xf;
         line([xm xm], [0 0.5], 'LineStyle',':','Color','r','LineWidth',2); % rat's midpoint
@@ -521,7 +521,7 @@ for i=2:length(numtrials)
     line([cumtrials(i-1) cumtrials(i-1)], [0 1.5], 'LineStyle','-','Color','k');
 end;
 
-set(gca,'YLim',[0.4 1], 'YTick',0:0.2:1, 'YTickLabel', 0:20:100);
+set(double(gca),'YLim',[0.4 1], 'YTick',0:0.2:1, 'YTickLabel', 0:20:100);
 
 ylabel('Hit rate');
 xlabel('Trial #');
@@ -599,7 +599,7 @@ end;
 
 function [] = sub__plot1()
 figure;
-set(gcf,'Position',[-33   589   440   390],'Color', bgcolor,'Menubar','none','TOolbar','none','Tag','loadpsych');
+set(double(gcf),'Position',[-33   589   440   390],'Color', bgcolor,'Menubar','none','TOolbar','none','Tag','loadpsych');
 subplot(3,1,1);
 if weber ~= -1
     if ~isstr(weber)
@@ -609,7 +609,7 @@ if weber ~= -1
         %             hold on; l2 = plot(Monday_idx, weber(Monday_idx), '.g');
         %             set(l2,'Color',[0.6 0.6 0.4], 'MarkerSize',20);
         xlabel('Day'); ylabel('Weber ratio');
-        %            set(gca,'YLim',[0 max(weber)+0.1], 'YTick',0:max(weber)+0.1);
+        %            set(double(gca),'YLim',[0 max(weber)+0.1], 'YTick',0:max(weber)+0.1);
         hold on;
         % line([0 length(weber)+1], [0.2 0.2],'LineStyle',':','Color','b');
         % line([0 length(weber)+1], [0.3 0.3],'LineStyle',':','Color','b');
@@ -617,7 +617,7 @@ if weber ~= -1
         % line([0 length(weber)+1], [0.5 0.5],'LineStyle',':','Color','r');
     end;
 end;
-set(gca,'FontWeight','bold','FontSize',11);
+set(double(gca),'FontWeight','bold','FontSize',11);
 title('Behaviour of Weber ratio over days');
 
 subplot(3,1,2);
@@ -640,7 +640,7 @@ if bias_val ~= -1
 
         lim = max(abs(bias_val));
 
-        set(gca,'YLim', [(-1*lim)-10 lim+10],'FontWeight','bold','FontSize',11);
+        set(double(gca),'YLim', [(-1*lim)-10 lim+10],'FontWeight','bold','FontSize',11);
     end;
 end;
 subplot(3,1,3);
@@ -652,11 +652,11 @@ end;
 %     l2 = plot(Monday_idx, numtrials(Monday_idx), '.g');
 %     set(l2,'Color',[0.6 0.6 0.4], 'MarkerSize',20);
 title('# trials per session');ylabel('numtrials'); xlabel('day');
-set(gca,'FontWeight','bold','FontSize',11);
+set(double(gca),'FontWeight','bold','FontSize',11);
 
 
 function [] = sub__plot2()
-figure; set(gcf,'Position',[ 1136         145         250         500],'Color',bgcolor);
+figure; set(double(gcf),'Position',[ 1136         145         250         500],'Color',bgcolor);
 
 subplot(3,1,1);% Average hit rate
 
@@ -673,7 +673,7 @@ catch
 end;
 
 
-set(gca,'YLim',[0.5 1], 'YTick',0.5:0.1:1, 'YTickLabel',50:10:100,'XTick',0.7:0.15:1.3,'XTickLabel',lds);
+set(double(gca),'YLim',[0.5 1], 'YTick',0.5:0.1:1, 'YTickLabel',50:10:100,'XTick',0.7:0.15:1.3,'XTickLabel',lds);
 title('Overall success rate');
 t=text(1.2, 0.9, sprintf('%2.0f%% (%2.0f)\nPs: %2.0f%% (%2.0f)', ...
     mean(no_hh)*100, std(no_hh*100)/sqrt(length(no_hh)), mean(ps_hh)*100, std(ps_hh*100)/sqrt(length(ps_hh))));
@@ -683,7 +683,7 @@ subplot(3,1,2);
 if weber ~= -1
     if ~isstr(weber)
         barweb(mean(weber), std(weber), 0.25, ratname, [],'Rat', 'Average weber (SD)');
-        set(gcf,'Color',bgcolor);
+        set(double(gcf),'Color',bgcolor);
         t=text(1.2, 0.1, sprintf('%1.2f (%1.2f)', mean(weber), std(weber)));
         title('Overall Weber ratio');
     end;
@@ -718,7 +718,7 @@ title('Overall bias');
 
 function [] = sub__plottaskvars()
 figure;
-set(gcf,'Position', [400         852        900        450],'Color', bgcolor);
+set(double(gcf),'Position', [400         852        900        450],'Color', bgcolor);
 axes;
 patch([0 0 sum(numtrials) sum(numtrials)], [0 0.5 0.5 0],[1 0.8 0.8]); hold on;
 patch([0 0 sum(numtrials) sum(numtrials)], [0.8 1 1 0.8],[1 1 0.6]);
@@ -738,8 +738,8 @@ for k = 1:length(numtrials),
 end;
 sub__plot_hitrate(hit_history,numtrials);
 sub__draw_separators(numtrials,0,1);
-pos = get(gca,'Position');
-set(gca,'Position',[0.04 0.6 0.9 0.35],'XLim',[0 sum(numtrials)],'XTick',[sum(numtrials)],'FontWeight','bold','FontSize',10);
+pos = get(double(gca),'Position');
+set(double(gca),'Position',[0.04 0.6 0.9 0.35],'XLim',[0 sum(numtrials)],'XTick',[sum(numtrials)],'FontWeight','bold','FontSize',10);
 
 
 % tones plot
@@ -754,13 +754,13 @@ else
     ylabel('Frequency (KHz)');
     ylim = [binmin binmax];
 end;
-pos = get(gca,'Position');
-set(gca,'Position',[0.04 0.4 0.9 0.15],'FontWeight','bold','FontSize',10,'XLim',[0 sum(numtrials)],'XTick',[sum(numtrials)],'YLim',ylim);
+pos = get(double(gca),'Position');
+set(double(gca),'Position',[0.04 0.4 0.9 0.15],'FontWeight','bold','FontSize',10,'XLim',[0 sum(numtrials)],'XTick',[sum(numtrials)],'YLim',ylim);
 
 axes;
 plot(left_prob,'-b');
-set(gca,'Position',[0.04 0.25 0.9 0.1]);
-ylabel('LeftProb'); set(gca,'YTick',[0 0.5 1],'YLim',[0 1],'FontWeight','bold','FontSize',10);
+set(double(gca),'Position',[0.04 0.25 0.9 0.1]);
+ylabel('LeftProb'); set(double(gca),'YTick',[0 0.5 1],'YLim',[0 1],'FontWeight','bold','FontSize',10);
 
 axes;
 bbspl_array = zeros(size(bbspl));
@@ -768,7 +768,7 @@ bbspl_array(find(strcmpi(bbspl,'normal'))) = 1;
 bbspl_array(find(strcmpi(bbspl,'Louder'))) = 2;
 bbspl_array(find(strcmpi(bbspl,'LOUDEST'))) = 3;
 bbspl=bbspl_array;
-plot(bbspl,'-r'); set(gca,'Position',[0.04 0.05 0.9 0.1], 'FontWeight','bold','FontSize',10,'YLim',[0 4],'YTick',[1 2 3],'YTickLabel',{'nor','Lou','DEST'});
+plot(bbspl,'-r'); set(double(gca),'Position',[0.04 0.05 0.9 0.1], 'FontWeight','bold','FontSize',10,'YLim',[0 4],'YTick',[1 2 3],'YTickLabel',{'nor','Lou','DEST'});
 ylabel('BBSPL');
 
 uicontrol('Tag', 'figname', 'Style','text', 'String', [ratname '_hrate'], 'Visible','off');

@@ -155,11 +155,11 @@ if isstr(ratname) % not a callback; load data
 
 
         if f_col == 1
-            f=gcf;
-            %             set(gcf,'Position', [321   376   663   448]);
+            f=double(gcf);
+            %             set(double(gcf),'Position', [321   376   663   448]);
         else
-            set(gcf,'Position',[250 250 800 600],'Tag','psych');
-            set(gca,'Position',[0.1 0.1 0.8 0.8]);
+            set(double(gcf),'Position',[250 250 800 600],'Tag','psych');
+            set(double(gca),'Position',[0.1 0.1 0.8 0.8]);
         end;
 
         weber = weber';
@@ -243,7 +243,7 @@ if isstr(ratname) % not a callback; load data
     bhits = rawhh_cell{:,1}; ahits = rawhh_cell{:,2};
     
     % Compute significance of difference between before and after curve
-    bins = get(gca,'XTick');
+    bins = get(double(gca),'XTick');
     before_data ={};
     before_data.tones = alltones_cell{:,1};
     before_data.side_choices = allsidechoices_cell{:,1};
@@ -261,22 +261,22 @@ if isstr(ratname) % not a callback; load data
     end;
 
     % set position for figure with before/after psych curves
-    set(gcf, 'Position',   [20 350 480 450]);
-    set(gca,'Position',[0.15 0.15 0.8 0.75]);
-    set(gca,'FontSize',18);
-    set(get(gca,'XLabel'),'FontSize',24);
-    set(get(gca,'YLabel'),'FontSize',18);
-    set(get(gca,'title'),'FontSize',20);
-    xtick = get(gca,'XTick');
+    set(double(gcf), 'Position',   [20 350 480 450]);
+    set(double(gca),'Position',[0.15 0.15 0.8 0.75]);
+    set(double(gca),'FontSize',18);
+    set(get(double(gca),'XLabel'),'FontSize',24);
+    set(get(double(gca),'YLabel'),'FontSize',18);
+    set(get(double(gca),'title'),'FontSize',20);
+    xtick = get(double(gca),'XTick');
     xmin=xtick(1); xmax=xtick(end);
     xmid = (xmin+xmax)/2;
     if strcmpi(task(1:3),'dua')
-        set(gca,'XTick', [xmin xmid xmax], 'XTickLabel', round(2.^[xmin xmid xmax] * 10)/10);
+        set(double(gca),'XTick', [xmin xmid xmax], 'XTickLabel', round(2.^[xmin xmid xmax] * 10)/10);
     else
-        set(gca,'XTick', [xmin xmid xmax], 'XTickLabel', round(exp([xmin xmid xmax])));
+        set(double(gca),'XTick', [xmin xmid xmax], 'XTickLabel', round(exp([xmin xmid xmax])));
     end
     
-    set(gca,'XLim',[xmin xmax], 'YLim', [0 1]);
+    set(double(gca),'XLim',[xmin xmax], 'YLim', [0 1]);
 
     % if any parameter estimates for AFTER fall OUTSIDE the conf. interval
     % of those for BEFORE, set background to yellow -- the two curves are
@@ -286,11 +286,11 @@ if isstr(ratname) % not a callback; load data
 %     for i = 1:length(bh2)
 %         if bh2(i) < ci(i,1) || bh2(i) > ci(i,2)
 % %            fprintf(1,'***PARAMETER %i is DIFFERENT in AFTER curve***\n', i);
-%             % set(gca,'Color','y');
+%             % set(double(gca),'Color','y');
 %         end;
 %     end;
 
-    f = findobj('Parent',gcf,'Tag','figname');
+    f = findobj('Parent',double(gcf),'Tag','figname');
     for fidx = 1:length(f)
         delete(f(fidx));
     end;
@@ -300,7 +300,7 @@ if isstr(ratname) % not a callback; load data
         assignin('caller','sig_curve', sig_curve);
         assignin('caller','p_curve', p_curve);
         return;
-        sign_fname(gcf,mfilename);
+        sign_fname(double(gcf),mfilename);
     end;
     
     % This is end of execution when psychgraph_only flag is set.
@@ -338,15 +338,15 @@ if isstr(ratname) % not a callback; load data
     % From here on, plot other measures of performance from before and
     % after
     if ~isempty(timeout_cell{:,1}) && graphic > 0
-        plot_me(4,timeout_cell{:,1}, timeout_cell{:,2}); set(gcf,'Tag','metric_hist','Position',[1000 700 330 130],'Toolbar','none');
+        plot_me(4,timeout_cell{:,1}, timeout_cell{:,2}); set(double(gcf),'Tag','metric_hist','Position',[1000 700 330 130],'Toolbar','none');
         title(sprintf('%s: %% Session with no timeouts',ratname));
     end;
     if graphic > 0
         try
-        plot_me(4,rxn_cell{:,1},rxn_cell{:,2});  set(gcf,'Tag','metric_hist','Position',[1000 500 330 130],'Toolbar','none');
+        plot_me(4,rxn_cell{:,1},rxn_cell{:,2});  set(double(gcf),'Tag','metric_hist','Position',[1000 500 330 130],'Toolbar','none');
         catch
             addpath('Analysis/duration_disc/stat_sandbox/');
-                    plot_me(4,rxn_cell{:,1},rxn_cell{:,2});  set(gcf,'Tag','metric_hist','Position',[1000 500 330 130],'Toolbar','none');
+                    plot_me(4,rxn_cell{:,1},rxn_cell{:,2});  set(double(gcf),'Tag','metric_hist','Position',[1000 500 330 130],'Toolbar','none');
         end;
         title(sprintf('%s: Reaction time',ratname));
     end;
@@ -367,7 +367,7 @@ if isstr(ratname) % not a callback; load data
     sem_hh_cell{:,AFTER_COL} = tmp(idx_after);
     lds_cell{:,AFTER_COL} = common;
 
-    if graphic > 0,set(gcf,'Tag', 'psych');end;
+    if graphic > 0,set(double(gcf),'Tag', 'psych');end;
 
     % ----------------------------------
     % Figure 3: # datapoints (sessions) for each metric
@@ -383,7 +383,7 @@ if isstr(ratname) % not a callback; load data
         pcount_bef = length(pdates{:,BEFORE_COL});
         pcount_aft = length(pdates{:,AFTER_COL});
 
-        figure; set(gcf,'Position',[1 150 650 150],'Toolbar','none','Tag','num_points');
+        figure; set(double(gcf),'Position',[1 150 650 150],'Toolbar','none','Tag','num_points');
         %  axes('Position',[0.05 0.1 0.8 0.75]);
         p=bar(1:rows(sz), sz(:,BEFORE_COL),0.5);
         set(p,'FaceColor',[170 255 255] ./255,'EdgeColor',[0 0 104]./255);
@@ -397,10 +397,10 @@ if isstr(ratname) % not a callback; load data
 
         %   text(-1.5, pcount_bef-5, sprintf('# psych\nbefore'));
         %    text(-0.5, pcount_aft-5, sprintf('# psych\nafter'));
-        set(gca,'XTick', 1:rows(sz), 'XTickLabel', datafields,'XLim',[0.5 rows(sz)+0.5], 'YLim',[0 max(max(sz))+1] );
+        set(double(gca),'XTick', 1:rows(sz), 'XTickLabel', datafields,'XLim',[0.5 rows(sz)+0.5], 'YLim',[0 max(max(sz))+1] );
         t=title('# datapoints for each metric');set(t,'FontSize',12,'FontWeight','bold');
 %        uicontrol('Tag', 'figname', 'Style','text', 'String', sprintf('%s_beforeafter_datacount',ratname), 'Visible','off');
-sign_fname(gcf,mfilename);
+sign_fname(double(gcf),mfilename);
     end;
 end;
 
@@ -411,11 +411,11 @@ end;
 if graphic > 0
     figure;
     % plot top row of bar graph (mean hitrate for different situations)
-    set(gcf,'Position', [65   863   220*numMetrics   221],'Tag', 'normplot');
-   % uicontrol(gcf, 'Style','text', 'String', ratname, 'Position',[50 570 300 20],'FontSize',14, 'FontWeight','bold', 'BackgroundColor', [171/255 186/255 122/255]);
+    set(double(gcf),'Position', [65   863   220*numMetrics   221],'Tag', 'normplot');
+   % uicontrol(double(gcf), 'Style','text', 'String', ratname, 'Position',[50 570 300 20],'FontSize',14, 'FontWeight','bold', 'BackgroundColor', [171/255 186/255 122/255]);
     dbef = sessdates{:,BEFORE_COL}; daft = sessdates{:,AFTER_COL};
     dstr = sprintf('Performance before (%s-%s)\n & after (%s-%s) surgery',dbef{1}, dbef{end}, daft{1}, daft{end});
-    %uicontrol(gcf, 'Style','text', 'STring', dstr, 'Position',[50 550 300 20], 'FontWeight','bold', 'BackgroundColor', [171/255 186/255 122/255]);
+    %uicontrol(double(gcf), 'Style','text', 'STring', dstr, 'Position',[50 550 300 20], 'FontWeight','bold', 'BackgroundColor', [171/255 186/255 122/255]);
 
     alphaval = 0.05/numMetrics;
     axes_width = 0.75 /numMetricsShow;
@@ -430,13 +430,13 @@ if graphic > 0
         p=bargraph_metric_compare(bef,aft, f, axes_width, axes_ht,alphaval, data_titles{f},data_ylbls{f});
         p_array = horzcat(p_array, p);
     end;
-    uicontrol(gcf,'Style','text','String', ratname,'Units','normalized','Position',[0.01 0.88 0.1 0.1],'BackgroundColor','w',...
+    uicontrol(double(gcf),'Style','text','String', ratname,'Units','normalized','Position',[0.01 0.88 0.1 0.1],'BackgroundColor','w',...
         'FontSize',16,'ForegroundColor',[0 140/255 204/255],'FontWeight','bold');
-    uicontrol(gcf,'Style','text','String', sprintf('alpha=%1.3f',0.05/numMetrics),...
+    uicontrol(double(gcf),'Style','text','String', sprintf('alpha=%1.3f',0.05/numMetrics),...
         'Units','normalized','Position',[0.8 0.01 0.15 0.1],'BackgroundColor','w',...
         'FontSize',16,'FontWeight','bold');
     %uicontrol('Tag', 'figname', 'Style','text', 'String', sprintf('%s_beforeafter_means',ratname), 'Visible','off');
-    sign_fname(gcf,mfilename);
+    sign_fname(double(gcf),mfilename);
 end;
 
 % if nopsych >0, close(findobj('Tag','psych')); end;
@@ -454,13 +454,13 @@ if do_sigtest > 0,do_hitsigs_only();end; % we'll fix this when we need this
 
 % show histogram for metric distribution across sessions
 if length(showhist) > 0 && graphic > 0
-    figure; set(gcf,'Tag','metric_hist',...
+    figure; set(double(gcf),'Tag','metric_hist',...
         'Position',[  826   147   427   274],'Toolbar','none');
     hist(showhist{1});
     t=title(showhist{2});set(t,'FontSize',12,'FontWeight','bold');
     t=xlabel(showhist{3});    set(t,'FontSize',12,'FontWeight','bold');
     t=ylabel('Session #');    set(t,'FontSize',12,'FontWeight','bold');
-    set(gca,'FontSize',12);
+    set(double(gca),'FontSize',12);
 end;
 if closehist > 0
     f =findobj('Tag', 'metric_hist');
@@ -480,7 +480,7 @@ end;
 % curve; do the latter fall within the confidence interval of the former?
 ci = overall_cis{:,1}; bh = overall_betahats{:,1};
 if graphic > 0
-    figure; set(gcf,'Position',[10 2 300 150],'Toolbar','none','Tag','parci_plot');
+    figure; set(double(gcf),'Position',[10 2 300 150],'Toolbar','none','Tag','parci_plot');
     for idx = 1:length(bh)
         c = ci(idx,:);
         p=patch([idx-0.2 idx-0.2 idx+0.2 idx+0.2], [c(1) c(2) c(2) c(1)], [0.7 0.7 0.7]);
@@ -498,15 +498,15 @@ if graphic > 0
     l=plot(1:length(bh2), bh2, '^b');
     set(l,'Color', [1 0 0],'MarkerSize',10);
     %legend({'Before', 'After'},'boxoff');
-    set(gca,'XTick',1:4,'XTickLabel',{'Pmax','m','n','Rise rate'});
-    set(get(gca,'XLabel'),'FontSize',18,'FontWeight','bold');
-    set(get(gca,'YLabel'),'FontSize',18,'FontWeight','bold');
-    set(get(gca,'title'),'FontSize',18,'FontWeight','bold');
-    set(gca,'FontSize',18,'FontWeight','bold');
+    set(double(gca),'XTick',1:4,'XTickLabel',{'Pmax','m','n','Rise rate'});
+    set(get(double(gca),'XLabel'),'FontSize',18,'FontWeight','bold');
+    set(get(double(gca),'YLabel'),'FontSize',18,'FontWeight','bold');
+    set(get(double(gca),'title'),'FontSize',18,'FontWeight','bold');
+    set(double(gca),'FontSize',18,'FontWeight','bold');
     title('Parameter estimates for logistic curve for before and after');
 end;
 %uicontrol('Tag', 'figname', 'Style','text', 'String', sprintf('%s_beforeafter_paramestim',ratname), 'Visible','off');
-sign_fname(gcf,mfilename);
+sign_fname(double(gcf),mfilename);
 
 % Finally, give verbose output -------------------------------------
 if verbose
@@ -630,7 +630,7 @@ if ~isstr(bef) && ~isstr(aft)
     ylim = [min_ylim*1.5 max_ylim*1.5];
     ht = max_ylim;
 
-    set(gca,'XTIck',[],'FontSize',14,'FontWeight','bold','YLim',ylim);
+    set(double(gca),'XTIck',[],'FontSize',14,'FontWeight','bold','YLim',ylim);
     [sig p]= permutationtest_diff(bef, aft,'alphaval',alphaval);
 
     hold on; line([0.85 1.15], [ht*1.1 ht*1.1],'Color','k');
@@ -640,7 +640,7 @@ if ~isstr(bef) && ~isstr(aft)
         t=text(0.9, ht*1.15, sprintf('n.s. (%1.2f)',p));
     end;
     y=ylabel(ylbl);
-    x=get(gca,'XLabel'); set(x,'FontSize',16,'FontWeight','bold');
+    x=get(double(gca),'XLabel'); set(x,'FontSize',16,'FontWeight','bold');
     set(y,'FontSize',16, 'FontWeight','bold');
 else
     t=text(0.5,0.5, 'n/a');
@@ -651,12 +651,12 @@ set(t,'FontSize',16,'FontWeight','bold');
 
 % plot histogram of weber ratios before and after
 function [] = plot_weber_hist(ratname,webers, overall_webers, BEFORE_COL, AFTER_COL)
-figure; set(gcf,'Position',[800 140 380 140],'Toolbar','none','Tag','weber_hist');
+figure; set(double(gcf),'Position',[800 140 380 140],'Toolbar','none','Tag','weber_hist');
 bins = 0:0.02:0.5;
 
 if (length(webers{:,AFTER_COL}) > 1) || (webers{:,AFTER_COL} ~= -1)
     hist(webers{:,AFTER_COL},bins);
-    p=findobj(gca,'Type','patch'); set(p,'FaceColor', [1 0 0],'EdgeColor',[1 0 0],'facealpha',0.75);
+    p=findobj(double(gca),'Type','patch'); set(p,'FaceColor', [1 0 0],'EdgeColor',[1 0 0],'facealpha',0.75);
     hold on;
     line([overall_webers{:,AFTER_COL} overall_webers{:,AFTER_COL}], [0 8], 'Color','r','LineWidth',4);
     t=text(overall_webers{:,AFTER_COL}, 3, 'Pooled after'); set(t,'Color','red');
@@ -665,7 +665,7 @@ end;
 
 if (length(webers{:,BEFORE_COL}) > 1) || (webers{:,BEFORE_COL} ~= -1)
     hist(webers{:,BEFORE_COL},bins);
-    p=findobj(gca,'Type','patch');
+    p=findobj(double(gca),'Type','patch');
     set(p,'facealpha',0.25, 'EdgeColor','none');
     line([overall_webers{:,BEFORE_COL} overall_webers{:,BEFORE_COL}], [0 6], 'Color','b','LineWidth',3,'LineStyle',':');
     t=text(overall_webers{:,BEFORE_COL}, 5, 'Pooled before'); set(t,'Color','blue');
@@ -679,7 +679,7 @@ if  ((length(webers{:,BEFORE_COL}) > 1) || (webers{:,BEFORE_COL} ~= -1)) && ...
 end;
 
 binsize = bins(2)-bins(1);
-set(gca,'XLim',[min(weberrange) - (2* binsize) ...
+set(double(gca),'XLim',[min(weberrange) - (2* binsize) ...
     max(weberrange) + (2* binsize) ]);
 
 % -------------------------------------------------------------------------
@@ -727,13 +727,13 @@ uicontrol('Units','normalized','Position', [0.05+((currnum-1)*(axes_width*1.1)) 
 vals = isnormal(my_array{:,beforecol});
 cdfplot(vals{2}); hold on; plot(vals{3}, vals{4},'-k');
 if vals{1} >0 % reject
-    set(gca,'Color', reject_colour);
+    set(double(gca),'Color', reject_colour);
 end;
 normhbefore = vals{1};
 
 t=title(tstr);
 set(t,'FontSize',12);
-set(gca,'FontSize',12);
+set(double(gca),'FontSize',12);
 
 % AFTER ----------------
 axes('Position', [0.05+((currnum-1)*(axes_width*1.1)) 0.1 axes_width axes_ht]);
@@ -747,12 +747,12 @@ uicontrol('Units','normalized','Position', [0.05+((currnum-1)*(axes_width*1.1)) 
 vals = isnormal(my_array{:,aftercol});
 cdfplot(vals{2}); hold on; plot(vals{3}, vals{4},'-k');
 if vals{1} >0 % reject
-    set(gca,'Color', reject_colour);
+    set(double(gca),'Color', reject_colour);
 end;
 normhafter = vals{1};
 t=title(tstr);
 set(t,'FontSize',12);
-set(gca,'FontSize',12);
+set(double(gca),'FontSize',12);
 
 % now plot variances for both groups
 axes_width = 0.8/numMetrics;
@@ -763,12 +763,12 @@ axes('Position',[0.05+((currnum-1)*(axes_width*1.1)) 0.1 axes_width axes_ht]);
 l=plot([1 2], [std(my_array{:,beforecol}).^2 std(my_array{:,aftercol}).^2], '.b');
 set(l,'MarkerSize',20);
 
-set(gca,'XLim',[0 3],'XTick',[1 2], 'XTickLabel',{'before','after'});
+set(double(gca),'XLim',[0 3],'XTick',[1 2], 'XTickLabel',{'before','after'});
 t=xlabel(xlbl);set(t,'FontSize',12);
 ylabel('Variance');
 t=title(sprintf([tstr '\n']));
 set(t,'FontSize',12);
-set(gca,'FontSize',12);
+set(double(gca),'FontSize',12);
 
 tmp = my_array{:,beforecol}; if cols(tmp) > 1, tmp = tmp'; end;
 levene_array = [tmp ones(size(tmp))];
@@ -777,14 +777,14 @@ tmp = my_array{:,aftercol}; if cols(tmp) > 1, tmp = tmp'; end;
 levene_array = vertcat(levene_array, [tmp 2*ones(size(tmp))]);
 h = Levenetest(levene_array);
 if h > 0 % reject,
-    set(gca,'Color', reject_colour);
+    set(double(gca),'Color', reject_colour);
 end;
 
 % now change colour on summary graphs
 f = findobj('Tag', sprintf('%s_assumption_summary', ratname)); set(0,'CurrentFigure',f);
 % normality test
 f = findobj('Tag', sprintf('%s_norm_summary', ratname));
-set(gcf,'CurrentAxes',f);
+set(double(gcf),'CurrentAxes',f);
 patch_colour = 'w'; if normhbefore > 0, patch_colour = reject_colour; end;
 patch([currnum currnum currnum+1 currnum+1],[1 2 2 1], patch_colour);
 text(currnum+0.1, 1.5, titlestr);
@@ -794,7 +794,7 @@ patch([currnum currnum currnum+1 currnum+1],[0 1 1 0], patch_colour);
 
 % homoscedasticity test
 f = findobj('Tag', sprintf('%s_eqvar_summary', ratname));
-set(gcf,'CurrentAxes',f);
+set(double(gcf),'CurrentAxes',f);
 patch_colour = 'w'; if h > 0, patch_colour = reject_colour; end;
 patch([currnum currnum currnum+1 currnum+1],[0 1 1 0], patch_colour);
 text(currnum+0.1, 0.5, titlestr);
@@ -808,27 +808,27 @@ normality_cell{AFTER_COL, 1} = isnormal(webers{:,AFTER_COL});
 
 % mini view of whether assumptions are met for various tests
 figure;
-set(gcf,'Tag',sprintf('%s_assumption_summary',ratname), 'Name', 'Assumptions met?', ...
+set(double(gcf),'Tag',sprintf('%s_assumption_summary',ratname), 'Name', 'Assumptions met?', ...
     'Position', [200 200 500 200]); %, 'Menubar','none','Toolbar','none');
 
 axes('Position', [0.05 0.05 0.9 0.3]); % bottom axis of homoscedasticity
-set(gca,'Tag', sprintf('%s_eqvar_summary', ratname),'XLim',[1 numMetrics+1],'YLim',[0 1], 'XTick',[], 'YTick',[]);
+set(double(gca),'Tag', sprintf('%s_eqvar_summary', ratname),'XLim',[1 numMetrics+1],'YLim',[0 1], 'XTick',[], 'YTick',[]);
 title(sprintf('%s: Equal variance assumption', ratname));
 
 axes('Position',[0.05 0.5 0.9 0.4]); % top axis of normality assumption
-set(gca,'Tag', sprintf('%s_norm_summary', ratname), 'XLim',[1 numMetrics+1], 'YLim', [0 2], 'XTick', [], 'YTick',[]);
+set(double(gca),'Tag', sprintf('%s_norm_summary', ratname), 'XLim',[1 numMetrics+1], 'YLim', [0 2], 'XTick', [], 'YTick',[]);
 title(sprintf('%s: Normality assumption', ratname));
 
 
 figure;
-set(gcf,'Tag','eqvar','Name','Variances Before & After', ...
+set(double(gcf),'Tag','eqvar','Name','Variances Before & After', ...
     'Position', [ 520   870   880   160]);
 
 figure;
 axes('Position', [0.95 0 0.05 1], 'Color','y', 'XLim',[0 1], 'YLim',[0 1], 'YTick',[], 'XTick',[]);
 t=text(0.5,0.2, ratname);set(t,'Rotation', 90,'FontWeight','bold','FontSize',40);
 
-set(gcf,'Position', [120 500 1400 330],'Tag','normplot','Name','Normality of Metrics');
+set(double(gcf),'Position', [120 500 1400 330],'Tag','normplot','Name','Normality of Metrics');
 % close histogram button
 uicontrol('Units','normalized','Position', [0 0.95 0.05 0.07], ...
     'Style','pushbutton',  'String', 'Close all hist',...
@@ -873,7 +873,7 @@ sigvanilla = permutationtest_diff(vanilla_bef, vanilla_aft,'alphaval',alphaval);
 
 
 % plot
-figure; set(gcf,'Tag', 'hits_sig');
+figure; set(double(gcf),'Tag', 'hits_sig');
 subplot(1,2,1);
 barweb([mean(psych_bef) mean(psych_aft)], [std(psych_bef)/length(psych_bef), std(psych_aft)/length(psych_aft)]);
 hold on; line([0.85 1.15], [1.2 1.2],'Color','k');
@@ -885,7 +885,7 @@ end;
 set(t,'FontSize',14,'FontWeight','bold');
 text(1, 1.5, sprintf('alpha = %1.3f', alphaval));
 
-set(gca,'YLim', [0 1.5], 'YTick', 0:0.2:1, 'YTickLabel', 0:20:100,'XTick',[]);
+set(double(gca),'YLim', [0 1.5], 'YTick', 0:0.2:1, 'YTickLabel', 0:20:100,'XTick',[]);
 title('Psychometric trials');
 subplot(1,2,2);
 barweb([mean(vanilla_bef) mean(vanilla_aft)], [std(vanilla_bef)/length(vanilla_bef), std(vanilla_aft)/length(vanilla_aft)]);
@@ -897,6 +897,6 @@ else
 end;
 set(t,'FontSize',14,'FontWeight','bold');
 text(1, 1.5, sprintf('alpha = %1.3f', alphaval));
-set(gca,'YLim', [0 1.5], 'YTick', 0:0.2:1, 'YTickLabel', 0:20:100,'XTick',[]);
+set(double(gca),'YLim', [0 1.5], 'YTick', 0:0.2:1, 'YTickLabel', 0:20:100,'XTick',[]);
 title('Vanilla trials');
 

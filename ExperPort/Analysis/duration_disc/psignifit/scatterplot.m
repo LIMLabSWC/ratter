@@ -35,9 +35,9 @@ for i =  1:length(keys)
 	if ~isempty(lasterr)
 		lasterr('')
 		if strmatch(lower(keys{i}), {'xlabel', 'ylabel', 'title'}, 'exact')
-			eval('set(get(gca, keys{i}), ''string'', values{i})', '');
+			eval('set(get(double(gca), keys{i}), ''string'', values{i})', '');
 		else
-			eval('set(gca, keys{i}, values{i})', '');
+			eval('set(double(gca), keys{i}, values{i})', '');
 		end
 		if ~isempty(lasterr)
 			error(['could not set the supplied value for property ''' keys{i}(1,:) ''' of either line or axes'])
@@ -62,4 +62,4 @@ if ishold, yRange(1) = min(yRange(1), min(ylim)); yRange(2) = max(yRange(2), max
 if diff(yRange) == 0, yRange = yRange + [-1 1]; end
 ylim(yRange)
 
-if nargout, hOut = h; else figure(gcf), end
+if nargout, hOut = h; else figure(double(gcf)), end

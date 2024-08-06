@@ -19,4 +19,4 @@ plot(find(sides == 0), dklen(sides ==0), '.r'); hold on;
 legend({'left','right'});
 ylabel('reward state (s)'); 
 title(sprintf('%s (%s)', ratname, indate));
-axes__format(gca);
+axes__format(double(gca));

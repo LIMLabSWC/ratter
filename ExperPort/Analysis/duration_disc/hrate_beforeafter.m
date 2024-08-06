@@ -35,12 +35,12 @@ end;
 makebargroups({bmetric, ametric}, [0 0 1; 1 0 0]);
 
 if strcmpi(mymetric,'numtrials')
-    set(gca,'YLim',[0 300], 'YTick',0:50:300, 'XTick',[]);
+    set(double(gca),'YLim',[0 300], 'YTick',0:50:300, 'XTick',[]);
 else
-    set(gca,'YLim',[0 1.5],'YTick',0:0.25:1, 'YTickLabel',0:25:100,'XTick',[]);
+    set(double(gca),'YLim',[0 1.5],'YTick',0:0.25:1, 'YTickLabel',0:25:100,'XTick',[]);
     ylabel('Accuracy rate (%)');
 end;
-axes__format(gca);
+axes__format(double(gca));
 
 
 fprintf(1,'Before = %2.1f%% (%2.1f)\nAfter = %2.1f%% (%2.1f)\n', ...

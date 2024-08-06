@@ -20,12 +20,12 @@ switch action,
       'OffString', 'Sounds', 'TooltipString', 'Show/Hide Sounds panel'); 
     set_callback(SoundsShow, {mfilename, 'show_hide'}); %#ok<NODEF> (Defined just above)
     next_row(y);
-    oldx=x; oldy=y;    parentfig=gcf;
+    oldx=x; oldy=y;    parentfig=double(gcf);
 
     SoloParamHandle(obj, 'myfig', 'value', figure('Position', [100 100 560 440], ...
       'closerequestfcn', [mfilename '(' class(obj) ', ''hide'');'], 'MenuBar', 'none', ...
       'Name', mfilename), 'saveable', 0);
-    set(gcf, 'Visible', 'off');
+    set(double(gcf), 'Visible', 'off');
     x=10;y=10;
     
     [x,y]=SoundInterface(obj,'add','ViolationSound',x,y,'Style','WhiteNoise','Volume',0.05);

@@ -43,7 +43,7 @@ for f = 1:ceil(size(ratnames,1)/(h*w))
         end
     end
 
-    set(gca,'Units','Normalized');
+    set(double(gca),'Units','Normalized');
 end
 
 

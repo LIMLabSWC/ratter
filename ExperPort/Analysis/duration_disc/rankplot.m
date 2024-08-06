@@ -33,4 +33,4 @@ for d=0:length(r1) % plot old versus new measure for duration rats
     end;
 end;
 
-set(gca,'XLim',[numgroups-0.2 numgroups+0.2], 'YLim',[0 length(r1)+1]);
+set(double(gca),'XLim',[numgroups-0.2 numgroups+0.2], 'YLim',[0 length(r1)+1]);

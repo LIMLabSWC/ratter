@@ -14,7 +14,7 @@ GetSoloFunctionArgs(obj);
 switch action,
  case 'init',  % ---------- CASE INIT ----------
 
-   fig = gcf; % This is the protocol's main window, to which we add a menu:   
+   fig = double(gcf); % This is the protocol's main window, to which we add a menu:   
    SoloParamHandle(obj, 'my_xyfig', 'value', [x y fig]);
 
    ToggleParam(obj, 'pokes_plot_show', 1, x, y, ...
@@ -128,7 +128,7 @@ switch action,
      set(t, 'Interpreter', 'none', ...
        'HorizontalAlignment', 'right', ...
        'VerticalAlignment', 'middle', 'Rotation', 90);
-     set(gca, 'Visible', 'off');
+     set(double(gca), 'Visible', 'off');
    end;
    ylim([0 1]); xlim([0 length(fnames)]);
 

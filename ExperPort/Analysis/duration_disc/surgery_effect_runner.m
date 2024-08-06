@@ -59,17 +59,17 @@ for r= 1:length(ratlist)
      
   %  surgery_effect_fixedlog(ratname,'brief_title',1);
     %  uicontrol('Tag', 'fname', 'Style','text', 'String', ratname, 'Visible','off');
-    set(gcf,'Tag', 'blah');
+    set(double(gcf),'Tag', 'blah');
 end;
 
 function [] = overlap_hists(x1,x2)
 
 hist(x2);
-p=findobj(gca,'Type','patch'); set(p,'FaceColor', [1 0 0],'EdgeColor',[1 0 0],'facealpha',0.75);
+p=findobj(double(gca),'Type','patch'); set(p,'FaceColor', [1 0 0],'EdgeColor',[1 0 0],'facealpha',0.75);
 hold on;
 
 hist(x1);
-p=findobj(gca,'Type','patch');
+p=findobj(double(gca),'Type','patch');
 set(p,'facealpha',0.25, 'EdgeColor','none');
 
 
@@ -88,14 +88,14 @@ plot_averaged_residuals(residuals_set1, [1 0.5 0],f,include_nonpsych_days);hold 
 plot_averaged_residuals(residuals_set2, [0.8 0 1],f,include_nonpsych_days);
 x=xlabel('Day of post-recovery training');
 y=ylabel('Residual averaged across rats');
-set(gca,'XTick', 1:1:3);
+set(double(gca),'XTick', 1:1:3);
 t=title(sprintf('%s-lesioned rats\nResiduals through post-lesion sessions',titleprfx));
 legend({'Duration','Frequency'});
 
 set(y,'FontSize',18,'FontWeight','bold');
 set(x,'FontSize',18,'FontWeight','bold');
 set(t,'FontSize',18,'FontWeight','bold');
-set(gca,'FontSize',16,'FontWeight','bold');
+set(double(gca),'FontSize',16,'FontWeight','bold');
 
 qual = 'inc';
 if include_nonpsych_days == 0, qual ='no';end;
@@ -184,12 +184,12 @@ for idx = 1:length(fnames)
     set(l2,'Color',curr_c,'LineWidth',2);
     %set(l3,'Color',curr_c);
 
-    xlim = get(gca,'XLim');
-    set(gca,'XLim',[0 max(xlim(2), length(curr_res))],'XTick', 1:1:length(curr_res));
+    xlim = get(double(gca),'XLim');
+    set(double(gca),'XLim',[0 max(xlim(2), length(curr_res))],'XTick', 1:1:length(curr_res));
 end;
 
 x=xlabel('Day of post-recovery training'); set(x,'FontWeight','bold','FontSize',20);
 y=ylabel('%'); set(y,'FontWeight','bold','FontSize',20);
-set(gca,'FontSize',16,'FontWeight','bold');
+set(double(gca),'FontSize',16,'FontWeight','bold');
 
 

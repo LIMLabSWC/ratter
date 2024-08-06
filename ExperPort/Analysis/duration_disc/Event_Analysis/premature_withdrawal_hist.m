@@ -40,8 +40,8 @@ for r=1:length(flat),
     text(r-0.1, (counter(r)*100)+10, sprintf('%2.0f%%', counter(r)*100),'FontSize',11, 'FontWeight','bold');
 end;
 
-set(gcf,'Position', [200 200 300 200],'Menubar','none','Toolbar', 'none');
-a = get(gcf, 'CurrentAxes');
+set(double(gcf),'Position', [200 200 300 200],'Menubar','none','Toolbar', 'none');
+a = get(double(gcf), 'CurrentAxes');
 set(a,'XTickLabel', headers, 'FontSize', 12, 'FontWeight','bold','YLim', [0 100]);
 ylabel('# occurrences'); xlabel('States');
 title(sprintf('Proportion of Timeout Occurrences\nin different pre-GO states'));

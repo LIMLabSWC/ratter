@@ -60,7 +60,7 @@ function [output_txt] = session_stims(rat, task, varargin)
  % master_matrix = [ master_matrix ; master_ld ]; 
   
   figure;
-  set(gcf,'Menubar','none','Toolbar','none', 'Position', [100 100 400 500]);
+  set(double(gcf),'Menubar','none','Toolbar','none', 'Position', [100 100 400 500]);
   
   for k = 1:rows(master_matrix)
     curr = master_matrix(k,:); present = find(curr == 1);
@@ -81,7 +81,7 @@ function [output_txt] = session_stims(rat, task, varargin)
 
   xlabel(xlbl);
   ylabel('Session #');
-  set(gca, 'XLim', [0 length(master_ld)+1], 'YLim', [0 rows(dates)+1], ...
+  set(double(gca), 'XLim', [0 length(master_ld)+1], 'YLim', [0 rows(dates)+1], ...
            'XTick', 1:length(master_ld), 'XTickLabel', num2cell(master_ld), ...
            'YTick', 1:rows(dates), 'YTickLabel', rows(dates):-1:1, ...
            'Position', [0.1 0.15 0.8 0.75]);
@@ -92,16 +92,16 @@ function [output_txt] = session_stims(rat, task, varargin)
   rat, from, to);
   title(s);
   
-   uicontrol(gcf, 'Style','text','Position', [10 15 250 30], ...
+   uicontrol(double(gcf), 'Style','text','Position', [10 15 250 30], ...
             'String', sprintf(['Green dots indicate hit rate > %2.0f%% & ' ...
                        'bias < %2.0f%%\nAny logdiff set < %i trials is marked red by default'], good_hrate*100, max_bias*100, valid_set), ...
             'FontAngle', 'italic', 'Background', [1 1 0.8]);
    
-   set(gcf,'Name', sprintf('%s: Stimulus pairs',rat));
+   set(double(gcf),'Name', sprintf('%s: Stimulus pairs',rat));
    
    
  datacursormode on;
-  dcm_obj = datacursormode(gcf);
+  dcm_obj = datacursormode(double(gcf));
   set(dcm_obj, 'SnapToDataVertex', 'on', 'DisplayStyle','datatip');
   set(dcm_obj, 'Updatefcn', {@session_stims,'action', 'show'})  
    

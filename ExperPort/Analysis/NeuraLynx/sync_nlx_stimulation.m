@@ -124,8 +124,8 @@ for i = 1:length(trains),
 	b = [qfind(t, trains{i}.pulse_In(1)) qfind(t, trains{i}.pulse_In(end)+trains{i}.width+15e-3)];
 	if b(1) > 0,
 		figure; hold on;
-		set(gcf, 'Position', [400 200 800 200]);	
-		set(gcf, 'PaperUnits', 'inches', 'PaperPosition', [1 1 8 2], 'PaperPositionMode', 'manual');	
+		set(double(gcf), 'Position', [400 200 800 200]);	
+		set(double(gcf), 'PaperUnits', 'inches', 'PaperPosition', [1 1 8 2], 'PaperPositionMode', 'manual');	
 		plot(t(b(1)-1000:b(2))-t(b(1)), V(b(1)-1000:b(2)), 'k');
 		h = line([trains{i}.pulse_In trains{i}.pulse_In+trains{i}.width]'-t(b(1)), 0*ones(length(trains{i}.pulse_In), 2)'); 
 		set(h, 'Color', 'b', 'LineWidth', 5);
@@ -146,8 +146,8 @@ for i = 1:length(trains),
     [y, x] = cdraster(trains{i}.pulse_In(1:5), t, V, buffer, max(pulse_width+buffer, 25e-3), 0.001/32);
     
 	figure; hold on;
-	set(gcf, 'Position', [100 200 200 200]);
-	set(gcf, 'PaperUnits', 'inches', 'PaperPosition', [1 1 2 2], 'PaperPositionMode', 'manual');
+	set(double(gcf), 'Position', [100 200 200 200]);
+	set(double(gcf), 'PaperUnits', 'inches', 'PaperPosition', [1 1 2 2], 'PaperPositionMode', 'manual');
     plot(x, y, 'Color', 0.7*[1 1 1]);
     plot(x, mean(y), 'k');
 	h = line([0 trains{i}.width], -1.5e-4*[1 1]); set(h, 'Color', 'b', 'LineWidth', 3);

@@ -105,8 +105,8 @@ title(sprintf('%s (%s)', area_filter, ttype));
 ylabel('Accuracy (%)');
 xlabel('Trial number (1st postlesion session)');
 
-set(gca,'YLim',[0.3 1.2],'YTick',0.3:0.1:1,'YTickLabel',30:10:100);
-set(gcf,'Position',[1 1 1109 304]);
+set(double(gca),'YLim',[0.3 1.2],'YTick',0.3:0.1:1,'YTickLabel',30:10:100);
+set(double(gcf),'Position',[1 1 1109 304]);
 
 
 function [a] = sub__kernalize(hh)

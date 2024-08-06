@@ -69,7 +69,7 @@ fprintf(1,'State distribution\n');
 for k = 1:rows(stotal)
 %     figure; 
 %     plot(tmp,'.b'); ylabel(snames{k}); xlabel('trial #');
-%     set(gca,'XLim',[1 length(tmp)]);   
+%     set(double(gca),'XLim',[1 length(tmp)]);   
     fprintf(1,'\t%9s:\t%1.2f min\n', stotal{k,2}, stotal{k,1} / 60);    
 end;
 
@@ -80,12 +80,12 @@ if nargin > 2
     tmp = eval(['sdurs.' state2plot ';']);
     plot(tmp,'.b');
     hold on;
-    yl = get(gca,'YLim'); line([2 2], [0 yl(2)],'Color','r','LineWidth',2);
+    yl = get(double(gca),'YLim'); line([2 2], [0 yl(2)],'Color','r','LineWidth',2);
     ylabel(state2plot);
-    set(gca,'XLim',[1 length(tmp)]);
+    set(double(gca),'XLim',[1 length(tmp)]);
     xlabel('trial #');
-    set(gcf,'Position',[200 200 600 150]);
-    axes__format(gca);
+    set(double(gcf),'Position',[200 200 600 150]);
+    axes__format(double(gca));
     title(sprintf('%s:%s', ratname, indate));
   %  hist(tmp);
 end;

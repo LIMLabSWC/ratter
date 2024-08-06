@@ -83,7 +83,7 @@ function [output_txt] = biasview(rat, task, varargin)
   % Orange: 20 - 50% 
   % Red: > 50%
   figure;
-  set(gcf,'Menubar','none','Toolbar','none', 'Position', [360   138   341 ...
+  set(double(gcf),'Menubar','none','Toolbar','none', 'Position', [360   138   341 ...
                       550], 'Name', sprintf('%s: Multi-session bias view', ...
                                             rat));
  
@@ -107,18 +107,18 @@ function [output_txt] = biasview(rat, task, varargin)
   l= plot(col .* ones(length(pos),1), pos, '.r', 'MarkerSize', 18);
   end;
   
-  set(gca, 'XLim', [0 4], 'YLim', [0 rows(dates)+1], 'XTick', 0:1:4);
+  set(double(gca), 'XLim', [0 4], 'YLim', [0 rows(dates)+1], 'XTick', 0:1:4);
   
   s = sprintf('%s: Bias for each third of session\n(%s to %s)', rat, from, ...
               to);
   title(s);
   
   datacursormode on;
-  dcm_obj = datacursormode(gcf);
+  dcm_obj = datacursormode(double(gcf));
   set(dcm_obj, 'SnapToDataVertex', 'on', 'DisplayStyle','datatip');
   set(dcm_obj, 'Updatefcn', {@biasview,'action', 'update'})  
   
-  uicontrol(gcf, 'Style','text', 'BackgroundColor', [1 1 0], 'String', ...
+  uicontrol(double(gcf), 'Style','text', 'BackgroundColor', [1 1 0], 'String', ...
             'Black: <20% bias, Red: 20-49%bias, Blue: >=50%bias', 'Position', ...
             [10 10 200 30]);
   
@@ -130,7 +130,7 @@ function [output_txt] = biasview(rat, task, varargin)
   
 % $$$   % Plot LeftProbability
 % $$$   figure;
-% $$$   set(gcf,'Menubar','none','Toolbar','none', 'Position', [860   138   341   550]);
+% $$$   set(double(gcf),'Menubar','none','Toolbar','none', 'Position', [860   138   341   550]);
 % $$$   
 % $$$   curr = lprobs(:,1);  
 % $$$   for k = 1:length(curr)
@@ -147,7 +147,7 @@ function [output_txt] = biasview(rat, task, varargin)
 % $$$     set(l, 'Color', [1 0 1] .* curr(k));
 % $$$   end;
 % $$$  
-% $$$   set(gca, 'XLim', [0 3], 'YLim', [0 rows(dates)+1], 'XTick', 0:1:3);
+% $$$   set(double(gca), 'XLim', [0 3], 'YLim', [0 rows(dates)+1], 'XTick', 0:1:3);
 % $$$   
   output_txt = tempo;
    case 'update'

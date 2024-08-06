@@ -3,7 +3,7 @@ function [] = rhs_pitch(rat, date);
   load_datafile(rat, 'dual_discobj',date);
   
   figure;
-  set(gcf,'Menubar', 'none','Toolbar','none','Position',[200 200 900 300]);
+  set(double(gcf),'Menubar', 'none','Toolbar','none','Position',[200 200 900 300]);
   % Plot1 : RHS Duration
   subplot(1,2,1);
   d2 = cell2mat(saved_history.ChordSection_Tone_Dur_R);

@@ -15,7 +15,7 @@ GetSoloFunctionArgs;
 switch action,
  case 'init',
      
-   fig=gcf;
+   fig=double(gcf);
    MenuParam(obj, 'CRewardParams', {'hidden','view'},1,x,y);next_row(y);
    set_callback(CRewardParams, {'CRewardSection', 'creward_param_view'});
    

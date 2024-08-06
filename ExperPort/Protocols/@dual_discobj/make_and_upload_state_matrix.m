@@ -144,13 +144,13 @@ switch action,
        'FontSize', 20, 'FontWeight','bold', ...
            'Position',[20 60 500 120],'BackgroundColor','y' );       
        
-       c = get(gcf,'Children');
+       c = get(double(gcf),'Children');
        % button
        set(c(2),'Position',[120 20 300 30],'FontSize', 14,'BackgroundColor','r');
        % uipanel
        set(c(3),'BackgroundColor','y');
        
-       set(gcf,'Position', [300 300 500 200],'Name', 'Session time up','Color',[1 1 0],'Tag','tup_fig','Menubar','none','Toolbar','none');
+       set(double(gcf),'Position', [300 300 500 200],'Name', 'Session time up','Color',[1 1 0],'Tag','tup_fig','Menubar','none','Toolbar','none');
               
        refresh;
        tup_flag.value = 1;
@@ -323,7 +323,7 @@ TimeOutReinit_endstate = TimeOutReinit_state + max(2*TimeOutReinitPenalty/wnln +
 %     b=uicontrol('Style','text','String', sprintf('Program has crashed.\nPlease take out rat and notify Shraddha.\nPlease leave the protocol as-is.'), ...
 %                 'FontSize', 20, 'FontWeight','bold', ...
 %                 'Position',[10 60 520 120],'BackgroundColor','y' );
-%             set(gcf,'Position', [300 300 500 200],'Name', 'Unexpected crash!','Color',[1 1 0],'Menubar','none','Toolbar','none');
+%             set(double(gcf),'Position', [300 300 500 200],'Name', 'Unexpected crash!','Color',[1 1 0],'Menubar','none','Toolbar','none');
 %             refresh; 
 %             error('Error in program. Please notify Shraddha.');
 %             

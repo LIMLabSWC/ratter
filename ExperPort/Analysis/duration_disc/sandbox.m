@@ -78,21 +78,21 @@ function [] = sandbox()
 % %         betalist = vertcat(betalist, [out1 out2]);
 % %         if out3 > 0
 % %             good = horzcat(good, psychdates(r));
-% %             set(gcf,'Position',[x y w h],'Toolbar','none');
+% %             set(double(gcf),'Position',[x y w h],'Toolbar','none');
 % %             y = y+h; if y > scrh, y = 100; x = x+w; end;
 % %             good_tally=horzcat(good_tally, sum(pooled_tally(r,:)));
 % %         else
-% %             set(gca,'XLim',[5 7]);
-% %             set(gcf,'Position',[xbad ybad w h],'Toolbar','none','Color',[0.3 0.3 0.3]);
+% %             set(double(gca),'XLim',[5 7]);
+% %             set(double(gcf),'Position',[xbad ybad w h],'Toolbar','none','Color',[0.3 0.3 0.3]);
 % %             ybad = ybad+h; if ybad > scrh, ybad = 100; xbad = xbad+w; end;
 % %             badctr = badctr+1;
 % %             if badctr > maxbad
-% %                 close gcf;
+% %                 close double(gcf);
 % %             end;
 % %             bad_tally = horzcat(bad_tally, sum(pooled_tally(r,:)));
 % %         end;
 % % %         l=plot(bins, pooled_replong(r,:)./pooled_tally(r,:), '.g'); set(l,'MarkerSize',20);
-% % %             set(gcf,'Position',[xbad ybad w h],'Toolbar','none','Color',[0 0.3 0]);
+% % %             set(double(gcf),'Position',[xbad ybad w h],'Toolbar','none','Color',[0 0.3 0]);
 % % %             ybad = ybad+h; if ybad > scrh, ybad = 100; xbad = xbad+w; end;
 % % %       shorttr_tally = horzcat(shorttr_tally, sum(pooled_tally(r,:)));
 % % end;
@@ -123,7 +123,7 @@ function [] = sandbox()
 %   for r=1:length(ratlist)
 %       ratname=ratlist{r};
 %       surgery_effect(ratname, 'psychgraph_only',1, 'days_after',[1 5], 'lastfew_before',5);
-%       set(gcf,'Tag','blahblah');
+%       set(double(gcf),'Tag','blahblah');
 %   end;
 
 % ratname = 'Evenstar';
@@ -179,9 +179,9 @@ function [] = sandbox()
 % right4little = intersect(find(sc_idx == 0), little_tones);
 % plot(right4little, ones(size(right4little))*4, 'vb');
 %
-% set(gca,'YLim',[-1 +5], 'YTick', [0 1 2 3], 'YTickLabel', {'Went RIGHT','Went LEFT', 'RIGHT','LEFT'});
+% set(double(gca),'YLim',[-1 +5], 'YTick', [0 1 2 3], 'YTickLabel', {'Went RIGHT','Went LEFT', 'RIGHT','LEFT'});
 % title(sprintf('%s on %s',ratname, d));
-% set(gcf,'Position',[200 200 1000 300]);
+% set(double(gcf),'Position',[200 200 1000 300]);
 
 
 %  % plot residuals
@@ -201,7 +201,7 @@ function [] = sandbox()
 %         end;
 %
 %               % map colours to rats
-%         figure;set(gcf,'Position',[1200 100 100 500]);
+%         figure;set(double(gcf),'Position',[1200 100 100 500]);
 %         fnames = fieldnames(ratcolour);
 %         for idx=1:length(fnames)
 %             t=text(1, idx, fnames{idx});
@@ -209,7 +209,7 @@ function [] = sandbox()
 %
 %             t=title('Rat colours');
 %             set(t,'FontWeight','bold','FontSize',14);
-%             set(gca,'XLim',[0.5 1.5],'YLim',[0 length(fnames)+1]);
+%             set(double(gca),'XLim',[0.5 1.5],'YLim',[0 length(fnames)+1]);
 %         end;
 %
 % %
@@ -225,15 +225,15 @@ function [] = sandbox()
 %   %  surgery_effect(ratname,'psychgraph_only',1);
 %   surgery_effect_fixedlog(ratname,'brief_title',1);
 %   %  uicontrol('Tag', 'fname', 'Style','text', 'String', ratname, 'Visible','off');
-%     set(gcf,'Tag', 'blah');
+%     set(double(gcf),'Tag', 'blah');
 % end;
 % function [] = overlap_hists(x1,x2)
 %
 % hist(x2);
-% p=findobj(gca,'Type','patch'); set(p,'FaceColor', [1 0 0],'EdgeColor',[1 0 0],'facealpha',0.75);
+% p=findobj(double(gca),'Type','patch'); set(p,'FaceColor', [1 0 0],'EdgeColor',[1 0 0],'facealpha',0.75);
 % hold on;
 % hist(x1);
-% p=findobj(gca,'Type','patch');
+% p=findobj(double(gca),'Type','patch');
 % set(p,'facealpha',0.25, 'EdgeColor','none');
 %
 % global Solo_datadir;
@@ -265,11 +265,11 @@ function [] = sandbox()
 % l=plot(ones(5,1)*2, buffer2,'.r');
 % set(l,'Color',[0.8 0 1],'MarkerSize',20);
 %
-% set(gca,'XTick',[ 1 2], 'XLim', [0.5 2.5],'FontSize',20,'FontWeight','bold');
-% set(gca,'XTickLabel',{'Duration','Pitch'});
-% set(get(gca,'XLabel'),'FontSize',20,'FontWeight','bold');
+% set(double(gca),'XTick',[ 1 2], 'XLim', [0.5 2.5],'FontSize',20,'FontWeight','bold');
+% set(double(gca),'XTickLabel',{'Duration','Pitch'});
+% set(get(double(gca),'XLabel'),'FontSize',20,'FontWeight','bold');
 % ylabel('p-value');
-% set(get(gca,'YLabel'),'FontSize',20,'FontWeight','bold');
+% set(get(double(gca),'YLabel'),'FontSize',20,'FontWeight','bold');
 % line([0 3], [0.05 0.05], 'LineStyle',':','Color','k','LineWidth',2);
 %
 % uicontrol('Tag', 'figname', 'Style','text', 'String', 'ACx_curve_sigs', 'Visible','off');
@@ -355,7 +355,7 @@ function [] = sandbox()
 %
 % stim = find(abs(y - pt) == min(abs(y-pt)));
 
-% a = get(gca,'Children');
+% a = get(double(gca),'Children');
 % for num = 1:length(a)
 %     if ~strcmpi(get(a(num),'Type'), 'text')
 %     x = get(a(num), 'XData');
@@ -379,7 +379,7 @@ function [] = sandbox()
 % %                 line([0 x75],[0.75 0.75], 'LineStyle',':','Color','k','LineWidth',2);
 %       %  weber=(2^(x75) - 2^(x25))/(2^(x50))
 %         weber=(exp(x75) - exp(x25))/(exp(x50))
-% %         set(gca,'YTick', 0:0.25:1, 'YTickLabel',0:25:100);
+% %         set(double(gca),'YTick', 0:0.25:1, 'YTickLabel',0:25:100);
 %     end;
 %     end;
 % end;
@@ -442,7 +442,7 @@ function [] = sandbox()
 % legend({'tones1', 'tones2'});
 % title(sprintf('%s: %s', ratname,date));
 %
-% set(gca,'YLim',[-0.2 1]);
+% set(double(gca),'YLim',[-0.2 1]);
 
 
 % durlist = { 'S002', 'S005', 'S007', 'S019', 'S018','S014'};
@@ -593,7 +593,7 @@ function [] = sandbox()
 % mymax=round(binmax*roundmult)/roundmult;
 % psych__xtklbl = round(miniaxis * roundmult)/roundmult;
 % 
-%       set(gca,'XTick',psych__xtick,'XLim', xlim, 'XTickLabel', psych__xtklbl, ...
+%       set(double(gca),'XTick',psych__xtick,'XLim', xlim, 'XTickLabel', psych__xtklbl, ...
 %             'YTick',0:0.25:1, 'YTickLabel', 0:25:100, 'YLim',[0 1], ...
 %             'FontSize',18,'FontWeight','bold');
 %         xlabel(psych__xlbl);

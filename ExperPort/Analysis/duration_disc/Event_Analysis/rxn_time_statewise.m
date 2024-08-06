@@ -72,7 +72,7 @@ if graphic >0
     figure;
     n = hist(claststate, 1:length(validcoutstates));
     plot(n,'.b');
-    set(gca,'XLim',[0 length(validcoutstates)+1],'XTick', 1:length(validcoutstates), 'XTickLabels', validcoutstates);
+    set(double(gca),'XLim',[0 length(validcoutstates)+1],'XTick', 1:length(validcoutstates), 'XTickLabels', validcoutstates);
     fprintf(1,'Cout states=%i of %i accounted for\n', sum(n), rows(p));
     xlabel('State of cout');
     ylabel('# couts');
@@ -82,7 +82,7 @@ if graphic >0
     figure;
     plot(ones(size(cen_all)), cen_all,'.b');hold on;
     plot(ones(size(clast))*2, clast, '.r');
-    set(gca,'XLim',[0 3],'XTick',1:2,'XTickLabel',{'All Cpokes','Last Cpoke'});
+    set(double(gca),'XLim',[0 3],'XTick',1:2,'XTickLabel',{'All Cpokes','Last Cpoke'});
     ylabel('Duration (s)');
     %title(sprintf('%s:%s to %s',ratname, fromd, tod));
 end;

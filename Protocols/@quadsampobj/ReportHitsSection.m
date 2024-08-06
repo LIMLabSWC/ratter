@@ -11,7 +11,7 @@ GetSoloFunctionArgs;
 
 switch action,
  case 'init'
-   fig = gcf; 
+   fig = double(gcf); 
    SoloParamHandle(obj, 'my_xyfig', 'value', [x y fig]);
    SoloParamHandle(obj, 'SWinbeta', 'value', {SChoiceWin, Sbeta});
    next_row(y, 0.5);
@@ -128,7 +128,7 @@ switch action,
    xlim([min(uniquefs(:,1))*0.2, max(uniquefs(:,1))*1.2]);
    ylim([min(uniquefs(:,2))*0.5, max(uniquefs(:,2))*1.2]);
    xlabel('f1'); ylabel('f2');
-   set(gca, 'XTick', unique(uniquefs(:,1)), 'YTick', unique(uniquefs(:,2)));
+   set(double(gca), 'XTick', unique(uniquefs(:,1)), 'YTick', unique(uniquefs(:,2)));
 
    % First individual stim classes:
    percents = NaN*ones(rows(uniquefs), 1);
@@ -203,7 +203,7 @@ switch action,
    xlim([min(uniquefs(:,1))*0.2, max(uniquefs(:,1))*1.2]);
    ylim([min(uniquefs(:,2))*0.4, max(uniquefs(:,2))*1.2]);
    xlabel('f1'); ylabel('f2');
-   set(gca, 'XTick', unique(uniquefs(:,1)), 'YTick', unique(uniquefs(:,2)),...
+   set(double(gca), 'XTick', unique(uniquefs(:,1)), 'YTick', unique(uniquefs(:,2)),...
             'TickDir', 'out');
    for i=1:rows(uniquefs),
       t=text(uniquefs(i,1), uniquefs(i,2), sprintf('%.0f', choices(i)*100));

@@ -427,19 +427,19 @@ if ~justgetdata
     end;
 
     x=xlabel(hist__xlbl);set(x,'FontSize',16,'FontWeight','bold');
-    set(gca,'XTick', mybins, 'XTickLabel', hist__xtklbl,...
+    set(double(gca),'XTick', mybins, 'XTickLabel', hist__xtklbl,...
         'XLim', [mybins(1)*0.99 1.01*mybins(end)], 'YLim', [0 1.1*max(tally)],...
         'FontSize', 16, 'FontWeight','bold');
     y=ylabel('Sample size (n)');set(y,'FontSize',16,'FontWeight','bold');
     t= title(sprintf('%s: %s (%s-%s): \nTone sampling distribution (n=%i)', make_title(ratname), make_title(task), dates{psychdates(1)}, dates{psychdates(end)}, mega_tally));
     set(t, 'FontSize', 16, 'FontWeight','bold');
     curr_x = curr_x + 0.5;
-    % axes__format(gca);
+    % axes__format(double(gca));
 end;
 
 % plotting psych curve
 if justgetdata,
-    if ~(strcmpi(get(gcf,'Tag'), [ratname '_psych_curve'])) && usefig == 0,
+    if ~(strcmpi(get(double(gcf),'Tag'), [ratname '_psych_curve'])) && usefig == 0,
         axes('Position', [0.1 0.15 0.8 0.75]);
     end;
 else
@@ -519,7 +519,7 @@ fct=0.04;
 
 if ~justgetdata
     % now plot
-    uicontrol('Style','text','String', dailytxt,'Position',[0.6 0.003 0.4 0.035] .* get(gcf,'Position'),'BackgroundColor', [1 0.7 0.7], 'FontWeight','bold','FontSize',12);
+    uicontrol('Style','text','String', dailytxt,'Position',[0.6 0.003 0.4 0.035] .* get(double(gcf),'Position'),'BackgroundColor', [1 0.7 0.7], 'FontWeight','bold','FontSize',12);
     % both binned points as well as fitted logistic
 
 
@@ -543,7 +543,7 @@ if ~justgetdata
     set(t,'FontSize', 14,'FontAngle','italic','FontWeight','bold');
 end;
 
-set(gca,'XTick',psych__xtick,'XLim', xlim, 'XTickLabel', psych__xtklbl, ...
+set(double(gca),'XTick',psych__xtick,'XLim', xlim, 'XTickLabel', psych__xtklbl, ...
     'YTick',0:0.25:1, 'YTickLabel', 0:25:100, 'YLim',[0 1], ...
     'FontSize',14,'FontWeight','bold');
 
@@ -559,18 +559,18 @@ t = title(sprintf(['%s: %s: \n[Min,Max] =' txtform ' (n=%i)'], make_title(ratnam
 set(t, 'FontSize', 14, 'FontWeight', 'bold');
 
 t=title(sprintf('%s: Overall psychometric curve',ratname));
-% axes__format(gca);
+% axes__format(double(gca));
 
 if justgetdata
     set(xlbl,'FontSize',fsize,'FontWeight','bold');
     set(ylbl,'FontSize',fsize,'FontWeight','bold');
     set(t, 'FontSize', fsize, 'FontWeight', 'bold');
-    set(gca,'FontSize', fsize,'FontWeight','bold');
+    set(double(gca),'FontSize', fsize,'FontWeight','bold');
 
     set(fig, 'Position', [225 279 800 419]);
-    set(gcf,'Tag',[ratname '_psych_curve']);
+    set(double(gcf),'Tag',[ratname '_psych_curve']);
 else
-    set(gcf,'Menubar','none','Toolbar','none','Position',[440   437   794   297]);
+    set(double(gcf),'Menubar','none','Toolbar','none','Position',[440   437   794   297]);
 end;
 
 % -------------------------------------------------------------------------

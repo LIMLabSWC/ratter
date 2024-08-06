@@ -15,7 +15,7 @@ GetSoloFunctionArgs;
 switch action,
  case 'init',
      
-   fig=gcf;
+   fig=double(gcf);
    MenuParam(obj, 'SideSwitchParams', {'hidden','view'},1,x,y);next_row(y);
    set_callback(SideSwitchParams, {'SideSwitchSection', 'side_switch_param_view'});
    

@@ -127,7 +127,7 @@ if do_plot == 1
         elseif MM(m,2) == 12; MN{end+1} = 'Dec'; %#ok<AGROW>
         end
     end
-    ylm = get(gca,'ylim');
+    ylm = get(double(gca),'ylim');
     for m = 1:size(MS,1)
         plot([MS(m,1) MS(m,1)],ylm,':','color',[0.5 0.5 0.5]);
     end
@@ -135,7 +135,7 @@ if do_plot == 1
     plot(bad, '-or','markerfacecolor','r','markersize',6);
     plot(wrong,'ob','markerfacecolor','b','markersize',6);
 
-    set(gca,'fontsize',20,'xtick',MM(:,1),'xticklabel',MN,'xlim',[0 length(days)+1],'ylim',ylm);
+    set(double(gca),'fontsize',20,'xtick',MM(:,1),'xticklabel',MN,'xlim',[0 length(days)+1],'ylim',ylm);
     ylabel('Mass, grams');
     title(ratname,'fontsize',24);
 end

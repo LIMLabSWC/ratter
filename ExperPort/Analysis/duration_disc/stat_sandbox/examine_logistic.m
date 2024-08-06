@@ -18,10 +18,10 @@ plot(xx,yy,'-r','LineWidth',2);
 hold on;
 plot(xx2,yy2,'-k','LineWidth',2);
 
-set(gca,'XLim',[ min(xx), max(xx)], 'YTick', 0:0.25:1,'YTickLabel', 0:25:100, ...
+set(double(gca),'XLim',[ min(xx), max(xx)], 'YTick', 0:0.25:1,'YTickLabel', 0:25:100, ...
     'XTick',[]);
 
-axes__format(gca);
+axes__format(double(gca));
 
 plus_sd = normcdf(1); minus_sd = normcdf(-1);
 comm = find(abs(yy - minus_sd) == min(abs(yy-minus_sd)));

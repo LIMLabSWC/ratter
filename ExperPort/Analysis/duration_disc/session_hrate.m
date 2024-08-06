@@ -43,14 +43,14 @@ if mark_manips > 0
 end;
 
 
-set(gca,'XTickLabel', sub__trimdates(dates),'XTick', 1:1:length(dates), 'XLim', [0 length(dates)+1]);
-%set(gca,'YTick', 0:50:max(numtrials),'FontSize',16,'FontWeight','bold','YLim',[0 ymax]);
+set(double(gca),'XTickLabel', sub__trimdates(dates),'XTick', 1:1:length(dates), 'XLim', [0 length(dates)+1]);
+%set(double(gca),'YTick', 0:50:max(numtrials),'FontSize',16,'FontWeight','bold','YLim',[0 ymax]);
 xlabel('Session');
 ylabel('# trials in 90 minutes');
 title(sprintf('%s: # trials in %i minutes\n%s to %s', ratname, normal_session_length, dates{1}, dates{end}));
-set(gcf,'Position',[ 124          30        1037         302]);
+set(double(gcf),'Position',[ 124          30        1037         302]);
 
-axes__format(gca);
-set(gca,'FontSize', 14);
-sign_fname(gcf, mfilename);
+axes__format(double(gca));
+set(double(gca),'FontSize', 14);
+sign_fname(double(gcf), mfilename);
 

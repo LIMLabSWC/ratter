@@ -80,7 +80,7 @@ switch action
 %         if dispatcher('is_running'); dispatcher('close'); end
 %         if bSettings('get','WATER','skip_calibration_now') ~= 1 && isbroken == 0
 %             if value(CalibAge) >= value(CalibExp) %#ok<NODEF>
-%                 dispatcher('init'); set(gcf,'visible','off');
+%                 dispatcher('init'); set(double(gcf),'visible','off');
 %                 dispatcher('set_protocol','WaterCalibration');
 %                 return;
 %             elseif value(CalibAge) >= value(CalibExp)-1
@@ -218,7 +218,7 @@ switch action
         set(get_ghandle(Safety),      'Fontsize',14,'BackgroundColor',[1,0.8,0.6],'HorizontalAlignment','left','FontWeight','bold','visible','off');
         
         
-        c = get(gcf,'children');
+        c = get(double(gcf),'children');
         set(c(end),'backgroundcolor',[1,0.8,0.6]);
         PanelBack.value = [c(end),get_ghandle(ExpLbl),get_ghandle(RatLbl),get_ghandle(SchLbl),get_ghandle(Instructions)];
         

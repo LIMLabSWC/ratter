@@ -186,7 +186,7 @@ else
         if fac > 0
             out = resize_polygon(buff{end}, fac);
             if graphic > 0
-                figure; set(gcf,'Position',[200 200 400 400]);
+                figure; set(double(gcf),'Position',[200 200 400 400]);
                 plot(buff{end}(:,1), buff{end}(:,2), '-r'); hold on;
                 plot(out(:,1), out(:,2),'-g');
                 title(sprintf('Endpoint %i shrunk to %2.1f%%', i, fac*100));
@@ -253,7 +253,7 @@ s1tmp = s1; s1(1,:) = s1tmp(2,:); s1(2,:) = s1tmp(1,:);
 s2tmp = s2; s2(1,:) = s2tmp(2,:); s2(2,:) = s2tmp(1,:);
 
 if graphic > 0
-    figure; set(gcf,'Position',[200 200 400 400]);
+    figure; set(double(gcf),'Position',[200 200 400 400]);
 
     plot(s1(1,:), s1(2,:), '-r');
     hold on; plot(s2(1,:), s2(2,:), '-b');

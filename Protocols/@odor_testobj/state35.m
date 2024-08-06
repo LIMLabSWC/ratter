@@ -27,7 +27,7 @@ function [] = state35(obj)
     end;    
     Write(olf_meter, 'Bank4_Valves',0);
     StopDAQ(rpbox('getstatemachine'));
-  %   set(gca, 'ylim', [0 10]);
+  %   set(double(gca), 'ylim', [0 10]);
     
     n_started_trials.value = n_started_trials + 1;
     StartDAQ(rpbox('getstatemachine'),[1:8]);

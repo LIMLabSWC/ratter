@@ -106,7 +106,7 @@ fprintf(1,'Range of SPL: %if to %i\n', round(min(tone_spl)), round(max(tone_spl)
 
 figure;
 
-set(gcf,'Position', [200   346   878   297],'Toolbar','none');
+set(double(gcf),'Position', [200   346   878   297],'Toolbar','none');
 % Left plot: plot histogram of spl distribution
 %axes('position',[0.8 0.2 0.2 0.5]);
 overlap_hist(tone_spl(left_idx), tone_spl(right_idx), leftcolour, rightcolour,num_bins);
@@ -122,7 +122,7 @@ t=title('SPL distribution');
 [nlong xlong] = hist(tone_spl(right_idx), num_bins);
 %xidx = unique(union(xshort, xlong));
 xidx = xshort;
-set(gca,'XTickLabel', round(xidx), 'XTick', xidx, 'XLim', [min(xidx)-3 max(xidx)+3],...
+set(double(gca),'XTickLabel', round(xidx), 'XTick', xidx, 'XLim', [min(xidx)-3 max(xidx)+3],...
     'FontWeight','bold','FontSize',16);
 set(yl,'FontWeight','bold','FontSize',fsize);
 set(xl,'FontSize',fsize,'FontWeight','bold');
@@ -168,7 +168,7 @@ legend({'L','R'});
 
 xl=xlabel('Bins of intensity (spl)');
 yl=ylabel('% reported "Short" (%)');
-set(gca,'YLim',[0 100],'YTick',0:20:100,'XLim',[min(tone_spl) max(tone_spl)],...
+set(double(gca),'YLim',[0 100],'YTick',0:20:100,'XLim',[min(tone_spl) max(tone_spl)],...
     'FontSize',18,'FontWeight','bold');
 str = sprintf('%s (%s-%s):\nInfluence of tone intensity on side choice', ratname, from, to);
 t=title(str);
@@ -177,19 +177,19 @@ set(yl,'FontWeight','bold','FontSize',fsize);
 set(xl,'FontSize',fsize,'FontWeight','bold');
 set(t,'FontSize',fsize,'FontWeight','bold');
 
-set(gcf,'Position',[264   367   1200   450]);
+set(double(gcf),'Position',[264   367   1200   450]);
 
 
 function [] = overlap_hist(x,y,xc, yc,num_bins)
 
 hist(x,num_bins);
-p=findobj(gca,'Type','patch'); 
+p=findobj(double(gca),'Type','patch'); 
 set(p,'FaceColor', xc,'EdgeColor',xc,'facealpha',0.75);
 hold on;
 hist(y,num_bins);
-set(gca,'XTick',[]);
+set(double(gca),'XTick',[]);
 
-p_all=findobj(gca,'Type','patch');
+p_all=findobj(double(gca),'Type','patch');
 new_hist = setdiff(p_all,p);
 
 set(new_hist,'facealpha',0.25, 'EdgeColor','none','FaceColor', yc );

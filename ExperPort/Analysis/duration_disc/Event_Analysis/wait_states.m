@@ -34,7 +34,7 @@ end;
 if 1
 % first wc
 figure;
-set(gcf,'Toolbar','none','Menubar','none','Position',[ 440   489   980   245]);
+set(double(gcf),'Toolbar','none','Menubar','none','Position',[ 440   489   980   245]);
 
 % plot wc_dur
 axes('Position',[0.05 0.12, 0.3 0.8]);
@@ -54,8 +54,8 @@ set(l,'Color',[1 0.3 0]);
 title('Duration of wait-for-cpoke');
 xlabel('trial #');
 ylabel('seconds');
-set(gca,'YLim', [0 1.5*max(wc_dur)]);
-axes__format(gca);
+set(double(gca),'YLim', [0 1.5*max(wc_dur)]);
+axes__format(double(gca));
 
 % Distribution of wait_for_cpoke lengths in pie form
 axes('Position',[0.4 0.12, 0.2 0.8]);
@@ -91,7 +91,7 @@ ylabel('seconds');
 
 % rat name
 axes('Position',[0.97 0 0.05 1]);
-set(gca,'Color','y','XTick',[],'YTick',[],'XLim',[-1 1],'YLim',[-1 1]);
+set(double(gca),'Color','y','XTick',[],'YTick',[],'XLim',[-1 1],'YLim',[-1 1]);
 t=text(0,0,ratname); set(t,'Rotation',90,'FontSize',12,'FontWeight','bold');
 
 end;

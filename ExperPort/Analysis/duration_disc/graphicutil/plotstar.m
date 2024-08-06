@@ -13,5 +13,5 @@ if length(varargin)>0
 end;
 
 fsize=28;
-set(gcf,'CurrentAxes',ax);
+set(double(gcf),'CurrentAxes',ax);
 t=text(x*0.99,y, '*','Color','r','FontWeight','bold','FontSize',fsize);

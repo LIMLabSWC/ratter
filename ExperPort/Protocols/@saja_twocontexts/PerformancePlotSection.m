@@ -51,13 +51,13 @@ switch action
     y = varargin{2};
     MaxTrialsLocal = varargin{3};
     
-    SoloParamHandle(obj, 'my_gui_info', 'value', [x y gcf]);
+    SoloParamHandle(obj, 'my_gui_info', 'value', [x y double(gcf)]);
 
-    MyFigPosition = get(gcf,'Position');
+    MyFigPosition = get(double(gcf),'Position');
 
     MarkerSize = 4;
  
-    oldunits = get(gcf, 'Units'); set(gcf, 'Units', 'normalized');
+    oldunits = get(double(gcf), 'Units'); set(double(gcf), 'Units', 'normalized');
     SoloParamHandle(obj, 'hAxesPerf', 'saveable', 0, 'value', axes('Position', [0.1, 0.52, 0.8, 0.24]));
     ColorBlue = 'c';%[153,157,84]/255;
     ColorChoc = 'm';%[19,255,103]/255;
@@ -133,7 +133,7 @@ switch action
     x = mn; y = mx;                     % Return these values
 
   case 'reinit',
-    currfig = gcf;
+    currfig = double(gcf);
 
     % Get the original GUI position and figure:
     x = my_gui_info(1); y = my_gui_info(2); figure(my_gui_info(3));

@@ -82,7 +82,7 @@ avg2 = mean(bks_rand,2);
 avg_rand = {bgname_rand avg2 se2};
 if ~isempty([avg_rand{:,2}])
     figure; errorbar(avg2, se2,'-o');
-    set(gca, 'YGrid','on','XTickLabel','');
+    set(double(gca), 'YGrid','on','XTickLabel','');
     title('Average score for odors (Random interleaved Trials)', 'FontSize', 12);
     ylim([30 100]);
     for i = 1: size(avg2,1)

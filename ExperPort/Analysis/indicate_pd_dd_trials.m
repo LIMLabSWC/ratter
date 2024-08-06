@@ -47,4 +47,4 @@ if plot_on
     dd_y_dots = ones(size(t_dd)) * dd_y;
     plot(t_dd, dd_y_dots, 'm.');
 end;
-%set(gca, 'YTick', [pd_y, dd_y], 'YTickLabel', {'PD Trial', 'DD Trial'});
+%set(double(gca), 'YTick', [pd_y, dd_y], 'YTickLabel', {'PD Trial', 'DD Trial'});

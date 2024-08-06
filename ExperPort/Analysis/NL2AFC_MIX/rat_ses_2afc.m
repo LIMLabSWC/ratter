@@ -52,11 +52,11 @@ for i = 1: n,
     end;
     save_result_file = [save_dir filesep ratname '_' date_ses{i}];
     save(save_result_file, 'L_Score', 'R_Score', 'Score','score_blk');
-    saveas(gcf, save_result_file, 'tif');
+    saveas(double(gcf), save_result_file, 'tif');
 end
    
 figure('Position', [lft 30 wd ht-50]); 
 plot(cell2mat(score_blk(2:end,2)), cell2mat(score_blk(2:end,7)),'-o'); % plot odor sampling time in a separate figure
-set(gca, 'YGrid','on', 'XGrid', 'off');
-set(get(gca,'XLabel'),'String','Trials','FontSize',18);
-set(get(gca,'YLabel'),'String','Odor Sampling Time (s)','FontSize',18);
+set(double(gca), 'YGrid','on', 'XGrid', 'off');
+set(get(double(gca),'XLabel'),'String','Trials','FontSize',18);
+set(get(double(gca),'YLabel'),'String','Odor Sampling Time (s)','FontSize',18);

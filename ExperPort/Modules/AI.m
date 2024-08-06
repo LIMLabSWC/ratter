@@ -124,7 +124,7 @@ case 'reset'
 	stop(exper.ai.daq);
 	flushdata(exper.ai.daq);
 	SetParam(me,'backlog',0);
-	SetParamUI(me,'backlog','background',get(gcf,'color'));
+	SetParamUI(me,'backlog','background',get(double(gcf),'color'));
 	message(me,'');
 	
 case 'save'
@@ -138,7 +138,7 @@ case 'save'
 		SetParamUI(me,'save','background',[0 1 0]);
 	else
 		set(exper.ai.daq,'loggingmode','memory');
-		SetParamUI(me,'save','background',get(gcf,'color'));
+		SetParamUI(me,'save','background',get(double(gcf),'color'));
 	end
 
 	
@@ -667,10 +667,10 @@ global exper
 			message('control','Stopping at trial end...');
 		else
 			stop(exper.ai.daq);
-			SetParamUI('control','run','Background',get(gcf,'color'));
+			SetParamUI('control','run','Background',get(double(gcf),'color'));
 		end
 	else
-		SetParamUI('control','run','Background',get(gcf,'color'));
+		SetParamUI('control','run','Background',get(double(gcf),'color'));
 	end
 
 
@@ -680,7 +680,7 @@ global exper
 if ~isfield(exper.ai,'daq') | isempty(exper.ai.daq.channel)
 	message(me,'Can''t start acquisition until channels are added!','error');
 	SetParam('control','run',0);
-	SetParamUI('control','run','background',get(gcf,'color'));
+	SetParamUI('control','run','background',get(double(gcf),'color'));
 else
     
     if ~strcmp(exper.ai.daq.running,'On')

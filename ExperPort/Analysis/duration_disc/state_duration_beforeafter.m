@@ -83,7 +83,7 @@ switch action
         for f=1:length(fnames)
             [xpos mlist slist]= makebargroups(datset(f,:), [0 0 1; 1 0 0]);
             yval=mlist+slist;
-            joinwithsigline(gca,xpos(1,1),xpos(1,2),...
+            joinwithsigline(double(gca),xpos(1,1),xpos(1,2),...
                 yval(1,1)*1.2, yval(1,2)*1.3, ...
                 max(yval(1,:))*1.3);
             p=sigp(f,2);
@@ -95,16 +95,16 @@ switch action
             if strcmpi(stars(1),'*'), ypos=1.32; else ypos=1.52; end;
             text(xm(f), max(yval(1,:))*ypos, stars,'FontSize',20,'FontWeight','bold');
             
-            set(gcf,'Position',  [440   358   560   420]);
+            set(double(gcf),'Position',  [440   358   560   420]);
             ysuper=max(ysuper, max(yval(1,:))*ypos);
             
-            set(gca,'XTick',[]);
+            set(double(gca),'XTick',[]);
             ylabel('seconds');
             title(sprintf('%s:%s', ratname, statedesc{f}));
-            axes__format(gca);
+            axes__format(double(gca));
 
-        set(gca,'XLim',[xpos(1)-1 xpos(end)+1]);
-        set(gca,'YLim',[0 ysuper+0.5]);
+        set(double(gca),'XLim',[xpos(1)-1 xpos(end)+1]);
+        set(double(gca),'YLim',[0 ysuper+0.5]);
         uicontrol('Tag', 'figname', 'Style','text', 'String', ...
             sprintf('%s_%s_statedur', ratname,statelist{f}), 'Visible','off');
             
@@ -137,7 +137,7 @@ switch action
         end;
 
 
-        set(gca,'XTick', 0.5:2:(2*length(statelist)), 'XTickLabel', statelist);
+        set(double(gca),'XTick', 0.5:2:(2*length(statelist)), 'XTickLabel', statelist);
         ylabel('seconds');
         title(sprintf('Difference in state duration\n%s:%s (%s)', tasktype, area_filter, followhh));
 

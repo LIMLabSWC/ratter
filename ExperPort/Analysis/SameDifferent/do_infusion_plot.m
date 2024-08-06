@@ -17,12 +17,12 @@ sess_todo=setdiff(all_sess, [inf_sess; post_inf_sess]);
 figure;
 
 ax=axes('Position',[0.2 0.2 0.6 0.6]);
-set(gca,'FontSize',7);
-set(gca,'FontName','Helvetica');
+set(double(gca),'FontSize',7);
+set(double(gca),'FontName','Helvetica');
 psychoplot_delori(ratname, experimenter, sess_todo,'memax',ax,'nonmemax',ax,'linestyle','--','marker','s','markersize',2);
 title([experimenter ', ' ratname ', control days']);
-saveas(gcf,['~/' ratname '_cont.eps'],'epsc2');
+saveas(double(gcf),['~/' ratname '_cont.eps'],'epsc2');
 psychoplot_delori(ratname, experimenter, inf_sess,'memax',ax,'nonmemax',ax,'linestyle','-','marker','o','markersize',2);
 title([experimenter ', ' ratname ', muscimol days']);
 title('')
-saveas(gcf,['~/' ratname '_musc.eps'],'epsc2');
+saveas(double(gcf),['~/' ratname '_musc.eps'],'epsc2');

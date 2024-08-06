@@ -18,11 +18,11 @@ mingo = cell2mat(saved_history.ChordSection_Min_2_GO);
 maxgo = cell2mat(saved_history.ChordSection_Max_2_GO);
 
 if newfig > 0, figure; end;
-set(gcf,'Menubar', 'none','Toolbar','none');
+set(double(gcf),'Menubar', 'none','Toolbar','none');
 k = plot(from:length(mingo), mingo(from:end), '-r', from:length(maxgo), ...
      maxgo(from:end), '.b'); 
 set(k(1), 'Color', [0.5 0.5 0]); set(k(2), 'Color', [0 0.4 0]);
-set(gca,'XLim', [from length(maxgo)]);
+set(double(gca),'XLim', [from length(maxgo)]);
 
 s = sprintf('%s: %s (%s)\nPre-GO time', make_title(rat), make_title(task), date);
 title(s);

@@ -361,7 +361,7 @@ switch action
                     set(h(i),'BackgroundColor',[0 1 0],'value',1);
                     RPBitsOut(bit(i)+1)=1;
                 else
-                    set(h(i),'BackgroundColor',get(gcf,'color'),'value',0);
+                    set(h(i),'BackgroundColor',get(double(gcf),'color'),'value',0);
                     RPBitsOut(bit(i)+1)=0;
                 end
                 % set the bit
@@ -395,7 +395,7 @@ switch action
         
         for i=1:3
             if RP_AO_Out(i),  set(h(i),'BackgroundColor',[0 1 0],'value',1);
-            else              set(h(i),'BackgroundColor',get(gcf,'color'),'value',0);
+            else              set(h(i),'BackgroundColor',get(double(gcf),'color'),'value',0);
             end
             % set the AO_Out
             AOBits_HighVal=bin2dec(sprintf('%d%d%d',RP_AO_Out(3:-1:1).*RP_AO_Out(3:-1:1)>0));

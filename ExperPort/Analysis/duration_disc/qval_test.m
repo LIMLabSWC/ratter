@@ -35,7 +35,7 @@ msize=20;
 plot(nse_array,qlin, '.k','MarkerSize',8,'Marker','o'); hold on;
 plot(nse_array,qsig, '.b', 'MarkerSize',msize);
 
-set(gcf,'Position',[188   542   857   288]);
+set(double(gcf),'Position',[188   542   857   288]);
 
 
 function [] = sub__makeratdatanoisy(ratname)
@@ -78,7 +78,7 @@ end;
 % plot(sigma_array,qlin, '.k','MarkerSize',8,'Marker','o'); hold on;
 % plot(sigma_array,qsig, '.b', 'MarkerSize',msize);
 % 
-% set(gcf,'Position',[188   542   857   288]);
+% set(double(gcf),'Position',[188   542   857   288]);
 % 2;  
 % 
 

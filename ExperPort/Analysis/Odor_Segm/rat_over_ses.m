@@ -36,6 +36,6 @@ for i = 1: n,
     end
     save_result_file = [save_dir filesep date_ses{i}];
     save(save_result_file, 'L_Score', 'R_Score', 'Score','score_blk');
-    saveas(gcf, save_result_file, 'tif');
+    saveas(double(gcf), save_result_file, 'tif');
 end
     

@@ -10,9 +10,9 @@ infile='psych_before';
 
 for r=1:length(ratlist)
     loadpsychinfo(ratlist{r}, 'infile','psych_before','lastfew',1,'justgetdata',1);
-	axes__format(gca);
+	axes__format(double(gca));
     loadpsychinfo(ratlist{r}, 'infile','psych_after','isafter',1, ...
         'dstart',1, 'dend', 1, 'justgetdata',1);
-    axes__format(gca);
+    axes__format(double(gca));
     
 end;

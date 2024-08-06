@@ -46,9 +46,9 @@ for r=1:length(seta)
 end;
 
 x=x+2;
-set(gca,'XTick', 1.5:2:(2*length(seta))+1.5, 'XTickLabel',rn);
+set(double(gca),'XTick', 1.5:2:(2*length(seta))+1.5, 'XTickLabel',rn);
 
-set(gca,'XLim',[-1 x]);
+set(double(gca),'XLim',[-1 x]);
 
 xlabel('Rat');
 ylabel('Psych(blue)-Non(grey)');

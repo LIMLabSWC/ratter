@@ -239,10 +239,10 @@ switch action
            ylabel('Weber ratio');
         title(['Weber ratio for week pre-lesion: ' strrep([ratgroup ': ' singlerat], '_', ' ')]);
 
-        sub__formataxes(gca);
+        sub__formataxes(double(gca));
 
-        set(gca,'YTick', 0:0.05:0.3);
-        ytkraw = get(gca,'YTick') * sqrt(binmin*binmax);
+        set(double(gca),'YTick', 0:0.05:0.3);
+        ytkraw = get(double(gca),'YTick') * sqrt(binmin*binmax);
         if pitch>0
             ytkraw=round(ytkraw*10)/10;
             unt='kHz';
@@ -250,17 +250,17 @@ switch action
             ytkraw= round(ytkraw*10)/10;
             unt='ms';
         end;
-        set(gca,'FontSize', 14,'FontWeight','bold','XTick',[], ...
+        set(double(gca),'FontSize', 14,'FontWeight','bold','XTick',[], ...
             'XLim',[-1 2], 'YLim',[0 0.4], ...
             'Position',[0.15 0.1 0.65 0.8]);
-        ax2=axes('Position',get(gca,'Position'), ...
+        ax2=axes('Position',get(double(gca),'Position'), ...
             'YAxisLocation','right', ...
-            'Color','none', 'XTick',[],'YTick', get(gca,'YTick'),...
-            'XLim',get(gca,'XLim'), 'YLim', get(gca,'YLim'), ...
+            'Color','none', 'XTick',[],'YTick', get(double(gca),'YTick'),...
+            'XLim',get(double(gca),'XLim'), 'YLim', get(double(gca),'YLim'), ...
             'YTickLabel', ytkraw,'FontSize',14, 'FontWeight','bold');
         set(get(ax2,'YLabel'), 'String', sprintf('JND (%s)', unt));
         sub__formataxes(ax2);
-        sign_fname(gcf,mfilename);
+        sign_fname(double(gcf),mfilename);
         
         2;
 
@@ -333,15 +333,15 @@ switch action
                 'MarkerSize',10);
         end;
 
-        set(gca,'XLim', [-0.5 (length(ratlist)*3)+0.5], 'YLim',[0 0.4]);
-        set(gca,'XTick',xtks, 'XTickLabel', 1:length(ratlist), 'YTick', 0:0.1:0.5);
+        set(double(gca),'XLim', [-0.5 (length(ratlist)*3)+0.5], 'YLim',[0 0.4]);
+        set(double(gca),'XTick',xtks, 'XTickLabel', 1:length(ratlist), 'YTick', 0:0.1:0.5);
         xlabel('Individual animals');
         ylabel('Weber ratio');
         title(['Weber ratio for week pre-lesion: ' strrep([ratgroup ': ' area_filter], '_', ' ')]);
 
-        sub__formataxes(gca);
+        sub__formataxes(double(gca));
 
-        ytkraw = get(gca,'YTick') * sqrt(binmin*binmax);
+        ytkraw = get(double(gca),'YTick') * sqrt(binmin*binmax);
         if pitch>0
             ytkraw=round(ytkraw*10)/10;
             unt='kHz';
@@ -349,19 +349,19 @@ switch action
             ytkraw= round(ytkraw*10)/10;
             unt='ms';
         end;
-        yl=get(gca,'YLim'); ytk=get(gca,'YTick');
-        set(gca,'FontSize', 14,'FontWeight','bold','Position',[0.1 0.2 0.8 0.65]);
-        ax2=axes('Position',get(gca,'Position'), ...
+        yl=get(double(gca),'YLim'); ytk=get(double(gca),'YTick');
+        set(double(gca),'FontSize', 14,'FontWeight','bold','Position',[0.1 0.2 0.8 0.65]);
+        ax2=axes('Position',get(double(gca),'Position'), ...
             'YAxisLocation','right', ...
-            'Color','none', 'XTick',[],'YTick', get(gca,'YTick'),...
-            'XLim',get(gca,'XLim'), 'YLim', get(gca,'YLim'), ...
+            'Color','none', 'XTick',[],'YTick', get(double(gca),'YTick'),...
+            'XLim',get(double(gca),'XLim'), 'YLim', get(double(gca),'YLim'), ...
             'YTickLabel', ytkraw,'FontSize',14, 'FontWeight','bold');
         set(get(ax2,'YLabel'), 'String', sprintf('JND (%s)', unt));
         sub__formataxes(ax2);
-%         sign_fname(gcf,mfilename);
+%         sign_fname(double(gcf),mfilename);
 
-%         set(gcf,'Position',[440   482   150*length(ratlist)   252]);
-        set(gcf,'Position',[360   596   708   262]);
+%         set(double(gcf),'Position',[440   482   150*length(ratlist)   252]);
+        set(double(gcf),'Position',[360   596   708   262]);
         
          uicontrol('Tag', 'figname', 'Style','text', 'String', ['weber_prelesion_' ttype '_indiv'], 'Visible','off');
 
@@ -372,33 +372,33 @@ switch action
         plot(ones(size(x))*0.5, x, 'or', 'MarkerSize',7,'LineWidth',1.3,'Color',clr_singleavg);
 
         axpos=[0.25 0.1 0.4 0.8];
-        set(gca,'XTick',[], 'XLim',[-0.2 1.5],...
+        set(double(gca),'XTick',[], 'XLim',[-0.2 1.5],...
             'YTick', ytk,'YLim',yl,...
             'Position',axpos);
         xlabel(ttype); ylabel('Weber ratio');
 
-        ytkraw = get(gca,'YTick') * sqrt(binmin*binmax);
+        ytkraw = get(double(gca),'YTick') * sqrt(binmin*binmax);
         if pitch>0
             ytkraw=round(ytkraw*10)/10;
         else
             ytkraw= round(ytkraw*10)/10;
         end;
-        axes__format(gca);
+        axes__format(double(gca));
 
         ax2=axes('Position',axpos, ...
             'YAxisLocation','right', ...
-            'Color','none', 'XTick',[],'YTick', get(gca,'YTick'),...
-            'XLim',get(gca,'XLim'), 'YLim', get(gca,'YLim'), ...
+            'Color','none', 'XTick',[],'YTick', get(double(gca),'YTick'),...
+            'XLim',get(double(gca),'XLim'), 'YLim', get(double(gca),'YLim'), ...
             'YTickLabel', ytkraw,'FontSize',14, 'FontWeight','bold');
         set(get(ax2,'YLabel'), 'String', sprintf('JND (%s)', unt));
 
         title(['Distribution of pooled webers: ' strrep([ratgroup ': ' area_filter], '_', ' ')]);
 
         axes__format(ax2);
-        set(get(gca,'Title'),'FontSize',14);
-%         sign_fname(gcf,mfilename);
-%         set(gcf,'Position',[ 42   240   412   279]);
-set(gcf,'Position',[1020         602         300         327]);
+        set(get(double(gca),'Title'),'FontSize',14);
+%         sign_fname(double(gcf),mfilename);
+%         set(double(gcf),'Position',[ 42   240   412   279]);
+set(double(gcf),'Position',[1020         602         300         327]);
  uicontrol('Tag', 'figname', 'Style','text', 'String', ['weber_prelesion_' ttype '_group'], 'Visible','off');
 
         % Now print textual output

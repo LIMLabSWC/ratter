@@ -124,7 +124,7 @@ next_column(x); y = 1;
 [x, y] = TimesSection(obj, 'init', x, y);
 
 
-figpos = get(gcf, 'Position');
+figpos = get(double(gcf), 'Position');
 HeaderParam(obj, 'prot_title', 'Odor Operant/Sampling training', ...
             x, y, 'position', [10 figpos(4)-25, 400 20]);
 

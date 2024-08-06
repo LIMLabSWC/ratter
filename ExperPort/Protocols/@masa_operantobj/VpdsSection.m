@@ -12,7 +12,7 @@ persistent vpd_small vpd_large_min vpd_large_mean %Thanks to these params,
 switch action,
     case 'init',
         %VpdsSection Parameters Window
-        fig=gcf;
+        fig=double(gcf);
         MenuParam(obj, 'VpdParams', {'view', 'hidden'}, 1, x,y); next_row(y);
         set_callback(VpdParams, {'VpdsSection', 'vpd_param_view'});
         oldx=x; oldy=y; x=5; y=5;

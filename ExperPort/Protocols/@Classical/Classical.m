@@ -174,7 +174,7 @@ switch action,
     next_column(x); y =5;
     [x, y] = RewardsSection(obj,      'init', x, y); %#ok<NASGU>
     
-    figpos = get(gcf, 'Position');
+    figpos = get(double(gcf), 'Position');
     [expmtr, rname]=SavingSection(obj, 'get_info');
     HeaderParam(obj, 'prot_title', [mfilename ': ' expmtr ', ' rname], ...
       x, y, 'position', [10 figpos(4)-25, 800 20]);

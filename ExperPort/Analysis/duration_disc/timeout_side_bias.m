@@ -10,7 +10,7 @@ right  = find(sides == 0);
 to_right = tcount(right);
 
 figure;bar([mean(to_left) mean(to_right)]);
-set(gca,'XTick',[1 2], 'XTickLabel',{'On LEFT trials', 'On RIGHT trials'});
+set(double(gca),'XTick',[1 2], 'XTickLabel',{'On LEFT trials', 'On RIGHT trials'});
 ylabel('Average # timeouts');
 title(sprintf('%s: %s', ratname, date));
 

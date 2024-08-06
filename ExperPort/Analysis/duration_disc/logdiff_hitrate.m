@@ -45,7 +45,7 @@ t=xlabel(ratname); set(t,'FontSize',14, 'FontWeight','bold');
 minld = min(logdiff); maxld = max(logdiff);
 numrows = ceil(length(numtrials) / jumpoffset);
 
-set(gca,'YLim',[0.5 1], 'YTick',0.5:0.1:1, 'YTickLabel',50:10:100,'XTick',xpos, 'XTickLabel', lds);
+set(double(gca),'YLim',[0.5 1], 'YTick',0.5:0.1:1, 'YTickLabel',50:10:100,'XTick',xpos, 'XTickLabel', lds);
 title(sprintf('%s (%s-%s)\nOverall success rate',ratname, dates{1}, dates{end}));
 
 % ----------------------------------------------
@@ -115,9 +115,9 @@ set(b,'YLim',[0.5 1], 'YTick', 0.5:0.1:1);
 
 lbls = {}; for k = 1:numrows, lbls{k} = sprintf('Wk%i',numrows-(k-1)); end;
 tmp = hh_cell(:,1); tmp = tmp(end:-1:1);
-set(gca,'YLim',[1 numrows+1], 'XLim', [0 rows(hh_cell)], ...
+set(double(gca),'YLim',[1 numrows+1], 'XLim', [0 rows(hh_cell)], ...
     'YTick',1.5:1:numrows+0.5,'YTickLabel', lbls, 'XTick', 0.5:1:rows(hh_cell)-0.5,'XTickLabel', tmp);
-set(gcf,'Position',[100   300   665   138]);
+set(double(gcf),'Position',[100   300   665   138]);
 title(sprintf('%s (%s to %s):\nPerformance progress on sharpening',ratname, dates{1}, dates{end}));
 
 % Summary printout

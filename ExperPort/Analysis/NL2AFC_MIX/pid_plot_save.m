@@ -66,4 +66,4 @@ fill([x1 x1 x2 x2], [y1 y2 y2 y1], [0.5 0.9 0.8],'LineStyle','none');
 save([rat_dir filesep 'pid_' date session '.mat'], 'pid_avg', 'pid_std','pid_time_index');
 errorshade(pid_time_index', pid_avg', pid_std');
 xlabel('Time (s)','FontSize',15); ylabel('PID Voltage (volts)', 'FontSize', 15);
-saveas(gcf, [rat_dir filesep 'pid_' date session], 'tif');
+saveas(double(gcf), [rat_dir filesep 'pid_' date session], 'tif');

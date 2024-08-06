@@ -42,7 +42,7 @@ end;
 
 % first show my fit ---------------
 [weber bfit bias xx yy xmid xcomm xfin replong tally bins] = psychometric_curve(ratname,indate,'nodist',1);
-set(gcf,'Position',[34   404   485   435]);
+set(double(gcf),'Position',[34   404   485   435]);
 
 xtk = [bins(1) mp bins(end)];
 logxtk = eval([bintrans 'xtk);']);
@@ -96,14 +96,14 @@ hist__xtklbl = round(bins*roundmult)/roundmult;
 psych__xtklbl = round(miniaxis * roundmult)/roundmult;
 
 title(sprintf('%s: %s -- psignifit curve', ratname, indate));
-    set(gca,'XTick',psych__xtick,'XLim', xlim, 'XTickLabel', psych__xtklbl, ...
+    set(double(gca),'XTick',psych__xtick,'XLim', xlim, 'XTickLabel', psych__xtklbl, ...
             'YTick',0:0.25:1, 'YTickLabel', 0:25:100, 'YLim',[0 1], ...
             'FontSize',18,'FontWeight','bold');
         xlabel(psych__xlbl);
         ylabel(psych__ylbl);
 
-axes__format(gca);
-set(gcf,'Menubar','none','Toolbar','none','Position', [541   404   485   435]);
+axes__format(double(gca));
+set(double(gcf),'Menubar','none','Toolbar','none','Position', [541   404   485   435]);
 
 
 
@@ -150,4 +150,4 @@ line(th.lims, ones(size(th.lims,1), 1) * drawHeights, 'color', [0 0 1])
 hold off
 
 % wait for key press
-figure(gcf);
+figure(double(gcf));

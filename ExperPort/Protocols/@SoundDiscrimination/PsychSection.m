@@ -43,7 +43,7 @@ switch action
   case 'init',
     % Save the figure and the position in the figure where we are
     % going to start adding GUI elements:
-    SoloParamHandle(obj, 'my_gui_info', 'value', [x y gcf]);
+    SoloParamHandle(obj, 'my_gui_info', 'value', [x y double(gcf)]);
 
     DispParam(   obj, 'T1_HitFrac',   0, x, y, 'position', [x     y 110 20], 'labelfraction', 0.6);
     DispParam(   obj, 'T1_TriNum' ,   0, x, y, 'position', [x+110 y  90 20], 'labelfraction', 0.7); next_row(y);
@@ -70,7 +70,7 @@ switch action
     ToggleParam( obj, 'UseSecondaryPsych',0,x,y, 'OnString', 'Active',         'OffString', 'Inactive',       'position',[x+110 y  90 20]); next_row(y);
     
     %Start SecondaryPsych Window
-        oldx = x; oldy = y; oldfigure = gcf;
+        oldx = x; oldy = y; oldfigure = double(gcf);
         SoloParamHandle(obj, 'SecondaryPsychFigure', 'saveable', 0, 'value', figure('Position', [120 120 350 350]));
         sfig = value(eval('SecondaryPsychFigure'));
         set(sfig, 'MenuBar', 'none', 'NumberTitle', 'on', ...
@@ -451,7 +451,7 @@ switch action
 % -----------------------------------------------------------------------
 
   case 'reinit',
-    currfig = gcf;
+    currfig = double(gcf);
     
     % Get the original GUI position and figure:
     x = my_gui_info(1); y = my_gui_info(2); figure(my_gui_info(3));

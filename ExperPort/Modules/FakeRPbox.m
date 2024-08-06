@@ -276,7 +276,7 @@ switch action
                     set(h(i),'BackgroundColor',[0 1 0],'value',1);
                     RPBitsOut(bit(i)+1)=1;
                 else
-                    set(h(i),'BackgroundColor',get(gcf,'color'),'value',0);
+                    set(h(i),'BackgroundColor',get(double(gcf),'color'),'value',0);
                     RPBitsOut(bit(i)+1)=0;
                 end
                 % set the bit
@@ -320,7 +320,7 @@ switch action
                     set(h(i),'BackgroundColor',[0 1 0],'value',1);
                     RP_AO_Out(AO(i))=1;
                 else
-                    set(h(i),'BackgroundColor',get(gcf,'color'),'value',0);
+                    set(h(i),'BackgroundColor',get(double(gcf),'color'),'value',0);
                     RP_AO_Out(AO(i))=0;
                 end
                 % set the AO_Out

@@ -172,7 +172,7 @@ switch action,
       }; parseargs(varargin, pairs);
       
       % SoloParamHandle(obj, 'init_poke_id', 'value', init_poke);  % Identity of poke that is taken as "start trial" poke
-      SoloParamHandle(obj, 'my_xyfig', 'value', [x y gcf]);
+      SoloParamHandle(obj, 'my_xyfig', 'value', [x y double(gcf)]);
       ToggleParam(obj, 'WaptorOnOff', 0, x, y, 'OnString', 'Waptor ON', ...
          'OffString', 'Waptor OFF', ...
 		 'TooltipString', sprintf('\nTurn WaterAdaptor on or off. If off, the plugin is inactive.'), ...
@@ -189,7 +189,7 @@ switch action,
       SoloParamHandle(obj, 'myfig', 'value', figure('Position', [700 100 640 560], ...
          'closerequestfcn', [mfilename '(' class(obj) ', ''hide'');'], 'MenuBar', 'none', ...
          'Name', mfilename), 'saveable', 0);
-      set(gcf, 'Visible', 'off');
+      set(double(gcf), 'Visible', 'off');
       
       x=10; y=10;
       TextBoxParam(obj, 'recipient_list', '', x, y, 'labelpos', 'top', 'labelfraction', 0.1, ...
@@ -819,7 +819,7 @@ switch action,
        else
           x = varargin{1}; y = varargin{2};
        end;
-       currfig = gcf; origfig = gcf;
+       currfig = double(gcf); origfig = double(gcf);
     
     
        delete_sphandle('owner', ['^@' class(obj) '$'], ...

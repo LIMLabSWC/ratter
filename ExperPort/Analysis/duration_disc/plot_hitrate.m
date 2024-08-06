@@ -74,7 +74,7 @@ if ~isnan(last_few_pre)
 end;
     
 line([0 maxdays+1], [0.75 0.75],'Color',[1 1 1]*0.7, 'LineStyle',':','LineWidth',lwidth);
-set(gca,'YLim',[0.6 0.95], ...
+set(double(gca),'YLim',[0.6 0.95], ...
     'YTick', 0.5:0.1:1, 'YTickLabel',50:10:100,...
     'FontWeight','bold','FontSize',fsize,...
     'XTick', xtk, 'XTickLabel', xlbl,'XLim',[0.5 maxdays+0.5]);
@@ -83,8 +83,8 @@ yl=ylabel('Session average(%)');
 set(xl,'FontWeight','bold','FontSize',fsize);
 set(yl,'FontWeight','bold','FontSize',fsize);
 
-set(gcf,'Position',[62 429 1159 389]);
-set(gca,'Position',[0.05 0.17 0.9 0.72]);
+set(double(gcf),'Position',[62 429 1159 389]);
+set(double(gca),'Position',[0.05 0.17 0.9 0.72]);
 
 if length(figtitle)>0
     t=title(figtitle);
@@ -152,10 +152,10 @@ yl=ylabel('Session average(%)');
 set(xl,'FontWeight','bold','FontSize',fsize*0.7);
 set(yl,'FontWeight','bold','FontSize',fsize*0.7);
 
-set(gca,'YLim',ylim, 'YTick',-0.3:0.1:0.3, 'YTickLabel',-30:10:30,...
+set(double(gca),'YLim',ylim, 'YTick',-0.3:0.1:0.3, 'YTickLabel',-30:10:30,...
       'FontWeight','bold','FontSize',fsize*0.7,...
     'XTick', xtk, 'XTickLabel', xlbl,'XLim',[0.5 maxdays-0.5]);
-set(gcf,'Position',[  405   127   750   225]);
-set(gca,'Position',[0.08 0.2 0.9 0.68]);
+set(double(gcf),'Position',[  405   127   750   225]);
+set(double(gca),'Position',[0.08 0.2 0.9 0.68]);
 
 title(sprintf('%s: Change in performance relative to previous day', figtitle));

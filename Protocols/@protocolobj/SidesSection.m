@@ -44,7 +44,7 @@ end;
 switch action,
     case 'init', % ----------  INIT  -------------------------
         % main protocol window
-        parentfig = gcf; figure(parentfig);
+        parentfig = double(gcf); figure(parentfig);
         parent_x = x; parent_y = y;
 
         % new popup window
@@ -79,12 +79,12 @@ switch action,
             ['SidesSection(' class(value(mychild)) '(''empty''), ''sides_param_hide'')']);
         set(value(sidesfig), 'Position', [980 781 288 151]);
 
-        x = parent_x; y = parent_y; figure(parentfig); % make master protocol figure gcf
+        x = parent_x; y = parent_y; figure(parentfig); % make master protocol figure double(gcf)
         MenuParam(obj, 'SidesParameters', {'hidden', 'view'}, 1, x, y, 'param_owner', child_class); next_row(y);
         set_callback({SidesParameters}, {'SidesSection', 'sides_param_view'});
 
         % ---- Now initialize plot
-        oldunits = get(gcf, 'Units'); set(gcf, 'Units', 'normalized');
+        oldunits = get(double(gcf), 'Units'); set(double(gcf), 'Units', 'normalized');
         SoloParamHandle(obj, 'h',  'value', axes('Position', [0.06, 0.86, 0.9, 0.08]), ...
             'param_owner', child_class); % axes
         SoloParamHandle(obj, 'p',  'value', plot(-1, 1, 'b.'), ...
@@ -112,7 +112,7 @@ switch action,
         set(value(h), 'YTick', [0 1], 'YTickLabel', {'R', 'L'});
         xlabel('');
 
-        set(gcf, 'Units', oldunits);
+        set(double(gcf), 'Units', oldunits);
 
         % "width", an EditParam to control the # of trials in the plot:
         SoloParamHandle(obj, 'width', 'type', 'edit', 'label', 'ntrials', ...

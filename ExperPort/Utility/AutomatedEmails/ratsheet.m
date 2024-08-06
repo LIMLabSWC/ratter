@@ -32,8 +32,8 @@ for f = 1:ceil(size(ratnames,1)/(h*w))
     
     F(f) = figure('color','w'); hold on; %#ok<AGROW>
 
-    set(gca,'xlim',[0 100],'ylim',[0 85],'Units','points','YDir','reverse')
-    set(gca,'Position',get(gca,'OuterPosition'));
+    set(double(gca),'xlim',[0 100],'ylim',[0 85],'Units','points','YDir','reverse')
+    set(double(gca),'Position',get(double(gca),'OuterPosition'));
     xc = 100/(w*2):100/w:100-(100/(w*2));
     yc = 75/(h*2):75/h:75-(75/(h*2)); yc = yc + 8;
 
@@ -55,7 +55,7 @@ for f = 1:ceil(size(ratnames,1)/(h*w))
         end
     end
 
-    set(gca,'Units','Normalized');
+    set(double(gca),'Units','Normalized');
 end
 
 

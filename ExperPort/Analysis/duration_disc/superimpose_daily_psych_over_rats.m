@@ -25,4 +25,4 @@ for d = 1:length(show_days)
     end;
 end;
 
-set(gca,'XLim', [min(bins), max(bins)]);
+set(double(gca),'XLim', [min(bins), max(bins)]);

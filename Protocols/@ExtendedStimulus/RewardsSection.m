@@ -38,7 +38,7 @@ switch action
   case 'init',
     % Save the figure and the position in the figure where we are
     % going to start adding GUI elements:
-    SoloParamHandle(obj, 'my_gui_info', 'value', [x y gcf]);
+    SoloParamHandle(obj, 'my_gui_info', 'value', [x y double(gcf)]);
 
     DispParam(obj, 'hit_streak', 0, x, y, ...
         'TooltipString', 'number of continuous hit trials (2 hit strials -> 1 hit_streak)');
@@ -97,7 +97,7 @@ switch action
     end;
     
   case 'reinit',
-    currfig = gcf;
+    currfig = double(gcf);
 
     % Get the original GUI position and figure:
     x = my_gui_info(1); y = my_gui_info(2); figure(my_gui_info(3));

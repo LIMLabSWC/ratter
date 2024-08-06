@@ -123,7 +123,7 @@ uicontrol('Tag', 'figname', 'Style','text', 'String', [mymetric '_prelesion_' tt
 title([ mymetric ' for week pre-lesion: ' ttype]);
 
 % axis formatting
-set(gca,'XTick',xpos, 'XTickLabel',1:length(xpos));
+set(double(gca),'XTick',xpos, 'XTickLabel',1:length(xpos));
 if strcmpi(mymetric,'Bias')
     
     ytk=-4:1:2;
@@ -141,12 +141,12 @@ else
     units = '%';
 end;
 
-set(gca,'YLim',yl,'YTick',ytk,'YTickLabel',ytklbl);
+set(double(gca),'YLim',yl,'YTick',ytk,'YTickLabel',ytklbl);
 
-axes__format(gca);
+axes__format(double(gca));
 ylabel([mymetric ' ' units]);
 xlabel('Individual animal');
-set(gcf,'Position',[360   596   708   262]);
+set(double(gcf),'Position',[360   596   708   262]);
 
 
 % now group average
@@ -158,25 +158,25 @@ plot(ones(size(ovdata))*0.5, ovdata, 'or', 'MarkerSize',7,'LineWidth',1.3,'Color
 %     text(1.1, ovdata(k),ratlist{k});
 % end;
 line([-1.5 2.5],[0 0],'LineStyle','-','Color','k','LineWidth',1);
-set(gca,'XLim',[-0.2 1.5]);
+set(double(gca),'XLim',[-0.2 1.5]);
 
 
 ylabel([mymetric ' ' units]);
-set(gca,'YLim',[min(ovdata) max(ovdata)],'XTick',[]);
+set(double(gca),'YLim',[min(ovdata) max(ovdata)],'XTick',[]);
 
 if strcmpi(mymetric,'bias')
     if strcmpi(ttype,'duration'), 
         ytk=[-0.1:0.05:0.1];
-        set(gca,'YLim',[-0.12 ytk(end)],'YTick',ytk);
+        set(double(gca),'YLim',[-0.12 ytk(end)],'YTick',ytk);
     else
-        set(gca,'YLim',[-4 2],'YTick',-4:1:2);
+        set(double(gca),'YLim',[-4 2],'YTick',-4:1:2);
     end;
 else
     m=m*100;
     s=s*100;
     fmt='%2.1f';
     units='%';
-    set(gca,'YLim',[0.5 1],'YTick',0.5:.1:1,'YTickLabel',50:10:100);
+    set(double(gca),'YLim',[0.5 1],'YTick',0.5:.1:1,'YTickLabel',50:10:100);
 end;
 xlabel(ttype);
 fprintf(1,'%s\n',repmat('-',1,50));
@@ -184,8 +184,8 @@ fprintf(1,['Group average (n=%i) = ' fmt '(' fmt ') %s\n'], length(ratlist), m, 
 fprintf(1,'%s\n',repmat('-',1,50));
 
 uicontrol('Tag', 'figname', 'Style','text', 'String', [mymetric '_prelesion_' ttype '_group'], 'Visible','off');
-axes__format(gca);
-set(gcf,'Position',[1020         602         189         327]);
+axes__format(double(gca));
+set(double(gcf),'Position',[1020         602         189         327]);
 
 
 function [sess_b b] = sub__bias(ttype, rm, ovmid)

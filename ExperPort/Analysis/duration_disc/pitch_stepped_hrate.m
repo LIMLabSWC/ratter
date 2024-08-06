@@ -29,13 +29,13 @@ function [] = pitch_stepped_hrate(varargin)
   specarray = {'.b','.r'};
   for r = 1:length(mega_perf)
     figure;
-  %set(gcf,'Menubar','none','Toolbar','none');
+  %set(double(gcf),'Menubar','none','Toolbar','none');
      temp = mega_perf{r};             
       errorbar(temp(:,1), temp(:,2), temp(:,3), ...
                temp(:,3),specarray{r},'MarkerSize',10);
       
   line([0 1.1], [0.8 0.8], 'LineStyle',':','Color','r');
-   set(gca,'XLim', [0 1.2], ...
+   set(double(gca),'XLim', [0 1.2], ...
 'YLim', [0 1.3], 'YTick', 0:0.2:1, 'YTickLabel', 0:20:100);
     t = ylabel('Average hit rate (%)');
   set(t,'FontSize',14,'FontWeight','bold');

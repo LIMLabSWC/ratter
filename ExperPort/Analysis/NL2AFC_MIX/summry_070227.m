@@ -19,4 +19,4 @@ figure; hold on;
 plot((1:n_epoch),cell2mat(mix2afc_ratname(2:n_epoch+1,2)),'o-b', 'MarkerSize', 12);
 plot((1:n_epoch),cell2mat(mix2afc_ratname(2:n_epoch+1,3)),'*-r', 'MarkerSize', 12);
 legend(pair1, pair2);
-set(gca,'XTick',(1:1:n_epoch),'XTickLabel',{mix2afc_ratname{2:n_epoch+1,1}},'YLim',[30 100],'YGrid','on');
+set(double(gca),'XTick',(1:1:n_epoch),'XTickLabel',{mix2afc_ratname{2:n_epoch+1,1}},'YLim',[30 100],'YGrid','on');

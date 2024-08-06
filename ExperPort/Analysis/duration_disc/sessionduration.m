@@ -15,8 +15,8 @@ wt = 400;
 sz = get(0,'ScreenSize');
 x = 10; y =900;
 xlbl = {};
-f1=figure;set(gcf,'Position',[22         603        1188         292]);
-f2=figure;set(gcf,'Position',[22         200        1188         292]);
+f1=figure;set(double(gcf),'Position',[22         603        1188         292]);
+f2=figure;set(double(gcf),'Position',[22         200        1188         292]);
 msize = 20;
 
 numtrials = [];
@@ -44,10 +44,10 @@ end;
 set(0,'CurrentFigure',f1);
 line([1 length(xlbl)],[60 60],'LineStyle',':','Color','r','LineWidth',2);
 line([1 length(xlbl)],[120 120],'LineStyle',':','Color','r','LineWidth',2);
-set(gca,'XTick',1:length(xlbl), 'XTickLabel',xlbl);
+set(double(gca),'XTick',1:length(xlbl), 'XTickLabel',xlbl);
 maxie = max(sessiondur);
-set(gca,'YTick',0:30:maxie, 'YTickLabel', 0:0.5:maxie/2);
-set(gcf,'Tag','sessionduration');
+set(double(gca),'YTick',0:30:maxie, 'YTickLabel', 0:0.5:maxie/2);
+set(double(gcf),'Tag','sessionduration');
 ylabel('Minutes');
 xlabel('rats');
 t=title(sprintf('Session duration for %s',date));
@@ -55,8 +55,8 @@ set(t,'FontSize',12,'FontWEight','bold');
 
 
 set(0,'CurrentFigure',f2);
-set(gca,'XTick',1:length(xlbl), 'XTickLabel',xlbl);
-set(gcf,'Tag','sessionduration');
+set(double(gca),'XTick',1:length(xlbl), 'XTickLabel',xlbl);
+set(double(gcf),'Tag','sessionduration');
 ylabel('# trials');
 xlabel('rats');
 t=title(sprintf('# trials for %s',date));

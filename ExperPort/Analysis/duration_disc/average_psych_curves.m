@@ -219,12 +219,12 @@ switch action
                 hold on; plot(avgbefore_x, avgbefore_y, '-k');
                 title('Normalized Before');
 
-                %set(gca,'XLim',[-2 +2]);
+                %set(double(gca),'XLim',[-2 +2]);
 
                 subplot(1,2,2); sub__plotset(normed_after, ratcolour, 'newxx','newyy');
                 hold on; plot(avgafter_x, avgafter_y, '-k');
                 title('Normalized After');
-                %   set(gca,'XLim',[-2 +2]);
+                %   set(double(gca),'XLim',[-2 +2]);
 
             end;
 
@@ -304,8 +304,8 @@ switch action
 
 
             ylbl=ylabel(ytxt); set(ylbl,'FontSize',24,'FontWeight','bold');
-            set(gca, 'XLim', [minx maxx], 'YLim',[0 1.05],'YTick',0:0.25:1, 'YTickLabel', 0:25:100,'FontSize',24,'FontWeight','bold');
-            set(gca,'XTick',0, 'XTickLabel', zerotxt);
+            set(double(gca), 'XLim', [minx maxx], 'YLim',[0 1.05],'YTick',0:0.25:1, 'YTickLabel', 0:25:100,'FontSize',24,'FontWeight','bold');
+            set(double(gca),'XTick',0, 'XTickLabel', zerotxt);
             xlbl=xlabel(xtxt); set(xlbl,'FontSize',24, 'FontWeight','bold');
 
 
@@ -549,9 +549,9 @@ normeddata = 0;
 if doplot > 0
     f=figure; set(f,'Tag','scalefig');
     subplot(1,2,1);
-    set(gca,'Tag','before_scale'); title('Before scaling');
+    set(double(gca),'Tag','before_scale'); title('Before scaling');
     subplot(1,2,2);
-    set(gca,'Tag','after_scale'); title('After scaling');
+    set(double(gca),'Tag','after_scale'); title('After scaling');
 end;
 
 fnames = fieldnames(data);
@@ -562,10 +562,10 @@ for f = 1:length(fnames)
     if doplot > 0
         eval(['currcolour = plotclr.' ratname ';']);
         set(0,'CurrentFigure',findobj('Tag','scalefig'));
-        set(gcf,'CurrentAxes', findobj('Tag','before_scale'));
+        set(double(gcf),'CurrentAxes', findobj('Tag','before_scale'));
         l=plot(out.xx, out.yy,'-r');
         set(l,'Color',currcolour,'LineWidth',2); hold on;
-        set(gca,'Tag','before_scale');
+        set(double(gca),'Tag','before_scale');
     end;
 
     % now plot scaled
@@ -585,10 +585,10 @@ for f = 1:length(fnames)
         fprintf(1,'%s:\t\tOld slope = %2.2f', ratname,tau);
     end;
     if doplot > 0
-        set(gcf,'CurrentAxes', findobj('Tag','after_scale'));
+        set(double(gcf),'CurrentAxes', findobj('Tag','after_scale'));
         l=plot(norm_x, out.yy,'-r');
         set(l,'Color',currcolour,'LineWidth',2);   hold on;
-        set(gca,'Tag','after_scale');
+        set(double(gca),'Tag','after_scale');
         fprintf(1,'\t\tNew slope = %2.4f\n', sub__getslope(norm_x, out.yy));
     end;
 
@@ -606,9 +606,9 @@ for f = 1:length(fnames)
 end;
 
 if doplot > 0
-    set(gcf,'CurrentAxes', findobj('Tag','before_scale'));
+    set(double(gcf),'CurrentAxes', findobj('Tag','before_scale'));
     title('Before scaling');
-    set(gcf,'CurrentAxes', findobj('Tag','after_scale'));
+    set(double(gcf),'CurrentAxes', findobj('Tag','after_scale'));
     title('After scaling');
 end;
 

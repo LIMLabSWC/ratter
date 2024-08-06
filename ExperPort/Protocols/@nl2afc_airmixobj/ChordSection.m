@@ -5,13 +5,13 @@ GetSoloFunctionArgs;
 switch action
     case 'init'    % ------------- CASE 'INIT' ------------
         % make a collapsible figure for sound parameters
-        fig = gcf;
+        fig = double(gcf);
         rpbox('InitRP3StereoSound');
         figure(fig);
         oldx = x; oldy = y;  x = 5; y = 5;
         SoloParamHandle(obj, 'myfig', 'value', figure, 'saveable', 0);
 
-        % SoloParamHandle(obj, 'my_gui_info', 'value', [x y gcf]);
+        % SoloParamHandle(obj, 'my_gui_info', 'value', [x y double(gcf)]);
         NumeditParam(obj, 'SoundSPL', 20, x, y); next_row(y);
         NumeditParam(obj, 'SoundDur', 0.1, x, y); next_row(y);
         NumeditParam(obj, 'RampDur',    0.005, x, y);   next_row(y);

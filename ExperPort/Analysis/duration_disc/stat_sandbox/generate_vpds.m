@@ -6,7 +6,7 @@ hzdrate = [0.0001 0.001 0.01 0.05];
 
 
 figure;
-set(gcf,'Menubar','none','Toolbar','none');
+set(double(gcf),'Menubar','none','Toolbar','none');
 for h = 1:length(hzdrate)
     subplot(2,2,h);
     vl = vpd_hazard(vpdmin, vpdmax, hzdrate(h));

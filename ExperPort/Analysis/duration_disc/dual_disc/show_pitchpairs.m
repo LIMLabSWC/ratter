@@ -16,7 +16,7 @@ function [] = show_pitchpairs(rat, varargin)
     t2 = cell2mat(saved_history.ChordSection_Tone_Freq_R); t2 = t2(1:n);
     
     figure;
-    set(gcf,'Toolbar','none','Menubar','none');
+    set(double(gcf),'Toolbar','none','Menubar','none');
     plot(1:n, t1, '.b', 1:n, t2, '.g');
     legend({'Left', 'Right'});
     title(date_set{d});

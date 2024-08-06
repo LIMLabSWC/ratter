@@ -9,7 +9,7 @@ GetSoloFunctionArgs;
 switch action,
  case 'init',
      
-   fig=gcf;
+   fig=double(gcf);
    MenuParam(obj, 'BasicParams', {'view', 'hidden'},1,x,y);next_row(y);
    set_callback(BasicParams, {'ParamsSection', 'basic_param_view'});
    

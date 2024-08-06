@@ -103,7 +103,7 @@ switch action,
         SoloParamHandle(obj,'left_reward_history','value',[]);
         
         
-        SoloParamHandle(obj, 'my_xyfig', 'value', [x y gcf]);
+        SoloParamHandle(obj, 'my_xyfig', 'value', [x y double(gcf)]);
         ToggleParam(obj, 'RFShow', 0, x, y, 'OnString', 'Reinf Showing', ...
             'OffString', 'Reinf Hidden', 'TooltipString', 'Show/Hide Reinfocement panel');
         set_callback(RFShow, {mfilename, 'show_hide'}); %#ok<NODEF> (Defined just above)
@@ -112,7 +112,7 @@ switch action,
         SoloParamHandle(obj, 'myfig', 'value', figure('Position', [ 226   122  606   163], ...
             'closerequestfcn', [mfilename '(' class(obj) ', ''hide'');'], 'MenuBar', 'none', ...
             'Name', mfilename), 'saveable', 0);
-        set(gcf, 'Visible', 'off');
+        set(double(gcf), 'Visible', 'off');
         
         nx=10; ny=10;
         
@@ -304,7 +304,7 @@ switch action,
         % ------------------------------------------------------------------
     case 'reinit'
         x = my_xyfig(1); y = my_xyfig(2); origfig = my_xyfig(3);
-        currfig = gcf;
+        currfig = double(gcf);
         
         feval(mfilename, obj, 'close');
         

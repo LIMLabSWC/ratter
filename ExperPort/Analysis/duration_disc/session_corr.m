@@ -31,7 +31,7 @@ figure;
 subplot(2,1,2);
 
 plot(from:length(lp), lp(from:end), '-b');
-set(gca,'XLim', [from max(2,length(lp))],'YLim',[0 1],'YTick', [0 0.2 0.5 0.8 1]);
+set(double(gca),'XLim', [from max(2,length(lp))],'YLim',[0 1],'YTick', [0 0.2 0.5 0.8 1]);
 s = sprintf('%s: %s (%s)\n Value of LProb', make_title(ratname), make_title(task), ...
     date);
 t =  title(s);
@@ -42,10 +42,10 @@ ylabel('LProb (from 0 to 1)');
 
 % badboyspl
 subplot(2,1,1);
-set(gcf,'Position',[1082  100 360 280] , 'Menubar', 'none','Toolbar','none')
+set(double(gcf),'Position',[1082  100 360 280] , 'Menubar', 'none','Toolbar','none')
 plot(1:length(bb), bb, '.r');
 ylabel('BadboySPL');
-set(gca,'YTick', 1:3, 'YTickLabel', {'normal','Louder','LOUDEST'}, 'XLim', ...
+set(double(gca),'YTick', 1:3, 'YTickLabel', {'normal','Louder','LOUDEST'}, 'XLim', ...
     [1 max(2,length(bb))], 'YLim', [0 4]);
 xlabel('Trial #');
 s = sprintf('%s: %s (%s)\nBadBoySPL', make_title(ratname), make_title(task), date);

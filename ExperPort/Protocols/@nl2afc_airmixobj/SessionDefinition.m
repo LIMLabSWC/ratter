@@ -8,7 +8,7 @@ switch action
     case 'init'   % ------- CASE 'INIT' ----------
         figure(value(myfig));
         parentfig_x = x; parentfig_y =  y;
-        SoloParamHandle(obj, 'my_gui_info', 'value', [x y gcf]);
+        SoloParamHandle(obj, 'my_gui_info', 'value', [x y double(gcf)]);
 
         MenuParam(obj, 'session_show', {'view', 'hide'}, 2, x, y, 'label', 'Session Ctrl.', 'TooltipString', 'Define training stages to be automated'); next_row(y);
         set_callback(session_show, {'SessionDefinition','hide_show'});

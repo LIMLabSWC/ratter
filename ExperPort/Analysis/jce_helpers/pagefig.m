@@ -39,38 +39,38 @@ function pagefig(varargin)
    if strcmp(landscape, 'landscape'),
       if isempty(no_size_change),
 	 height = 7.5; width = 10;
-	 set(gcf, 'Position', ...
+	 set(double(gcf), 'Position', ...
 	     [580, 250+(10-height)*57, width*57, height*57]);
       end;
-      set(gcf, 'PaperOrientation', 'landscape');
-      % set(gcf, 'PaperPosition', ...
+      set(double(gcf), 'PaperOrientation', 'landscape');
+      % set(double(gcf), 'PaperPosition', ...
       % [0.5+(7.5-height), (11-width)/2, width, height]);
-      set(gcf, 'PaperPosition', ...
+      set(double(gcf), 'PaperPosition', ...
 	  [corneroffset, corneroffset, width, height]);
    else
       if isempty(no_size_change),
-	 set(gcf, 'Position', ...
+	 set(double(gcf), 'Position', ...
 	     [670, 1010-height*scale, width*scale, height*scale]);
       end;
-      set(gcf, 'PaperOrientation', 'portrait');
-      % set(gcf, 'PaperPosition', ...
+      set(double(gcf), 'PaperOrientation', 'portrait');
+      % set(double(gcf), 'PaperPosition', ...
       % [(8.5-width)/2, 0.5+(10-height), width, height]);
-      set(gcf, 'PaperPosition', ...
+      set(double(gcf), 'PaperPosition', ...
 	  [corneroffset, corneroffset, width, height]);
    end;
 
    
    clf;
-   set(gcf, 'Color', 'w');
-   set(gcf, 'InvertHardCopy', 'off');
-   set(gcf, 'DefaultTextColor', 0.01*[1 1 1]);
-   set(gcf, 'DefaultAxesFontSize',  FontSize);
-   set(gcf, 'DefaultTextFontSize',  FontSize);
-   set(gcf, 'DefaultAxesXColor',  0.01*[1 1 1]);
-   set(gcf, 'DefaultAxesYColor',  0.01*[1 1 1]);
-   set(gcf, 'DefaultAxesZColor',  0.01*[1 1 1]);
-   set(gcf, 'DefaultLineColor',   0.01*[1 1 1]);
-   set(gcf, 'DefaultAxesTickDir', 'out');
+   set(double(gcf), 'Color', 'w');
+   set(double(gcf), 'InvertHardCopy', 'off');
+   set(double(gcf), 'DefaultTextColor', 0.01*[1 1 1]);
+   set(double(gcf), 'DefaultAxesFontSize',  FontSize);
+   set(double(gcf), 'DefaultTextFontSize',  FontSize);
+   set(double(gcf), 'DefaultAxesXColor',  0.01*[1 1 1]);
+   set(double(gcf), 'DefaultAxesYColor',  0.01*[1 1 1]);
+   set(double(gcf), 'DefaultAxesZColor',  0.01*[1 1 1]);
+   set(double(gcf), 'DefaultLineColor',   0.01*[1 1 1]);
+   set(double(gcf), 'DefaultAxesTickDir', 'out');
 
    return;
    

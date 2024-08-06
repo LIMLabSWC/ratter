@@ -550,9 +550,9 @@ try
                 cd(original_dir);
                 %psthC(ev(:), (ts(:))', -t0*1000, t1*1000, 10, (msv(:))', 0, value(editSmoother)*1000);
                 %xlim([t0 t1]);
-                %set(gca, 'TickDir', 'out', 'FontSize', 16);
+                %set(double(gca), 'TickDir', 'out', 'FontSize', 16);
                 %xlabel(sprintf('time from %s', value(alignon)))
-                %set(get(gca, 'XLabel'), 'Interpreter', 'none');
+                %set(get(double(gca), 'XLabel'), 'Interpreter', 'none');
                 %ylabel('spikes/sec +/- std. err.');
             end
             

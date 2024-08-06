@@ -32,7 +32,7 @@ switch action,
     end;
     x = varargin{1}; y = varargin{2};
 
-    SoloParamHandle(obj, 'my_gui_info', 'value', [x y gcf]);
+    SoloParamHandle(obj, 'my_gui_info', 'value', [x y double(gcf)]);
     
     
     ToggleParam(obj, 'pbup_show', 0, x, y, ...
@@ -41,7 +41,7 @@ switch action,
        'TooltipString', 'Show/Hide PBup window'); next_row(y);
     set_callback(pbup_show, {mfilename, 'show_hide';});  %#ok<NODEF>
     
-    screen_size = get(0, 'ScreenSize'); fig = gcf;
+    screen_size = get(0, 'ScreenSize'); fig = double(gcf);
     SoloParamHandle(obj, 'pbup_fig', ...
         'value', figure('Position', [200 screen_size(4)-500 400 140], ...
         'closerequestfcn', [mfilename '(' class(obj) ', ''hide''' ');'], 'MenuBar', 'none', ...

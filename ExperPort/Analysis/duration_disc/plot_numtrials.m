@@ -35,10 +35,10 @@ end;
 f= findobj('Tag','plotfig');
 if isempty(f)
 figure;
-set(gcf,'Position',[200 200 500 500],'Tag','plotfig');
+set(double(gcf),'Position',[200 200 500 500],'Tag','plotfig');
 
 figure;
-set(gcf,'Tag','namefig');
+set(double(gcf),'Tag','namefig');
 end;
 
 buff = [];
@@ -64,6 +64,6 @@ t=text(1, r+0.5,ratname); set(t,'FontWeight','bold','FontSize',14);
 
 end;
     set(0,'CurrentFigure',findobj('Tag', 'plotfig'));
-set(gca,'YLim',eval(['ATTR__YLIMS.' plotval]), 'YTick',eval(['ATTR__YTICKS.' plotval]));
+set(double(gca),'YLim',eval(['ATTR__YLIMS.' plotval]), 'YTick',eval(['ATTR__YTICKS.' plotval]));
     set(0,'CurrentFigure',findobj('Tag', 'namefig'));
-    set(gcf,'Position',[1050 360   164   399]);
+    set(double(gcf),'Position',[1050 360   164   399]);

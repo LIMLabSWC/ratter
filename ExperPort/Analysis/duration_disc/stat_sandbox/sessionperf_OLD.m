@@ -68,7 +68,7 @@ function [] = sessionperf(rat, task, date, varargin)
   % if strcmpi(task(1:3), 'dua'), nump = 2; ht = 680 * (2/3); end;
    
    
-   set(gcf,'Menubar','none', 'Toolbar','none', 'Position', [200 100 750 ht]);
+   set(double(gcf),'Menubar','none', 'Toolbar','none', 'Position', [200 100 750 ht]);
   
    % Plot 1: Hit rates -----------
   subplot(nump,1,1); 
@@ -78,7 +78,7 @@ function [] = sessionperf(rat, task, date, varargin)
   else
     hit_rates(rat, task, date, 'bout_size', winsize);
     end;
-  set(gca, 'XTick', [0:20:length(hh)-winsize],'XLim', [winsize+1 ...
+  set(double(gca), 'XTick', [0:20:length(hh)-winsize],'XLim', [winsize+1 ...
                       length(hh)-winsize],'YLim',[0.3 1.1]);
   
   % Plot 2: Bias -----------------
@@ -87,7 +87,7 @@ function [] = sessionperf(rat, task, date, varargin)
               make_title(rat), make_title(task), date, winsize);
 % $$$   subplot(2,1,1);
 % $$$   plot(1:length(side), side, '.b');
-% $$$   set(gca, 'YTick', [0 1], 'YTickLabel', {'Right', 'Left'}, 'YLim', ...
+% $$$   set(double(gca), 'YTick', [0 1], 'YTickLabel', {'Right', 'Left'}, 'YLim', ...
 % $$$            [-1 2]);                     
 % $$$   subplot(2,1,2);
   blah = plot(1:length(lrate), lrate, '-b', 1:length(rrate), rrate, ...
@@ -97,7 +97,7 @@ function [] = sessionperf(rat, task, date, varargin)
   ylabel('Hit rate');
   legend({'Left', 'Right'}, 'Location', 'SouthWest');
   title(s);
-  set(gca, 'YLim', [0.5 1.1], 'XTick', [0:20:length(hh)-winsize], 'XLim', ...
+  set(double(gca), 'YLim', [0.5 1.1], 'XTick', [0:20:length(hh)-winsize], 'XLim', ...
            [winsize+1 length(hh)-winsize]);
   
   % Plot 3: Whatever your heart desires ----------
@@ -130,7 +130,7 @@ function [] = sessionperf(rat, task, date, varargin)
   idx = find(strcmpi(tone_loc, 'on'));
   toneloc(idx) = 1; 
      plot(1:length(goloc), goloc, '.g', 1:length(toneloc), toneloc, '-b');
- set(gca, 'YLim', [-1 2], 'YTickLabel', {'', 'off', 'on', ''}, 'YTick', ...
+ set(double(gca), 'YLim', [-1 2], 'YTickLabel', {'', 'off', 'on', ''}, 'YTick', ...
            -1:1:2, 'XLim', ...
            [winsize+1 length(hh)-winsize]);
     s = sprintf('%s: %s (%s)\nTone & GO Localisation', make_title(rat), make_title(task), date);
@@ -157,9 +157,9 @@ title(s);
     line([1 length(temp)], [0.2 0.2], 'LineStyle',':', 'Color','r');
     line([1 length(temp)], [-0.2 -0.2], 'LineStyle',':', 'Color','r');
    
-      set(gca,'YLim', [-0.5 0.5]);
+      set(double(gca),'YLim', [-0.5 0.5]);
       xlabel('Trial #'); ylabel('(Hit rate)L - (Hit rate)R');
-      set(gca,'XTick', 0:20:length(temp));
+      set(double(gca),'XTick', 0:20:length(temp));
       s = sprintf('%s: %s (%s)\nBias (trial-by-trial)', make_title(rat), ...
                   make_title(task), date);    
       title(s);

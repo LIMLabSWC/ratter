@@ -176,7 +176,7 @@ switch action,
   %  pos = get(value(myfig), 'Position');
   %  set(value(myfig), 'Position', [pos(1:2) x+250 maxy+150]);
 
-  figpos = get(gcf, 'Position');
+  figpos = get(double(gcf), 'Position');
   HeaderParam(obj, 'prot_title', 'util_compare', x, y, 'position', [10 ...
                       figpos(4)-25, 200 20]);
   

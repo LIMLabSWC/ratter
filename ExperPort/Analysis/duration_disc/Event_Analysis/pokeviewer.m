@@ -41,7 +41,7 @@ switch action,
         fig = figure;
         screen_size = get(0, 'ScreenSize');
 
-        set(gcf,'Tag','pokeviewer','Position',[1 screen_size(4)-700, 400 540],  'MenuBar', 'none', 'Name', 'Pokes Plot', ...
+        set(double(gcf),'Tag','pokeviewer','Position',[1 screen_size(4)-700, 400 540],  'MenuBar', 'none', 'Name', 'Pokes Plot', ...
             'NumberTitle', 'off','Name', sprintf('%s: %s',ratname, indate));
 
         % UI param that controls what t=0 means in pokes plot:
@@ -177,8 +177,8 @@ switch action,
             set(findobj('Tag','axpatches'), 'Ylim',[bot, dtop], ...
                 'Xlim', [t0, t1]);
             
-            yl=get(gca,'YLim');
-             set(gca,'YTick', yl(1)+0.5:1:yl(2)+0.5,'YTickLabel', yl(1)+1:yl(2)+1);
+            yl=get(double(gca),'YLim');
+             set(double(gca),'YTick', yl(1)+0.5:1:yl(2)+0.5,'YTickLabel', yl(1)+1:yl(2)+1);
 
 
             drawnow;
@@ -227,5 +227,5 @@ end;
 
 % makes uicontrol and label
 function [] = sub__mkcontrl(tag, pos, type, val, strg,cbk)
-uicontrol(gcf,'position',pos,'Style', type,'value',val,'Tag',tag,'BackgroundColor',[1 1 1],'String', strg,'Callback',cbk);
-uicontrol(gcf,'position',[pos(1)+pos(3)+2 pos(2) 50 20],'STyle','text','String', tag);
+uicontrol(double(gcf),'position',pos,'Style', type,'value',val,'Tag',tag,'BackgroundColor',[1 1 1],'String', strg,'Callback',cbk);
+uicontrol(double(gcf),'position',[pos(1)+pos(3)+2 pos(2) 50 20],'STyle','text','String', tag);

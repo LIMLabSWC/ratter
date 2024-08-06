@@ -16,4 +16,4 @@ pct = percentile(td, pctl_array);
 for k = 1:length(pctl_array)
     fprintf(1,'%ith percentile: %i seconds\n', pctl_array(k), round(pct(k)));
 end;
-set(gca,'XLim',[0 min(max(bins), pct(4))]);
+set(double(gca),'XLim',[0 min(max(bins), pct(4))]);

@@ -171,7 +171,7 @@ switch action,
 %     pos = get(value(myfig), 'Position');
 %     set(value(myfig), 'Position', [pos(1:2) x+240 maxy+25]);
 
-    figpos = get(gcf, 'Position');
+    figpos = get(double(gcf), 'Position');
     [expmtr, rname]=SavingSection(obj, 'get_info');
     HeaderParam(obj, 'prot_title', ['ProAnti: ' expmtr ', ' rname] , ...
             x, y, 'position', [10 figpos(4)-25, 600 20]);
