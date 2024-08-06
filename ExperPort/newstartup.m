@@ -443,7 +443,7 @@ end             % end helper function BControl_First_Run
 %           created if it does not exist but is defined.).
 %       - Checks that Main_Code_Directory is defined, exists, and is the
 %           current directory (issuing warnings otherwise).
-%       - Checks that value of fake_rp_box is 0-4 or 20. (Consult dispatcher
+%       - Checks that value of fake_rp_box is 0-4 or 20, 30. (Consult dispatcher
 %           assumptions.)
 %       - If fake_rp_box is 1,2, or 20, then checks for defined state_machine_server
 %           string setting.
@@ -528,11 +528,11 @@ if ~isempty(Main_Data_Directory) && ~strcmp(Main_Data_Directory,'NULL'),
 end;            %  end if Main_Data_Directory variable is not meaningless
 
 
-%     Check for meaningful fake_rp_box (0-4 or 20).
+%     Check for meaningful fake_rp_box (0-4 or 20, 30).
 [fake_rp_box errID errmsg] = ...
     bSettings('get','RIGS','fake_rp_box');
 if errID, return; end;
-if ~ismember(fake_rp_box, [0 1 2 3 4 20]), % <~> added 20 2008.July.04
+if ~ismember(fake_rp_box, [0 1 2 3 4 20 30]), % <~> added 20 2008.July.04
     warn = [nl nl 'WARNING in Verify_Settings:' nl 'The setting' ...
         ' RIGS;fake_rp_box is not an integer in the set [0 1 2 3 4].' nl...
         'It is expected to be. See documentation in settings files.' nl];
