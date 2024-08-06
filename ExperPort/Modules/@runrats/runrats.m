@@ -113,15 +113,36 @@ switch action
             'NumberTitle','off','Name','RunRats V2.2 ','Resize','off',...
             'closerequestfcn', [mfilename '(''close'')']);
         SoloParamHandle(obj,'myfig', 'value',fig);
-        
         try
-            jf=get(value(myfig), 'JavaFrame');
-            pause(0.1);
-            javaMethod('setAlwaysOnTop', jf.fFigureClient.getWindow, 1);
-            %delete or change - sharbat
-        catch %#ok<CTCH>
+            % Assuming myfig is your original figure handle
+            originalFig = value(myfig);
+            
+            % Create a new figure that will stay on top
+            newFig = figure;
+            set(newFig, 'Position', get(originalFig, 'Position')); % Set the new figure's position to cover the original one
+            
+            % Optionally, you can set the Name property of the new figure to distinguish it
+            set(newFig, 'Name', ['New Figure: ', get(originalFig, 'Name')]);
+            
+            % Perform operations on newFig as needed
+            % For demonstration, let's just pause here
+            pause(10); % Keep the new figure open for 10 seconds
+            
+            % Close the new figure after the operation is done
+            close(newFig);
+        catch
             disp('WARNING: Failed to keep runrats on top');
         end
+
+
+        % try
+        %     jf=get(value(myfig), 'JavaFrame');
+        %     pause(0.1);
+        %     javaMethod('setAlwaysOnTop', jf.fFigureClient.getWindow, 1);
+        %     %delete or change - sharbat
+        % catch %#ok<CTCH>
+        %     disp('WARNING: Failed to keep runrats on top');
+        % end
         
         
         %Create the non-gui variables we will need
