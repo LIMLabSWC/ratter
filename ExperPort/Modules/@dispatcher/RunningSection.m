@@ -19,7 +19,7 @@ switch action,
         % ------------------------------------------------------------------
         %%                       INIT
         % ------------------------------------------------------------------
-        SoloParamHandle(obj, 'my_gui_info', 'value', [x y double(gcf)]);
+        SoloParamHandle(obj, 'my_gui_info', 'value', [x y gcf]);
 
         SoloParamHandle(obj, 'Running', 'value', 0);
         PushbuttonParam(obj, 'RunButton', x, y, ...
