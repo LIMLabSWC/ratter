@@ -48,7 +48,7 @@ switch action
 subplot(1,2,2);
 errorbar(1:length(betahat),betahat, ci(:,1), ci(:,2),'.r');
 title('Error bars on parameter estimates');
-set(gca,'XTick',1:4, 'XTickLabel',{'a','m','n','tau'});
+set(double(gca),'XTick',1:4, 'XTickLabel',{'a','m','n','tau'});
             [xc xf xm web]= get_weber(bigx, yhat);
             
         end;
@@ -64,7 +64,7 @@ set(gca,'XTick',1:4, 'XTickLabel',{'a','m','n','tau'});
         if rows(ypred) ~= rows(tally), tally=tally'; end;
         sig = nlinfit_sandbox('goodness_of_fit',replong, ypred.*tally,tally);
 
-        if sig == 1, set(gca,'Color','y'); end;
+        if sig == 1, set(double(gca),'Color','y'); end;
         title(date);
 
         out1 = betahat;

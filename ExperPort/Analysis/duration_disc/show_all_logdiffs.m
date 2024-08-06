@@ -78,7 +78,7 @@ end;
 
 
 figure;
-set(gcf,'Menubar','none','Toolbar','none', 'Position', [200 200 1000 400]);
+set(double(gcf),'Menubar','none','Toolbar','none', 'Position', [200 200 1000 400]);
 
 
 % Plot of logdiffs at start of session
@@ -114,7 +114,7 @@ else ext= 'Log-distance'; extent = [0 1];
 end;
    
 
-set(gca,'XTick',[], 'YLim', 1.1*extent);
+set(double(gca),'XTick',[], 'YLim', 1.1*extent);
 title([rat 'Session START (blue) and END (red) values: Pair ' ext]);
 
 bdays = find(breaks > 0);
@@ -132,7 +132,7 @@ if show_distance > 0
       line([bdays(k)-0.5 bdays(k)], [-200 200], 'LineStyle', '--', 'Color', ...
            'k');
    end;
-set(gca,'XTick',[]); % 'YTick', [-200:50:200], 'YLim', [-200 200]);
+set(double(gca),'XTick',[]); % 'YTick', [-200:50:200], 'YLim', [-200 200]);
 else
 tmp = logdiffs_start - logdiffs_end;
 currl = plot(1:length(logdiffs_start), tmp, '.r');
@@ -141,7 +141,7 @@ currl = plot(1:length(logdiffs_start), tmp, '.r');
 for k = 1:length(bdays)
   line([bdays(k)-0.5 bdays(k)], [-0.2 0.5], 'LineStyle', '--', 'Color', 'k');
 end;
-set(gca,'XTick',[], 'YTick', [-0.2:0.1:0.4], 'YLim', [-0.2 0.5]);
+set(double(gca),'XTick',[], 'YTick', [-0.2:0.1:0.4], 'YLim', [-0.2 0.5]);
 end;
 
 for k = 1:length(caps)
@@ -151,14 +151,14 @@ end;
 title([rat ': Difference between START and END of a session']);
 
 datacursormode on;
-dcm_obj = datacursormode(gcf);
+dcm_obj = datacursormode(double(gcf));
 set(dcm_obj, 'SnapToDataVertex', 'on', 'DisplayStyle','datatip');
 set(dcm_obj, 'Updatefcn', {@show_all_logdiffs,'action', 'update_me'});
 
 
 % Plot 3: Plot start pair & drop as a function of day
 figure;
-set(gcf,'Menubar','none','Toolbar','none','Position', [910 420 430 350]);
+set(double(gcf),'Menubar','none','Toolbar','none','Position', [910 420 430 350]);
 tmp = t2_start-t1_start;
 currl= plot3(1:length(t1_start), tmp, tmp-(t2_end-t1_end),'.b', ...
              1:length(t1_start), tmp, tmp-(t2_end-t1_end),'-r'); 
@@ -169,7 +169,7 @@ ylabel('Start pair distance');
 zlabel('Drop distance');
 title([rat ': Drop as a function of starting pair distance']);
 datacursormode on;
-dcm_obj = datacursormode(gcf);
+dcm_obj = datacursormode(double(gcf));
 set(dcm_obj, 'SnapToDataVertex', 'on', 'DisplayStyle','datatip');
 set(dcm_obj, 'Updatefcn', {@show_all_logdiffs,'action', 'update_me'});
 

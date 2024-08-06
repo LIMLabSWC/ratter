@@ -48,11 +48,11 @@ function [s] = SoloParam(varargin)
       autoset_callback = 'autoset_callback';
       
       if ~isempty(type), % If we are UI, work around Matlab 7 popupmenu bug
-         daddy = findobj(gcf, 'Tag', 'ContainerPanel');
+         daddy = findobj(double(gcf), 'Tag', 'ContainerPanel');
          if isempty(daddy),
             daddy = uipanel('Units', 'normalized', 'Position', [0 0 1 1], ...
                             'Tag', 'ContainerPanel');
-            set(gcf, 'ResizeFcn', @panel_resize_workaround);
+            set(double(gcf), 'ResizeFcn', @panel_resize_workaround);
          end;
       end;
       

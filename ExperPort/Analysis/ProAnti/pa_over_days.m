@@ -111,7 +111,7 @@ end;
 
 
 if isempty(fignum),  %#ok<NODEF>
-  figure; fignum = gcf;
+  figure; fignum = double(gcf);
 end;
 if ~ishandle(fignum), 
   figure(fignum); 

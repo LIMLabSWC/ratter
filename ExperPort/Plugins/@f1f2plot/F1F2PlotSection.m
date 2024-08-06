@@ -41,7 +41,7 @@ switch action,
     end;
     x = varargin{1}; y = varargin{2};
     
-    SoloParamHandle(obj, 'my_xyfig', 'value', [x y gcf]);
+    SoloParamHandle(obj, 'my_xyfig', 'value', [x y double(gcf)]);
     
     
     ToggleParam(obj, 'f1f2plot_show', 0, x, y, ...
@@ -50,7 +50,7 @@ switch action,
        'TooltipString', 'Show/Hide f1-f2 Plot window'); next_row(y);
     set_callback(f1f2plot_show, {mfilename, 'show_hide'}); 
     
-    screen_size = get(0, 'ScreenSize'); fig = gcf;
+    screen_size = get(0, 'ScreenSize'); fig = double(gcf);
     SoloParamHandle(obj, 'myf1f2fig', ...
         'value', figure('Position', [200 screen_size(4)-740, 800 400], ...
         'closerequestfcn', [mfilename '(' class(obj) ', ''hide'');'], 'MenuBar', 'none', ...
@@ -299,7 +299,7 @@ switch action,
   % ------------------------------------------------------------------    
   case 'reinit'
     x = my_xyfig(1); y = my_xyfig(2); origfig = my_xyfig(3);
-    currfig = gcf;
+    currfig = double(gcf);
     
     feval(mfilename, obj, 'close');
     

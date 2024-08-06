@@ -11,7 +11,7 @@ longt= 0:1/2000:8;
     l = plot(shortt, snd);
    set(l,'LineWidth'); 
    
-    set(gca,'YLim', [-2 2]);
+    set(double(gca),'YLim', [-2 2]);
     
     subplot(2,1,2);
     snd =  sin( 2*pi.*longt ) ; %IS THIS CORRECT???
@@ -19,6 +19,6 @@ longt= 0:1/2000:8;
     l = plot(longt, snd);
    set(l,'LineWidth'); 
    
-    set(gca,'YLim', [-2 2]);
+    set(double(gca),'YLim', [-2 2]);
     
 

@@ -19,7 +19,7 @@ for i = 1:6,
     plot((1:bs_end), tg_scr(1: bs_end),'o-c'); 
     plot((bs_end+1:test_end), tg_scr(bs_end+1:test_end),'o-g');
     plot((test_end+1:length(tg_idx)), tg_scr(test_end+1:end),'o-m');
-    set(gca, 'YLim', [0 100], 'XLim', [0 length(tg_idx)+1], 'YGrid', 'on');
+    set(double(gca), 'YLim', [0 100], 'XLim', [0 length(tg_idx)+1], 'YGrid', 'on');
     for j = 1:length(tg_idx), 
         % left-right score biasing.
         bias(j) = score_blk{tg_idx(j),5} - score_blk{tg_idx(j),6}; 
@@ -76,7 +76,7 @@ X1 = (1:size(bs_avg,1)); Y11 = bs_avg(:,1); err11 = bs_avg(:,2); Y21 = bs_avg(:,
 X2 = (size(bs_avg,1)+1:size(bs_avg,1)+size(tst_avg,1));
 Y12 = tst_avg(:,1); err12 = tst_avg(:,2); Y22 = tst_avg(:,3); err22 = tst_avg(:,4);
 subplot(2,1,1); hold on; title(['6 rat avg, ' session], 'FontSize', 20);
-set(gca,'XLim', [0 size(bs_avg,1)+size(bs_avg,1)+1],'YLim',[0.6 1.3]); 
+set(double(gca),'XLim', [0 size(bs_avg,1)+size(bs_avg,1)+1],'YLim',[0.6 1.3]); 
 h1 = errorbar(X1, Y11, err11, '-oc','MarkerSize', 10);
 h2 = errorbar(X2, Y12, err12, '-og','MarkerSize', 10);
 subplot(2,1,2); hold on;
@@ -84,4 +84,4 @@ b1 = bar(X1, Y21); set(b1, 'FaceColor', 'none', 'EdgeColor', 'c');
 b2 = bar(X2, Y22); set(b2, 'FaceColor', 'none', 'EdgeColor', 'g');
 errorbar(X1, Y21, err21, 'LineStyle','none','Color','c');
 errorbar(X2, Y22, err22, 'LineStyle','none','Color','g');
-set(gca,'XLim', [0 size(bs_avg,1)+size(bs_avg,1)+1],'YLim', [0 100]);
+set(double(gca),'XLim', [0 size(bs_avg,1)+size(bs_avg,1)+1],'YLim', [0 100]);

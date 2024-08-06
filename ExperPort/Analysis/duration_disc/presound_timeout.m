@@ -65,7 +65,7 @@ end;
 
  basetitle = sprintf('%s: %s: %s\n', make_title(rat), make_title(task), date);
 figure;
-set(gcf,'Menubar','none', 'Toolbar','none', 'Position', [100 100 1100 ...
+set(double(gcf),'Menubar','none', 'Toolbar','none', 'Position', [100 100 1100 ...
                     400]);
 
 % Timeout rate
@@ -82,7 +82,7 @@ if presound > 0
 end;
 title([basetitle 'Timeout Rate (Lookback 15 trials)']);
 xlabel('Trials'); ylabel('# Timeouts -- Avg. 15 trials');
-set(gca,'XLim', [1 rows(p)], 'YLim', [0 max(2, max(to_ct_rate))]);
+set(double(gca),'XLim', [1 rows(p)], 'YLim', [0 max(2, max(to_ct_rate))]);
 
 % Timeout Duration
 subplot(2,2,2);

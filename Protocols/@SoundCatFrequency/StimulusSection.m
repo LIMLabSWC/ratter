@@ -25,7 +25,7 @@ switch action,
       'Name', mfilename), 'saveable', 0);
     screen_size = get(0, 'ScreenSize');
     set(value(myfig),'Position',[1 screen_size(4)-740, 1000 1000]); % put fig at top right
-    set(gcf, 'Visible', 'off');
+    set(double(gcf), 'Visible', 'off');
     x=10;y=10;
          
     SoloParamHandle(obj, 'ax', 'saveable', 0, ...

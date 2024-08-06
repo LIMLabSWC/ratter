@@ -97,7 +97,7 @@ end;
 axes('Position', [0.4 0.6 0.53 0.3],'YTick',[]);
 p = replong ./ tally;
 bar(bins(1:end-1), tally, 'stacked');
-set(gca,'YTick',[]); y_max = 1.5*max(tally);
+set(double(gca),'YTick',[]); y_max = 1.5*max(tally);
 for k = 1:length(bins)-1
     if isnan(p(k)), p(k) = 0;end;
     h = text(bins(k)-10, tally(k)+2, sprintf('%2.0f%%\n(%i/%i)', p(k)*100, replong(k), tally(k)));   

@@ -75,7 +75,7 @@ plot_others=0;
 % plot hit rate ----------------------
 figure;
 axes('Position',[0.1 0.75 0.8 0.15]);
-plot(sides,'.b'); set(gca,'YTick', [0 1], 'YTickLabel',{'R','L'}, 'YLim',[-1 2]);
+plot(sides,'.b'); set(double(gca),'YTick', [0 1], 'YTickLabel',{'R','L'}, 'YLim',[-1 2]);
 title(['Chanakya - ' dateset{1}]);
 axes('Position',[0.1 0.55 0.8 0.2]);
 
@@ -102,8 +102,8 @@ hold on;
 plot(lesser+1,num(lesser+1),'.r');
 
 y=ylabel('% Correct');set(y,'FontWEight','bold','fontsize',14);
-set(gca,'FontSize',14,'FOntWEight','bold');
-set(gca,'XGrid', 'off','XTick',[],'YTick',0:0.2:1, 'YTickLabel', 0:20:100);
+set(double(gca),'FontSize',14,'FOntWEight','bold');
+set(double(gca),'XGrid', 'off','XTick',[],'YTick',0:0.2:1, 'YTickLabel', 0:20:100);
 
 % plot tone parameters ---------------
 
@@ -127,8 +127,8 @@ plot(durr,'.r');
     p=plot(pidx,durr(pidx),'.k');
 
 y=ylabel('duration (sec)');set(y,'FontSize',14,'FOntWEight','bold');
-set(gca,'FontSize',14,'FOntWEight','bold');
-set(gca,'YLim',[0 maxie]);
+set(double(gca),'FontSize',14,'FOntWEight','bold');
+set(double(gca),'YLim',[0 maxie]);
 
 % tone pitch ------------------------------
 axes('Position',[0.1 0.3 0.8 0.25]);
@@ -147,7 +147,7 @@ plot(freqr,'.r');
 
 y=ylabel('frequency (KHz)');
 set(y,'FontSize',14,'FOntWEight','bold');
-set(gca,'FontSize',14,'FOntWEight','bold','XGrid', 'off','XTick',[],'YLim',[minnie maxie],'YScale','log',...
+set(double(gca),'FontSize',14,'FOntWEight','bold','XGrid', 'off','XTick',[],'YLim',[minnie maxie],'YScale','log',...
     'YTick',[1 15]);
 
 t=text(1, maxie*0.6, 'Left'); set(t,'FontWEight','bold','Color','b');
@@ -184,7 +184,7 @@ draw_separators(numtrials,minnie,maxie);
 %     %     l=plot(pidx, 0, '.b'); set(l, 'Color', [1 0.7 0.7]);
 %    % t=title([ratname ': ' dateset{1}]);
 % %     set(t,'FontSize',18,'FontWeight','bold');
-%     set(gca,'FontSize',14,'FOntWEight','bold','XGrid', 'off','XTick',[]);
+%     set(double(gca),'FontSize',14,'FOntWEight','bold','XGrid', 'off','XTick',[]);
 %     draw_separators(numtrials,-1,2);
 %     cumtrials = cumsum(numtrials);
 % 
@@ -202,7 +202,7 @@ if plot_others
     plot(vpd,'.g'); t=title('Length of initial silent period'); ylabel('seconds');
     set(t,'FontSize',18,'FontWeight','bold');
     draw_separators(numtrials,min(vpd),max(vpd));
-    set(gcf,'Position',[  815    38   636   242]);
+    set(double(gcf),'Position',[  815    38   636   242]);
 
     figure;
     subplot(2,1,1);
@@ -212,13 +212,13 @@ if plot_others
     plot(gol,'-g');hold on;
     plot(gor,'.g');
     draw_separators(numtrials,0,65)
-    set(gcf,'Position',[ 942   353   535   177]);
+    set(double(gcf),'Position',[ 942   353   535   177]);
 
     figure;
     plot(toneloc,'-b'); hold on;
     plot(goloc,'.g');
     draw_separators(numtrials,-1,2)
-    set(gcf,'Position',[ 942   600   535   177]);
+    set(double(gcf),'Position',[ 942   600   535   177]);
 end;
 
 function [] = sub__makepatches(task_type,numtrials, minnie, maxie)
@@ -363,4 +363,4 @@ end
 % plot(freql(idx),'.b'); hold on;
 % plot(freqr(idx),'-r');
 % title('pitch');
-% set(gcf,'Name',figname);
+% set(double(gcf),'Name',figname);

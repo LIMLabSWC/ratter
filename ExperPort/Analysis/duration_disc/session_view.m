@@ -22,7 +22,7 @@ hname = eval(['saved.' task '_hostname']);
 figure; uicontrol('Style','text','String', hname, ...
     'FontWeight','bold','FontSize', 24,'ForegroundColor','w', ...
     'Position', [10 10 200 40]);
-set(gcf,'Position',[550 820 260 90],'Color','b','Menubar','none','Toolbar','none', 'Tag','sessionview');
+set(double(gcf),'Position',[550 820 260 90],'Color','b','Menubar','none','Toolbar','none', 'Tag','sessionview');
 
 hh = eval(['saved.' task '_hit_history']);
 tr = eval(['saved.' task '_n_done_trials']);
@@ -66,11 +66,11 @@ if isfield(saved_history,'ChordSection_right_is_low'),
     figure;
     
     plot(flp);
-    set(gca,'YLim',[-1 2],'YTick',[0 1], 'YTickLabel',{'off','on'});
+    set(double(gca),'YLim',[-1 2],'YTick',[0 1], 'YTickLabel',{'off','on'});
     t=title('Flipped flag'); set(t,'FontSize',fsize,'FontWeight','bold');
-   % axes__format(gca);
-    set(gcf,'Tag','sessionview','Position',[509   430   438   108],'Menubar','none','Toolbar','none');
-    if sum(flp) > length(flp)/2, set(gca,'Color','y'); end;
+   % axes__format(double(gca));
+    set(double(gcf),'Tag','sessionview','Position',[509   430   438   108],'Menubar','none','Toolbar','none');
+    if sum(flp) > length(flp)/2, set(double(gca),'Color','y'); end;
 end;
 
 % sharpening stuff
@@ -129,13 +129,13 @@ bb(i) = 3;
 
 
 % Figure 1 Cue parameters ------------------------------------------------
-% gcf,
+% double(gcf),
 ssize = get(0,'ScreenSize');
 BIG_SCR = 1000; % height threshold of big screen
 h_offset = 0;
 if ssize(4) > BIG_SCR, h_offset = ssize(4)-BIG_SCR; end;% compensate for taller monitors
 
-figure;set(gcf,'Menubar','none','Toolbar','none','Name',['Stimulus & Go ' ...
+figure;set(double(gcf),'Menubar','none','Toolbar','none','Name',['Stimulus & Go ' ...
     'params'],'Position',  [ 41   293+h_offset   454   564]);
 subplot(3,2,1); y_offset = 0.1; width = 1/8; height = 0.7; x_offset = 0.05;
 
@@ -160,7 +160,7 @@ plot(rightt,effright,'.r');
 
     line([0 maxt], [316 316], 'LineStyle',':','Color','k','LineWidth',2);
 
-set(gca,'YLim',[0 max(max(effleft),max(effright))+0.1]);
+set(double(gca),'YLim',[0 max(max(effleft),max(effright))+0.1]);
 ylabel('Tone Duration (s)');
 s = sprintf('%s: %s (%s)\nStimulus durations', make_title(ratname), make_title(task), date);
 t = title(s); set(t,'FontSize',fsize);
@@ -191,7 +191,7 @@ if strcmpi(task(1:3),'dua')
     line([0 maxt], [11.3 11.3], 'LineStyle',':','Color','k','LineWidth',2);
     
 
-    set(gca,'YLim',[min(min(effleft),min(effright)) max(max(effleft), max(effright))]);
+    set(double(gca),'YLim',[min(min(effleft),min(effright)) max(max(effleft), max(effright))]);
 
     un = unique(effleft);
     if length(un) < 5
@@ -209,7 +209,7 @@ else
     un = unique(tfreq);
     for k = 1:length(un), t=text(min(find(tfreq == un(k)))+2, un(k)+2, sprintf('%2.1f',un(k)));
         set(t,'FontWeight','bold','FontSize',14,'Color','r'); end;
-    set(gca,'YLim',[0 20]);
+    set(double(gca),'YLim',[0 20]);
 end;
 ylabel('Tone frequency (kHz)');
 
@@ -222,13 +222,13 @@ subplot(3,2,5);
 
 plot(1:length(goloc), goloc, '.g', 1:length(toneloc), toneloc, '-b');
 
-mainfig = gcf;
+mainfig = double(gcf);
 if  (sum(toneloc) > 1 || sum(goloc) > 1)
     set(0,'CurrentFigure',mainfig);
-    set(gca,'Color', 'y');
+    set(double(gca),'Color', 'y');
 end;
 
-set(gca, 'YLim', [-1 2], 'YTickLabel', {'', 'off', 'on', ''}, 'YTick', -1:1:2);
+set(double(gca), 'YLim', [-1 2], 'YTickLabel', {'', 'off', 'on', ''}, 'YTick', -1:1:2);
 s = sprintf('Tone & GO Localisation');
 
 t = title(s); set(t,'FontSize',f);
@@ -247,10 +247,10 @@ else
     if strcmpi(task(1:3),'dua') && ~isempty(find(gospl > 5)) ,
         f= get(0,'CurrentFigure');
         a=get(f,'CurrentAxes');
-        set(gca,'Color','y');
+        set(double(gca),'Color','y');
     end;
 end;
-set(gca,'YLim',[0  85]);
+set(double(gca),'YLim',[0  85]);
 ylabel('Volume in SPL');
 s = sprintf('Tone & GO Volume');
 t = title(s); set(t,'FontSize',14);
@@ -279,21 +279,21 @@ end;
 
 line([1 length(vanilla_on)], [2 2],'Color', [0.5 0.5 0.5],'LineStyle',':');
 
-set(gca, 'YLim', [-1 8], 'YTickLabel', {'off', 'on','off','on','off','on'}, 'YTick', ...
+set(double(gca), 'YLim', [-1 8], 'YTickLabel', {'off', 'on','off','on','off','on'}, 'YTick', ...
     [0 1 3 4 6 7]);
 
 t = title(sprintf('Sharpening (PINK)\nPsych trials (GREEN) switches'));
 set(t,'FontSize',fsize);
 
 subplot(3,2,6);
-%set(gca,'Position',[x_offset y_offset width height]);
+%set(double(gca),'Position',[x_offset y_offset width height]);
 l = plot(1:length(logdiff), logdiff,'.r'); set(l,'Color', [0.5 0 0.5]);
-set(gca,'YLim',[0.2 1.2]);
+set(double(gca),'YLim',[0.2 1.2]);
 t= title('Logdiff values');
 set(t,'FontSize',fsize);
-if (sum(vanilla_on(2:end)) == 0), set(gca,'Color',[0.5 0.5 0.5]); end;
+if (sum(vanilla_on(2:end)) == 0), set(double(gca),'Color',[0.5 0.5 0.5]); end;
 
-set(gcf,'Tag','sessionview');
+set(double(gcf),'Tag','sessionview');
 
 datacursormode on;
 
@@ -304,7 +304,7 @@ datacursormode on;
 
 if sum(psych_on) > 5,
     psychometric_curve(ratname, 0,'usedate', date);
-    set(gcf,'Tag','sessionview');
+    set(double(gcf),'Tag','sessionview');
 end;
 
 if toneprog_only > 0
@@ -314,7 +314,7 @@ end;
 %%%%%%%%%%
 % FIGURE 2: Silent periods
 %%%%%%%%%%
-figure;set(gcf,'Menubar','none','Toolbar','none','Name',['Silent ' ...
+figure;set(double(gcf),'Menubar','none','Toolbar','none','Name',['Silent ' ...
     'periods'],'Position',[ 59    11+h_offset   323   293]);
 subplot(2,2,[1 2]);
 plot(1:length(pre_cuemin), pre_cuemin, '.k', 1:length(pre_cuemin), ...
@@ -326,33 +326,33 @@ if isfield(saved_history,'VpdsSection_VPDSetPoint')
 end;
 
 ylabel('Silent period duration (s)');
-set(gca,'YLim',[0 max(pre_cuemax)+0.2]);
+set(double(gca),'YLim',[0 max(pre_cuemax)+0.2]);
 s = sprintf('%s: %s (%s)\nInitial silent period', make_title(ratname), make_title(task), date);
 t = title(s); set(t,'FontSize',fsize);
 
 subplot(2,2,3);
 hist(vpd);
 t = title('VPD distr''n'); set(t,'FontSize',fsize);
-set(gca,'XLim',[0 max(vpd)+0.2]); xlabel('VPD length (s)'); ylabel('# trials');
+set(double(gca),'XLim',[0 max(vpd)+0.2]); xlabel('VPD length (s)'); ylabel('# trials');
 
 subplot(2,2,4);
 plot(1:length(pre_gomin), pre_gomin, '.g', 1:length(pre_gomax), ...
     pre_gomax, '-r');
-set(gca,'YLim',[0 0.4]);
-if (sum([sum(pre_gomin(2:end)) sum(pre_gomax(2:end))]) > 0), set(gca,'Color','y');  end;
+set(double(gca),'YLim',[0 0.4]);
+if (sum([sum(pre_gomin(2:end)) sum(pre_gomax(2:end))]) > 0), set(double(gca),'Color','y');  end;
 
 ylabel('Silent period duration (s)');
 t = title('Post-cue silent period');set(t,'FontSize',fsize);
 
-set(gcf,'Tag','sessionview');
+set(double(gcf),'Tag','sessionview');
 
 datacursormode on;
 %%%%%%%%%%%%%%%%%%%%
 % FIGURE 3: Performance
 %%%%%%%%%%%%%%%%%%%%
 sessionperf(ratname, task, date);
-set(gcf,'Position',[411     2+h_offset   597   400]);
-set(gcf,'Tag','sessionview');
+set(double(gcf),'Position',[411     2+h_offset   597   400]);
+set(double(gcf),'Tag','sessionview');
 datacursormode on;
 
 %%%%%%%%%%%%%%%%%%%%
@@ -361,10 +361,10 @@ datacursormode on;
 figure;
 % badboyspl
 subplot(2,1,1);
-set(gcf,'Position',[1082          10+h_offset         360         280] , 'Menubar', 'none','Toolbar','none')
+set(double(gcf),'Position',[1082          10+h_offset         360         280] , 'Menubar', 'none','Toolbar','none')
 plot(1:length(bb), bb, '.r');
 ylabel('BadboySPL');
-set(gca,'YTick', 1:3, 'YTickLabel', {'normal','Louder','LOUDEST'}, 'XLim', ...
+set(double(gca),'YTick', 1:3, 'YTickLabel', {'normal','Louder','LOUDEST'}, 'XLim', ...
     [1 max(2,length(bb))], 'YLim', [0 4]);
 xlabel('Trial #');
 s = sprintf('%s: %s (%s)\nBadBoySPL', make_title(ratname), make_title(task), date);
@@ -375,18 +375,18 @@ subplot(2,1,2);
 lp = lprob(ratname, task, date, 'newfig', 0, 'from', 1);
 if 0 && length(unique(lp)) > 2
     %warndlg('LProb is being changed!','LProb alert');
-    set(gca,'Color','y');
+    set(double(gca),'Color','y');
 end;
 
-set(gcf,'Tag','sessionview');
+set(double(gcf),'Tag','sessionview');
 datacursormode on;
 %%%%%%%%%%%%%%%%%%%%
 % FIGURE 5: Timeout
 %%%%%%%%%%%%%%%%%%%%
 %if strcmpi(task(1:3),'dur')
 timeout_count(ratname,task,date);
-set(gcf,'Position', [1020         550         350         304]);
-set(gcf,'Tag','sessionview');
+set(double(gcf),'Position', [1020         550         350         304]);
+set(double(gcf),'Tag','sessionview');
 datacursormode on;
 %end;
 
@@ -394,11 +394,11 @@ datacursormode on;
 % FIGURE 6: last_change
 %%%%%%%%%%%%%%%%%%%
 l=view_automation_progress(ratname, date);
-mainfig =gcf;
-if sum(l(1:end)) == 0, set(gca,'Color','y'); end;
+mainfig =double(gcf);
+if sum(l(1:end)) == 0, set(double(gca),'Color','y'); end;
 set(0,'CurrentFigure',mainfig);
-set(gcf,'Position', [1020         327        250  200],'Menubar','none','Toolbar','none');
-set(gcf,'Tag','sessionview');
+set(double(gcf),'Position', [1020         327        250  200],'Menubar','none','Toolbar','none');
+set(double(gcf),'Tag','sessionview');
 datacursormode on;
 
 % d is in form yymmdd

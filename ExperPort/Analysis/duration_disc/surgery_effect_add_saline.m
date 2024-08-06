@@ -33,7 +33,7 @@ set(0,'CurrentFigure',2);
 
 % superimpose saline impairment values on ibo impairment values
 msize = 20;
-c = get(gca,'Children');
+c = get(double(gca),'Children');
 for k = 1:length(c), 
     y= get(c(k),'YData'); 
    if length(y) > 2, 

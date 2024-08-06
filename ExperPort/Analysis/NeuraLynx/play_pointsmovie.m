@@ -72,19 +72,19 @@ newlinemat=[cosd(theta(1)) sind(theta(1)); -sind(theta(1)) cosd(theta(1))]...
 h(3)=line(newlinemat(1,:),newlinemat(2,:),'color','g','linewidth',3); % line for head angle
 xlim(xl)
 ylim(yl)
-fp=get(gcf,'position');
-set(gca,'position',get(gca,'position').*[1 1 fp(4)/fp(3) 1])
-set(gca,'XAxisLocation','top','YAxisLocation','right');
-ah=gca;
+fp=get(double(gcf),'position');
+set(double(gca),'position',get(double(gca),'position').*[1 1 fp(4)/fp(3) 1])
+set(double(gca),'XAxisLocation','top','YAxisLocation','right');
+ah=double(gca);
 if isvel
-    ap=get(gca,'position');
+    ap=get(double(gca),'position');
     ahv=axes('position',ap.*[1 1 1 0.25]);
     line(1:nfr,dtheta,'color','k','linewidth',2);
     line([1 nfr],[0 0],'color',0.7*ones(1,3),'linestyle','--')
     hvl=line([1 1],[-300 300],'color','g');
     ylim([-300 300]);
     xlim([-4 5]);
-    set(gca,'box','on')
+    set(double(gca),'box','on')
 end
 
 % draw frame-by-frame

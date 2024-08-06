@@ -23,7 +23,7 @@ for f = 1:length(fnames)
 end;
 
    loadpsychinfo(ratname, 'infile', before_file, 'justgetdata',1,'psychthresh',psychthresh);
-    f=gcf;
+    f=double(gcf);
 
     % ---------------------------------------------------------------------
     % Collect data from before
@@ -46,7 +46,7 @@ end;
 
     
      loadpsychinfo(ratname, 'infile', after_file, 'justgetdata',1,'psychthresh',psychthresh,'firstfew',firstfew);
-    set(gcf,'Position',[250 250 800 600],'Tag','psych');
+    set(double(gcf),'Position',[250 250 800 600],'Tag','psych');
     weber = weber';
     bias_val = bias_val';
     means_hh = means_hh';
@@ -74,7 +74,7 @@ end;
     tmp = pdates{:,BEFORE_COL}; short={};
     for t =1:length(tmp), blah= tmp{t}; short{end+1} = blah(end-3:end-1);end;
     plot(1:length(webers{:,BEFORE_COL}),webers{:,BEFORE_COL},'or');
-    set(gca, 'XTick',1:length(webers{:,BEFORE_COL}),'XTickLabel', short);
+    set(double(gca), 'XTick',1:length(webers{:,BEFORE_COL}),'XTickLabel', short);
  
     
     

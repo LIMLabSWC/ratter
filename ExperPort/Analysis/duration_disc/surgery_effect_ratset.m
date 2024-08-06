@@ -79,24 +79,24 @@ switch action
             set(l2,'Color',curr_c);
             %set(l3,'Color',curr_c);
 
-            xlim = get(gca,'XLim');
-            set(gca,'XLim',[0 max(xlim(2), length(curr_res))]);
+            xlim = get(double(gca),'XLim');
+            set(double(gca),'XLim',[0 max(xlim(2), length(curr_res))]);
         end;
 
         x=xlabel('Day of post-recovery training'); set(x,'FontWeight','bold','FontSize',20);
         y=ylabel('%'); set(y,'FontWeight','bold','FontSize',20);
-        set(gca,'FontSize',16,'FontWeight','bold');
+        set(double(gca),'FontSize',16,'FontWeight','bold');
         ar=strrep(tasktype,'_',' ');
         t=title(sprintf('%s-lesioned %sometric rats (n=%i)', area_filter, ar, length(ratlist)));
         set(t,'FontWeight','bold','FontSize',12);
-        %         xlim = get(gca,'XLim');
+        %         xlim = get(double(gca),'XLim');
         %         line([xlim(1) xlim(2)], [0 0],'LineStyle',':');
 
-        lns =get(gca,'Children');
+        lns =get(double(gca),'Children');
         for i =1:length(lns), currl= lns(i); set(currl,'LineWidth',2); end;
         if length(curvecolour) == 1 && curvecolour == 0
             % map colours to rats
-            figure;set(gcf,'Position',[1200 100 100 500]);
+            figure;set(double(gcf),'Position',[1200 100 100 500]);
             fnames = fieldnames(ratcolour);
             for idx=1:length(fnames)
                 t=text(1, idx, fnames{idx});
@@ -104,7 +104,7 @@ switch action
 
                 t=title('Rat colours');
                 set(t,'FontWeight','bold','FontSize',14);
-                set(gca,'XLim',[0.5 1.5],'YLim',[0 length(fnames)+1]);
+                set(double(gca),'XLim',[0.5 1.5],'YLim',[0 length(fnames)+1]);
             end;
         end;
 
@@ -123,10 +123,10 @@ switch action
         % now plot patchwork of significance
         close all;
         ratlist = fieldnames(param_buffer);
-        figure; set(gcf,'Color','w','Toolbar','none','Position',[60 500 630 230]);
-        set(gcf,'Tag', 'metric_sig_chart');
+        figure; set(double(gcf),'Color','w','Toolbar','none','Position',[60 500 630 230]);
+        set(double(gcf),'Tag', 'metric_sig_chart');
 
-        figure;set(gcf,'Color','w','Tag','paramestim_sig','Toolbar','none','Position',[700 400 330 380]);
+        figure;set(double(gcf),'Color','w','Tag','paramestim_sig','Toolbar','none','Position',[700 400 330 380]);
 
         curr_m = 0;
         curr_b=0;
@@ -167,7 +167,7 @@ switch action
         end;
 
         set(0,'CurrentFigure',findobj('Tag','metric_sig_chart'));
-        set(gca,'YTick',[1 length(ratlist)+1], 'XLim',[1 length(curr_m)+1],...
+        set(double(gca),'YTick',[1 length(ratlist)+1], 'XLim',[1 length(curr_m)+1],...
             'XTick', 1.5:1:length(curr_m)+0.5, 'XTickLabel', ttl,'YTick', 1.5:1:length(ratlist)+0.5,...
             'YTickLabel', ratlist);
         ar = strrep(tasktype, '_',' ');
@@ -175,7 +175,7 @@ switch action
         set(t,'FontWeight','bold','FontSize',14);
 
         set(0,'CurrentFigure',findobj('Tag','paramestim_sig'));
-        set(gca,'YTick',[1 length(ratlist)+1], 'XLim',[1 length(curr_b)+1],...
+        set(double(gca),'YTick',[1 length(ratlist)+1], 'XLim',[1 length(curr_b)+1],...
             'XTick', 1.5:1:length(curr_m)+0.5, 'XTickLabel', {'Pmax','m','n','Growth rate'},'YTick', 1.5:1:length(ratlist)+0.5,...
             'YTickLabel', ratlist);
         t=title(sprintf('%s rats (Area = %s)\nComparing param estimates for logistic fit?', ar, area_filter));

@@ -10,7 +10,7 @@ function [x, y] = OdorSection(obj, action, x, y)
     case 'init',   % ---------- CASE INIT -------------
       
       % Save the figure and the position in the figure where we are
-      fig = gcf;
+      fig = double(gcf);
       MenuParam(obj, 'Olf_Meter', {'hidden', 'view'}, 1, x, y); next_row(y);
       oldx = x;  oldy = y; x = 5; y = 5;
       SoloParamHandle(obj, 'myfig', 'value', figure, 'saveable', 0);
@@ -29,7 +29,7 @@ function [x, y] = OdorSection(obj, action, x, y)
       set_callback({Olf_Meter}, {'OdorSection', 'view'});
       
       % going to start adding GUI elements:
-      SoloParamHandle(obj, 'my_gui_info', 'value', [x y gcf]);
+      SoloParamHandle(obj, 'my_gui_info', 'value', [x y double(gcf)]);
       % Old call to initialise Olfactometer:
       NumeditParam(obj, 'Carrier3_FR', 900, x,y);
       next_row(y);
@@ -155,7 +155,7 @@ function [x, y] = OdorSection(obj, action, x, y)
         end
     
     case 'reinit',       % ---------- CASE REINIT -------------
-      currfig = gcf; 
+      currfig = double(gcf); 
 
       % Get the original GUI position and figure:
       x = my_gui_info(1); y = my_gui_info(2); figure(my_gui_info(3));

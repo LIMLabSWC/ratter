@@ -7,7 +7,7 @@ global exper
 	fig = findobj('tag',module,'type','figure');
 
 	if nargin < 2 
-		pos=get(gcf,'pos'); 
+		pos=get(double(gcf),'pos'); 
 		voff = pos(4);
 	else
 		voff = pos(2);	
@@ -17,7 +17,7 @@ global exper
 	hs1 = 60;
 	hs2 = 100;
 	hoff = pos(1);
-	bc = get(gcf,'color');
+	bc = get(double(gcf),'color');
 
 	md = getfield(exper,module);
    if ~isempty(md.param)

@@ -17,7 +17,7 @@ GetSoloFunctionArgs;
 switch action,
  case 'init',
    %PokeDuration Parameters Window
-   fig=gcf;
+   fig=double(gcf);
   
    MenuParam(obj, 'CpokePlots', {'view', 'hidden'}, 1, x,y); next_row(y);
    set_callback(CpokePlots, {'PokeDuration', 'cpoke_plots_view'});

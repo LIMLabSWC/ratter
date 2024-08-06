@@ -221,16 +221,16 @@ else
     linkaxes(rh,'x');
     
     %% Print
-    fh=gcf;
+    fh=double(gcf);
     if print_flag
-        set(gcf,'PaperPosition',[0.25 0.25 8 9])
+        set(double(gcf),'PaperPosition',[0.25 0.25 8 9])
         print -dpsc2 -painters
     end
     
     %% Save
     if save_flag
-        set(gcf,'PaperPosition',[0.25 0.25 8 9]);
-        saveas(gcf,[ratname{1} '_' num2str(cellid) '.pdf']);
+        set(double(gcf),'PaperPosition',[0.25 0.25 8 9]);
+        saveas(double(gcf),[ratname{1} '_' num2str(cellid) '.pdf']);
     end
     
     

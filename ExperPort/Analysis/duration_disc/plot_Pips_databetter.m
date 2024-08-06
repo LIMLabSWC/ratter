@@ -19,8 +19,8 @@ subplot(2,1,1);
 l=plot(tone_loc,'-b'); 
 set(l,'LineWidth', 2); hold on;
 l=plot(go_loc,'-.g'); set(l,'LineWidth',2, 'Color', [0 0.6 0]);
-set(gca,'YLim',[-1 2],'YTick',[0 1],'YTickLabel',{'off','on'});
-set(gca,'XLim',[1 sum(numtrials)]);
+set(double(gca),'YLim',[-1 2],'YTick',[0 1],'YTickLabel',{'off','on'});
+set(double(gca),'XLim',[1 sum(numtrials)]);
 ylabel('Localization');
 xlabel('Trial #');
 
@@ -29,8 +29,8 @@ title(sprintf('%s - progress through training %s to %s', ratname, fromdate, toda
 hh = hit_history;
 subplot(2,1,2);
 plot_hh(hh,numtrials,dates);
-set(gca,'YLim',[0.5 1], 'YTick',0.5:0.05:1, 'YTickLabel', 50:5:100);
-set(gca,'XLim',[1 sum(numtrials)]);
+set(double(gca),'YLim',[0.5 1], 'YTick',0.5:0.05:1, 'YTickLabel', 50:5:100);
+set(double(gca),'XLim',[1 sum(numtrials)]);
 
 ylabel('Hit rate');
 xlabel('Trial #');
@@ -38,10 +38,10 @@ xlabel('Trial #');
 % subplot(2,1,3);
 % plot(logdiff);
 % ylabel('Logdiff');
-% set(gca,'XLim',[1 sum(numtrials)],'YLim',[0.4 1.2]);
+% set(double(gca),'XLim',[1 sum(numtrials)],'YLim',[0.4 1.2]);
 % % 
 % subplot(2,1,4); plot(psychf); ylabel('Psych on');
-% set(gca,'YLim',[-1 2]);
+% set(double(gca),'YLim',[-1 2]);
 
 
 function [] = plot_hh(hh,numtrials,dates)

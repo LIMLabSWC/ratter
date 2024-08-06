@@ -68,7 +68,7 @@ if graphic == 0
 end;
 
 % now plot
-figure; set(gcf,'Position',[ 440   395   905   339]);
+figure; set(double(gcf),'Position',[ 440   395   905   339]);
 ypos = 0.1;
 axes('Position',[.03 ypos 0.3 0.80]);
 overlap_hists(p1_ct,p2_ct);
@@ -147,10 +147,10 @@ end;
 function [] = overlap_hists(x1,x2)
 
 hist(x2);
-p=findobj(gca,'Type','patch'); set(p,'FaceColor', [1 0 0],'EdgeColor',[1 0 0],'facealpha',0.75);
+p=findobj(double(gca),'Type','patch'); set(p,'FaceColor', [1 0 0],'EdgeColor',[1 0 0],'facealpha',0.75);
 hold on;
 hist(x1);
-p=findobj(gca,'Type','patch');
+p=findobj(double(gca),'Type','patch');
 set(p,'facealpha',0.25, 'EdgeColor','none');
 
 

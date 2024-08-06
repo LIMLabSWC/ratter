@@ -16,14 +16,14 @@ plot(parray,'.b');
 ylabel('% bad trials');
 xlabel('Day #');
 
-set(gca,'XTick', 1:length(f), 'XTickLabel', sub__trimdates(f), 'XLim', [0 length(f)+1]);
-set(gca, 'YLim', [0 max(parray)+0.1], 'YTick', 0:0.1:max(parray)+0.1, 'YTickLabel', 0:10:100*(max(parray)+0.1));
+set(double(gca),'XTick', 1:length(f), 'XTickLabel', sub__trimdates(f), 'XLim', [0 length(f)+1]);
+set(double(gca), 'YLim', [0 max(parray)+0.1], 'YTick', 0:0.1:max(parray)+0.1, 'YTickLabel', 0:10:100*(max(parray)+0.1));
 title(sprintf('%s: from %s to %s', ratname, fromdate, todate));
 
-set(gcf,'Position', [440   529   594   205]);
+set(double(gcf),'Position', [440   529   594   205]);
 
-axes__format(gca);
-sign_fname(gcf,mfilename);
+axes__format(double(gca));
+sign_fname(double(gcf),mfilename);
 
 
 % -----------------------------------------------------------------------
@@ -68,7 +68,7 @@ idx = sub__multi_trials(ratname, mydate, events);
 
 % figure;
 % plot(ones(numtrials,1), '.b','MarkerSize',20);
-% set(gca,'YLim',[0 3]);
+% set(double(gca),'YLim',[0 3]);
 % hold on;
 % plot(idx, ones(size(idx)), '.r','MarkerSize',20);
 % 
@@ -106,7 +106,7 @@ end;
 % plot(ct,'.b','MarkerSize',20);
 % xlabel('trial#'); ylabel('# wait for cpoke'); title(sprintf('%s: %s', ratname, mydate));
 % fprintf(1,'%% bad trials: %2.1f%%\n', length(idx)/length(ct)*100);
-% axes__format(gca);
+% axes__format(double(gca));
 % idx
 % 
 % 2;

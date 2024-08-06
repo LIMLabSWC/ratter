@@ -50,15 +50,15 @@ switch action,
         
        
   %-------- Initilize a plot monitoring rats perfomance-------------
-        oldunits = get(gcf, 'Units'); set(gcf, 'Units', 'normalized');
+        oldunits = get(double(gcf), 'Units'); set(double(gcf), 'Units', 'normalized');
         SoloParamHandle(obj, 'h1',  'value', axes('Position', [0.08, 0.52, 0.8, 0.25])); hold on; % axes
         % Plot performance against trial number (over sliding window)
    %     SoloParamHandle(obj, 'sliding_left',  'value', plot(-1, 1, 'b*')); hold on; %
    %     SoloParamHandle(obj, 'sliding_right',  'value', plot(-1, 1, 'mo')); hold on; %
    %     SoloParamHandle(obj, 'Legend','value',legend('Left','Right','Location',[0.09 0.74 0.12 0.06]));
         %SoloParamHandle(obj, 'perform_bars',  'value', bar(value(perform)); % bar plot of performance till now
-        %set(gca,'XTickLabel',{'Score';'Hits';'Miss';'False'}, ...
-        %    get(gca, 'YLabel'),'String', 'Percentage'); 
+        %set(double(gca),'XTickLabel',{'Score';'Hits';'Miss';'False'}, ...
+        %    get(double(gca), 'YLabel'),'String', 'Percentage'); 
    %     SoloParamHandle(obj, 'h2',  'value', axes('Position', [0.56, 0.52, 0.4, 0.25])); % axes
         % Plot performance against trial number (over blocks)
         SoloParamHandle(obj, 'block_left',  'value', plot(-1, 1, 'b*')); hold on; %
@@ -74,7 +74,7 @@ switch action,
     %    title(value(h2), 'Block Average Plot','Color','b');
         
         set_saveable({h1;block_left;block_right}, 0);
-        set(gcf, 'Units', oldunits);
+        set(double(gcf), 'Units', oldunits);
         BlockControl(obj, 'rand_interlv');
         
     case 'user_specify'

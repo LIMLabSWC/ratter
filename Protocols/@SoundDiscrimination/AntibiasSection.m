@@ -152,7 +152,7 @@ switch action
     x = varargin{1}; y = varargin{2}; y0 = y;
     % Save the figure and the position in the figure where we are
     % going to start adding GUI elements:
-    SoloParamHandle(obj, 'my_gui_info', 'value', [x y gcf]);
+    SoloParamHandle(obj, 'my_gui_info', 'value', [x y double(gcf)]);
 
     LogsliderParam(obj, 'HitFracTau', 30, 10, 400, x, y, 'label', 'hits frac tau', ...
       'TooltipString', ...
@@ -349,7 +349,7 @@ switch action
     
             
   case 'reinit',   % ------- CASE REINIT -------------
-    currfig = gcf;
+    currfig = double(gcf);
     
     % Get the original GUI position and figure:
     x = my_gui_info(1); y = my_gui_info(2); figure(my_gui_info(3));

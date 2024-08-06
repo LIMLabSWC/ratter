@@ -230,7 +230,7 @@ case 'trial'
 			n=n-1
 		end
 	else
-		SetParamUI(me,'run','BackgroundColor',get(gcf,'Color'));
+		SetParamUI(me,'run','BackgroundColor',get(double(gcf),'Color'));
 	end
 
     %    set(findobj('tag','save_matfile_button'),'background',[1 0 0],'enable','on');
@@ -336,7 +336,7 @@ case 'new_acquire' % used to be called 'reset'
     
     check_paths;
 
-    set(findobj(gcf,'tag','save_matfile_button'),'background',get(gcf,'color'),'enable','on');
+    set(findobj(double(gcf),'tag','save_matfile_button'),'background',get(double(gcf),'color'),'enable','on');
    
 	CallModules(GetParam(me,'sequence','list'),'trialready');
 
@@ -399,7 +399,7 @@ case 'save_matfile_button'
     
 case 'save_matfile'
 	save_matfile;
-    set(findobj('tag','save_matfile_button'),'background',get(gcf,'color'),'enable','on');
+    set(findobj('tag','save_matfile_button'),'background',get(double(gcf),'color'),'enable','on');
     
 case 'save_as_matfile'
     save_as_matfile;
@@ -690,7 +690,7 @@ global exper
 % 		SetParam('control','run',0);    % unnecessary  
 % 		Modified by Lung-Hao Tai, 05/01/2003
 
-	%	SetParamUI(me,'run','BackgroundColor',get(gcf,'Color'));
+	%	SetParamUI(me,'run','BackgroundColor',get(double(gcf),'Color'));
     
         SetParamUI(me,'slicerate','enable');
         SetParamUI(me,'trialdur','enable');

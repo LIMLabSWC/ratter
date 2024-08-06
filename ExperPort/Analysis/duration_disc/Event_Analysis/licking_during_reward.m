@@ -49,7 +49,7 @@ end;
 
 [mega_licks, left_licks, right_licks] = sub__sidelicks(lick_cell, sides,hit_history);
 
-figure; set(gcf,'Position',[ 440   545   828   189]);
+figure; set(double(gcf),'Position',[ 440   545   828   189]);
 
 % lick time as function of trial #  - side coded
 axes('Position',[0.09 0.13 0.7 0.7]);
@@ -59,8 +59,8 @@ plot(lc, left_licks,'.b');
 plot(rc, right_licks, '.r');
 ylabel('Lick duration(s)');
 title(sprintf('%s: %s', ratname, indate));
-set(gca,'FontSize',14,'FontWeight','bold');
-%axes__format(gca);
+set(double(gca),'FontSize',14,'FontWeight','bold');
+%axes__format(double(gca));
 
 % 
 lft_mean = mean(left_licks); lft_sd = std(left_licks);
@@ -76,13 +76,13 @@ patch([r r r+0.2 r+0.2], [0 rt_mean rt_mean 0], 'r'); hold on;
 plot(ones(size(right_licks))*(r+0.1), right_licks, '.r', 'Color', [1 0.5 0.5]);
 line([r+0.1 r+0.1], [rt_mean - rt_sd, rt_mean+rt_sd], 'LineWidth',2);
 ylabel('Mean(SD)');
-set(gca,'XLim',[0.6 1.4], 'XTick',[]);
-%axes__format(gca);
+set(double(gca),'XLim',[0.6 1.4], 'XTick',[]);
+%axes__format(double(gca));
 
-set(gcf,'Menubar','none','Toolbar','none');
-% set(gca,'XTick', 1:length(ratlist), 'XTickLabel', ratlist);
+set(double(gcf),'Menubar','none','Toolbar','none');
+% set(double(gca),'XTick', 1:length(ratlist), 'XTickLabel', ratlist);
 % %        min(yl(2), 120)
-% yl = get(gca,'YLim'); set(gca,'YLim',[0 30],'XLim',[0 length(ratlist)+1]);
+% yl = get(double(gca),'YLim'); set(double(gca),'YLim',[0 30],'XLim',[0 length(ratlist)+1]);
 % 
 
 % ----------------------------------------------------------------

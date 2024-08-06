@@ -41,13 +41,13 @@ if ismember('random_bg', saved_history.BlockControl_block_update)
 end
 [L_Score, R_Score, Score, score_blk] = rat_perform(saved,saved_history,taskname,0);
 figure(fig1);
-set(gca,'YGrid','on')
+set(double(gca),'YGrid','on')
 title(Title, 'FontSize', 20);
 save(save_path, 'L_Score', 'R_Score', 'Score','score_blk');
-saveas(gcf, save_path, 'tif');
+saveas(double(gcf), save_path, 'tif');
 
 figure('Position', [lft 30 wd ht-50]); 
 plot(cell2mat(score_blk(:,2)), cell2mat(score_blk(:,7)),'-o'); % plot odor sampling time in a separate figure
-set(gca, 'YGrid','on', 'XGrid', 'off');
-set(get(gca,'XLabel'),'String','Trials','FontSize',18);
-set(get(gca,'YLabel'),'String','Odor Sampling Time (s)','FontSize',18);
+set(double(gca), 'YGrid','on', 'XGrid', 'off');
+set(get(double(gca),'XLabel'),'String','Trials','FontSize',18);
+set(get(double(gca),'YLabel'),'String','Odor Sampling Time (s)','FontSize',18);

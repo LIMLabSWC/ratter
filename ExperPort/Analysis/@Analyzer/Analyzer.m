@@ -31,7 +31,7 @@ end;
 
 % initialise mother menu
 %fig = findobj('Tag', me);
-h = uimenu(gcf, 'Tag', 'sherlock', 'Label', 'Analyzer', 'Accelerator', 'A');
+h = uimenu(double(gcf), 'Tag', 'sherlock', 'Label', 'Analyzer', 'Accelerator', 'A');
 
 
 SoloFunction('register_tool', 'rw_args', 'tool_list');

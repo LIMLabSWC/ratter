@@ -355,7 +355,7 @@ if strcmpi(use_dateset,'given') || strcmpi(use_dateset,'')
     end;
 
     %     % % histogram of distributions
-    %     figure; set(gcf,'Position', [200 200 350 200],'Toolbar','none','Tag','bias_hist');
+    %     figure; set(double(gcf),'Position', [200 200 350 200],'Toolbar','none','Tag','bias_hist');
     %     % subplot(1,2,1);
     %     % hist(metrics(:,1)); % plot webers.
     %     % xlabel('Weber ratio per session');
@@ -408,14 +408,14 @@ if usefig ==0
     for fidx = 1:length(final_figlist)
         set(0,'CurrentFigure',final_figlist(fidx));
         if strcmpi(task(1:3),'dur')
-            %       set(gca,'XTick', bins,'XTickLabel',realbins);
-            set(gca,'XTick',[]);
-            set(gca,'XLim',xlim);
+            %       set(double(gca),'XTick', bins,'XTickLabel',realbins);
+            set(double(gca),'XTick',[]);
+            set(double(gca),'XLim',xlim);
             xlabel('Duration (ms)');
         else
-            %       set(gca,'XTick', bins,'XTickLabel',realbins);
-            set(gca,'XTick',[]);
-            set(gca,'XLim',xlim);
+            %       set(double(gca),'XTick', bins,'XTickLabel',realbins);
+            set(double(gca),'XTick',[]);
+            set(double(gca),'XLim',xlim);
             xlabel('Frequency (KHz)');
         end;
         ylabel('% "Long"');
@@ -438,6 +438,6 @@ if forcecurvecolour == 0
         end;
     end;
     title('Colours used for various dates');
-    set(gca,'YLim',[0 rows(dates)+1],'XLim',[0.95 2]);
-    set(gcf,'Position',[100 100 100 300],'Toolbar','none');
+    set(double(gca),'YLim',[0 rows(dates)+1],'XLim',[0.95 2]);
+    set(double(gcf),'Position',[100 100 100 300],'Toolbar','none');
 end;

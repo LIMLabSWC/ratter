@@ -267,9 +267,9 @@ xl=xlabel(sprintf('Window of %i trials', window));
 yl=ylabel('Hit rate (%)');
 set(xl,'FontWeight','bold','FontSize',14);
 set(yl,'FontWeight','bold','FontSize',14);
-set(gca,'YLim',[0.5 1.1],'FontWeight','bold','FontSize',12,'XLim',[0 chunks_so_far+10]);
-set(gca,'YTick',0:0.25:1, 'YTickLabel',0:25:100);
-set(gcf,'Position',[300 500 1200 300],'Toolbar','none');
+set(double(gca),'YLim',[0.5 1.1],'FontWeight','bold','FontSize',12,'XLim',[0 chunks_so_far+10]);
+set(double(gca),'YTick',0:0.25:1, 'YTickLabel',0:25:100);
+set(double(gcf),'Position',[300 500 1200 300],'Toolbar','none');
 t=title(sprintf('%s: Success rate through the session on %s', ratname, dates{1}));
 set(t,'FontWeight','bold','FontSize',14);
 

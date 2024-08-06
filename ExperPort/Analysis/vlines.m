@@ -16,7 +16,7 @@ function [ll] = vlines(varargin)
 if numel(varargin{1})==1  &&  ishandle(varargin{1}) &&  strcmp(get(varargin{1}, 'Type'), 'axes')==1,
     ax = varargin{1}; varargin = varargin(2:end);
 else
-    ax = gca;
+    ax = double(gca);
 end;
 x = varargin{1};
 yls = get(ax, 'Ylim');

@@ -17,4 +17,4 @@ figure;
 plot(dgap,'.b');
 ylabel('DT(k) start - DT(k-1) end (seconds)');
 title(sprintf('%s:%s', ratname, indate));
-axes__format(gca);
+axes__format(double(gca));

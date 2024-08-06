@@ -106,12 +106,12 @@ if graphic
     subplot(2,1,1);
     plot(1:length(cpoke_stats(:,2)), cpoke_stats(:,2),'.g');
     title([ratname ':cpoke dur']);
-    set(gca,'XLim',[0 length(cpoke_stats(:,2))+1]);
+    set(double(gca),'XLim',[0 length(cpoke_stats(:,2))+1]);
 
     subplot(2,1,2);
     plot(1:length(apoke_stats(:,2)), apoke_stats(:,2), '.k');
     title([ratname ':apoke dur']);
-    set(gca,'XLim',[0 length(cpoke_stats(:,2))+1]);
+    set(double(gca),'XLim',[0 length(cpoke_stats(:,2))+1]);
 end;
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -149,7 +149,7 @@ if graphic > 0
     % Plot histogram of # occurrences of the state in a trial
     subplot(1,2,1);
     hist(dur(:,1));
-    blah=findobj(gcf,'Type','patch');
+    blah=findobj(double(gcf),'Type','patch');
     set(blah,'Facecolor','r');
     title([date ': "' statestr '"' ': Distribution of # occurrences per trial']);
 
@@ -159,7 +159,7 @@ if graphic > 0
     ylabel('Time (seconds)');
     xlabel('Trial #');
     title([date ': "' statestr '"' ' state duration']);
-    set(gcf,'Position',figpos);
+    set(double(gcf),'Position',figpos);
 end;
 
 avg_occur = mean(ct);

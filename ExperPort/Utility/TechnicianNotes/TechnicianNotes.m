@@ -218,7 +218,7 @@ switch action
                 'Position', [0.90012     0.93466    0.081081    0.039927]);
             
             
-            HANDLES = guihandles(gcf);
+            HANDLES = guihandles(double(gcf));
             
             
             %% Initializing listbox content

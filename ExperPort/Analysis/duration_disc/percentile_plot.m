@@ -35,7 +35,7 @@ hold on;
 xlabel('Points from normal distribution');
 ylabel('Data set');
 
-set(gca,'YLim',[x(1) x(end)], 'XLim',[fset(1) fset(end)]);
+set(double(gca),'YLim',[x(1) x(end)], 'XLim',[fset(1) fset(end)]);
 df=length(normx)-length(fset);
 if df>0
     text(x(2), fset(end),...
@@ -54,4 +54,4 @@ text(x(end-1), max(x)*0.9, txt,'FontWeight','bold');
 if nargin >1
 title(t);
 end;
-axes__format(gca);
+axes__format(double(gca));

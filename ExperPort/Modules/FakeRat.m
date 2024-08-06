@@ -32,7 +32,7 @@ switch action
         InitParam(me,'min','ui','edit','value',0.005,'save',1,'pos',[h n*vs hs vs]); n=n+1;
         InitParam(me,'showfig','ui','checkbox','value',1,'pos',[h n*vs hs vs]); n=n+1;
         InitParam(me,'on','ui','togglebutton','value',0,'pos',[h n*vs hs vs]); n=n+1;
-        SetParamUI(me,'on','string','On','background',get(gcf,'color'),'label','','pref',0);
+        SetParamUI(me,'on','string','On','background',get(double(gcf),'color'),'label','','pref',0);
         InitParam(me,'times','save',1);
         InitParam(me,'pokes','save',1);
         InitParam(me,'AOData','value',0);
@@ -235,7 +235,7 @@ if GetParam(me,'ShowFig')
     cla
     xlabel('Event times (s)');
     ylabel('Event');
-    set(gca,'YTick',[0 1],'YTickLabel',{'Out','In'});
+    set(double(gca),'YTick',[0 1],'YTickLabel',{'Out','In'});
     mm = sqrt(mean(diff_times.^2))*1000;
     title(sprintf('Trial %d: Fakerat RMS time err: %3.3g ms',trial,mm));
     %plot(rp2_times,ones(1,length(rp2_times)),'x');  hold on;

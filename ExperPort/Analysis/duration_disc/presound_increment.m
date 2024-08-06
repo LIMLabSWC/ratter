@@ -19,11 +19,11 @@ function  [] = presound_increment(rat, task, date, varargin);
   maxvpd = cell2mat(saved_history.VpdsSection_MaxValidPokeDur);
   
 
-  if newfig > 1, figure; set(gcf,'Menubar','none','Toolbar','none'); end;
+  if newfig > 1, figure; set(double(gcf),'Menubar','none','Toolbar','none'); end;
   
   plot(from:length(minvpd), minvpd(from:end), '-r', from:length(maxvpd), maxvpd(from:end), '.b');
   legend('MinPST', 'MaxPST');
-  set(gca,'XLim', [from length(minvpd)]);
+  set(double(gca),'XLim', [from length(minvpd)]);
   
   s = sprintf('%s: %s (%s)\n', make_title(rat), make_title(task), date);
   title([s 'Automated increment of pre-sound time']);

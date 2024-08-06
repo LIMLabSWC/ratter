@@ -9,7 +9,7 @@ switch action
     case 'update'
         scans = GetDAQScans(rpbox('getstatemachine'));
         % save(['C:\Home\PID_testing\Scan' num2str(value(n_done_trials))], 'scans');
-        figure(10); set(gcf, 'Position',[504    87   919   482]);
+        figure(10); set(double(gcf), 'Position',[504    87   919   482]);
         if size(scans,1)>1.5e4, pltrng = (1:1.5e4); else, pltrng = (1:size(scans,1));end;
         scans(:,8) = scans(:,8)-scans(1,8);
         plot(scans(pltrng,1)-scans(1,1), scans(pltrng,8));

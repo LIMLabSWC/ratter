@@ -81,7 +81,7 @@ if ~isempty(gcbo)
 		param = pmf{2};
 		field = pmf{3};
         
-        list = get(findobj(gcf,'tag','edit_editlist'),'string');
+        list = get(findobj(double(gcf),'tag','edit_editlist'),'string');
        
         % take out empty lines from thelist
         if ~isempty(list)

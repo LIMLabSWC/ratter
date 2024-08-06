@@ -729,8 +729,8 @@ case 'show_blobs'
     
     umtoggle(gcbo);
    
-    % this gca might be a problem
-    show_blobs(gcbf,gca);
+    % this double(gca) might be a problem
+    show_blobs(gcbf,double(gca));
     
     
     
@@ -851,7 +851,7 @@ case 'set_bgd_roi'
     % called from figure menu
     h = text(10,10,'Select background ROI...','fontweight','bold','fontsize',14);
    
-    ax = gca;
+    ax = double(gca);
     
     h = show_bgd_roi(ax,1);
     set(h,'color',[0 1 0]);
@@ -868,7 +868,7 @@ case 'set_bgd_roi'
     
 case 'show_bgd_roi'
     show = umtoggle(gcbo);
-    show_bgd_roi(gca,show);
+    show_bgd_roi(double(gca),show);
          
     im_h = findobj(gcbf,'tag','ratio_image');
     im = get(im_h(1),'cdata');
@@ -1040,7 +1040,7 @@ case 'buttondown'
         ax = get(gco,'parent');
         user = get(ax,'user');
         
-        switch get(gcf,'SelectionType');
+        switch get(double(gcf),'SelectionType');
         case 'open'
             Blob('buttondown');
         case 'normal'       % left button
@@ -1069,7 +1069,7 @@ case 'buttondown'
         otherwise
         end
      case 'text'
-        if strcmp(get(gcf,'SelectionType'),'open') % double click
+        if strcmp(get(double(gcf),'SelectionType'),'open') % double click
             click_str = get(gco,'string');
             if str2num(click_str) > 0
                 % clicked on a single trial

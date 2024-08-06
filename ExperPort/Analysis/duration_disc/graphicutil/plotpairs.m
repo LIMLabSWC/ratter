@@ -12,9 +12,9 @@ sub__plotgrp(g1);
 hold on;
 sub__plotgrp(g2);
 
-set(gca,'XLim',[0.5 2.5]);
-set(gca,'XTick',1:2, 'XTickLabel',{g1.xtklbl, g2.xtklbl});
-set(gcf,'Position',[440   289   301   445]);
+set(double(gca),'XLim',[0.5 2.5]);
+set(double(gca),'XTick',1:2, 'XTickLabel',{g1.xtklbl, g2.xtklbl});
+set(double(gcf),'Position',[440   289   301   445]);
 
 
 function [] = sub__plotgrp(g)

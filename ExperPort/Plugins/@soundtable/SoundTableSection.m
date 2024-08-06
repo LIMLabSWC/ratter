@@ -110,7 +110,7 @@ switch action,
     end;
     x = varargin{1}; y = varargin{2};
     
-    % SoloParamHandle(obj, 'soundtablefig', 'value', [x y gcf]);
+    % SoloParamHandle(obj, 'soundtablefig', 'value', [x y double(gcf)]);
     
     
     ToggleParam(obj, 'soundtable_show', 0, x, y, ...
@@ -119,7 +119,7 @@ switch action,
        'TooltipString', 'Show/Hide Sound Table window'); next_row(y);
     set_callback(soundtable_show, {mfilename, 'show_hide'}); 
     
-    screen_size = get(0, 'ScreenSize'); fig = gcf;
+    screen_size = get(0, 'ScreenSize'); fig = double(gcf);
     SoloParamHandle(obj, 'soundtablefig', ...
         'value', figure('Position', [200 screen_size(4)-740, 630 400], ...
         'closerequestfcn', [mfilename '(' class(obj) ', ''hide'');'], 'MenuBar', 'none', ...
@@ -832,7 +832,7 @@ switch action,
 %
 % ---------------------------------------------------------------------
   case 'reinit'
-    currfig = gcf;
+    currfig = double(gcf);
     
     feval(mfilename, obj, 'close');
     

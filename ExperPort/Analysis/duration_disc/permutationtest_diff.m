@@ -66,7 +66,7 @@ if plotme
     figure;
     hist(diff_sims, 10);
     hold on; 
-    ylim = get(gca,'YLim');
+    ylim = get(double(gca),'YLim');
     line([realdiff realdiff], [0 ylim(2)] ,'Color','r','LineWidth',2);
 end;
 

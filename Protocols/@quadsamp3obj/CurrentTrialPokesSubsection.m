@@ -39,7 +39,7 @@ plottables = fieldnames(state_colors);
 switch action,
  case 'init',  % ---------- CASE INIT ----------
 
-   fig = gcf; % This is the protocol's main window, to which we add a menu:   
+   fig = double(gcf); % This is the protocol's main window, to which we add a menu:   
    SoloParamHandle(obj, 'my_xyfig', 'value', [x y fig]);
 
    MenuParam(obj, 'CurrentTrialPokes', {'hidden', 'view'}, 2, x, y); next_row(y);
@@ -319,7 +319,7 @@ switch action,
 
    
  case 'tinfo',
-   currfig = gcf;
+   currfig = double(gcf);
 
    str = sprintf(['In %d trials of this protocol, the trial_info ' ...
                   'structure provides the following fieldnames and ' ...

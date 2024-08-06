@@ -59,7 +59,7 @@ switch action
         % plot LAST
         figure;
         datacursormode on;
-        dcm_obj = datacursormode(gcf);
+        dcm_obj = datacursormode(double(gcf));
         set(dcm_obj, 'SnapToDataVertex', 'on', 'DisplayStyle','datatip');
         datacursormode on;
             set(dcm_obj, 'Updatefcn', {@psych_endpoints_runner,'action', 'update'});
@@ -84,17 +84,17 @@ switch action
         legend(ratnames,'Location', 'EastOutside');
         title('HIGHEST binned y-vals - freq psych curve');
         miny = floor(miny/0.05);
-%         set(gca,'YLim', [0 0.05*miny], 'YTick', 0:0.05:0.05*miny, 'YTickLabel', 0:5:5*ymax);
-        set(gca,'XLim', [0 maxlen]);
+%         set(double(gca),'YLim', [0 0.05*miny], 'YTick', 0:0.05:0.05*miny, 'YTickLabel', 0:5:5*ymax);
+        set(double(gca),'XLim', [0 maxlen]);
 
-        axes__format(gca);
-        set(gca,'FontSize', 14);
-        set(gcf,'Position',[200   100   877   302]);
+        axes__format(double(gca));
+        set(double(gca),'FontSize', 14);
+        set(double(gcf),'Position',[200   100   877   302]);
         
         % plot FIRST binned        
         figure;
         datacursormode on;
-        dcm_obj = datacursormode(gcf);
+        dcm_obj = datacursormode(double(gcf));
         set(dcm_obj, 'SnapToDataVertex', 'on', 'DisplayStyle','datatip');
         datacursormode on;
             set(dcm_obj, 'Updatefcn', {@psych_endpoints_runner,'action', 'update'});
@@ -121,16 +121,16 @@ switch action
         legend(ratnames,'Location', 'EastOutside');
         title('Lowest binned y-vals - freq psych curve');
         ymax = ceil(maxy/0.05);
-        set(gca,'YLim', [0 0.05*ymax], 'YTick', 0:0.05:0.05*ymax, 'YTickLabel', 0:5:5*ymax);
-        set(gca,'XLim', [0 maxlen]);
+        set(double(gca),'YLim', [0 0.05*ymax], 'YTick', 0:0.05:0.05*ymax, 'YTickLabel', 0:5:5*ymax);
+        set(double(gca),'XLim', [0 maxlen]);
 
-        axes__format(gca);
-        set(gca,'FontSize', 14);
-        set(gcf,'Position',[200   427   877   302]);
+        axes__format(double(gca));
+        set(double(gca),'FontSize', 14);
+        set(double(gcf),'Position',[200   427   877   302]);
         
         % figure to show any psych curves
         figure;
-        set(gcf,'Position',[971    22   433   295],'Menubar','none','Toolbar','none', 'Tag','psychshow');
+        set(double(gcf),'Position',[971    22   433   295],'Menubar','none','Toolbar','none', 'Tag','psychshow');
         
 
     case 'update'
@@ -148,17 +148,17 @@ switch action
   [dy wkd ] = weekday(dstr);
   
   
-  cf = gcf;
+  cf = double(gcf);
      set(0,'CurrentFigure', findobj('Tag','psychshow'));
      clf;
-     psychometric_curve(tg, dts{pos(1)}, 'nodist', 1, 'usefig', gcf);
+     psychometric_curve(tg, dts{pos(1)}, 'nodist', 1, 'usefig', double(gcf));
      set(0,'CurrentFigure', cf);
  
   output_txt = [dts{pos(1)} ': ' wkd];
   
     case 'plot_psych'
 %      tg =  get(mkover,'Tag');
-%      xpos = get(gca,'CurrentPoint');
+%      xpos = get(double(gca),'CurrentPoint');
 %      xpos = round(xpos(1,1));
 %      
 %       myrow = -1;
@@ -166,10 +166,10 @@ switch action
 %   dts = datelist{myrow};
 %   
 %     
-%      cf = gcf;
+%      cf = double(gcf);
 %      set(0,'CurrentFigure', findobj('Tag','psychshow'));
 %      clf;
-%      psychometric_curve(tg, dts{xpos}, 'nodist', 1, 'usefig', gcf);
+%      psychometric_curve(tg, dts{xpos}, 'nodist', 1, 'usefig', double(gcf));
 %      set(0,'CurrentFIgure', cf);
  
     otherwise

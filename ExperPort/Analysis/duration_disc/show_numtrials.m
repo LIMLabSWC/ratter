@@ -56,8 +56,8 @@ function [output_txt] = show_numtrials(rat, task, varargin)
       % Now plot
       %%%%%%%%%%
       figure;
-      set(gcf,'Menubar','none','Toolbar','none');
-      set(gcf,'Position', [360   506   763   364]);
+      set(double(gcf),'Menubar','none','Toolbar','none');
+      set(double(gcf),'Position', [360   506   763   364]);
       
       % Plot 1: # trials
       subplot(2,1,1);
@@ -71,7 +71,7 @@ function [output_txt] = show_numtrials(rat, task, varargin)
       line([1 length(dates)], [200 200], 'Linestyle', ':', 'Color', [0.8 ...
                           0.8 0.8]);
       datacursormode on;
-  dcm_obj = datacursormode(gcf);
+  dcm_obj = datacursormode(double(gcf));
   set(dcm_obj, 'SnapToDataVertex', 'on', 'DisplayStyle','datatip');
   set(dcm_obj, 'Updatefcn', {@show_numtrials,'action', 'update'})  
   
@@ -94,13 +94,13 @@ function [output_txt] = show_numtrials(rat, task, varargin)
       line([1 length(dates)], [2*hour 2*hour], 'Linestyle', ':', 'Color', [0.8 ...
                           0.8 0.8]);
       
-      set(gca, 'YTick', 0.5*hour:0.5*hour:4*hour, ...
+      set(double(gca), 'YTick', 0.5*hour:0.5*hour:4*hour, ...
                'YTickLabel', {'1/2', '1hr', '1.5' '2hr', '2.5', '3hr', ...
                           '3.5', '4hr'});
       xlabel('Session #');
       ylabel('Session duration (hrs)');
       
-      set(gcf,'Name',sprintf('%s: Session parameters', rat));
+      set(double(gcf),'Name',sprintf('%s: Session parameters', rat));
  
   output_txt = 1;
  

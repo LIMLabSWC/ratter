@@ -172,9 +172,9 @@ switch action
         for k = 1:length(dnames), text(0.9, dimpair(k), dnames{k}, 'FontSize',14, 'FontWeight','bold','Color', dur_clr,'HorizontalAlignment', 'right'); end;
         for k = 1:length(fnames), text(1.1, fimpair(k), fnames{k}, 'FontSize',14, 'FontWeight','bold','Color', freq_clr); end;
         title('hr aft - hr bef');
-        set(gcf,'Position', [50+800   280   200   445]);
-        set(gca,'XTick',[],'XLim',[0.5 1.5]);
-        axes__format(gca);
+        set(double(gcf),'Position', [50+800   280   200   445]);
+        set(double(gca),'XTick',[],'XLim',[0.5 1.5]);
+        axes__format(double(gca));
 
 
         allimp=[dimpair; fimpair];
@@ -240,9 +240,9 @@ switch action
             text(k-0.3, 10, tmp,'FontWeight','bold','FontSize',14);
             line([k+0.5 k+0.5],[0 90],'Color',[1 1 1]*0.3);
         end;
-        set(gca,'YLim',[0 90], 'XLim',[0 length(allnames)+1]);
+        set(double(gca),'YLim',[0 90], 'XLim',[0 length(allnames)+1]);
         ylabel('Degrees'); xlabel('Rat names');
-        set(gcf,'Position',[100   340   843   260]);
+        set(double(gcf),'Position',[100   340   843   260]);
 
     case 'plot_impairdim'
         if ~exist('fslope', 'var')
@@ -277,8 +277,8 @@ switch action
 
         yl=[-1 1]; xl=[-1 1];
         xlabel('Slope change (>0 => flattening)'); ylabel('Bias change (>0 => increase)');
-        set(gca,'YLim',yl);
-        set(gca,'XLim',xl);
+        set(double(gca),'YLim',yl);
+        set(double(gca),'XLim',xl);
         line([0 0],yl,'LineStyle',':','Color',[1 1 1]*0.5,'LineWidth',2);
         line(xl,[0 0], 'LineStyle',':','Color',[1 1 1]*0.5,'LineWidth',2);
 
@@ -374,7 +374,7 @@ switch action
             %             line([0 0],[-3 3],'LineStyle',':','Color', [1 1 1]*0.5,'LineWidth',2);
             %
             %             vmini = misc.V;
-            %             axes__format(gca);
+            %             axes__format(double(gca));
 
 
         else
@@ -412,8 +412,8 @@ switch action
             
             plot2groupdots(dgrp,fgrp);
             title(tt{p});
-            set(gcf,'Position',poslist(p,:));
-            axes__format(gca);
+            set(double(gcf),'Position',poslist(p,:));
+            axes__format(double(gca));
         end;
 
         % plot all impair on same x-value
@@ -427,12 +427,12 @@ switch action
         end;
         
         title('impair');
-        set(gcf,'Position', [50+800   280   200   445]);
-        set(gca,'XTick',[],'XLim',[0.5 1.5]);
-        xl = get(gca,'XLim');
+        set(double(gcf),'Position', [50+800   280   200   445]);
+        set(double(gca),'XTick',[],'XLim',[0.5 1.5]);
+        xl = get(double(gca),'XLim');
         line(xl, [0 0],'Color',[1 1 1]*0.5,'LineWidth',2, 'LineStyle',':');
 
-        axes__format(gca);
+        axes__format(double(gca));
 
 
         % now plot a bar graph
@@ -460,12 +460,12 @@ switch action
         
         title('IMPAIR post-ACx lesion');
         ylabel('IMPAIR');
-        axes__format(gca);
-        set(gca,'YLim',[-0.3 1.5],'YTick',-0.2:0.2:1);
-        set(gcf,'Position',[655   415   323   457]);
+        axes__format(double(gca));
+        set(double(gca),'YLim',[-0.3 1.5],'YTick',-0.2:0.2:1);
+        set(double(gcf),'Position',[655   415   323   457]);
         
         [s p] = permutationtest_diff(dimp,fimp,'typeoftest','onetailed_ls0');
-        joinwithsigline(gca,dx,fx,0.6,1,1.2);
+        joinwithsigline(double(gca),dx,fx,0.6,1,1.2);
         if p < 0.001, stars='***'; 
         elseif p < 0.01, stars='**'; 
         elseif p < 0.05, stars='*';
@@ -492,10 +492,10 @@ switch action
 
         sub__plotvaldiffs(dslope, dur_clr,'Timing',fslope, freq_clr, 'Frequency',@sub__sdiff,1);
         title('Slope'); ylabel('Post-Pre');
-        axes__format(gca);
+        axes__format(double(gca));
 
         sub__plotvaldiffs(dbias,dur_clr,'Timing',fbias,freq_clr,'Frequency', @sub__bdiff,0);
-        axes__format(gca);
+        axes__format(double(gca));
         title('Bias');ylabel('Post-Pre');
 
         % make raw and pool among groups
@@ -756,9 +756,9 @@ text(xpos-1,0.9, 'Line fit', 'Color','k','FontWeight','bold', 'FontSize',14);
 text(xpos-1, 0.85,'Sigmoid fit', 'Color','b','FontWeight','bold', 'FontSize',14);
 
 ylabel({'Q', '(Line:BK; Sigmoid:BL)'});
-set(gca,'XLim',[0 xpos],'XTick',xtks,'XTickLabel', forder1);
-set(gcf,'Position',[ 360   613   873   245]);
-axes__format(gca);
+set(double(gca),'XLim',[0 xpos],'XTick',xtks,'XTickLabel', forder1);
+set(double(gcf),'Position',[ 360   613   873   245]);
+axes__format(double(gca));
 
 
 function [] = sub__plotvaldiffs(g1, g1clr, gnm1, g2, g2clr,gnm2,fnhandle, amslope)
@@ -766,9 +766,9 @@ figure;
 sub__ps(g1,g1clr,1, fnhandle,amslope); hold on;
 sub__ps(g2,g2clr,2, fnhandle,amslope);
 
-set(gca,'XLim',[0.5 2.5]);
-set(gca,'XTick',1:2, 'XTickLabel',{gnm1, gnm2});
-set(gcf,'Position',[440   289   301   445]);
+set(double(gca),'XLim',[0.5 2.5]);
+set(double(gca),'XTick',1:2, 'XTickLabel',{gnm1, gnm2});
+set(double(gcf),'Position',[440   289   301   445]);
 
 
 function [flist fraw] = sub__ps(g, gclr,xpos, f,amslope)
@@ -864,5 +864,5 @@ for k=1:length(s)
 end;
 
 plot(x,y,'.k','MarkerSize', 15);
-set(gca,'XLim',[-1 3],'XTick',[0 1], 'XTickLabel', {'orig','norm'});
-set(gcf,'Position',[98   327   419   563]);
+set(double(gca),'XLim',[-1 3],'XTick',[0 1], 'XTickLabel', {'orig','norm'});
+set(double(gcf),'Position',[98   327   419   563]);

@@ -55,7 +55,7 @@ end;
 
 function [] = make_patch(ratlist, sig)
 % plot significance
-figure; set(gcf,'Position', [400 400 400 250],'Toolbar','none');
+figure; set(double(gcf),'Position', [400 400 400 250],'Toolbar','none');
 rlist = {};
 for r = 1:length(ratlist)
     ratname = ratlist{r};
@@ -70,5 +70,5 @@ for r = 1:length(ratlist)
     end;
 end;
 
-set(gca,'YTick',1.5:length(rlist)+0.5, 'YTickLabel',rlist, 'XTick',[1.5 2.5], 'XTickLabel', ...
+set(double(gca),'YTick',1.5:length(rlist)+0.5, 'YTickLabel',rlist, 'XTick',[1.5 2.5], 'XTickLabel', ...
     {'On reporting "LEFT"', 'On reporting "RIGHT"'});

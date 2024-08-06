@@ -34,7 +34,7 @@ parse_knownargs(varargin,pairs);
  
   if show_plot > 0
   figure;
-  set(gcf,'Name', 'Timeout Metrics','Menubar','none','Toolbar','none', ...
+  set(double(gcf),'Name', 'Timeout Metrics','Menubar','none','Toolbar','none', ...
           'Position',[859 242 350 350]);
   subplot('Position',[0.3 0.4 0.4 0.4]);
   lbls = {};
@@ -58,7 +58,7 @@ parse_knownargs(varargin,pairs);
   maxidx = find(n == max(n)); xplode = zeros(size(n)); xplode(maxidx) =1;
   if sum(n) > 0
   p = pie(n,xplode,lbls);
-  toppos = 0.5;% get(gcf,'Position'); toppos = (toppos(2) + toppos(4)) - (0.25 * toppos(4));
+  toppos = 0.5;% get(double(gcf),'Position'); toppos = (toppos(2) + toppos(4)) - (0.25 * toppos(4));
   for k = 2:2:length(p), 
       set(p(k-1), 'EdgeColor','none'); 
       set(p(k),'FontWeight','bold','FontSize',14,'Position',[-2 toppos 0]);
@@ -89,9 +89,9 @@ colormap jet;
 if flg__show_timeout_rate > 0
  plot(winsize+1:length(tlen_norm),trate,'.b');
  maxie = max(2,max(trate));
- if maxie > 2, set(gca,'Color','y'); end;
+ if maxie > 2, set(double(gca),'Color','y'); end;
  if isempty(maxie), maxie = 1; end;
- set(gca,'YLim', [0 maxie], 'XLim',[winsize+1 max(winsize+2,length(tlen_norm))],'YTick',0:1:maxie);
+ set(double(gca),'YLim', [0 maxie], 'XLim',[winsize+1 max(winsize+2,length(tlen_norm))],'YTick',0:1:maxie);
  hold on;
  line([winsize+1 length(tlen_norm)],[0.5 0.5],'LineStyle','-','Color', ...
       'g');
@@ -100,11 +100,11 @@ if flg__show_timeout_rate > 0
 
 else
     plot(tcount,'.b');
-    if max(tcount) > 5, set(gca,'Color','y'); end;
+    if max(tcount) > 5, set(double(gca),'Color','y'); end;
     ylabel('numOccur TO');
     xlabel('Trial #');    
        s = sprintf('%s: %s (%s)\nTimeout count', make_title(rat), make_title(task), date);
-       yl = get(gca,'YLim');
+       yl = get(double(gca),'YLim');
        text(length(tcount)*0.95, yl(2)*0.9, sprintf('%1.0f', mean(tcount)), 'FOntSize', 12,'FontWeight', 'bold');
       
 

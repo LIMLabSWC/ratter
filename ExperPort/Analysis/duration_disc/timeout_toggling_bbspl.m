@@ -25,16 +25,16 @@ bb = bb(1:n);
 
 figure;
 subplot(4,1,1);
-plot(bb,'.b'); set(gca,'XLim',[1 n]); ylabel('bbspl');
+plot(bb,'.b'); set(double(gca),'XLim',[1 n]); ylabel('bbspl');
 subplot(4,1,2);
-plot(tolast15,'.k'); set(gca,'XLim',[1 n]); ylabel('to last 15');
+plot(tolast15,'.k'); set(double(gca),'XLim',[1 n]); ylabel('to last 15');
 hold on;
 line([1 n],[1 1], 'LineStyle',':','Color','b');
 line([1 n],[1.3 1.3], 'LineStyle',':','Color','r');
 subplot(4,1,3);
-plot(pokelast15,'.k'); set(gca,'XLim',[1 n]); ylabel('poke last 15');
+plot(pokelast15,'.k'); set(double(gca),'XLim',[1 n]); ylabel('poke last 15');
 subplot(4,1,4);
-plot(lprob,'.k'); set(gca,'XLim',[1 n]); ylabel('lprob');
+plot(lprob,'.k'); set(double(gca),'XLim',[1 n]); ylabel('lprob');
 
 2;
 

@@ -9,7 +9,7 @@ function [x, y] = OdorSection(obj, action, x, y)
     case 'init',   % ---------- CASE INIT -------------
       
       % Start adding GUI elements:
-      SoloParamHandle(obj, 'my_gui_info', 'value', [x y gcf]);
+      SoloParamHandle(obj, 'my_gui_info', 'value', [x y double(gcf)]);
 
       % Initialize odor settings
 
@@ -55,7 +55,7 @@ function [x, y] = OdorSection(obj, action, x, y)
 
       % Make separate figure for odor parameters
       
-      fig = gcf; % first save current (main) figure
+      fig = double(gcf); % first save current (main) figure
       
       SoloParamHandle(obj, 'odor_params_fig', 'value', figure, 'saveable', 0);
       
@@ -161,7 +161,7 @@ function [x, y] = OdorSection(obj, action, x, y)
       
       text_buff = 10;
       axes('Position', [0 0 1 1]);
-      set(gca, 'Visible', 'off');
+      set(double(gca), 'Visible', 'off');
       
       fig_position = get(value(odor_params_fig), 'Position');
       
@@ -248,7 +248,7 @@ function [x, y] = OdorSection(obj, action, x, y)
           % add text labels to 'mixture fraction' section of plot
 
           axes('Position', [0 0 1 1]);
-          set(gca, 'Visible', 'off');
+          set(double(gca), 'Visible', 'off');
 
           % label rows
           for ind2 = (((ind1 - 1) * max_mixture_fractions) + 1):(((ind1 - 1) * max_mixture_fractions) + max_mixture_fractions)
@@ -384,7 +384,7 @@ function [x, y] = OdorSection(obj, action, x, y)
        end
        
     case 'reinit',       % ---------- CASE REINIT -------------
-      currfig = gcf; 
+      currfig = double(gcf); 
 
       % Get the original GUI position and figure:
       x = my_gui_info(1); y = my_gui_info(2); figure(my_gui_info(3));

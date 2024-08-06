@@ -302,14 +302,14 @@ if graphic > 0
         xlabel('Slice #');
         title(sprintf('Coverage of %s for rat %s', roi, ratname));
 
-        set(gca,'YLim',[0 1.05],'YTick',0:0.2:1, 'YTickLabel',0:20:100, ...
+        set(double(gca),'YLim',[0 1.05],'YTick',0:0.2:1, 'YTickLabel',0:20:100, ...
             'XLim', [min(slices)-1 max(slices)+1],'XTick', slices);
 
-        axes__format(gca, 14);
+        axes__format(double(gca), 14);
     end;
 
-    set(gcf,'Position',[255 476 844 410]);
-    sign_fname(gcf,mfilename);
+    set(double(gcf),'Position',[255 476 844 410]);
+    sign_fname(double(gcf),mfilename);
 end;
 
 
@@ -340,7 +340,7 @@ for f = 1:length(fnames)
     % end;
 end;
 
-set(gca,'XGrid','on','YGrid','on','ZGrid','on');
+set(double(gca),'XGrid','on','YGrid','on','ZGrid','on');
 
 % returns all the point locations at a given z-slice of a volume array only
 function [px py pz] = sub__viewslice(V, x,y,z, zval, thresh)
@@ -414,10 +414,10 @@ if graphic > 0
     plot(pts_array(idx_rt,1), pts_array(idx_rt,2),'+r','MarkerSize',msize,'LineWidth',lwdth);
 
     % resize figure to make it square
-    xlim = get(gca,'XLim'); ylim = get(gca,'YLim');
-    set(gcf,'Position',[200 200 diff(xlim)*3 diff(ylim)*3]);
-    set(gca,'Position',[0.07 0.05 0.9 0.9]);
+    xlim = get(double(gca),'XLim'); ylim = get(double(gca),'YLim');
+    set(double(gcf),'Position',[200 200 diff(xlim)*3 diff(ylim)*3]);
+    set(double(gca),'Position',[0.07 0.05 0.9 0.9]);
 
-    axes__format(gca,12);
+    axes__format(double(gca),12);
     fprintf(1,'Point count = %i\n', lesionpt);
 end;

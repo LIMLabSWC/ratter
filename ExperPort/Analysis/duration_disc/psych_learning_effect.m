@@ -119,7 +119,7 @@ if length(notnanrows) > 1
     fprintf(1,'\n\n\n\n%i sessions ignored *****', nanrows);
 end;
 [barh xpos] =barweb(nanmean(hrate_blocks), nanstd(hrate_blocks) ./ length(notnanrows));
-set(gca,'FontSize',18,'FontWeight','bold',...
+set(double(gca),'FontSize',18,'FontWeight','bold',...
     'XTick',[], ...
    'Position', [0.1 0.1 0.35 0.75]);
 %    'YLim',[0.5 1], 'YTick', 0.5:0.1:1, 'YTickLabel',50:10:100);
@@ -138,7 +138,7 @@ else
     clr = [1 0 0.8];
 end;
 
-barweb_change_colour(gca, clr,'none');
+barweb_change_colour(double(gca), clr,'none');
 
 sumhh = sum(weber_blocks');
 notnanrows = find(~isnan(sumhh));
@@ -146,14 +146,14 @@ nanrows = length(sumhh) - length(notnanrows);
 
 axes('Position',[0.55 0.1 0.4 0.75]);
 barweb(nanmean(weber_blocks), NaN(size(nanmean(weber_blocks))));
-set(gca,'FontSize',18,'FontWeight','bold','XTick',[]);
+set(double(gca),'FontSize',18,'FontWeight','bold','XTick',[]);
 t=ylabel('Weber fraction'); set(t,'FontSize',18,'FontWeight','bold');
 t=xlabel('Block #'); set(t,'FontSize',18,'FontWeight','bold');
 title('Weber through blocks within a session');
-barweb_change_colour(gca, clr,'none');
+barweb_change_colour(double(gca), clr,'none');
 
-set(gcf,'Color',[0.8 0.8 0.8],'Position',[245   418   837   367],'Menubar','none','Toolbar','none');
-sign_fname(gcf,mfilename);
+set(double(gcf),'Color',[0.8 0.8 0.8],'Position',[245   418   837   367],'Menubar','none','Toolbar','none');
+sign_fname(double(gcf),mfilename);
 uicontrol('Tag', 'figname', 'Style','text', 'String', ['psychlearn_' ratname], 'Visible','off');
 
 

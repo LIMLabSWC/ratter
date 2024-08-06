@@ -100,7 +100,7 @@ switch action,
     end;
     x = varargin{1}; y = varargin{2};
     
-    SoloParamHandle(obj, 'my_xyfig', 'value', [x y gcf]);
+    SoloParamHandle(obj, 'my_xyfig', 'value', [x y double(gcf)]);
     ToggleParam(obj, 'CommentsShow', 0, x, y, 'OnString', 'Comments showing', ...
       'OffString', 'Comments hidden', 'TooltipString', 'Show/Hide Comments panel'); 
     set_callback(CommentsShow, {mfilename, 'show_hide'}); %#ok<NODEF> (Defined just above)
@@ -109,7 +109,7 @@ switch action,
     SoloParamHandle(obj, 'myfig', 'value', figure('Position', [100 100 560 440], ...
       'closerequestfcn', [mfilename '(' class(obj) ', ''hide'');'], 'MenuBar', 'none', ...
       'Name', mfilename), 'saveable', 0);
-    set(gcf, 'Visible', 'off');
+    set(double(gcf), 'Visible', 'off');
 
     % ---
 
@@ -270,7 +270,7 @@ switch action,
   % ------------------------------------------------------------------    
   case 'reinit'
     x = my_xyfig(1); y = my_xyfig(2); origfig = my_xyfig(3); 
-    currfig = gcf;
+    currfig = double(gcf);
     
     feval(mfilename, obj, 'close');
     

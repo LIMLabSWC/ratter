@@ -34,7 +34,7 @@ switch action,
           next_row(y);
 
         % ---- Now initialize plot
-        oldunits = get(gcf, 'Units'); set(gcf, 'Units', 'normalized');
+        oldunits = get(double(gcf), 'Units'); set(double(gcf), 'Units', 'normalized');
         SoloParamHandle(obj, 'h',  'value', axes('Position', [0.06, 0.85, 0.8, 0.12])); % axes
         SoloParamHandle(obj, 'p',  'value', plot(-1, 1, 'b.')); hold on; % blue dots
         SoloParamHandle(obj, 'g',  'value', plot(-1, 1, 'g.')); hold on; % green dots
@@ -53,7 +53,7 @@ switch action,
         set(value(h), 'YTick', [0 1], 'YTickLabel', {'Right', 'Left'});
         xlabel('');
 
-        set(gcf, 'Units', oldunits);
+        set(double(gcf), 'Units', oldunits);
 
         % "width", an EditParam to control the # of trials in the plot:
         SoloParamHandle(obj, 'width', 'type', 'edit', 'label', 'ntrials', ...

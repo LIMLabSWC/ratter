@@ -33,11 +33,11 @@ for r = 1:length(ratlist)
 
 end;
 
-set(gca,'XTick', 1:length(ratlist), 'XTickLabel', ratlist,'XLim', [0 length(ratlist)+1]);
-set(gca,'YTick', 0.5:0.05:1, 'YTickLabel', 50:5:100,'YLim',[0.5 1], 'FontSize',12, 'FontWeight','bold');
+set(double(gca),'XTick', 1:length(ratlist), 'XTickLabel', ratlist,'XLim', [0 length(ratlist)+1]);
+set(double(gca),'YTick', 0.5:0.05:1, 'YTickLabel', 50:5:100,'YLim',[0.5 1], 'FontSize',12, 'FontWeight','bold');
 xlabel('Rat name');
 ylabel('Session average (%)');
-set(gcf,'Position',[440   434   150*length(ratlist)   300]);
+set(double(gcf),'Position',[440   434   150*length(ratlist)   300]);
 
 title(sprintf('Session avgs. before & after lesion: %s', brainarea));
 

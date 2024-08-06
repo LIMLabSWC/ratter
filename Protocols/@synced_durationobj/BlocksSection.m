@@ -5,7 +5,7 @@ GetSoloFunctionArgs;
 switch action,
     case 'init', % ----------  INIT  -------------------------
         % main protocol window
-        parentfig = gcf; figure(parentfig);
+        parentfig = double(gcf); figure(parentfig);
         parent_x = x; parent_y = y;
 
         % new popup window
@@ -41,7 +41,7 @@ switch action,
 
         SubheaderParam(obj, 'blocks_sbh', 'Blocks Section', x, y);next_row(y);
 
-        x = parent_x; y = parent_y; figure(parentfig); % make master protocol figure gcf
+        x = parent_x; y = parent_y; figure(parentfig); % make master protocol figure double(gcf)
         MenuParam(obj, 'BlocksView', {'hidden', 'view'}, 1, x, y); next_row(y);
         set_callback({BlocksView}, {'BlocksSection', 'blocks_param_view'});
 

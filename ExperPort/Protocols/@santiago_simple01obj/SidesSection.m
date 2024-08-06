@@ -29,7 +29,7 @@ switch action
     hold off;
     ylim([-0.5,1.5])
     xlabel('Trial');
-    set(gca,'YTick',[0,1],'YTickLabel',{'Right','Left'});
+    set(double(gca),'YTick',[0,1],'YTickLabel',{'Right','Left'});
     
   case 'updateplot'
     %TrialsToPlot = [ max(1,value(NdoneTrials)-value(NtrialsToPlot)) : ...
@@ -47,6 +47,6 @@ switch action
     hErrorPlot.value = plot(TrialsError,SidesList(TrialsError),'or','MarkerFaceColor','r');
     ylim([-0.5,1.5])
     xlabel('Trial');
-    set(gca,'YTick',[0,1],'YTickLabel',{'Right','Left'});
+    set(double(gca),'YTick',[0,1],'YTickLabel',{'Right','Left'});
     
 end

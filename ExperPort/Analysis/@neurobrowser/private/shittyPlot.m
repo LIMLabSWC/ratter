@@ -36,7 +36,7 @@ for cx=1:numel(spks)
 	tsraster2(pk3, c_spks, 5E3, 5E3);
 	title([num2str(cx) ' ' rat{1} '\_' sdate{1} '\_TT' num2str(sc(cx)) 'C' num2str(clust(cx)) ', Poke3']);
 	xlabel('Time (secs)');
-	set(gcf, 'Position',M(cx,:));
+	set(double(gcf), 'Position',M(cx,:));
 end
 	
 
@@ -56,7 +56,7 @@ clrs={'r' 'k' 'g' 'b','m','c','y','r','k'};
 figure
 %pagefig('height',NN,'width',3)
 h=subplot(NN,1,NN);
-set(gcf,'renderer','painters')
+set(double(gcf),'renderer','painters')
 
 	for cx=1:(NN-1)
 			subplot(NN,1,cx)
@@ -70,13 +70,13 @@ set(gcf,'renderer','painters')
 			end
 
 			ylim([0 ceil(max(y))])
-			set(gca,'YTick',[]);
-			set(gca,'Box','off')
+			set(double(gca),'YTick',[]);
+			set(double(gca),'Box','off')
 			drawnow
 			subplot(NN,1,NN)
 			hold on
 			krn=normpdf(-20:20,0,5);
-			psth(pk3g(st), c_spks, 4E3, 2E3, 10, krn,{clrs{cx},gca,0.7});
+			psth(pk3g(st), c_spks, 4E3, 2E3, 10, krn,{clrs{cx},double(gca),0.7});
 
 		end
 
@@ -85,12 +85,12 @@ ylabel('Firing Rate (Hz \pm StdErr)')
 xlabel('Time from response (sec)')
 % 
 % 
- ch=get(gcf,'Children');
+ ch=get(double(gcf),'Children');
 % p1=get(ch(5),'Position');
 % set(ch(5),'Position',p1+[0 -.05 0 +0.05]);
-% set(gca,'Position', p1+[0 -.5 0 +.05]);
+% set(double(gca),'Position', p1+[0 -.5 0 +.05]);
 ylabel(ch(2),'Trials ordered by response: right trials on top')
-set(gcf,'Renderer','painters');
+set(double(gcf),'Renderer','painters');
 
 
 %% subplot PROANTI with PSTH
@@ -109,7 +109,7 @@ set(gcf,'Renderer','painters');
 		figure
 		%pagefig('height',NN,'width',3)
 		h=subplot(NN,1,NN);
-		set(gcf,'renderer','painters')
+		set(double(gcf),'renderer','painters')
 
 		for cx=1:(NN-1)
 			subplot(NN,1,cx)
@@ -123,13 +123,13 @@ set(gcf,'Renderer','painters');
 			end
 
 			ylim([0 ceil(max(y))])
-			set(gca,'YTick',[]);
-			set(gca,'Box','off')
+			set(double(gca),'YTick',[]);
+			set(double(gca),'Box','off')
 			drawnow
 			subplot(NN,1,NN)
 			hold on
 			krn=normpdf(-20:20,0,5);
-			psth(pk3g(st), c_spks, 4E3, 2E3, 10, krn,{clrs{cx},gca,0.7});
+			psth(pk3g(st), c_spks, 4E3, 2E3, 10, krn,{clrs{cx},double(gca),0.7});
 
 		end
 
@@ -137,12 +137,12 @@ set(gcf,'Renderer','painters');
 		xlabel('Time from response (sec)')
 		%
 		%
-		ch=get(gcf,'Children');
+		ch=get(double(gcf),'Children');
 		% p1=get(ch(5),'Position');
 		% set(ch(5),'Position',p1+[0 -.05 0 +0.05]);
-		% set(gca,'Position', p1+[0 -.5 0 +.05]);
+		% set(double(gca),'Position', p1+[0 -.5 0 +.05]);
 		ylabel(ch(2),'Trials ordered by context: Pro trials on top')
-		set(gcf,'Renderer','painters');
+		set(double(gcf),'Renderer','painters');
 %%	case 'context',
 	case 'correct'
 gt=[1:nume(correct)];
@@ -158,7 +158,7 @@ clrs={'r' 'k' 'g' 'b','m','c','y','r','k'};
 figure
 %pagefig('height',NN,'width',3)
 h=subplot(NN,1,NN);
-set(gcf,'renderer','painters')
+set(double(gcf),'renderer','painters')
 	for cx=1:(NN-1)
 			subplot(NN,1,cx)
 			c_spks=spks{cx};
@@ -171,13 +171,13 @@ set(gcf,'renderer','painters')
 			end
 
 			ylim([0 ceil(max(y))])
-			set(gca,'YTick',[]);
-			set(gca,'Box','off')
+			set(double(gca),'YTick',[]);
+			set(double(gca),'Box','off')
 			drawnow
 			subplot(NN,1,NN)
 			hold on
 			krn=normpdf(-20:20,0,5);
-			psth(pk3g(st), c_spks, 4E3, 2E3, 10, krn,{clrs{cx},gca,0.7});
+			psth(pk3g(st), c_spks, 4E3, 2E3, 10, krn,{clrs{cx},double(gca),0.7});
 
 		end
 
@@ -185,12 +185,12 @@ ylabel('Firing Rate (Hz \pm StdErr)')
 xlabel('Time from response (sec)')
 % 
 % 
- ch=get(gcf,'Children');
+ ch=get(double(gcf),'Children');
 % p1=get(ch(5),'Position');
 % set(ch(5),'Position',p1+[0 -.05 0 +0.05]);
-% set(gca,'Position', p1+[0 -.5 0 +.05]);
+% set(double(gca),'Position', p1+[0 -.5 0 +.05]);
 ylabel(ch(2),'Trials ordered by correct: correct trials on top')
-set(gcf,'Renderer','painters');
+set(double(gcf),'Renderer','painters');
 
 %%
 	case 'waves'
@@ -204,8 +204,8 @@ for ci=1:2;
 	
 end
 
-set(gca,'XTick',[16 16+32+5 16+32*2+10 16+32*3+15])
-set(gca, 'XTickLabel', {'ch. 0', 'ch. 1', 'ch. 2' , 'ch. 3'}) 
+set(double(gca),'XTick',[16 16+32+5 16+32*2+10 16+32*3+15])
+set(double(gca), 'XTickLabel', {'ch. 0', 'ch. 1', 'ch. 2' , 'ch. 3'}) 
 ylabel('Waveforms (\muV \pm stdev)');
 
 
@@ -219,8 +219,8 @@ for ci=3:4;
 	
 end
 
-set(gca,'XTick',[16 16+32+5 16+32*2+10 16+32*3+15])
-set(gca, 'XTickLabel', {'ch. 0', 'ch. 1', 'ch. 2' , 'ch. 3'}) 
+set(double(gca),'XTick',[16 16+32+5 16+32*2+10 16+32*3+15])
+set(double(gca), 'XTickLabel', {'ch. 0', 'ch. 1', 'ch. 2' , 'ch. 3'}) 
 ylabel('Waveforms (\muV \pm stdev)');
 
 

@@ -12,7 +12,7 @@ GetSoloFunctionArgs;
 
 switch action,
  case 'init'
-  fig = gcf; rpbox('InitRP3StereoSound'); figure(fig);
+  fig = double(gcf); rpbox('InitRP3StereoSound'); figure(fig);
   
   oldx = x; oldy = y;  x = 5; y = 5;
   SoloParamHandle(obj, 'myfig', 'value', figure, 'saveable', 0);

@@ -9,7 +9,7 @@ if exist('opt','var')
 	alph=opt{3};
 else
     figure;
-    h=gca;
+    h=double(gca);
    	clr='b';
     alph=.7;
 end
@@ -31,8 +31,8 @@ waveMn=reshape(waveMn',1,numel(waveMn));
         plot(xdx, waveMn(ydx),clr);
     end
     ylim([min(waveMn)-max(waveStd) max(waveMn)+max(waveStd)])
-set(gca,'Xtick',[]);
+set(double(gca),'Xtick',[]);
 ylabel('\muV')
 hold off
-%set(gca,'YLim',[-500 2600]);
-%set(gca,'Ytick',[]);
+%set(double(gca),'YLim',[-500 2600]);
+%set(double(gca),'Ytick',[]);

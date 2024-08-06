@@ -11,7 +11,7 @@ function [lp] = get_lprob(ratname, task, date, varargin)
   
   if newfig > 0, figure; end;
   plot(from:length(lp), lp(from:end), '-b');
-  set(gca,'XLim', [from max(2,length(lp))],'YLim',[0 1],'YTick', [0 0.2 0.5 0.8 1]);
+  set(double(gca),'XLim', [from max(2,length(lp))],'YLim',[0 1],'YTick', [0 0.2 0.5 0.8 1]);
   
   s = sprintf('%s: %s (%s)\n Value of LProb', make_title(ratname), make_title(task), ...
               date);

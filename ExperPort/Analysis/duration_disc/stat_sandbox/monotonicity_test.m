@@ -35,7 +35,7 @@ if graphic > 0
     if newfig > 0
         figure;
         figpos = [figpos(1) figpos(2) width height];
-        set(gcf,'Position',figpos);
+        set(double(gcf),'Position',figpos);
     end;
 
     [n x]=hist(slopes);
@@ -51,9 +51,9 @@ if graphic > 0
     else
         minX = min(real_slope, min(slopes))*1.1; maxX = max(real_slope, max(slopes))*1.1;
     end;
-    set(gca,'XLim',[minX maxX]);
+    set(double(gca),'XLim',[minX maxX]);
     if max(n) > 0
-    set(gca,'YLim', [0 max(n)]);
+    set(double(gca),'YLim', [0 max(n)]);
     end;
 
     text(-9, (numsim/4)-5, sprintf('%i sims', numsim));

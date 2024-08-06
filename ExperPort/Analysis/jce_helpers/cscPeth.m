@@ -26,7 +26,7 @@ xax=xax/1E6;
 y=mean(dV);
 y=jconv([1 1 1 1 1]/5, y);
 %se=stderr(dV);
-%h=gcf;
+%h=double(gcf);
 %shadeplot(xax, y-se,y+se,{ [.8 .8 .8 ] h 1})
 %hold on
 plot(xax,y,'k');

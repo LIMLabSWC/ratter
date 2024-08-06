@@ -367,7 +367,7 @@ switch action
                         RPBitsOut(bit(i)+1)=1;
                     end
                 else
-                    set(h(i),'BackgroundColor',get(gcf,'color'),'value',0);
+                    set(h(i),'BackgroundColor',get(double(gcf),'color'),'value',0);
                     RPBitsOut(bit(i)+1)=0;
                 end
                 % set the bit
@@ -398,7 +398,7 @@ switch action
         h = exper.rpbox_5port.AO_h;
         for i=1:3
             if RP_AO_Out(i),  set(h(i),'BackgroundColor',[0 1 0],'value',1);
-            else              set(h(i),'BackgroundColor',get(gcf,'color'),'value',0);
+            else              set(h(i),'BackgroundColor',get(double(gcf),'color'),'value',0);
             end
         end;
         % set the AO_Out
@@ -626,7 +626,7 @@ function InitRP
 %	Initialize RP and load the finite state machine
 %   If an RP object already exists; make sure it's done playing & def writing
 
-currfig = gcf;
+currfig = double(gcf);
 global exper fake_rp_box state_machine_server FakeActiveXObjects
 if existparam(me, 'RP')
     RP=GetParam(me, 'RP');
@@ -777,7 +777,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function InitRPSound
 
-currfig = gcf;
+currfig = double(gcf);
 global exper fake_rp_box sound_machine_server FakeActiveXObjects
 if existparam(me, 'RPSound')
     RPS=GetParam(me, 'RPSound');

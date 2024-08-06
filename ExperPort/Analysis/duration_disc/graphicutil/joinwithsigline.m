@@ -3,7 +3,7 @@ function [] = joinwithsigline(ax,x1,x2,y1,y2,ytop)
 % U-stem goes from (x1,y) up to (x1,ytop), over to (x2,ytop) and down to
 % (x2,y)
 
-set(gcf,'CurrentAxes',ax);
+set(double(gcf),'CurrentAxes',ax);
 lw=2;
 clr='k';
 line([x1 x1],[y1 ytop],'Color','k','LineWidth',lw);

@@ -6,7 +6,7 @@ function [x, y] = TimesSection(obj, action, x, y)
     case 'init',
       % Save the figure and the position in the figure where we are
       % going to start adding GUI elements:
-      SoloParamHandle(obj, 'my_gui_info', 'value', [x y gcf]);
+      SoloParamHandle(obj, 'my_gui_info', 'value', [x y double(gcf)]);
       
       NumeditParam(obj, 'ExtraITIOnError', 1, x, y);
       next_row(y);
@@ -48,7 +48,7 @@ function [x, y] = TimesSection(obj, action, x, y)
       next_row(y, 1.5);
       
       % ---- Initialize plot for the task schedule
-        oldunits = get(gcf, 'Units'); set(gcf, 'Units', 'normalized');
+        oldunits = get(double(gcf), 'Units'); set(double(gcf), 'Units', 'normalized');
         SoloParamHandle(obj, 'h',  'value', axes('Position', [0.1, 0.48, 0.8, 0.43])); % axes
         SoloParamHandle(obj, 'p',  'value', plot(-1, 0.2, 'b.')); hold on; % blue dots
         SoloParamHandle(obj, 'g',  'value', plot(-1, 0.2, 'g.')); hold on; % green dots
@@ -61,7 +61,7 @@ function [x, y] = TimesSection(obj, action, x, y)
         xlabel('Trials');
         ylabel('ValidPokeTime');
 
-        set(gcf, 'Units', oldunits);
+        set(double(gcf), 'Units', oldunits);
         
         % store the x value of the points in to a SPH. (initialize them)
         SoloParamHandle(obj, 'p_xdata', 'value', [1:value(total_correct_trials)]);
@@ -223,7 +223,7 @@ function [x, y] = TimesSection(obj, action, x, y)
        end
         
     case 'reinit',
-      currfig = gcf; 
+      currfig = double(gcf); 
 
       % Get the original GUI position and figure:
       x = my_gui_info(1); y = my_gui_info(2); figure(my_gui_info(3));

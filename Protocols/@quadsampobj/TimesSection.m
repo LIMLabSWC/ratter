@@ -22,7 +22,7 @@ GetSoloFunctionArgs;
 
 switch action,
  case 'init',
-   SoloParamHandle(obj, 'myxyfig', 'value', [x y gcf]);
+   SoloParamHandle(obj, 'myxyfig', 'value', [x y double(gcf)]);
    
    cell_units = {}; for i=0:2:16, 
       cell_units = [cell_units {num2str(i)}];
@@ -87,7 +87,7 @@ switch action,
    end;
    
  case 'reinit', 
-   currfig = gcf; x = myxyfig(1); y = myxyfig(2); figure(myxyfig(3));
+   currfig = double(gcf); x = myxyfig(1); y = myxyfig(2); figure(myxyfig(3));
    
    delete_sphandle('handlelist', ...
       get_sphandle('owner', class(obj), 'fullname', mfilename));

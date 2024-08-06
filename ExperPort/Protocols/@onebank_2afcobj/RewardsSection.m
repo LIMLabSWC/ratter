@@ -20,7 +20,7 @@ GetSoloFunctionArgs;
 switch action,
     case 'init',
 
-        fig = gcf;
+        fig = double(gcf);
         
         SoloParamHandle(obj, 'LeftRewards', 'value', zeros(1, maxtrials));
         SoloParamHandle(obj, 'RightRewards', 'value',zeros(1, maxtrials));
@@ -62,15 +62,15 @@ switch action,
         SubheaderParam(obj, 'hitrt_sbh', 'Hit History', x, y); next_row(y);
         
    %-------- Initilize a plot monitoring rats perfomance-------------
-        oldunits = get(gcf, 'Units'); set(gcf, 'Units', 'normalized');
+        oldunits = get(double(gcf), 'Units'); set(double(gcf), 'Units', 'normalized');
         SoloParamHandle(obj, 'h1',  'value', axes('Position', [0.08, 0.52, 0.4, 0.25])); hold on; % axes
         % Plot performance against trial number (over sliding window)
         SoloParamHandle(obj, 'sliding_left',  'value', plot(-1, 1, 'b*')); hold on; %
         SoloParamHandle(obj, 'sliding_right',  'value', plot(-1, 1, 'mo')); hold on; %
         SoloParamHandle(obj, 'Legend','value',legend('Left','Right','Location',[0.09 0.74 0.12 0.06]));
         %SoloParamHandle(obj, 'perform_bars',  'value', bar(value(perform)); % bar plot of performance till now
-        %set(gca,'XTickLabel',{'Score';'Hits';'Miss';'False'}, ...
-        %    get(gca, 'YLabel'),'String', 'Percentage'); 
+        %set(double(gca),'XTickLabel',{'Score';'Hits';'Miss';'False'}, ...
+        %    get(double(gca), 'YLabel'),'String', 'Percentage'); 
         SoloParamHandle(obj, 'h2',  'value', axes('Position', [0.56, 0.52, 0.4, 0.25])); % axes
         % Plot performance against trial number (over blocks)
         SoloParamHandle(obj, 'block_left',  'value', plot(-1, 1, 'b*')); hold on; %
@@ -85,7 +85,7 @@ switch action,
         title(value(h2), 'Block Average Plot','Color','b');
         
         set_saveable({h1;sliding_left;sliding_right;h2;block_left;block_right}, 0);
-        set(gcf, 'Units', oldunits);
+        set(double(gcf), 'Units', oldunits);
 
     case 'update',
         TrialTracker.value = value(TrialTracker) + 1;
@@ -160,7 +160,7 @@ switch action,
         clf;
         
         whole_fig = axes('Position', [0 0 1 1]);
-        set(gca, 'Visible', 'off');
+        set(double(gca), 'Visible', 'off');
       
         init_x = 0.07;
         init_y = 0.9;

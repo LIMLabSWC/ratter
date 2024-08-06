@@ -59,7 +59,7 @@ for f=[1 3]%n = 1:5
     fprintf(1,'when %s = %i, pct95 reached at %i\n', 'n', n, minp);
 end;
 line([min(t) max(t)], [a/2 a/2],'LineStyle',':','Color','k');
-%set(gca,'YLim',[0 100]);
+%set(double(gca),'YLim',[0 100]);
 
 figure; 
 subplot(1,2,1); 

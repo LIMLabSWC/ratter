@@ -27,9 +27,9 @@ for r = 1:rows(ratlist)
     else
         currcolour = rand(1,3);
     end;
-set(gcf,'Position',[x     y   wd   ht],'Color', currcolour);
-set(gcf,'Tag','sessionview');
-h = uicontrol(gcf,'Style','text','String',rathosts{r,2},'FontSize',14);
+set(double(gcf),'Position',[x     y   wd   ht],'Color', currcolour);
+set(double(gcf),'Tag','sessionview');
+h = uicontrol(double(gcf),'Style','text','String',rathosts{r,2},'FontSize',14);
 p = get(h,'Position'); set(h,'Position',[p(1) p(2) p(3)*1.5, p(4)]);
 datacursormode on;
 y = y + (1.1*ht);

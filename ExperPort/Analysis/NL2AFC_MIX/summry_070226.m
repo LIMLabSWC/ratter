@@ -15,5 +15,5 @@ distr_freq = length(ranges{3})/(length(ranges{2})+length(ranges{3}));
 mix2afc_ratname = [mix2afc_ratname; {bs_name,bs_score,test_name,test_score,test_freq,...
     distr_name,distr_score,distr_freq}];
 figure; bar([bs_score test_score distr_score]);
-set(gca,'XTickLabel',{mix2afc_ratname{1,[2 4 7]}},'YLim',[30 100]);
+set(double(gca),'XTickLabel',{mix2afc_ratname{1,[2 4 7]}},'YLim',[30 100]);
 title([ratname 'EB/Prp' bs_name 'Freq' num2str(test_freq)]);

@@ -76,7 +76,7 @@ end
 output = data;
 
 figure; hold on
-set(gca,'fontsize',14);
+set(double(gca),'fontsize',14);
 plotpd(data);
 shape = 'logistic';
 numsim = 1e4;

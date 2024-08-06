@@ -28,10 +28,10 @@ text(0.9*n, ylim(2)*0.9, 'Go right', 'Color','r','FontWeight','bold','FontSize',
 xlabel('Trial #'); ylabel('Cue value');
 t=title(sprintf('%s: Cue-side relationship for %s', ratname,date));
 set(t,'FontWeight','bold','FontSize',18);
-set(gca,'FontWeight','bold','FontSize',16);
+set(double(gca),'FontWeight','bold','FontSize',16);
 
 
-set(gca,'YLim',ylim);
+set(double(gca),'YLim',ylim);
 
 function [stim] = sub__stim_at(x,y, pt)
 if min(y) > pt || max(y) < pt % you're asking for a point that isn't on the curve

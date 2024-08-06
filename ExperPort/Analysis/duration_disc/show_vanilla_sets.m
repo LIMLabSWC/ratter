@@ -95,7 +95,7 @@ if plotme
     xtcell = cell(0,0);
     for k=1:length(xticklbls), xtcell{k} = sprintf('%1.2f',xticklbls(k)); end;
     axis([0 maxie 2.8 y_val+0.3]);
-    set(gca, 'YTick', [], 'XTickLabel', xtcell, 'XTick', xticks, 'FontSize', 12)
+    set(double(gca), 'YTick', [], 'XTickLabel', xtcell, 'XTick', xticks, 'FontSize', 12)
     if base2, lbl = 'Log2 Difference'; else, lbl = 'Log difference'; end;
     if pitches, ylbl = 'Pitches (KHz)'; else ylbl = 'Duration values (ms)'; end;
     t = xlabel(lbl); set(t, 'FontSize', 12, 'FontWeight', 'bold');

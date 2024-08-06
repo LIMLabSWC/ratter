@@ -387,7 +387,7 @@ case 'buttondown'
     case 'open'         % double click
         % don't know the radius, so make it 10
         ho = findobj(fig,'tag','blob','type','line');
-        ax = get(gcf,'currentaxes');
+        ax = get(double(gcf),'currentaxes');
         
         if isempty(ho)
             new_circle(ax,get(ax,'currentpoint'),10);
@@ -455,7 +455,7 @@ case 'keypress'
             bl{n} = num2str(n);
         end
         SetParam(me,'select','list',bl,'value',mx);
-        Blob('draw',gca);
+        Blob('draw',double(gca));
         
         return;
     otherwise
@@ -578,7 +578,7 @@ case 'x_plot'
         plot(xsn,ysm,'ko ');
     else
         plot(ysm,'ko ');
-        set(gca,'Xtick',1:length(xs),'XTickLabel',xs);
+        set(double(gca),'Xtick',1:length(xs),'XTickLabel',xs);
     end
     xlabel(sprintf('%s %s',module,param));
     
@@ -646,10 +646,10 @@ case 'matrix'
    otherwise
 
    end
-   set(gca,'XLim',[0 nblob+1],'Xtick',1:nblob,'XTickLabel',ind');
+   set(double(gca),'XLim',[0 nblob+1],'Xtick',1:nblob,'XTickLabel',ind');
    xlabel('Glomerulus');
    [trials, group_names] = Group('all');
-   set(gca,'YLim',[0 ngroups+1],'Ytick',1:ngroups,'YTickLabel',group_names(2:end));
+   set(double(gca),'YLim',[0 ngroups+1],'Ytick',1:ngroups,'YTickLabel',group_names(2:end));
    ylabel('Odor');
    bgd_subtract = GetPopupmenuItem('bgd_subtract',findobj('type','figure','tag','opt'));
    filter = GetPopupmenuItem('filter',findobj('type','figure','tag','opt'));
@@ -681,11 +681,11 @@ case 'cluster'
    
    
    [trials, groupnames] = Group('all');
-   order = str2num(get(gca,'XTickLabel'));
+   order = str2num(get(double(gca),'XTickLabel'));
    for n=1:length(order)
        ordered_names{n} = groupnames{order(n)+1};
    end
-   set(gca,'XTickLabel',ordered_names);
+   set(double(gca),'XTickLabel',ordered_names);
    xlabel('Odor');
    ylabel('Distance');
    

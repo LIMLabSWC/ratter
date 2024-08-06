@@ -66,7 +66,7 @@ set(h,'String',{line1, line2, line3});
 
 %% Now plot the busy plot
 subplot('position',[.1 .15 .8 .6])
-myaxes=gca;
+myaxes=double(gca);
 previous_sides=saved.PerformanceSection_previous_sides;
 previous_cntxt=saved.PerformanceSection_previous_cntxt;
     ps = value(previous_sides);

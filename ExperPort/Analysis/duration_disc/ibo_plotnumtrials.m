@@ -82,15 +82,15 @@ for f = 1:length(ratlist)
 end;
 
 % set(0,'CurrentFigure',f1);
-% set(gcf,'Position',[100 200 800 300]);
+% set(double(gcf),'Position',[100 200 800 300]);
 % xlabel('Day');
 % ylabel('# trials');
 % title(sprintf('%s:BEFORE lesion', area_filter));
 %
 %  set(0,'CurrentFigure',f2);
-%  set(gcf,'Position',[300 500 200 600]);
+%  set(double(gcf),'Position',[300 500 200 600]);
 %  xlabel('Day');
-%  set(gca,'XLim', [0 4],'XTick',[1 2 3], 'XTickLabel', {'mean(-7:-1)', '+1', '+2'});
+%  set(double(gca),'XLim', [0 4],'XTick',[1 2 3], 'XTickLabel', {'mean(-7:-1)', '+1', '+2'});
 %  ylabel('normalized numtrials');
 %  title(sprintf('%s:Avg last 7 to first post', area_filter));
 
@@ -113,10 +113,10 @@ plot(ones(size(flist(:,1)))*xlist(1,2), flist(:,1), '.k','MarkerSize',msize,'Col
 plot(ones(size(dlist(:,2)))*xlist(2,1), dlist(:,2),'.k','MarkerSize', msize,'Color',durlite);
 plot(ones(size(flist(:,2)))*xlist(2,2), flist(:,2), '.k','MarkerSize', msize,'Color',freqlite);
 
-set(gca,'XLim',[-1 xlist(end)+1],'YLim',[0 2], 'YTick',0:0.5:2);
+set(double(gca),'XLim',[-1 xlist(end)+1],'YLim',[0 2], 'YTick',0:0.5:2);
 ylabel('Normalized # trials');
-set(gca,'XTickLabel', {'Day 1', 'Day 2'});
-axes__format(gca);
+set(double(gca),'XTickLabel', {'Day 1', 'Day 2'});
+axes__format(double(gca));
 
 %  (dlist(:,1), flist(:,1), ...
 %      'what2show','median','errtype','iqr', ...

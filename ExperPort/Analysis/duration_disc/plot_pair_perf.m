@@ -21,7 +21,7 @@ function [pair_perf pair_idx] = plot_pair_perf(rat, task, varargin)
                                                'to', to);
   
   figure; 
-  set(gcf,'Menubar','none','Toolbar', 'none', 'Position', [200 200 400 400]);
+  set(double(gcf),'Menubar','none','Toolbar', 'none', 'Position', [200 200 400 400]);
  s = sprintf('%s: Pair Performance for %s - %s', rat, from, to);
 
  
@@ -47,7 +47,7 @@ function [pair_perf pair_idx] = plot_pair_perf(rat, task, varargin)
  
  line([1 cols(pair_perf)], [0.8 0.8], 'LineStyle', '-', 'Color','r');
  legend(lgd,'Location', 'SouthWest');
- set(gca, 'YLim', [0 1]);
+ set(double(gca), 'YLim', [0 1]);
 
   title(s);
  

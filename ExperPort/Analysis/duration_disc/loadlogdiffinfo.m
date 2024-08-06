@@ -56,7 +56,7 @@ end;
 
 
 figure;
-set(gcf,'Position', [76         852        1390         220]);
+set(double(gcf),'Position', [76         852        1390         220]);
 
 if exist('numtrials')
     max_trials = numtrials;
@@ -77,8 +77,8 @@ for k = 1:length(max_trials),
     offset=offset+max_trials(k);
 end;
 %title('Hit history (Raw)');
-pos = get(gca,'Position');
-set(gca,'Position',[0.04 0.6 0.9 0.35],'XLim',[0 sum(max_trials)],'XTick',[sum(max_trials)]);
+pos = get(double(gca),'Position');
+set(double(gca),'Position',[0.04 0.6 0.9 0.35],'XLim',[0 sum(max_trials)],'XTick',[sum(max_trials)]);
 
 % logdiff plot
 axes;
@@ -92,8 +92,8 @@ for k = 1:length(max_trials),
 end;
 
 ylabel('Logdiff');
-pos = get(gca,'Position');
-set(gca,'Position',[0.04 0.35 0.9 0.2],'XLim',[0 sum(max_trials)],'XTick',[sum(max_trials)]);
+pos = get(double(gca),'Position');
+set(double(gca),'Position',[0.04 0.35 0.9 0.2],'XLim',[0 sum(max_trials)],'XTick',[sum(max_trials)]);
 
 % Sharpening and psych flags
 axes;
@@ -102,15 +102,15 @@ hold on;
 l = plot(1:length(psychflag), psychflag,'-r'); set(l,'Color',[0.7 1 0.7],'LineWidth',3);
 draw_separators(max_trials,-1,5);
 line([1 length(logflag)], [2 2],'Color', [0.5 0.5 0.5],'LineStyle',':');
-set(gca, 'YLim', [-1 5], 'YTickLabel', {'off', 'on','off','on'}, 'YTick', ...
+set(double(gca), 'YLim', [-1 5], 'YTickLabel', {'off', 'on','off','on'}, 'YTick', ...
     [0 1 3 4],'XTick',[sum(max_trials)]);
 %t = title(sprintf('Sharpening flag(PINK)\nPsych trials (Blue) switches'));
-pos = get(gca,'Position');
-set(gca,'Position',[0.04 0.07 0.9 0.2],'XLim',[0 sum(max_trials)]);
+pos = get(double(gca),'Position');
+set(double(gca),'Position',[0.04 0.07 0.9 0.2],'XLim',[0 sum(max_trials)]);
 ylabel(sprintf('Sharp. flag (pk)\nPsych flag(gr)'));
 
 axes;
-set(gca,'Position',[0.96 0, 0.04,1],'XLim',[0 1], 'YLim',[0 1],'XTick',[],'YTick',[]);
+set(double(gca),'Position',[0.96 0, 0.04,1],'XLim',[0 1], 'YLim',[0 1],'XTick',[],'YTick',[]);
 patch([0 0 1 1],[0 1 1 0],[1 0.8 0.4]);
 t=text(0.5,0.1,sprintf('%s\n%s-%s',ratname,dates{1},dates{end}));
 set(t,'FontWeight','bold','FontSize',18,'Rotation',90);
@@ -121,11 +121,11 @@ datacursormode on;
 figure;
 % badboyspl
 subplot(2,1,1);
-set(gcf,'Position',[1082      10         360         280] , 'Toolbar', 'none')
+set(double(gcf),'Position',[1082      10         360         280] , 'Toolbar', 'none')
 bb = flatten_bbspl(bbspl);
 plot(1:length(bb), bb, '.r');
 ylabel('BadboySPL');
-set(gca,'YTick', 1:3, 'YTickLabel', {'normal','Louder','LOUDEST'}, 'XLim', ...
+set(double(gca),'YTick', 1:3, 'YTickLabel', {'normal','Louder','LOUDEST'}, 'XLim', ...
     [1 length(bb)], 'YLim', [0 4]);
 xlabel('Trial #');
 s = sprintf('%s: %s (%s)\nBadBoySPL', make_title(ratname), make_title(task), date);
@@ -136,9 +136,9 @@ subplot(2,1,2);
 plot(1:length(left_prob), left_prob,'-b');
 if length(unique(left_prob)) > 1
     %warndlg('LProb is being changed!','LProb alert');
-    set(gca,'Color','y');
+    set(double(gca),'Color','y');
 end;
-set(gcf,'Tag','sessionview');
+set(double(gcf),'Tag','sessionview');
 title('Value of LeftProb');
 xlabel('Trial #');
 ylabel('LProb');
@@ -151,8 +151,8 @@ t=title(sprintf('%s: Avg %% correct:(%s-%s)', ratname, dates{1}, dates{end}));
 set(t,'FontSize',16,'FontWeight','bold');
 t=text(0.8, 1.2, sprintf('%i%% (%i)', round(mean(hh)*100), round((std(hh)/(length(hh)-1))*100)));
 set(t,'FontSize',14, 'FontWeight','bold');
-set(gca, 'XLim',[0 2],'XTIck',[],'FontSize',16,'FontWeight','bold','YLim',[0 1.5],'YTick',[0:0.2:1], 'YTickLabel',0:20:100);
-set(gcf,'Position',[587   431   403   314],'Toolbar','none');
+set(double(gca), 'XLim',[0 2],'XTIck',[],'FontSize',16,'FontWeight','bold','YLim',[0 1.5],'YTick',[0:0.2:1], 'YTickLabel',0:20:100);
+set(double(gcf),'Position',[587   431   403   314],'Toolbar','none');
 ylabel('%% Correct (SEM)');
 
 
@@ -196,7 +196,7 @@ line([start_idx end_idx], [0.5 0.5], 'LineStyle', '--', 'Color', 'r');
 %set(t,'FontSize',fsize,'FontWeight','bold');
 xlabel('Trial #');
 ylabel('Hit rate');
-set(gca,'YLim',[0.35 1.1]);
+set(double(gca),'YLim',[0.35 1.1]);
 
 offset =0;
 for k=1:length(max_trials)
@@ -288,7 +288,7 @@ x=logbins;
 
 % Plotting begins here ---------------------------
 fig = figure;
-%set(gcf,
+%set(double(gcf),
 %        'Name', sprintf('%s: Pooled psychometric trials', rat));
 curr_x = 0.05; curr_width = 0.4;
 if nodist == 0
@@ -312,8 +312,8 @@ graf = plot(xx, yy, '-r'); set(graf, 'LineWidth', 2);hold on;
 
 graf = errorbar(log(bins(1:end-1)), p, stdev, stdev, '.r');
 set(graf, 'MarkerSize',10,'LineWidth',2);
-set(gca,'XTick', log(bins(1:end-1)),'YTick',0:0.2:1,'YTickLabel',[0:20:100]);
-set(gca, 'XTickLabel',bins(1:end-1));
+set(double(gca),'XTick', log(bins(1:end-1)),'YTick',0:0.2:1,'YTickLabel',[0:20:100]);
+set(double(gca), 'XTickLabel',bins(1:end-1));
 
 for k = 1:length(bins)-1
     ypos = p(k)+stdev(k)+0.04;

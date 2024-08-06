@@ -86,8 +86,8 @@ switch action
 %         plot(ones(size(dfirst))*x1, dfirst,'.r','Color', [1 0 0], 'MarkerSize',msize);
 %         plot(ones(size(ffirst))*x2, ffirst,'.r','Color', [0 0 0.3], 'MarkerSize',msize);
 %         title(sprintf('%s: Sessions till valid psych',area_filter));    
-%         set(gca,'YTick',0:2:8, 'YLim',[0 8]);
-%         axes__format(gca);
+%         set(double(gca),'YTick',0:2:8, 'YLim',[0 8]);
+%         axes__format(double(gca));
         
     otherwise
         error('invalid action');

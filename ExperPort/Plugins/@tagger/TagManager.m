@@ -108,7 +108,7 @@ switch action
         
         
         if  ~isempty(tagwindow)
-            set(get(gcf,'Children'),'units','normalized')
+            set(get(double(gcf),'Children'),'units','normalized')
         end
         
         

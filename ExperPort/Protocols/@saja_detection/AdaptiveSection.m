@@ -33,7 +33,7 @@ switch action
 
     screen_size = get(0, 'ScreenSize');
     
-    SoloParamHandle(obj, 'orig_fig', 'value', gcf);
+    SoloParamHandle(obj, 'orig_fig', 'value', double(gcf));
     SoloParamHandle(obj, 'myfig', 'value', figure('Position', [1 screen_size(4)-740, 435 435], ...
       'closerequestfcn', [mfilename '(' class(obj) ', ''hide'');'], 'MenuBar', 'none', ...
       'Name', mfilename), 'saveable', 0);

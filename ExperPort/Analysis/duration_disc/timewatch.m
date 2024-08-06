@@ -29,16 +29,16 @@ end;
 
 unit_ht = 50;
 figure;
-set(gcf,'Position',[10 10 400 length(ratlist)*unit_ht],'Menubar','none','Toolbar','none');
-plotter(gcf,durations, 2,1.5,2,10);
+set(double(gcf),'Position',[10 10 400 length(ratlist)*unit_ht],'Menubar','none','Toolbar','none');
+plotter(double(gcf),durations, 2,1.5,2,10);
 title('Session duration for past one week');
-set(gca,'YTick',[],'XLim',[1 abs(fd-td)+2.5],'Xtick',[]);
+set(double(gca),'YTick',[],'XLim',[1 abs(fd-td)+2.5],'Xtick',[]);
 
 figure;
-set(gcf,'Position',[450 10 400 length(ratlist)*unit_ht],'Menubar','none','Toolbar','none');
-plotter(gcf,durations,3,30,60,60);
+set(double(gcf),'Position',[450 10 400 length(ratlist)*unit_ht],'Menubar','none','Toolbar','none');
+plotter(double(gcf),durations,3,30,60,60);
 title('Average trial length for past one week');
-set(gca,'YTick',[],'XLim',[1 abs(fd-td)+2.5],'XTick',[]);
+set(double(gca),'YTick',[],'XLim',[1 abs(fd-td)+2.5],'XTick',[]);
 
 
 function [ylbl] = hour2str(yrange)

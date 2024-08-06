@@ -6,7 +6,7 @@ GetSoloFunctionArgs(obj);
 
 switch action
   case 'init',
-    SoloParamHandle(obj, 'my_gui_info', 'value', [x y gcf]);
+    SoloParamHandle(obj, 'my_gui_info', 'value', [x y double(gcf)]);
     
     SoloParamHandle(obj, 'existing_nVars', 'value', 0);   
     NumeditParam(obj, 'nVars', 0, x, y);
@@ -15,7 +15,7 @@ switch action
   case 'nVars',
     if nVars > existing_nVars,       %#ok<NODEF>
       % If asking for more vars than exist, make them:
-      orig_fig = gcf;
+      orig_fig = double(gcf);
       x = my_gui_info(1); y = my_gui_info(2); figure(my_gui_info(3));
       
       next_row(y, 1+ value(existing_nVars));
@@ -48,7 +48,7 @@ switch action
     % ---------------------------------------------------------------------
 
   case 'reinit',
-    currfig = gcf;
+    currfig = double(gcf);
 
     % Get the original GUI position and figure:
     x = my_gui_info(1); y = my_gui_info(2); figure(my_gui_info(3));

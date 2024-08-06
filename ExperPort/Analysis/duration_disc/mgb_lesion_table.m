@@ -204,7 +204,7 @@ switch action
 
         f=intensity_graph(spared_list, ROW_HEADERS,COL_HEADERS);
         set(f,'Position',[ 105         329        200*length(ratlist)         398]);
-        set(gca,'FontSize',14,'FontWeight','bold');
+        set(double(gca),'FontSize',14,'FontWeight','bold');
         
         out = f;
         
@@ -217,7 +217,7 @@ switch action
 
         f=graph_lesions(lesion_list, ROW_HEADERS,COL_HEADERS);
                 set(f,'Position',[ 105         329        150*length(ratlist)         398]);
-        set(gca,'FontSize',14,'FontWeight','bold');
+        set(double(gca),'FontSize',14,'FontWeight','bold');
         
         out = f;
     case 'return_raw'
@@ -258,7 +258,7 @@ if ~isstruct(mylesion)
     mylesion = tmp;
 end;
 
-%set(gca,'XLim',[0 (2*length(fieldnames(mylesion)))-1], 'YLim', [0 rows(mylesion)]);
+%set(double(gca),'XLim',[0 (2*length(fieldnames(mylesion)))-1], 'YLim', [0 rows(mylesion)]);
 ratlist = fieldnames(mylesion);
 
 megalesion = mylesion;
@@ -277,8 +277,8 @@ for idx = 1:length(ratlist)
     line([(2*idx)-1 (2*idx)-1],[0 rows(mylesion)],'Color','r','LineWidth',4);
 end;
 
-set(gca,'YTick',0.5:1:6.5, 'YTickLabel',ROW_HEADERS(end:-1:1),'XTick',0:2:((2*length(ratlist))),'XTickLabel', ratlist,'XLim',[-1 (2*length(ratlist))-1]);
-set(gca,'Position',[0.1 0.1 0.8 0.8])
+set(double(gca),'YTick',0.5:1:6.5, 'YTickLabel',ROW_HEADERS(end:-1:1),'XTick',0:2:((2*length(ratlist))),'XTickLabel', ratlist,'XLim',[-1 (2*length(ratlist))-1]);
+set(double(gca),'Position',[0.1 0.1 0.8 0.8])
 
 % plots two lesions side by side and then marks index # "idx" with a red
 % asterisk.

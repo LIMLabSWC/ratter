@@ -81,12 +81,12 @@ switch action
         errorbar(1:2, [ma mb], [sa sb],'.k','Color', freq_clr,'MarkerSize', msize, 'LineWidth',2);
         plot(1:2, [ma mb], '-k','Color', freq_clr,'MarkerSize', msize, 'LineWidth',4);
 
-        set(gca,'XLim',[0.7 2.3],'XTick',[1 2], 'XTickLabel',{'Before','After'});
+        set(double(gca),'XLim',[0.7 2.3],'XTick',[1 2], 'XTickLabel',{'Before','After'});
         ylabel('Weber');
         title(subuscore(fpfx));
-        set(gca,'YLim',[0 1.1]);
-        axes__format(gca);
-        set(gcf,'Toolbar','none','Position',[160   426   258   432]);
+        set(double(gca),'YLim',[0 1.1]);
+        axes__format(double(gca));
+        set(double(gcf),'Toolbar','none','Position',[160   426   258   432]);
         uicontrol('Tag', 'figname', 'Style','text', ...
             'String', fname, 'Visible','off');
 
@@ -95,13 +95,13 @@ switch action
         line([0 3],[ 0 0], 'LineStyle',':','Color',[1 1 1]*0.5,'LineWidth',2);hold on;
         plot(ones(size(wdraw,1)), wdraw(:,2)-wdraw(:,1),'.k','Color', dur_clr,'MarkerSize',msize);
         plot(ones(size(wfraw,1))*2, wfraw(:,2)-wfraw(:,1), '.k','Color',freq_clr,'MarkerSize',msize);
-        set(gca,'XLim',[0.8 2.2],'XTick',[1 2],'XTickLabel',{'Timing','Frequency'});
-        set(gca,'YTick',-0.2:0.2:1,'YLim',[-0.3 1.5]);
+        set(double(gca),'XLim',[0.8 2.2],'XTick',[1 2],'XTickLabel',{'Timing','Frequency'});
+        set(double(gca),'YTick',-0.2:0.2:1,'YLim',[-0.3 1.5]);
         ylabel({'After-Before;'; '(Weber; higher is worse)'});
          title(subuscore(fname));
-        axes__format(gca);
+        axes__format(double(gca));
 
-        set(gcf,'Position',[500   426   258   432]);
+        set(double(gcf),'Position',[500   426   258   432]);
         uicontrol('Tag', 'figname', 'Style','text', ...
             'String', [fname '_impair'], 'Visible','off');
 
@@ -117,17 +117,17 @@ switch action
 
         %             plot significance
         fsize=14;
-        if pdur < alphaval,plotstar(gca,1,1.2); else plotstar(gca,1, 1.2,'ns');end;
-        if pdur < alphaval/10,plotstar(gca,1.4);end;
-        if pfreq < alphaval,plotstar(gca,2,1.2); else plotstar(gca,2, 1.2,'ns');end;
-        if pfreq <alphaval/10,plotstar(gca,2,1.4);   end;
+        if pdur < alphaval,plotstar(double(gca),1,1.2); else plotstar(double(gca),1, 1.2,'ns');end;
+        if pdur < alphaval/10,plotstar(double(gca),1.4);end;
+        if pfreq < alphaval,plotstar(double(gca),2,1.2); else plotstar(double(gca),2, 1.2,'ns');end;
+        if pfreq <alphaval/10,plotstar(double(gca),2,1.4);   end;
 
         2;
 
-        %         joinwithsigline(gca,1,2,1.2,1.3);
+        %         joinwithsigline(double(gca),1,2,1.2,1.3);
         %        text (1.3,0.05,sprintf('p=%1.3f',p),'FontSize', 14);
-        %         if p<alphaval, plotstar(gca,1.5, 1.4); end;
-        %         if p<alphaval/5, plotstar(gca,1.4, 1.4); end;
+        %         if p<alphaval, plotstar(double(gca),1.5, 1.4); end;
+        %         if p<alphaval/5, plotstar(double(gca),1.4, 1.4); end;
 
     case 'load'
         load([outdir fname]);

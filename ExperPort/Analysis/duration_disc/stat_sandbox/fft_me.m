@@ -76,12 +76,12 @@ fprintf(1,'Range of large values = [%1.2f, %1.2f]', min(xrange), max(xrange));
 
 
 set(l,'Color', curvecolour);
-set(gca,'XLim',ff_lim);
+set(double(gca),'XLim',ff_lim);
 ylabel('Fourier coeffs');
 title('Fourier coefficients');
 xlabel('Modulus of Fourier coeffs');
 
-%set(gca,'XTick',1:round((1/4)*length(y2)):length(y2));
+%set(double(gca),'XTick',1:round((1/4)*length(y2)):length(y2));
 % 
 % y3 = y(2:min(length(y),round(srate)));
 % [min2max idx_min2max] = sort(y3);

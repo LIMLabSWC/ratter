@@ -43,7 +43,7 @@ pairs={'pre'        3;...
 	}; parseargs(varargin,pairs);
 
 
-set(gcf, 'Renderer',renderer);
+set(double(gcf), 'Renderer',renderer);
 
 
 if isscalar(krn)
@@ -77,11 +77,11 @@ for ci=1:numel(n_cnd)
 	%% Plot the rasters
 	ll=line(x2/1000,y2);
 	set(ll,'color','k');
-	set(gca,'XTickLabel',[]);
-	set(gca,'YTick',[]);
-	set(gca,'Box','off')
-	set(gca,'YLim',[0 max(y2)])
-	set(gca,'XLim',[-pre post]);
+	set(double(gca),'XTickLabel',[]);
+	set(double(gca),'YTick',[]);
+	set(double(gca),'Box','off')
+	set(double(gca),'YLim',[0 max(y2)])
+	set(double(gca),'XLim',[-pre post]);
 	
 	ll=line([0 0],[0 max(y2)]);
 	set(ll,'LineStyle','-','color',clrs{ci},'LineWidth',2);
@@ -103,7 +103,7 @@ for ci=1:numel(n_cnd)
 		set(hh,'LineWidth',1,'LineStyle','-','Color',clrs{ci});
 		sh(ci)=hh(1);
 	end
-	set(gca,'XLim',[-pre,post]);
+	set(double(gca),'XLim',[-pre,post]);
 	
 	legstr{ci}=[num2str(n_cnd(ci)) ', n=' num2str(sampz)];
 	
@@ -120,7 +120,7 @@ legend boxoff
 set(lh,'Position',legend_pos);
 
 hold off
-%set(gca,'FontSize',36);
+%set(double(gca),'FontSize',36);
 if isempty(x_label)
 	xlabel(['Time from ' ref_label '(sec)'])
 else

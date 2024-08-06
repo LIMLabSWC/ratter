@@ -20,6 +20,6 @@ plot(1:length(p),p,'.b');
 hold on;
 idx = find(strcmpi(prod(:,3),'dual_discobj'));
 plot(idx, p(idx),'.r');
-set(gca,'XTick',1:length(p),'XTickLabel',ratlist(:,1));
-set(gcf,'Menubar','none','Toolbar','none');
+set(double(gca),'XTick',1:length(p),'XTickLabel',ratlist(:,1));
+set(double(gcf),'Menubar','none','Toolbar','none');
 title(sprintf('# trials done on %s',date));

@@ -161,7 +161,7 @@ if ~isempty(gcbo)
 
         
 
-        list = get(findobj(gcf,'tag','edit_editlist'),'string');
+        list = get(findobj(double(gcf),'tag','edit_editlist'),'string');
 
        
 

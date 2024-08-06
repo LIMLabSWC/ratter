@@ -47,7 +47,7 @@ end
 % --- Executes just before TechNotes is made visible.
 function TechNotes_OpeningFcn(hObject, eventdata, handles, varargin) %#ok<INUSL>
 
-set(gcf,'name','TechNotes V2.0');
+set(double(gcf),'name','TechNotes V2.0');
 set(handles.date_text,'string',datestr(now,29));
 
 [names, initials] = bdata('select experimenter, initials from ratinfo.contacts where is_alumni=0 order by experimenter');

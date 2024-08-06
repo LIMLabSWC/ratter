@@ -22,7 +22,7 @@ parse_knownargs(varargin, pairs);
 if ax == 0
     figure;
 else
-    set(gcf,'CurrentAxes',ax);
+    set(double(gcf),'CurrentAxes',ax);
 end;
 
 switch what2show
@@ -61,7 +61,7 @@ g2x=1.5;
 patch([1 1 2 2], [0 m m 0],g2_clr,'EdgeColor','none');
 line([1.5 1.5], [m-s m+s],'Color', color_errbar);
 
-set(gca, 'XLim',[-1 3], 'XTick', [0.5 1.5], 'XTickLabel',{g1_lbl, g2_lbl});
+set(double(gca), 'XLim',[-1 3], 'XTick', [0.5 1.5], 'XTickLabel',{g1_lbl, g2_lbl});
 ylabel(ylbl);
 title(figtitle);
 

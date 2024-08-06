@@ -39,22 +39,22 @@ switch action
         % hit rate
         newdata=data(:,1:2);
         makebargroups(newdata, clrset);
-        set(gca,'XTickLabel', data(:,3), 'YTick',0:0.25:1,'YTickLabel',0:25:100);
-        xl = get(gca,'XLim');
+        set(double(gca),'XTickLabel', data(:,3), 'YTick',0:0.25:1,'YTickLabel',0:25:100);
+        xl = get(double(gca),'XLim');
         line(xl, [50 50]/100,'LineStyle',':','LineWidth',2,'Color', [1 1 1]*0.4);
         ylabel('Average hit rate');
-        axes__format(gca);
-        set(gcf,'Position',[155   557   900   339]);
+        axes__format(double(gca));
+        set(double(gcf),'Position',[155   557   900   339]);
         
         % now TO
         newdata=todata(:,1:2);
         makebargroups(newdata, clrset);
-        set(gca,'XTickLabel', todata(:,3)); %, 'YTick',0:0.25:1,'YTickLabel',0:25:100);
-%        xl = get(gca,'XLim');
+        set(double(gca),'XTickLabel', todata(:,3)); %, 'YTick',0:0.25:1,'YTickLabel',0:25:100);
+%        xl = get(double(gca),'XLim');
 %        line(xl, [50 50]/100,'LineStyle',':','LineWidth',2,'Color', [1 1 1]*0.4);
         ylabel('TO count (average)');
-        axes__format(gca);
-        set(gcf,'Position',[155   557   900   339]);        
+        axes__format(double(gca));
+        set(double(gcf),'Position',[155   557   900   339]);        
         
     otherwise
         error('invalid action');

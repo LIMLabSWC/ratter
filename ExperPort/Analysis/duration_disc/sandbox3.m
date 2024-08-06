@@ -67,7 +67,7 @@ function [] = sandbox3()
 % end;
 % xlabel('Bin #');
 % ylabel('Rats');
-% set(gca,'YTick',0.5:rows(ratlist)-0.5, 'YTickLabel',fieldnames(sig_struct),'YLim',[0 rows(ratlist)],...
+% set(double(gca),'YTick',0.5:rows(ratlist)-0.5, 'YTickLabel',fieldnames(sig_struct),'YLim',[0 rows(ratlist)],...
 %     'XTick', 1.5:1:length(tmp)+0.5, 'XTickLabel', 2:1:length(tmp)+1,'XLim',[0 length(tmp)]);
 % hold on;
 

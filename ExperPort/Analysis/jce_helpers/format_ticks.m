@@ -16,7 +16,7 @@
 %             FUNCTION BEFORE RUNNING THIS ON THE SAME FIGURE TWICE
 %
 %Required Inputs:
-%       h        : handle of axis to change tick labels (can use gca)
+%       h        : handle of axis to change tick labels (can use double(gca))
 %       tickx    : cell array of tick labels or string to append to current
 %                  labels
 %                  (Defaults to appending degree symbols if not input)
@@ -56,30 +56,30 @@
 %       ;Example 1: Append Degree Symbols to X-Axis of a Plot
 %       figure;
 %       plot(1:10,1:10);
-%       [hx,hy] = format_ticks(gca);
+%       [hx,hy] = format_ticks(double(gca));
 %
 %       ;Example 2: Append Degree Symbolts to X and Y Axes of a Plot
 %       figure;
 %       plot(1:10,1:10);
-%       [hx,hy] = format_ticks(gca,'^{\circ}','^{\circ}');
+%       [hx,hy] = format_ticks(double(gca),'^{\circ}','^{\circ}');
 %
 %       ;Example 2: Append Degree Symbolts to X and Y Axes of a Plot and
 %       ;           put a 45 degree tilt on them
 %       figure;
 %       plot(1:10,1:10);
-%       [hx,hy] = format_ticks(gca,'^{\circ}','^{\circ}',[],[],45,45);
+%       [hx,hy] = format_ticks(double(gca),'^{\circ}','^{\circ}',[],[],45,45);
 %       
 %       ;Example 3: Make a plot with fractions on the x tick labels
 %       figure
 %       plot(1:10,1:10);
-%       [hx,hy] = format_ticks(gca,{'$1$','$2\frac{1}{2}$','$9\frac{1}{2}$'},...
+%       [hx,hy] = format_ticks(double(gca),{'$1$','$2\frac{1}{2}$','$9\frac{1}{2}$'},...
 %                 [],[1,2.5,9.5]);
 %
 %       ;Example 4: Make a plot with degrees on y tick label and fractions
 %       ;           on x
 %       figure 
 %       plot(0:10,0:10);
-%       [hx,hy] = format_ticks(gca,...
+%       [hx,hy] = format_ticks(double(gca),...
 %                 {'$0$','$2\frac{1}{2}$','$5$','$7\frac{1}{2}$','$10$'},...
 %                 '$^{\circ}$',[0,2.5,5,7.5,10],[],0,45,[],...
 %                 'FontSize',16,'FontWeight','Bold');
@@ -105,17 +105,17 @@ end;
 
 %make sure the axis handle input really exists
 if ~exist('h','var');
-    h = gca;
+    h = double(gca);
     warning(['Axis handle NOT Input, Defaulting to Current Axes, '...
         num2str(h)]);
 elseif length(h) == 0;
-    h = gca;
+    h = double(gca);
     warning(['Axis Handle NOT Input, Defaulting to Current Axes, '...
         num2str(h)]);
 elseif ~ishandle(h(1))
     warning(['Input (' num2str(h(1)) ') is NOT an axis handle, ' ...
         'defaulting to current axis, ' num2str(h)]);
-        h = gca;
+        h = double(gca);
 end;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

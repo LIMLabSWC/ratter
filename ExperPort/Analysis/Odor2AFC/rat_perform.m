@@ -167,9 +167,9 @@ if odorsegmplot
     h5 = plot(X,Y_lft,'*','Color',[.1 .5 .9],'MarkerSize',10);
     h6 = plot(X,Y_rt,'*','Color',[.9 .1 .1],'MarkerSize',10);
 end;
-set(gca,'Xlim',[0 length(Trials)+5],'YLim',[0 100]);
-set(get(gca,'XLabel'),'String','Trials','FontSize',18);
-set(get(gca,'YLabel'),'String','Correct Choice %','FontSize',18);
+set(double(gca),'Xlim',[0 length(Trials)+5],'YLim',[0 100]);
+set(get(double(gca),'XLabel'),'String','Trials','FontSize',18);
+set(get(double(gca),'YLabel'),'String','Correct Choice %','FontSize',18);
     
 
 

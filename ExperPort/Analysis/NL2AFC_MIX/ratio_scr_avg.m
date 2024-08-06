@@ -43,7 +43,7 @@ for i = 1: length(filenames),
     ratio_scr = [ratio_scr; {ses_name, blkscr_mean, blkscr_se}];
 end;
 errorbar((1:size(ratio_scr,1)),cell2mat(ratio_scr(:,2)), cell2mat(ratio_scr(:,3)),'-o','MarkerSize', 8);
-set(gca, 'YLim', [20 100], 'YGrid', 'on', 'XTickLabel','');
+set(double(gca), 'YLim', [20 100], 'YGrid', 'on', 'XTickLabel','');
 for i = 1:size(ratio_scr,1), text(i, 20, ratio_scr(i,1),'Rotation',-30); end;
 title([ratname ' Session Avg on ', ratio], 'FontSize', 15);
     

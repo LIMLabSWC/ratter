@@ -10,7 +10,7 @@ vpd = vpd(1:n);
 tcount = timeout_count(rat, task, date,'show_plot',0);
 
 figure;
-set(gcf,'Menubar','none','Toolbar','none');
+set(double(gcf),'Menubar','none','Toolbar','none');
 [x binned_to sem] = bin_hits(vpd, 10, tcount);
 errorbar(x, binned_to, sem, sem,'.r');
 xlabel('Intial poke period (s)');

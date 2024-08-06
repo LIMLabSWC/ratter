@@ -63,7 +63,7 @@ function [] = sandbox2(b)
 % subplot(1,3,2);
 % plot(1:length(left_tones),left_tones,'.b');hold on;
 % plot(1:length(right_tones),right_tones,'.r');
-% %set(gca,'XLim',[1 5]);
+% %set(double(gca),'XLim',[1 5]);
 % 
 % % now stitch the mixed tones together using the mixed sides list
 % block_tones = zeros(size(sides));

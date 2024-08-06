@@ -158,7 +158,7 @@ end;
 
 % % Figure 1 --- Total # trials
 % figure;
-% set(gcf,'Position', [140 400 1000 310]);
+% set(double(gcf),'Position', [140 400 1000 310]);
 % axes('Position', [0.08 0.15 0.9 0.7]);
 % 
 % ymax = (floor(max(numtrials)/50)+1)*50;
@@ -181,15 +181,15 @@ end;
 % set(t,'FontSize',16,'FontWeight','bold');
 % 
 % xtk=2:2:length(numtrials);
-% set(gca,'XTickLabel', dates(xtk),'XTick', xtk);
-% set(gca,'YTick', 0:50:max(numtrials),'FontSize',16,'FontWeight','bold','YLim',[0 ymax]);
+% set(double(gca),'XTickLabel', dates(xtk),'XTick', xtk);
+% set(double(gca),'YTick', 0:50:max(numtrials),'FontSize',16,'FontWeight','bold','YLim',[0 ymax]);
 % t=xlabel('Day #');set(t,'FontSize',16,'FontWeight','bold');
 % t=ylabel('# trials (session duration may vary)');set(t,'FontSize',16,'FontWeight','bold');
 % 
-% sign_fname(gcf, mfilename);
+% sign_fname(double(gcf), mfilename);
 % 
 % if close_rawnumtrials > 0
-%     close gcf;
+%     close double(gcf);
 % end;
 
 % Figure 2 --- # trials in 90 minutes
@@ -222,16 +222,16 @@ end;
 
 
 
-set(gca,'XTickLabel', sub__trimdates(dates),'XTick', 1:1:length(dates), 'XLim', [0 length(dates)+1]);
-set(gca,'YTick', 0:50:max(numtrials),'FontSize',16,'FontWeight','bold','YLim',[0 ymax]);
+set(double(gca),'XTickLabel', sub__trimdates(dates),'XTick', 1:1:length(dates), 'XLim', [0 length(dates)+1]);
+set(double(gca),'YTick', 0:50:max(numtrials),'FontSize',16,'FontWeight','bold','YLim',[0 ymax]);
 xlabel('Session');
 ylabel('# trials in 90 minutes');
 title(sprintf('%s: # trials in %i minutes\n%s to %s', ratname, normal_session_length, dates{1}, dates{end}));
-set(gcf,'Position',[ 124          30        1037         302]);
+set(double(gcf),'Position',[ 124          30        1037         302]);
 
-axes__format(gca);
-set(gca,'FontSize', 14);
-sign_fname(gcf, mfilename);
+axes__format(double(gca));
+set(double(gca),'FontSize', 14);
+sign_fname(double(gcf), mfilename);
 
 
 

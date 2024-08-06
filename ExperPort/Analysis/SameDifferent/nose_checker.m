@@ -191,16 +191,16 @@ if doplot,
   
   subplot(nplots,1,1); plot(hh); drawnow;
   ylim([0.5 1]);
-  h = line([d ; d], get(gca, 'YLim')'*ones(1, length(d)));
+  h = line([d ; d], get(double(gca), 'YLim')'*ones(1, length(d)));
   set(h, 'Color', 'k');
   title('hit_history', 'Interpreter', 'none');
-  set(gca, 'YGrid', 'on');
+  set(double(gca), 'YGrid', 'on');
   
   subplot(nplots,1,2); plot(b, '.-'); drawnow; 
-  h = line([d ; d], get(gca, 'YLim')'*ones(1, length(d)));
+  h = line([d ; d], get(double(gca), 'YLim')'*ones(1, length(d)));
   set(h, 'Color', 'k');
   title('non-violation rate', 'Interpreter', 'none');
-  set(gca, 'YGrid', 'on');
+  set(double(gca), 'YGrid', 'on');
   ylim([0.5 1]);
 
   plots_made = 2;
@@ -208,50 +208,50 @@ if doplot,
   if show_nose_in_center,
     plots_made = plots_made+1;
     subplot(nplots,1,plots_made); plot(v); drawnow;
-    h = line([d ; d], get(gca, 'YLim')'*ones(1, length(d)));
+    h = line([d ; d], get(double(gca), 'YLim')'*ones(1, length(d)));
     set(h, 'Color', 'k');
-    set(gca, 'YGrid', 'on');
+    set(double(gca), 'YGrid', 'on');
     title('nose_in_center', 'Interpreter', 'none');
   end;
   
   if show_c2sgap,
     plots_made = plots_made+1;
     subplot(nplots,1,plots_made); plot(g); drawnow;
-    h = line([d ; d], get(gca, 'YLim')'*ones(1, length(d)));
+    h = line([d ; d], get(double(gca), 'YLim')'*ones(1, length(d)));
     set(h, 'Color', 'k');
-    set(gca, 'YGrid', 'on');
+    set(double(gca), 'YGrid', 'on');
     title('C2SGap', 'Interpreter', 'none');
   end;
 
   if show_fixed_stim_dur,
     plots_made = plots_made+1;
     subplot(nplots,1,plots_made); plot(f); drawnow;
-    h = line([d ; d], get(gca, 'YLim')'*ones(1, length(d)));
+    h = line([d ; d], get(double(gca), 'YLim')'*ones(1, length(d)));
     set(h, 'Color', 'k');
-    set(gca, 'YGrid', 'on');
+    set(double(gca), 'YGrid', 'on');
     title('fixed_stim_dur', 'Interpreter', 'none');
   end;
   
   if show_c2sgap_rate,
     plots_made = plots_made+1;
     subplot(nplots,1,plots_made); plot(cg, '.-'); drawnow;
-    h = line([d ; d], get(gca, 'YLim')'*ones(1, length(d)));
+    h = line([d ; d], get(double(gca), 'YLim')'*ones(1, length(d)));
     set(h, 'Color', 'k');
     title('C2SGap violation rate', 'Interpreter', 'none');
-    set(gca, 'YGrid', 'on');
+    set(double(gca), 'YGrid', 'on');
     ylim([0.5 1]);
   end;
 
   if show_temp_pun,
     plots_made = plots_made+1;
     subplot(nplots,1,plots_made); plot(tp, '-'); drawnow;
-    h = line([d ; d], get(gca, 'YLim')'*ones(1, length(d)));
+    h = line([d ; d], get(double(gca), 'YLim')'*ones(1, length(d)));
     set(h, 'Color', 'k');
-    set(gca, 'YGrid', 'on');
+    set(double(gca), 'YGrid', 'on');
     title('temp pun', 'Interpreter', 'none');
   end;
 
-  set(gcf, 'Name', ratname);
+  set(double(gcf), 'Name', ratname);
   drawnow;
 end;
 

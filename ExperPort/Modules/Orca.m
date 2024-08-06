@@ -383,7 +383,7 @@ case 'focus'
 		focus;
 	else
 		close(findobj('type','figure','tag','orcafocus','name','Focus'));
-		SetParamUI(me,'focus','BackgroundColor',get(gcf,'Color'));
+		SetParamUI(me,'focus','BackgroundColor',get(double(gcf),'Color'));
 %        if GetParam(me,'board','board') == 2
         if GetParam(me,'board','value') == 1
             SetParamUI(me,'gain','Enable','on');
@@ -402,7 +402,7 @@ case 'acquire'
 	if GetParam(me,'acquire') 
 		SetParamUI(me,'acquire','background',[0 1 0]);
 	else
-		SetParamUI(me,'acquire','background',get(gcf,'color'));
+		SetParamUI(me,'acquire','background',get(double(gcf),'color'));
 	end
 	
 case 'overlay'
@@ -412,7 +412,7 @@ case 'overlay'
 	if GetParam(me,'overlay') 
 		SetParamUI(me,'overlay','background',[0 1 0]);
 	else
-		SetParamUI(me,'overlay','background',get(gcf,'color'));
+		SetParamUI(me,'overlay','background',get(double(gcf),'color'));
 	end
 	if ~GetParam(me,'focus')
 		draw_image;

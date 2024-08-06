@@ -53,4 +53,4 @@ end;
     end;
   end;
   
-if ~multiday,  set(gcf,'Menubar','none','Toolbar', 'none');end;
+if ~multiday,  set(double(gcf),'Menubar','none','Toolbar', 'none');end;

@@ -1,7 +1,7 @@
 function LOGplotPairs(x,y,marker,markersize,markeredgecolor,thislinewidth,FONTSIZE)
 
 
-% delete(gca)
+% delete(double(gca))
 % load('NEWHOT','HOTETOBOKHORAM') 
 
 %  position =     [16         124        1019         761];
@@ -36,7 +36,7 @@ hold off
 % figure('Position',[1 scrsz(4)/2 scrsz(3)/2 scrsz(4)/2])
 
 Ylabel('log_e \sigma_2','FontSize',FONTSIZE,'FontName','Cambria Math');  
-set(gca,'Fontsize',15)
+set(double(gca),'Fontsize',15)
 Xlabel('log_e \sigma_1','FontSize',FONTSIZE,'FontName','Cambria Math')
 
 % grid on
@@ -44,13 +44,13 @@ setyticklabels=1
 
 if setyticklabels==1
 
-Ytick=get(gca,'YtickLabel');
-Xtick=get(gca,'XtickLabel');
+Ytick=get(double(gca),'YtickLabel');
+Xtick=get(double(gca),'XtickLabel');
 % 
 % Ytick=num2str((3:0.5:6)');
 % Xtick=num2str((3:0.5:6)');
 
-%     set(gca,'ytick',[],'xtick',[]);
+%     set(double(gca),'ytick',[],'xtick',[]);
 end
 % 
 % axis square
@@ -63,9 +63,9 @@ end
 %  xlim([3.5 6.5])
 % end
 if setyticklabels==1
-set(gca,'ytick',str2num(Ytick),'xtick',str2num(Xtick));
-set(gca,'yticklabel',num2str(round(round(exp(str2num(Ytick)).*100)./100)),'xticklabel',num2str(round(round(exp(str2num(Xtick)).*100)./100)));
+set(double(gca),'ytick',str2num(Ytick),'xtick',str2num(Xtick));
+set(double(gca),'yticklabel',num2str(round(round(exp(str2num(Ytick)).*100)./100)),'xticklabel',num2str(round(round(exp(str2num(Xtick)).*100)./100)));
 end
 
-%  set(gca,'yticklabel',num2str(round(exp(str2num(Ytick)).*100)./100),'xticklabel',num2str(round(exp(str2num(Xtick)).*100)./100));
+%  set(double(gca),'yticklabel',num2str(round(exp(str2num(Ytick)).*100)./100),'xticklabel',num2str(round(exp(str2num(Xtick)).*100)./100));
 view(2)

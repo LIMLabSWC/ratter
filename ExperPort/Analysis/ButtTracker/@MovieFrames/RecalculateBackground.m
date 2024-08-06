@@ -147,7 +147,7 @@ obj.Settings.RecalculateBackground.posid=posid;
 %     % <<<<<<ERASE ME!
 % %     tmp=obj.Frames{k}; colormap gray; 
 % %     tmp(isoutellipse)=128;
-% %     imagesc(tmp); colormap gray; set(gca,'position',[0 0 1 1]);
+% %     imagesc(tmp); colormap gray; set(double(gca),'position',[0 0 1 1]);
 % %     drawnow
 % %     ki=input('>','s');
 % %     if strcmp(ki,'k'), keyboard; end
@@ -181,7 +181,7 @@ obj.Settings.RecalculateBackground.posid=posid;
 %     % <<<<<<ERASE ME!
 %     tmp=obj.Frames{k}; colormap gray; 
 %     tmp(~isoutellipse)=128;
-%     imagesc(tmp); colormap gray; set(gca,'position',[0 0 1 1]);
+%     imagesc(tmp); colormap gray; set(double(gca),'position',[0 0 1 1]);
 %     drawnow
 % %     pause;
 %     % ERASE ME!>>>>>>
@@ -327,7 +327,7 @@ obj.Settings.RecalculateBackground.posid=posid;
 %     % <<<<<<ERASE ME!
 %     tmp=obj.Frames{k}; colormap gray; 
 %     tmp(isoutellipse)=128;
-%     imagesc(tmp); colormap gray; set(gca,'position',[0 0 1 1]);
+%     imagesc(tmp); colormap gray; set(double(gca),'position',[0 0 1 1]);
 %     drawnow
 % %     ki=input('>','s');
 % %     if strcmp(ki,'k'), keyboard; end
@@ -361,7 +361,7 @@ obj.Settings.RecalculateBackground.posid=posid;
 %     % <<<<<<ERASE ME!
 %     tmp=obj.Frames{k}; colormap gray; 
 %     tmp(~isoutellipse)=128;
-%     imagesc(tmp); colormap gray; set(gca,'position',[0 0 1 1]);
+%     imagesc(tmp); colormap gray; set(double(gca),'position',[0 0 1 1]);
 %     drawnow
 % %     pause;
 %     % ERASE ME!>>>>>>
@@ -502,7 +502,7 @@ obj.Settings.RecalculateBackground.posid=posid;
 %   figure(2289); clf;
 %   hi=imagesc(obj.Background); 
 %   colormap gray; 
-%   set(gca,'position',[0 0 1 1],'clim',[0 255]);
+%   set(double(gca),'position',[0 0 1 1],'clim',[0 255]);
 %   hl=line(1,1,'linestyle','none','marker','.','color','g','markersize',10);
 %   countdown=0;
 % end
@@ -663,7 +663,7 @@ obj.Settings.RecalculateBackground.posid=posid;
 %     % <<<<<<ERASE ME!
 %     tmp=obj.Frames{k}; colormap gray; 
 %     tmp(isoutellipse)=128;
-%     imagesc(tmp); colormap gray; set(gca,'position',[0 0 1 1]);
+%     imagesc(tmp); colormap gray; set(double(gca),'position',[0 0 1 1]);
 %     drawnow
 % %     ki=input('>','s');
 % %     if strcmp(ki,'k'), keyboard; end
@@ -697,7 +697,7 @@ obj.Settings.RecalculateBackground.posid=posid;
 %     % <<<<<<ERASE ME!
 %     tmp=obj.Frames{k}; colormap gray; 
 %     tmp(~isoutellipse)=128;
-%     imagesc(tmp); colormap gray; set(gca,'position',[0 0 1 1]);
+%     imagesc(tmp); colormap gray; set(double(gca),'position',[0 0 1 1]);
 %     drawnow
 % %     pause;
 %     % ERASE ME!>>>>>>

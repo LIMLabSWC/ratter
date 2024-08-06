@@ -49,7 +49,7 @@ end
 % --- Executes just before GlobalControlSystem is made visible.
 function GlobalControlSystem_OpeningFcn(hObject, eventdata, handles, varargin) %#ok<INUSL>
 
-set(gcf,'name','GlobalControlSystem V2.1');
+set(double(gcf),'name','GlobalControlSystem V2.1');
 
 handles.output = hObject;
 handles.lastrefresh = 0;

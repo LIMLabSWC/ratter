@@ -13,7 +13,7 @@ runbins = 1:10;
 figure; hist(runlen, runbins);
 ylabel('# of such runs'); xlabel('Run length');
 title(sprintf('%s: Length of runs in psych stimulus samples\n(%s to %s)', ratname, from, to));
-axes__format(gca);
+axes__format(double(gca));
 
 
 
@@ -34,7 +34,7 @@ figure;
 plot(sl,'.k');
 hold on;
 plot(changes, ones(size(changes))*3, '*b');
-set(gca,'YTick',[0 1 3], 'YTickLabel',{'R', 'L', 'Swtch'},'YLim',[-1 6]);
+set(double(gca),'YTick',[0 1 3], 'YTickLabel',{'R', 'L', 'Swtch'},'YLim',[-1 6]);
 end;
 
 for c = 2:length(changes)

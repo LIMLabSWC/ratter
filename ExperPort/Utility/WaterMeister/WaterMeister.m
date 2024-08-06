@@ -59,8 +59,8 @@ handles.buttons   = zeros(1,10);
 handles.fontsize_ratname = 22;
 handles.redraw_on_resize = 0;
 
-C = get(gcf,'children');
-P = get(gcf,'position');
+C = get(double(gcf),'children');
+P = get(double(gcf),'position');
 for c = 1:length(C)
     handles.fontsize(c) = get(C(c),'fontsize');
 end
@@ -92,7 +92,7 @@ e{1} = 'Name';
 
 set(handles.initials_edit,'string',e)
 
-set(gcf,'name','WaterMeister V3.3');
+set(double(gcf),'name','WaterMeister V3.3');
 
 guidata(hObject, handles);
 
@@ -393,7 +393,7 @@ function figure1_ResizeFcn(hObject, eventdata, handles) %#ok<INUSL,DEFNU>
 try %#ok<TRYNC>
     global button_state CLS running_timer %#ok<TLEV>
     
-    P = get(gcf,'position');
+    P = get(double(gcf),'position');
     C = handles.children;
     tempR = P(3:4) ./ handles.size;
     
@@ -459,13 +459,13 @@ function print_button_Callback(hObject, eventdata, handles) %#ok<INUSL,DEFNU>
 
 if (now - handles.lastupdate) * 24 * 60 > 10; handles = init_check(handles); end
 
-cp_old = get(gcf,'position');
+cp_old = get(double(gcf),'position');
 size_old = handles.size;
-set(gcf,'paperunits','inches');
-set(gcf,'paperposition',[0.25 0.25 10.5 8]);
-set(gcf,'units','points','paperunits','points')
-cp = get(gcf,'position');
-pp = get(gcf,'paperposition');
+set(double(gcf),'paperunits','inches');
+set(double(gcf),'paperposition',[0.25 0.25 10.5 8]);
+set(double(gcf),'units','points','paperunits','points')
+cp = get(double(gcf),'position');
+pp = get(double(gcf),'paperposition');
 
 handles.currsize = cp(3:4);
 handles.size = handles.size * (cp(3) / cp_old(3));
@@ -473,22 +473,22 @@ handles.redraw_on_resize = 1;
 guidata(hObject, handles);
 
 pause(0.1);
-set(gcf,'position',[20 20 pp(3) pp(4)]);
+set(double(gcf),'position',[20 20 pp(3) pp(4)]);
 orient landscape
 
 handles = session_button(find(handles.buttons == 1),handles);
 
-saveas(gcf,'C:\WaterMeisterFigure_temp.fig'); pause(0.1);
+saveas(double(gcf),'C:\WaterMeisterFigure_temp.fig'); pause(0.1);
 !matlab -r "print_WM_figure"
 
-set(gcf,'units','pixels','paperunits','inches');
-cp = get(gcf,'position');
+set(double(gcf),'units','pixels','paperunits','inches');
+cp = get(double(gcf),'position');
 handles.currsize = cp(3:4);
 handles.size = size_old;
 
 guidata(hObject, handles);
 pause(0.1);
-set(gcf,'position',cp_old);
+set(double(gcf),'position',cp_old);
 pause(0.1);
 handles.redraw_on_resize = 0;
 guidata(hObject, handles);

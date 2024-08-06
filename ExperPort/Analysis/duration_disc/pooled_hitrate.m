@@ -30,7 +30,7 @@ function [] = pooled_hitrate(varargin)
   end;
   
   %figure;
-  %set(gcf,'Menubar','none','Toolbar','none');
+  %set(double(gcf),'Menubar','none','Toolbar','none');
   %mega_mean
   %bar(mega_mean, 1); hold on; 
   %errorbar(, [mean_pre mean_post], [sem_pre sem_post], [sem_pre ...
@@ -39,7 +39,7 @@ function [] = pooled_hitrate(varargin)
                       '(%)']);
   hold on;
   line([0 rows(rat_set)+1], [0.8 0.8], 'LineStyle',':','Color','r');
-  set(gca,'XLim', [0 4], 'XTick', 1:rows(rat_set), 'XTickLabel', name_list, ...
+  set(double(gca),'XLim', [0 4], 'XTick', 1:rows(rat_set), 'XTickLabel', name_list, ...
           'YLim', [0 2], 'YTick', 0:0.2:1, 'YTickLabel', 0:20:100);
   t = ylabel('Average hit rate (%)');
 set(t,'FontSize',14,'FontWeight','bold');

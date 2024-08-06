@@ -117,7 +117,7 @@ for ri=1:numel(all_rats)
     colors  = [0 0 1 ; 1 0 1 ; 1 0 0 ; 0 1 0];
 
     if isempty(fignum_in),  %#ok<NODEF>
-        figure; fignum = gcf;
+        figure; fignum = double(gcf);
     end;
     if ~ishandle(fignum_in),
         figure(fignum);

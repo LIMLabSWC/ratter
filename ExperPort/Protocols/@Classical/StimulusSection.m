@@ -56,7 +56,7 @@ switch action
   case 'init',
     % Save the figure and the position in the figure where we are
     % going to start adding GUI elements:
-    SoloParamHandle(obj, 'my_gui_info', 'value', [x y gcf]);
+    SoloParamHandle(obj, 'my_gui_info', 'value', [x y double(gcf)]);
     
     % 
 
@@ -122,7 +122,7 @@ switch action
     set_callback(PASfig_show_hide,      {mfilename, 'PASfig_show_hide'}); %#ok<NODEF>
     set_callback(PostAnswerSoundSwitch, {mfilename, 'PostAnswerSoundSwitch'}); 
     
-    currfig = gcf; currx = x; curry = y;
+    currfig = double(gcf); currx = x; curry = y;
        SoloParamHandle(obj, 'PASfig', 'saveable', 0, 'value', figure('Position', [ 268   269   222   159]));
     
        set(value(PASfig), 'MenuBar', 'none', 'NumberTitle', 'on', ...
@@ -297,7 +297,7 @@ switch action
     
     
   case 'reinit',
-    currfig = gcf;
+    currfig = double(gcf);
 
     % Get the original GUI position and figure:
     x = my_gui_info(1); y = my_gui_info(2); figure(my_gui_info(3));

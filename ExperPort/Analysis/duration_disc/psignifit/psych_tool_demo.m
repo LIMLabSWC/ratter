@@ -48,7 +48,7 @@ line(th.lims, ones(size(th.lims,1), 1) * drawHeights, 'color', [0 0 1])
 hold off
 
 % wait for key press
-figure(gcf);
+figure(double(gcf));
 % xlabel('press any key....', 'fontsize', 24)
 %, drawnow, pause, xlabel('')
 

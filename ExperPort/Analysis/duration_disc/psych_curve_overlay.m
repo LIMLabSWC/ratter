@@ -53,11 +53,11 @@ else
     xtklbl = round((2.^(xtk))*10)/10;
 end;
 
-set(gca,'XTick',xtk, 'XTickLabel',xtklbl, ...
+set(double(gca),'XTick',xtk, 'XTickLabel',xtklbl, ...
     'YLim',[0 1],'XLim', [logbins(1) logbins(end)], ...
     'FontSize', 18,'FontWeight','bold');
 t=xlabel(xlbl); set(t,'FontSize', 20, 'FontWeight','bold');
 t=ylabel(ylbl); set(t,'FontSize', 20, 'FontWeight','bold');
 
 
-sign_fname(gcf,mfilename);
+sign_fname(double(gcf),mfilename);

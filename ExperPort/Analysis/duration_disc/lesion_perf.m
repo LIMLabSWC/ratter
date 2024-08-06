@@ -31,13 +31,13 @@ function [sem] = lesion_perf(varargin)
   end;
   
   %figure;
-  %set(gcf,'Menubar','none','Toolbar','none');
+  %set(double(gcf),'Menubar','none','Toolbar','none');
   %mega_mean
   %bar(mega_mean, 1); hold on; 
   %errorbar(, [mean_pre mean_post], [sem_pre sem_post], [sem_pre ...
   %                    sem_post]); colormap summer;
   barweb(mega_mean, mega_sem, [], name_list, [],'Rat','Avg. hit rate (%)');
-  set(gca,'XLim', [0 4], 'XTick', 1:3, 'XTickLabel', name_list, ...
+  set(double(gca),'XLim', [0 4], 'XTick', 1:3, 'XTickLabel', name_list, ...
           'YLim', [0 2], 'YTick', 0:0.2:1, 'YTickLabel', 0:20:100);
   t = ylabel('Average hit rate (%)');
 set(t,'FontSize',14,'FontWeight','bold');

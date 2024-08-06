@@ -86,7 +86,7 @@ set(h,'FaceColor',[0.7 .7 .7]);
 set(h,'EdgeColor',[0.7 .7 .7]);
 
 hold on
-set(gca, 'YLim',[.1 3.9])
+set(double(gca), 'YLim',[.1 3.9])
 % plot(hit/2+.2,'ko')  this is redundant.
 
 krn=1.618.^[0:10];  % make the exponential smoothing kernel
@@ -138,7 +138,7 @@ ha1=col(histc(ant1RT, edg));
 ha0=col(histc(ant0RT, edg)*-1);
 
 h=bar(edg,[hp1 hp0 ha1 ha0]);
-set(gca,'XLim', [0.25 max(trncRT)+0.5]);
+set(double(gca),'XLim', [0.25 max(trncRT)+0.5]);
 set(h(3),'EdgeColor',[.8 .5 .5])
 set(h(3),'FaceColor',[.8 .5 .5])
 set(h(4),'FaceColor',[.8 .5 .5])

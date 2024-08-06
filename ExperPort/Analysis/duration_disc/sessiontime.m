@@ -37,22 +37,22 @@ if plotme > 0
     
 
     figure;
-    set(gcf,'Menubar','none','Toolbar','none','Position',[6   706   563   151]);
+    set(double(gcf),'Menubar','none','Toolbar','none','Position',[6   706   563   151]);
     plot(1:length(times), times, '.b');
     idx = find(times > 2);
     hold on;
     plot(idx, times(idx),'.r');
     line([0 length(times)+1],[2 2], 'LineStyle',':','Color','r');
-    set(gca,'XTickLabel', dates,'XTick', 1:rows(dates),'XLim', [0 rows(dates)+1],...
+    set(double(gca),'XTickLabel', dates,'XTick', 1:rows(dates),'XLim', [0 rows(dates)+1],...
         'YTick',yrange,'YTickLabel',ylbls,'YLim',[0.5 4]);
     xlabel('Session date');
     ylabel('Session duration (in hours)');
     title(ratname);
     
      figure;
-    set(gcf,'Menubar','none','Toolbar','none','Position',[200   200   563   151]);
+    set(double(gcf),'Menubar','none','Toolbar','none','Position',[200   200   563   151]);
     plot(1:length(times), (times ./ trials)*3600,'.b');
-     set(gca,'XTickLabel', dates,'XTick', 1:rows(dates),'XLim', [0 rows(dates)+1]);
+     set(double(gca),'XTickLabel', dates,'XTick', 1:rows(dates),'XLim', [0 rows(dates)+1]);
      ylabel('Duration of a trial (in seconds, not hours)')
    
 end;

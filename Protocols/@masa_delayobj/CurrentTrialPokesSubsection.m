@@ -11,7 +11,7 @@ persistent last_plotted_handles
 switch action,
  case 'init',  % ---------- CASE INIT ----------
 
-   fig = gcf; % This is the protocol's main window, to which we add a menu:   
+   fig = double(gcf); % This is the protocol's main window, to which we add a menu:   
    MenuParam(obj, 'CurrentTrialPokes', {'view', 'hidden'}, 1, x, y); next_row(y);
    set_callback(CurrentTrialPokes, ...
                 {'CurrentTrialPokesSubsection', 'view'});

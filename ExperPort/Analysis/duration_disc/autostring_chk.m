@@ -78,15 +78,15 @@ ldlist(t) = logdiff;
   figure;
   subplot(4,1,1);
   plot(1:length(ldlist), ldlist, '.b');
- % set(gca,'YLim', [-1 2]);
- set(gca, 'YLim', [1 2]); 
+ % set(double(gca),'YLim', [-1 2]);
+ set(double(gca), 'YLim', [1 2]); 
  
   subplot(4,1,2);
   plot(1:length(blist), blist, '.b');
   hold on;
   line([1 length(blist)], [-0.2 -0.2], 'LineStyle', ':', 'Color','r');
  line([1 length(blist)], [0.2 0.2], 'LineStyle', ':', 'Color','r');
- set(gca,'YLim',[-0.25 0.25]);
+ set(double(gca),'YLim',[-0.25 0.25]);
  
  subplot(4,1,3);
   plot(1:length(lastchangelist), lastchangelist, '.b');
@@ -94,7 +94,7 @@ ldlist(t) = logdiff;
   
   subplot(4,1,4);
   plot(1:length(last30list), last30list, '-k');
-  set(gca,'YLim', [0.7 1]);
+  set(double(gca),'YLim', [0.7 1]);
   line([1 length(last30list)], [0.85 0.85], 'LineStyle', ':', 'Color','r');
  
  

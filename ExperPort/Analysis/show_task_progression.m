@@ -30,14 +30,14 @@ figure;
 
 num_plots = length(dateset);
 rows = ceil(num_plots/3);
-set(gcf, 'Position', [350 350 800 rows*150]);
+set(double(gcf), 'Position', [350 350 800 rows*150]);
 ind = 1;
 for curr_date = dateset
     subplot(rows, 3, ind);
     today = [dateprefix int2str(curr_date)];
     plot_days_progress(ratname, today, 'a');
-  %  set(gca,'Units', 'pixels');
-  %  pos = get(gca,'Pos');
-  %  set(gca, 'Position', [pos(1) pos(2) 0.3 pos(4)]);
+  %  set(double(gca),'Units', 'pixels');
+  %  pos = get(double(gca),'Pos');
+  %  set(double(gca), 'Position', [pos(1) pos(2) 0.3 pos(4)]);
     ind = ind+1;
 end;

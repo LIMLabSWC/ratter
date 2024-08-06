@@ -151,7 +151,7 @@ switch action,
       ToggleParam(obj, [pname '_SoundsPanel'], 1, x, y, 'OnString', [pname ' snds show'], 'OffString', [pname ' snds hide'], 'position', [x+120 y 80 20]);
       set_callback(eval([pname '_SoundsPanel']), {mfilename, 'SoundsPanel', pname});
     
-      oldx = x; oldy = y; oldfigure = gcf;
+      oldx = x; oldy = y; oldfigure = double(gcf);
       SoloParamHandle(obj, [pname '_SoundsPanelFigure'], 'saveable', 0, 'value', figure('Position', [100 100 430 156]));
       sfig = value(eval([pname '_SoundsPanelFigure']));
       set(sfig, 'MenuBar', 'none', 'NumberTitle', 'off', ...
@@ -243,7 +243,7 @@ switch action,
     % ------------------------------------------------------------------------
 
   case 'closeSoundsPanel',
-    obj = get(gcf, 'UserData'); GetSoloFunctionArgs(obj);
+    obj = get(double(gcf), 'UserData'); GetSoloFunctionArgs(obj);
     try
       t = eval([pname '_SoundsPanel']);
       t.value = 1;

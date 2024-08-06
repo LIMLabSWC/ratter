@@ -32,10 +32,10 @@ function [] = pokedur_overlap(minPre, maxPre, minpreGO, maxpreGO,stim1,stim2)
   
   
   figure;
-  set(gcf,'Position', [200 200 500 100],'Menubar','none','Toolbar','none');
+  set(double(gcf),'Position', [200 200 500 100],'Menubar','none','Toolbar','none');
   line([shortRange(1) shortRange(2)], [1 1], 'Color', 'r');hold on;
   line([longRange(1) longRange(2)], [2 2], 'Color', 'b');
-  set(gca, 'XLim', [0 2], 'YLim', [-1 3]);
+  set(double(gca), 'XLim', [0 2], 'YLim', [-1 3]);
   title('Depiction of total poke length for each stimulus');
   
   legend({num2str(stim1), num2str(stim2)});

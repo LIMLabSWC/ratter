@@ -49,7 +49,7 @@ function [thresh bestperf] = cueonset2go_perf(s1,s2, a, b, varargin)
  if 1 
  % Figure 1 - probs of getting trials correct
  figure;
-% set(gcf,'Menubar','none','Toolbar','none');
+% set(double(gcf),'Menubar','none','Toolbar','none');
  
    subplot(2,1,1);
  plot(threshrange, pr_short_correct,'-b', threshrange, pr_long_correct, ...
@@ -64,7 +64,7 @@ function [thresh bestperf] = cueonset2go_perf(s1,s2, a, b, varargin)
  ylabel('Probability of trials correct');
  legend({'Short','Long'});
  
- set(gca,'YLim', [0 1.2]);
+ set(double(gca),'YLim', [0 1.2]);
  
  % Figure 2 - Graphically shows overlap and duration which maximises sum
  % of both types of trials
@@ -72,7 +72,7 @@ function [thresh bestperf] = cueonset2go_perf(s1,s2, a, b, varargin)
  line([short_min short_max],[1 1], 'Color','b','LineWidth',4);
  hold on;
  line([long_min long_max], [2 2], 'Color','g','LineWidth',4);
- set(gca,'XLim', [short_min-0.2 long_max+0.2], ...
+ set(double(gca),'XLim', [short_min-0.2 long_max+0.2], ...
          'YTickLabel',{},'YTick',[], 'YLim', [0 3], ...
          'XTick', short_min:0.2:long_max);
 %  for k = 1:length(maxidx)

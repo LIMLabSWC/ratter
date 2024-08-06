@@ -55,7 +55,7 @@ switch action
 
         yval = mlist+slist;
 
-        joinwithsigline(gca,xpos(1),xpos(2),yval(1)*1.2,yval(2)*1.3,max(yval)*1.3);
+        joinwithsigline(double(gca),xpos(1),xpos(2),yval(1)*1.2,yval(2)*1.3,max(yval)*1.3);
         if p < 0.001, stars='***';
         elseif p < 0.01, stars='**';
         elseif p < 0.05, stars='*';
@@ -64,16 +64,16 @@ switch action
 
 
         if strcmpi(mymetric,'numtrials')
-            set(gca,'YLim',[0 max(yval)*1.5], 'YTick',0:50:max(yval)*1.5, 'XTick',[]);
+            set(double(gca),'YLim',[0 max(yval)*1.5], 'YTick',0:50:max(yval)*1.5, 'XTick',[]);
             ylabel('# trials');
         else
-            set(gca,'YLim',[0 1.5],'YTick',0:0.25:1, 'YTickLabel',0:25:100,'XTick',[]);
+            set(double(gca),'YLim',[0 1.5],'YTick',0:0.25:1, 'YTickLabel',0:25:100,'XTick',[]);
             ylabel('Accuracy rate (%)');
             bmetric=bmetric*100;
             ametric=ametric*100;
         end;
-        set(gca,'XLim',[-1 3]);
-        axes__format(gca);
+        set(double(gca),'XLim',[-1 3]);
+        axes__format(double(gca));
         title(sprintf('%s: %s', ratname, mymetric));
 
         fprintf(1,'Before = %2.1f%% (%2.1f)\nAfter = %2.1f%% (%2.1f)\n', ...

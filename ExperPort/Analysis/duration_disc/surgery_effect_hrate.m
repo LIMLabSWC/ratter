@@ -165,10 +165,10 @@ switch action
 
             diff_list{2} = af-bf;
             fnames_list{2} = fnames;
-            %         joinwithsigline(gca,1,2,0.035,0.05);
+            %         joinwithsigline(double(gca),1,2,0.035,0.05);
             %      %   text (1.3,0.05,sprintf('p=%1.3f',p),'FontSize', 14);
-            %         if p<0.05, plotstar(gca,1.5, 0.055); end;
-            %         if p<0.01, plotstar(gca,1.4, 0.055); end;
+            %         if p<0.05, plotstar(double(gca),1.5, 0.055); end;
+            %         if p<0.01, plotstar(double(gca),1.4, 0.055); end;
 
 
             save(infile,'diff_list','fnames_list','group_names','a','b','af','bf');
@@ -209,12 +209,12 @@ switch action
         text(1.5, 0.97, 'Frequency', 'Color', freqclr,'FontSize',14,'FontWeight','bold');
 
         uicontrol('Tag', 'figname', 'Style','text', 'String', sprintf('%s_prepost',fname), 'Visible','off');
-        set(gca,'YLim',[0.45 1],'YTick',0.5:0.1:1, 'YTickLabel', 50:10:100, 'XLim',[0.8 2.2]);
+        set(double(gca),'YLim',[0.45 1],'YTick',0.5:0.1:1, 'YTickLabel', 50:10:100, 'XLim',[0.8 2.2]);
         ylabel('Pooled success rate (%)');
-        set(gcf,'Position',[ 560   413   266   471]);
-        set(gca,'XTick',[1 2], 'XTickLabel',{'Before','After'});
+        set(double(gcf),'Position',[ 560   413   266   471]);
+        set(double(gca),'XTick',[1 2], 'XTickLabel',{'Before','After'});
         title(subuscore(fname));
-        axes__format(gca);
+        axes__format(double(gca));
 
         % plot diff_list
         diff_list=cell(2,1);
@@ -228,21 +228,21 @@ switch action
         plot(ones(size(diff_list{2})) * 2, diff_list{2},'.b','Color',freqclr,'MarkerSize',msize);
 
         ylabel({'After-Before','(%; lower is worse)'});
-        set(gca,'XTick', [1 2], 'XLim', [1-0.2 2+0.2], 'XtiCkLabel',{'Timing','Frequency'});
+        set(double(gca),'XTick', [1 2], 'XLim', [1-0.2 2+0.2], 'XtiCkLabel',{'Timing','Frequency'});
         yl=[-0.5 0.07];
-        set(gca,'YLim',yl, 'YTick',yl(1):0.1:yl(2), 'YTickLabel', (yl(1):0.1:yl(2))*100);
+        set(double(gca),'YLim',yl, 'YTick',yl(1):0.1:yl(2), 'YTickLabel', (yl(1):0.1:yl(2))*100);
         title(subuscore(fname));
-        axes__format(gca);
-        set(gcf,'Position',[ 560   113   266   471]);
+        axes__format(double(gca));
+        set(double(gcf),'Position',[ 560   113   266   471]);
         uicontrol('Tag', 'figname', 'Style','text', 'String', sprintf('%s_impairment',fname), 'Visible','off');
 
         % plot significance
 
         fsize=14;
-        if pdur < alphaval,plotstar(gca,1,.045), else plotstar(gca,1, 0.045,'ns');end;
-        if pdur < alphaval/10,plotstar(gca,1,.052);end;
-        if pfreq < alphaval,plotstar(gca,2,0.045);end;
-        if pfreq <alphaval/10,plotstar(gca,2,0.052);   end;
+        if pdur < alphaval,plotstar(double(gca),1,.045), else plotstar(double(gca),1, 0.045,'ns');end;
+        if pdur < alphaval/10,plotstar(double(gca),1,.052);end;
+        if pfreq < alphaval,plotstar(double(gca),2,0.045);end;
+        if pfreq <alphaval/10,plotstar(double(gca),2,0.052);   end;
 
         %         % 1-duration, 2-freq
         if 0
@@ -264,9 +264,9 @@ switch action
         [b a]=sub__psychhitrate(infile,clr, pool_all_trials, ...
             postpsych, diff_clr_flag);
         if graphic > 0
-            set(gca,'YLim',[0.65 1],'XLim',[0.8 2.2]);
+            set(double(gca),'YLim',[0.65 1],'XLim',[0.8 2.2]);
             ylabel('Psych hit rate');
-            set(gcf,'Position',[ 560   413   266   471]);
+            set(double(gcf),'Position',[ 560   413   266   471]);
             title([single_group ': ' area_filter]);
         end;
 
@@ -361,7 +361,7 @@ if graphic > 0
     if diff_clr_flag > 0
         fig = get(0,'CurrentFigure');
         % legend
-        figure; set(gcf,'Position',[766   639   128   215],'Menubar','none','TOolbar','none');
+        figure; set(double(gcf),'Position',[766   639   128   215],'Menubar','none','TOolbar','none');
         axes('Position',[0.01 0.01 0.95 0.96], 'XTick',[], 'YTick',[]);
         for f =1:length(fnames)
             patch([0 0 1 1], [f f+1 f+1 f], diffclrs(min(rows(diffclrs), f), :), 'EdgeColor','none');
@@ -370,10 +370,10 @@ if graphic > 0
         set(0,'CurrentFigure',fig);
     end;
 
-    set(gca,'XLim',[0.8 2.2],'XTick', [1 2], 'XTickLabel',{'Before','After'}, 'YLim',[0.4 1]);
+    set(double(gca),'XLim',[0.8 2.2],'XTick', [1 2], 'XTickLabel',{'Before','After'}, 'YLim',[0.4 1]);
     title(texc);
-    axes__format(gca);
-    sign_fname(gcf,mfilename);
+    axes__format(double(gca));
+    sign_fname(double(gcf),mfilename);
 end;
 
 function [hrate_list hrate_raw] = sub__gethrates(ratset,acxflag,postpsych,p_hrate)

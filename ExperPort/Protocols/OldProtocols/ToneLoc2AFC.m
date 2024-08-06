@@ -752,8 +752,8 @@ PlotAxes_Forward=GetParam(me,'PlotAxes_Forward');
 axis([min(max(ceil((CountedTrial-91-PlotAxes_Back)/50)*50,0),max((MaxTrial-100-PlotAxes_Back),0)) ...
         min(max(ceil((CountedTrial+9+PlotAxes_Forward)/50)*50,100),MaxTrial) 0.5 2.5]);
 
-set(gca,'yTick',[1 2]);
-set(gca,'yTicklabel',[]);
+set(double(gca),'yTick',[1 2]);
+set(double(gca),'yTicklabel',[]);
 ylabel(['Tone Source' sprintf('\n') 'Right<-->Left']);
 set(b,'tag','plot_ToneSource_Schedule','Ytick',[1 2],'XTickLabel',[]);
 %%%%%%%%%%%%%%%%%%%%%%%%
@@ -828,8 +828,8 @@ PlotAxes_Back   =GetParam(me,'PlotAxes_Back');
 PlotAxes_Forward=GetParam(me,'PlotAxes_Forward');
 axis([min(max(ceil((CountedTrial-91-PlotAxes_Back)/50)*50,0),max((MaxTrial-100-PlotAxes_Back),0)) ...
         min(max(ceil((CountedTrial+9+PlotAxes_Forward)/50)*50,100),MaxTrial) 0 3]);
-set(gca,'yTick',[1 2]);
-set(gca,'yTicklabel',[]);
+set(double(gca),'yTick',[1 2]);
+set(double(gca),'yTicklabel',[]);
 xlabel('CountedTrial');
 ylabel(['WaterPort' sprintf('\n') 'Right<== ==>Left']);
 set(c,'tag','plot_WaterPort_Schedule');

@@ -188,7 +188,7 @@ for d = 1:length(dateset)
         plot(xx,yy,'.r','Color',clr); hold on;
 
         if plot_separately > 0
-            set(gca,'YLim',[0 1],'XLim', [lb(1) lb(3)], 'XTick', lb,'XTickLabel', b);
+            set(double(gca),'YLim',[0 1],'XLim', [lb(1) lb(3)], 'XTick', lb,'XTickLabel', b);
             legend(dateset{d},'Location', 'SouthEast');
         end;
     end;
@@ -196,7 +196,7 @@ end;
 
 dateset = newdateset;
 
-set(gca,'YLim',[0 1],'XLim', [lb(1) lb(3)], 'XTick', lb,'XTickLabel', b);
+set(double(gca),'YLim',[0 1],'XLim', [lb(1) lb(3)], 'XTick', lb,'XTickLabel', b);
 if plot_separately == 0
     legend(dateset,'Location', 'SouthEast');
 else

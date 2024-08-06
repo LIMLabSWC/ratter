@@ -300,10 +300,10 @@ if noplot == 0
     xlabel('Session #');
     ylabel(sprintf('%% reported %s',ylbl));
     title({tstr,'Lowest y-value of psych fit'});
-    axes__format(gca);
-    set(get(gca,'YLabel'), 'FontSize', 14);
-    set(gca,'YLim',[-0.25 0.25], 'YTick', -0.25:0.1:0.25, 'YTickLabel', -25:10:25);
-    set(get(gca,'Title'), 'FontSize', 14);
+    axes__format(double(gca));
+    set(get(double(gca),'YLabel'), 'FontSize', 14);
+    set(double(gca),'YLim',[-0.25 0.25], 'YTick', -0.25:0.1:0.25, 'YTickLabel', -25:10:25);
+    set(get(double(gca),'Title'), 'FontSize', 14);
 
     subplot(2,1,2);
     plot(first__binnedy,'.k','MarkerSize',20);hold on;
@@ -312,13 +312,13 @@ if noplot == 0
     text(0.1, 0.11, '10%','FontSize', 14, 'FontWeight','bold');
     xlabel('Session #');
     ylabel(sprintf('%% reported %s',ylbl));
-    set(gca,'YLim',[0 0.25], 'YTick', 0:0.05:0.25, 'YTickLabel', 0:5:25);
+    set(double(gca),'YLim',[0 0.25], 'YTick', 0:0.05:0.25, 'YTickLabel', 0:5:25);
 
-    axes__format(gca);
-    set(get(gca,'YLabel'), 'FontSize', 14);
+    axes__format(double(gca));
+    set(get(double(gca),'YLabel'), 'FontSize', 14);
     title('Lowest binned y-value');
-    set(get(gca,'Title'), 'FontSize', 14);
+    set(get(double(gca),'Title'), 'FontSize', 14);
 
-    sign_fname(gcf, mfilename);
+    sign_fname(double(gcf), mfilename);
 end;
 

@@ -33,7 +33,7 @@ yvals = cell2mat(plot_cell(:,3));
 p = yvals/100; stdev = sqrt((p .* (1-p)) ./ trials);
 errorbar(1:rows(plot_cell), yvals, stdev*100, stdev*100, '.b');
 hold on; plot(1:rows(plot_cell), cell2mat(plot_cell(:,3)), '-r');
-set(gca, 'XTick', 1:rows(plot_cell), 'XTickLabel', plot_cell(:,1), 'XLim', [0 rows(plot_cell)+1], 'YLim', [0 100]);
+set(double(gca), 'XTick', 1:rows(plot_cell), 'XTickLabel', plot_cell(:,1), 'XLim', [0 rows(plot_cell)+1], 'YLim', [0 100]);
 
 for k = 1:rows(plot_cell)
     text(k-0.1, yvals(k)-7, sprintf('(%i)', trials(k)));

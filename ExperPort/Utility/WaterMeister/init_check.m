@@ -2,8 +2,8 @@ function handles = init_check(handles)
 
 global comp
 
-oldname = get(gcf,'name');
-set(gcf,'name','Updating');
+oldname = get(double(gcf),'name');
+set(double(gcf),'name','Updating');
 pause(0.1);
 
 handles.starttime = zeros(1,10); handles.starttime(:) = nan;
@@ -109,5 +109,5 @@ end
 set(handles.date_text,'string',datestr(now,29));
 handles.lastupdate = now;
 
-set(gcf,'name',oldname);
+set(double(gcf),'name',oldname);
 

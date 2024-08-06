@@ -109,7 +109,7 @@ set_callback(plot_pid, {'pid_plot_save'});
 NumeditParam(obj, 'inter_t_interval', 0.3, x, y);
 SoloFunctionAddVars('make_and_upload_state_matrix', 'ro_args', {'Max_Trials','pid_plot','OLF_IP', 'inter_t_interval'});
 
-figpos = get(gcf, 'Position');
+figpos = get(double(gcf), 'Position');
 HeaderParam(obj, 'prot_title', 'Testing OlfactoMeter', ...
             x, y, 'position', [10 figpos(4)-25, 400 20]);
 

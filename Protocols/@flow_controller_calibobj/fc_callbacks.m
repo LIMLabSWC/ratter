@@ -60,7 +60,7 @@ switch action
                 min_y = 0;
                 max_y = 100;
             end
-            set(gca, 'XLim', [0 5], 'YLim', [min_y max_y]);
+            set(double(gca), 'XLim', [0 5], 'YLim', [min_y max_y]);
 
             xlabel('voltage');
             ylabel('flow rate');

@@ -99,16 +99,16 @@ if 1
         end;    
        figure;
         plot(1:length(fnames), resid_list{g}, '.r');
-        set(gca,'XTick', 1:length(fnames), 'XTickLabel', fnames, 'XLim', [0 length(fnames)+1]);
+        set(double(gca),'XTick', 1:length(fnames), 'XTickLabel', fnames, 'XLim', [0 length(fnames)+1]);
     end;
 
        figure;       
         plot(ones(size(resid_list{1})), resid_list{1}, '.k');
         hold on;
         plot(ones(size(resid_list{1}))*2, resid_list{2}, '.k');
-        set(gca,'XLim',[0 3], 'XTick',1:2, 'XTickLabel', gnames);
+        set(double(gca),'XLim',[0 3], 'XTick',1:2, 'XTickLabel', gnames);
                 title('Both group residuals');
-        axes__format(gca);
+        axes__format(double(gca));
 
 end;
 
@@ -129,7 +129,7 @@ if 0
             t.xx, t.yy, t.replongs, t.tallies, ...
             t2.xx, t2.yy, t2.replongs, t2.tallies);
         title([fnames{f} ': ' str]);
-        set(gcf,'Position', [posx posy wd ht]);
+        set(double(gcf),'Position', [posx posy wd ht]);
 
 
         %         try
@@ -139,7 +139,7 @@ if 0
         %             fprintf(1,'\tAfter\n');
         %             %ad
         %
-        %             set(gcf,'Position', [posx posy+ht wd ht],'Tag', 'dummy');
+        %             set(double(gcf),'Position', [posx posy+ht wd ht],'Tag', 'dummy');
         %         catch
         %             warning('surgery_effect crashed for %s\n', fnames{f});
         %         end;
@@ -185,7 +185,7 @@ for k = 1:2
     errorbar(bn, p, sem, sem, '.b', 'Color', clr(k), 'MarkerSize', 20);
 end;
 
-set(gca,'XLim', [bn(1) bn(end)],'YLim',[0 1]);
+set(double(gca),'XLim', [bn(1) bn(end)],'YLim',[0 1]);
 
 % -------------------------------------------------------------------------
 
@@ -230,9 +230,9 @@ normeddata = 0;
 if doplot > 0
     f=figure; set(f,'Tag','scalefig');
     subplot(1,2,1);
-    set(gca,'Tag','before_scale'); title('Before scaling');
+    set(double(gca),'Tag','before_scale'); title('Before scaling');
     subplot(1,2,2);
-    set(gca,'Tag','after_scale'); title('After scaling');
+    set(double(gca),'Tag','after_scale'); title('After scaling');
 end;
 
 fnames = fieldnames(data);
@@ -243,10 +243,10 @@ for f = 1:length(fnames)
     if doplot > 0
         eval(['currcolour = plotclr.' ratname ';']);
         set(0,'CurrentFigure',findobj('Tag','scalefig'));
-        set(gcf,'CurrentAxes', findobj('Tag','before_scale'));
+        set(double(gcf),'CurrentAxes', findobj('Tag','before_scale'));
         l=plot(out.xx, out.yy,'-r');
         set(l,'Color',currcolour,'LineWidth',2); hold on;
-        set(gca,'Tag','before_scale');
+        set(double(gca),'Tag','before_scale');
     end;
 
     % now plot scaled
@@ -260,10 +260,10 @@ for f = 1:length(fnames)
         fprintf(1,'%s:\t\tOld slope = %2.2f', ratname,tau);
     end;
     if doplot > 0
-        set(gcf,'CurrentAxes', findobj('Tag','after_scale'));
+        set(double(gcf),'CurrentAxes', findobj('Tag','after_scale'));
         l=plot(norm_x, out.yy,'-r');
         set(l,'Color',currcolour,'LineWidth',2);   hold on;
-        set(gca,'Tag','after_scale');
+        set(double(gca),'Tag','after_scale');
         fprintf(1,'\t\tNew slope = %2.4f\n', sub__getslope(norm_x, out.yy));
     end;
 
@@ -281,9 +281,9 @@ for f = 1:length(fnames)
 end;
 
 if doplot > 0
-    set(gcf,'CurrentAxes', findobj('Tag','before_scale'));
+    set(double(gcf),'CurrentAxes', findobj('Tag','before_scale'));
     title('Before scaling');
-    set(gcf,'CurrentAxes', findobj('Tag','after_scale'));
+    set(double(gcf),'CurrentAxes', findobj('Tag','after_scale'));
     title('After scaling');
 end;
 

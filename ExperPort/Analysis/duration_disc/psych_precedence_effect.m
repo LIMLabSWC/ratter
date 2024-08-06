@@ -126,7 +126,7 @@ for k = 1:length(toneseq)
     plot([1 2], toneseq(k,2:3),'.b','Color', plotclr); hold on;
     plot([1 2], toneseq(k,2:3),'-b','Color', plotclr); hold on;
 end;
-set(gca,'XLim',[0.98 2.02], 'XTick', [1 2]);
+set(double(gca),'XLim',[0.98 2.02], 'XTick', [1 2]);
 
 % make sure that index in toneseq matches the trial #s in the original tone
 % array

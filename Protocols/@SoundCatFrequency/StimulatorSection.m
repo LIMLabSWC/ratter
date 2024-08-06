@@ -303,7 +303,7 @@ switch action
 %
 % -----------------------------------------------------------------------     
   case 'reinit',
-    currfig = gcf;
+    currfig = double(gcf);
 
     % Delete all SoloParamHandles who belong to this object and whose
     % fullname starts with the name of this mfile:

@@ -401,15 +401,15 @@ end;
 % viewopt 1 -3d plot
 % ---------------
 if viewopt == 1
-    figure; set(gcf,'Position',[ 197 561  1402 380],'Toolbar','none','Tag','bar3d_pctcvg');
+    figure; set(double(gcf),'Position',[ 197 561  1402 380],'Toolbar','none','Tag','bar3d_pctcvg');
     subplot(1,2,1);
     bar3(xl,'detached');
-    set(gca,'XTickLabel', xlbls, 'YTickLabel',ylbls);xlabel('Rat name');ylabel('ROI');zlabel('% coverage');
+    set(double(gca),'XTickLabel', xlbls, 'YTickLabel',ylbls);xlabel('Rat name');ylabel('ROI');zlabel('% coverage');
     title('LEFT');
 
     subplot(1,2,2);
     bar3(xr,'detached');
-    set(gca,'XTickLabel', xlbls, 'YTickLabel',ylbls);xlabel('Rat name');ylabel('ROI');zlabel('% coverage');
+    set(double(gca),'XTickLabel', xlbls, 'YTickLabel',ylbls);xlabel('Rat name');ylabel('ROI');zlabel('% coverage');
     title('RIGHT');
 
     % --------------------------------------
@@ -425,7 +425,7 @@ elseif viewopt == 2
     cmap = colormap;
 
     for q = 1:length(roiset)
-        figure; set(gcf,'Position',[posx posy wd ht],'Toolbar','none','Menubar','figure');
+        figure; set(double(gcf),'Position',[posx posy wd ht],'Toolbar','none','Menubar','figure');
         subplot(2,1,1);
 
         for l = 25:25:100, line([0 length(rnames)+1], [l l],'LineStyle',':','COlor',[1 1 1]*0.3); hold on; end;
@@ -435,17 +435,17 @@ elseif viewopt == 2
         end;
 
         xlabel('Rat name'); ylabel('LEFT');
-        set(gca,'XTick', 1:cols(xl), 'XTickLabel', abbrev_rnames,'XLim',[0 length(rnames)+1],...
+        set(double(gca),'XTick', 1:cols(xl), 'XTickLabel', abbrev_rnames,'XLim',[0 length(rnames)+1],...
             'YLim',[0 100],'YTick', 0:25:100);
-        title(sprintf('%s % Coverage', qnames{q})); axes__format(gca);
+        title(sprintf('%s % Coverage', qnames{q})); axes__format(double(gca));
 
         subplot(2,1,2);
         for l = 25:25:100, line([0 length(rnames)+1], [l l],'LineStyle',':','COlor',[1 1 1]*0.3); hold on; end;
         plot(1:cols(xr), xr(q,:), '.r', 'MarkerSize', msize);
         xlabel('Rat name'); ylabel('RIGHT');
-        set(gca,'XLim', [0 cols(xr)+1], 'XTick', 1:cols(xr), 'XTickLabel', abbrev_rnames,...
+        set(double(gca),'XLim', [0 cols(xr)+1], 'XTick', 1:cols(xr), 'XTickLabel', abbrev_rnames,...
             'YLim',[0 100],'YTick', 0:25:100);
-        title(sprintf('%s % Coverage', qnames{q})); axes__format(gca);
+        title(sprintf('%s % Coverage', qnames{q})); axes__format(double(gca));
         posx = posx+ wd+ 20;
         if posx > 1000, posx = 200; posy = posy+ht+50; end;
     end;
@@ -501,12 +501,12 @@ elseif viewopt == 3
         xl=[-0.5 xmax+0.5];
         line(xl, [50 50], 'LineStyle', ':','Color',[1 1 1]*0.5,'LineWidth',2);
 
-        set(gca,'XTick', 1:4:xmax, 'XTickLabel', qnames,'XLim',xl,'YLim',[0 100], 'YTick',0:20:100);
+        set(double(gca),'XTick', 1:4:xmax, 'XTickLabel', qnames,'XLim',xl,'YLim',[0 100], 'YTick',0:20:100);
         title([area_filter ':' hemname{h}],'Color','k');
-        axes__format(gca);
+        axes__format(double(gca));
         ylabel('% Coverage');
         xlabel('ROI');
-        set(gcf,'Position',[300 hempos(h) 850 240],'Toolbar','none','Menubar','figure','Tag', 'bar_pctcvg');
+        set(double(gcf),'Position',[300 hempos(h) 850 240],'Toolbar','none','Menubar','figure','Tag', 'bar_pctcvg');
     end;
     % ----------------------------
     % bargraph for each group, which each bar showing range of coverage for a given ROI in a rostrocaudal range
@@ -521,7 +521,7 @@ elseif viewopt == 4
         curr = eval([hset{h} 'grped;']);
 
         % left hem first
-        figure; set(gcf,'Position',[100 hempos(h) 200*length(qnames) 240],'Toolbar','none','Menubar','figure','Tag', 'bar_pctcvg');
+        figure; set(double(gcf),'Position',[100 hempos(h) 200*length(qnames) 240],'Toolbar','none','Menubar','figure','Tag', 'bar_pctcvg');
         axes('Position', [0.03 0.1 0.95 0.78]);
         xmax = ((3*length(qnames)*numgrps)-1)+1;
         line([0 xmax], [50 50], 'LineStyle', ':','Color',[1 1 1]*0.5,'LineWidth',2);hold on;
@@ -566,10 +566,10 @@ elseif viewopt == 4
             currx = currx+1;
         end;
         title(hemname{h});
-        set(gca,'Position',[0.05 0.1 0.9 0.8]);
-        set(gca,'XTick',xtk, 'XTickLabel', repmat(1:numgrps,1, length(qnames)), 'YTick', 0:25:100);
-        set(gca,'XLim',[0 max(xtk)+2],'YLim',[0 120])
-        axes__format(gca);
+        set(double(gca),'Position',[0.05 0.1 0.9 0.8]);
+        set(double(gca),'XTick',xtk, 'XTickLabel', repmat(1:numgrps,1, length(qnames)), 'YTick', 0:25:100);
+        set(double(gca),'XLim',[0 max(xtk)+2],'YLim',[0 120])
+        axes__format(double(gca));
     end;
 
 elseif viewopt ==5 % correlational graph
@@ -607,7 +607,7 @@ elseif viewopt ==5 % correlational graph
     ctr  = 1;
     for q = 1:length(qnames) % go down each column of xl and xr
         for h = 1:2
-            figure; set(gcf,'Position',[xpos hempos(h) wd ht],'Toolbar','none','Menubar','figure');
+            figure; set(double(gcf),'Position',[xpos hempos(h) wd ht],'Toolbar','none','Menubar','figure');
             xdata_dur = eval(['x' hset{h} '(q, isdur == 1)']); ydata_dur = ydata(isdur == 1);
             xdata_freq =  eval(['x' hset{h} '(q, isdur == 0)']); ydata_freq = ydata(isdur==0);
 
@@ -646,20 +646,20 @@ elseif viewopt ==5 % correlational graph
 
             text(85, 0.08, sprintf('r= %1.2f', p(1,2)),'FontWeight','bold','FontSize',18);
             xlabel('% coverage');
-            %            set(gca,'XLim',[-1 100]);
-            set(gca,'YLim',[-0.15 +0.1],'XTick',0:20:100, ...
+            %            set(double(gca),'XLim',[-1 100]);
+            set(double(gca),'YLim',[-0.15 +0.1],'XTick',0:20:100, ...
                 'YTick',-0.15:0.05:0.1, 'YTickLabel', -15:5:10 );
             ylabel({'POST-PRE (%)', '(Lower is worse)'});
 
-            %             set(gca,'XLim',[-1 100],'YLim',[-0.15 +0.15],'XTick',0:20:100);
+            %             set(double(gca),'XLim',[-1 100],'YLim',[-0.15 +0.15],'XTick',0:20:100);
             %             ylabel({'Residual (higher is worse)'});
 
             title([qnames{q} ': ' hemname{h}]);
-            axes__format(gca);
-            set(gca,'Position',[0.12 0.23 0.83 0.65],'FontSize', 14);
-            set(get(gca,'XLabel'), 'FontSize',14);
-            set(get(gca,'YLabel'), 'FontSize',14);
-            set(get(gca,'Title'), 'FontSize',14);
+            axes__format(double(gca));
+            set(double(gca),'Position',[0.12 0.23 0.83 0.65],'FontSize', 14);
+            set(get(double(gca),'XLabel'), 'FontSize',14);
+            set(get(double(gca),'YLabel'), 'FontSize',14);
+            set(get(double(gca),'Title'), 'FontSize',14);
 
             uicontrol('Tag', 'figname', 'Style','text', 'String', sprintf('impair_correl_%s_%s',qnames{q},hemname{h}), 'Visible','off');
         end;
@@ -737,7 +737,7 @@ elseif viewopt == 6 % viewpoint ==6
         'figtitle', 'Overall percent coverage', ...
         'g1_lbl', 'Timing', 'g2_lbl', 'Frequency');
     line([-1 3],[0.5 0.5], 'LineStyle',':','Color',[1 1 1]*0.3,'LineWidth',2)
-    set(gca,'YTick', 0:0.1:1, 'YTickLabel',[0:0.1:1]*100,'YLim',[0 1]);
+    set(double(gca),'YTick', 0:0.1:1, 'YTickLabel',[0:0.1:1]*100,'YLim',[0 1]);
     ylabel('% coverage');
     %    title('ACx2 - excluding S025 from duration group');
     str='(';
@@ -747,7 +747,7 @@ elseif viewopt == 6 % viewpoint ==6
     str=[str(1:end-1) ')'];
     title(sprintf('%s: %% cvg %s', area_filter, str));
 
-    xt = get(gca,'XTick');
+    xt = get(double(gca),'XTick');
     gr =[1 1 1] * 0.3;
     msize = 25;
     plot(ones(size(hemless_grp1))*xt(1), hemless_grp1, '.b', 'Color',group_colour('durlite'), 'MarkerSize', msize);
@@ -756,7 +756,7 @@ elseif viewopt == 6 % viewpoint ==6
     plot(ones(size(isbad))*xt(2), hemless_grp2(isbad), '.r', 'Color','r', 'LineWidth',1.5, 'MarkerSize', msize);    
     end;
 
-    axes__format(gca);
+    axes__format(double(gca));
 
     % correlate impairment of only those rats who are at least 70% covered
     grp1_filtered = find(hemless_grp1 >= area_filter_pct);
@@ -773,7 +773,7 @@ elseif viewopt == 6 % viewpoint ==6
         'figtitle', 'Overall percent coverage', ...
         'g1_lbl', 'Timing', 'g2_lbl', 'Frequency');
     line([-1 3],[0.5 0.5], 'LineStyle',':','Color',[1 1 1]*0.3,'LineWidth',2)
-    set(gca,'YTick', 0:0.1:1, 'YTickLabel',[0:0.1:1]*100,'YLim',[0 1]);
+    set(double(gca),'YTick', 0:0.1:1, 'YTickLabel',[0:0.1:1]*100,'YLim',[0 1]);
     ylabel('% coverage');
     %    title('ACx2 - excluding S025 from duration group');
     str='(';
@@ -783,7 +783,7 @@ elseif viewopt == 6 % viewpoint ==6
     str=[str(1:end-1) ')'];
     title(sprintf('%s: %% cvg %s (%s)', area_filter, str, hemlist{h}));
 
-    xt = get(gca,'XTick');
+    xt = get(double(gca),'XTick');
     gr =[1 1 1] * 0.3;
     msize = 25;
     plot(ones(size(g1))*xt(1), g1, '.b', 'Color',group_colour('durlite'), 'MarkerSize', msize);
@@ -792,7 +792,7 @@ elseif viewopt == 6 % viewpoint ==6
     plot(ones(size(isbad))*xt(2), g2(isbad), '.r', 'Color','r', 'LineWidth',1.5, 'MarkerSize', msize);    
     end;
 
-    axes__format(gca);
+    axes__format(double(gca));
  
         end;
         
@@ -896,7 +896,7 @@ elseif viewopt == 6 % viewpoint ==6
 
     text(85, 0.08, sprintf('r= %1.2f', p(1,2)),'FontWeight','bold','FontSize',18);
     xlabel('% coverage');
-    %            set(gca,'XLim',[-1 100]);
+    %            set(double(gca),'XLim',[-1 100]);
 
     if ~isempty(inroiset)
         str='(';
@@ -907,18 +907,18 @@ elseif viewopt == 6 % viewpoint ==6
     end;
 
     if strcmpi(use_metric,'hitrate')
-        set(gca,'YLim',yl,'XTick',0:20:100, ...
+        set(double(gca),'YLim',yl,'XTick',0:20:100, ...
             'YTick',yl(1):0.05:yl(2), 'YTickLabel', (yl(1):0.05:yl(2))*100 );
         ylabel(ylbl);
     else
-        set(gca,'YLim',yl,'XTick',0:20:100, ...
+        set(double(gca),'YLim',yl,'XTick',0:20:100, ...
             'YTick',-0.2:0.2:yl(2));
         ylabel(ylbl);
     end;
 
-    axes__format(gca);
-    set(gca,'XLim',[-3 100]);
-    set(gcf,'Position',[360   583   645   275]);
+    axes__format(double(gca));
+    set(double(gca),'XLim',[-3 100]);
+    set(double(gcf),'Position',[360   583   645   275]);
 
 elseif viewopt == 7 %viewopt is 7
     grp1_pct = [];
@@ -998,12 +998,12 @@ elseif viewopt == 7 %viewopt is 7
     %         xl=[-0.5 xmax+0.5];
     %         line(xl, [50 50], 'LineStyle', ':','Color',[1 1 1]*0.5,'LineWidth',2);
     %
-    %         set(gca,'XTick', 1:4:xmax, 'XTickLabel', qnames,'XLim',xl,'YLim',[0 100], 'YTick',0:20:100);
+    %         set(double(gca),'XTick', 1:4:xmax, 'XTickLabel', qnames,'XLim',xl,'YLim',[0 100], 'YTick',0:20:100);
     %         title([area_filter ':' hemname{h}],'Color','k');
-    %         axes__format(gca);
+    %         axes__format(double(gca));
     %         ylabel('% Coverage');
     %         xlabel('ROI');
-    %         set(gcf,'Position',[300 hempos(h) 850 240],'Toolbar','none','Menubar','figure','Tag', 'bar_pctcvg');
+    %         set(double(gcf),'Position',[300 hempos(h) 850 240],'Toolbar','none','Menubar','figure','Tag', 'bar_pctcvg');
     %     end;
 
 
@@ -1060,7 +1060,7 @@ elseif viewopt == 8 % recursive call; send data to caller.
     grp1_bothpctcvg=(sum(grp1_ptct.L,2) + sum(grp1_ptct.R,2))' ./ (2*sum(totalroisum.L));
     grp2_bothpctcvg=(sum(grp2_ptct.L,2) + sum(grp2_ptct.R,2))' ./ (2*sum(totalroisum.L));
 
-    % grp_cvg - has overall percent coverage per animalﬂ
+    % grp_cvg - has overall percent coverage per animal?
     grp1_pctcvg.L=sum(grp1_ptct.L,2) / sum(totalroisum.L);
     grp1_pctcvg.R=sum(grp1_ptct.R,2) / sum(totalroisum.R);
 
@@ -1087,7 +1087,7 @@ elseif viewopt == 9 % percent coverage of entire ACx.
         'g1_clr', grp1_clr,'g2_clr',grp2_clr, ...
         'g1_lbl', '', 'g2_lbl', '');
     line([-1 3],[0.5 0.5], 'LineStyle',':','Color',[1 1 1]*0.3,'LineWidth',2)
-    set(gca,'YTick', 0:0.2:1, 'YTickLabel',0:20:100,'YLim',[0 1.2]);
+    set(double(gca),'YTick', 0:0.2:1, 'YTickLabel',0:20:100,'YLim',[0 1.2]);
     ylabel('% coverage');
     %    title('ACx2 - excluiding S025 from duration group');
     roiset=qnames(:,end);
@@ -1098,18 +1098,18 @@ elseif viewopt == 9 % percent coverage of entire ACx.
     str=[str(1:end-1) ')'];
     title(sprintf('%s: %% cvg %s', area_filter, str));
 
-    xt = get(gca,'XTick');
+    xt = get(double(gca),'XTick');
     gr =[1 1 1] * 0.3;
     msize = 25;
 
     text(-0.5, 1.1,'Timing','Color',grp1_clr,'FontSize',18,'FontWeight','bold');
     text(-0.5, 1,'Frequency','Color',grp2_clr,'FontSize',18,'FontWeight','bold');
-    set(gca,'XTick',[]);
+    set(double(gca),'XTick',[]);
 
     plot(ones(size(grp1_bothpctcvg))*xt(1), grp1_bothpctcvg, 'ob', 'Color',dlite, 'MarkerSize', msize*0.3,'LineWidth',2);
     plot(ones(size(grp2_bothpctcvg))*xt(2), grp2_bothpctcvg, 'ob', 'Color',flite, 'MarkerSize', msize*0.3,'LineWidth',2);
 
-    axes__format(gca);
+    axes__format(double(gca));
 
 
 
@@ -1379,7 +1379,7 @@ end;
 
 figure;
 hist(maxp_set, 0:0.1:+1); title('correlation values from significance test');
-set(gcf,'Position',[ 22  7 538 208],'Toolbar','none','Menubar','figure');
+set(double(gcf),'Position',[ 22  7 538 208],'Toolbar','none','Menubar','figure');
 n= hist(maxp_set, -1:0.1:+1);
 line([bigun bigun], [0 max(n)], 'LineWidth',2,'Color','r');
 

@@ -14,10 +14,10 @@ function [] = raw_loc(rat, task, date)
   idx = find(strcmpi(tone_loc, 'on'));
   toneloc(idx) = 1;
   
-  figure; set(gcf,'Menubar','none','Toolbar','none');
+  figure; set(double(gcf),'Menubar','none','Toolbar','none');
   plot(1:length(goloc), goloc, '.g', 1:length(toneloc), toneloc, '-b');
   legend({'GO Loc', 'Tone Loc'}, 'Location', 'NorthWest');
-  set(gca, 'YLim', [-1 2], 'YTickLabel', {'', 'off', 'on', ''}, 'YTick', ...
+  set(double(gca), 'YLim', [-1 2], 'YTickLabel', {'', 'off', 'on', ''}, 'YTick', ...
            -1:1:2);
   
   s = sprintf('%s: %s (%s)\nPre-GO time', make_title(rat), make_title(task), date);

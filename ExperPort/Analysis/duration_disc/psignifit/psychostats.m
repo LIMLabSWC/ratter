@@ -196,9 +196,9 @@ axOpts = {
 }';
 
 if isempty(get(0, 'currentfigure')), figure('units', 'normalized', 'position', [0.025, 0.25, 0.95, 0.65]), end
-figHandle = gcf;
-if ~isempty(get(gcf, 'currentaxes'))
-	if strcmp(lower(get(gca, 'buttondownfcn')), 'clickplots(-gca)'), clickplots(-gca), end
+figHandle = double(gcf);
+if ~isempty(get(double(gcf), 'currentaxes'))
+	if strcmp(lower(get(double(gca), 'buttondownfcn')), 'clickplots(-double(gca))'), clickplots(-double(gca)), end
 end
 subplot(2, 3, 1)
 if length(d) >= 50
@@ -207,14 +207,14 @@ if length(d) >= 50
 	gy = 1/(1.0 * sqrt(2 * pi)) * exp(-((gx - 0.0).^2)/(2 * 1.0^2));
 	line(gx, gy / sum(diff(gx) .* (gy(1:end-1) + gy(2:end)) * 0.5), 'linewidth', 2, 'color', [0 1 0])
 	ylabel('')
-elseif ~strcmp(lower(get(gca, 'tag')), 'psychoplot')
+elseif ~strcmp(lower(get(double(gca), 'tag')), 'psychoplot')
 	cla, plotpd('numbered', dat, 'markersize', 4)
 	ans = sortrows([dat(:,1), p]); 
 	line(ans(:,1), ans(:,2))
-	h = findobj(gca, 'type', 'text');
+	h = findobj(double(gca), 'type', 'text');
 	set(h, 'color', [1 0 0], 'fontweight', 'bold')
-	ans = setdiff(get(gca, 'children'), h); set(gca, 'children', [h; ans(:)])
-	set(gca,  axOpts{:})
+	ans = setdiff(get(double(gca), 'children'), h); set(double(gca), 'children', [h; ans(:)])
+	set(double(gca),  axOpts{:})
 	xlabel('stimulus'); ylabel('performance');
 end
 
@@ -223,10 +223,10 @@ plot(p, d, 'o' , 'markeredgecolor', [0 0 0], 'markersize', 7, 'markerfacecolor',
 modelRange = [0  0.25 0.33 0.5]; modelRange = [modelRange(max(find(min(p) >= modelRange))) 1];
 line(modelRange, [0 0], 'color', [0 1 0], 'linewidth', 2)
 xlim(modelRange + [-0.05 0.05]), ylim([-1.1 1.1] * max(eps, max(abs(d))))
-set(gca,  axOpts{:})
+set(double(gca),  axOpts{:})
 xlabel('model prediction'); ylabel('deviance residuals');
 if plotpolyfits % plot polynomial fits
-	hold on, base = (min(p):diff([min(p) max(p)])/200:max(p))'; polycolours = get(gca, 'colororder');
+	hold on, base = (min(p):diff([min(p) max(p)])/200:max(p))'; polycolours = get(double(gca), 'colororder');
 	for i = 1:length(s.pd.polyfit), plot(base, polyval(s.pd.polyfit(i).coeffs, base), 'linestyle', '--', 'color', polycolours(1+rem(i-1, size(polycolours, 1)),:)), end
 	hold off
 end
@@ -236,7 +236,7 @@ plot(1:length(d), d, 'o', 'markeredgecolor', [0 0 0], 'markersize', 7, 'markerfa
 hold on, plot(find(~kdValid), d(~kdValid), 'x', 'color', [0 0 0], 'markersize', 14), hold off
 line([1 length(d)], [0 0], 'color', [0 1 0], 'linewidth', 2)
 xlim([0 length(d)+1]), ylim([-1.1 1.1] * max(eps, max(abs(d))))
-set(gca,  axOpts{:})
+set(double(gca),  axOpts{:})
 xlabel('index'); ylabel('deviance residuals');
 if plotpolyfits % plot polynomial fits
 	hold on, base = linspace(1, length(d), 200);
@@ -258,7 +258,7 @@ subplot(2, 3, 6), cla
 DoHist(statsSim(:,3), stats(3), [0.025 0.975], [1 0.8 0], 'R', 'index corr. coeff', axOpts{:})
 title(sprintf('r = %4g:  cpe = %.3g', stats(3),probs(3)));
 
-set(gcf, 'paperorientation', 'landscape', 'paperunits', 'normalized', 'paperposition', [0.05 0.05 0.9 0.9])
+set(double(gcf), 'paperorientation', 'landscape', 'paperunits', 'normalized', 'paperposition', [0.05 0.05 0.9 0.9])
 clickplots('plotboxaspectratio', [1.618 1 1])
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -286,7 +286,7 @@ n = n / (delta * sum(n)); % normalize area
 [x y] = stairs(x - delta / 2, n);
 x = [x(1); x; [1;1]*(x(end) + delta)];
 y = [0; y; y(end); 0];
-set(gca, 'ylimmode', 'auto', 'xlimmode', 'auto')
+set(double(gca), 'ylimmode', 'auto', 'xlimmode', 'auto')
 set(fill(x, y, colour / 2), 'edgecolor', colour / 2)
 grid on
 
@@ -296,21 +296,21 @@ if ~isempty(observed)
 end
 if any(distrib < 0) & any(distrib > 0), xlim([-1 1] * max(abs(xlim))), end
 
-set(gca, 'ylimmode', 'manual', 'xlimmode', 'manual')
+set(double(gca), 'ylimmode', 'manual', 'xlimmode', 'manual')
 boundaries = quantile(distrib, lims(:))';
 if ~isempty(boundaries), line([1;1] * boundaries, ylim', 'color', [1 0 0], 'linewidth', 1), end
 if ~isempty(observed), line([1;1]*observed, ylim', 'color', colour, 'linewidth', 2), end
-if ~isempty(varargin), set(gca, varargin{:}), end
+if ~isempty(varargin), set(double(gca), varargin{:}), end
 
-if ~isempty(varName), set(text(max(xlim)-diff(xlim)/30, max(ylim)-diff(ylim)/30, sprintf('%s = %d', varName, length(distrib))), 'horizontalAlignment', 'right', 'verticalAlignment', 'top', 'fontsize', get(gca, 'defaulttextfontsize')-1), end
-set(gca, 'layer', 'top') % line(xlim, [0 0], 'color', get(gca, 'xcolor'))
+if ~isempty(varName), set(text(max(xlim)-diff(xlim)/30, max(ylim)-diff(ylim)/30, sprintf('%s = %d', varName, length(distrib))), 'horizontalAlignment', 'right', 'verticalAlignment', 'top', 'fontsize', get(double(gca), 'defaulttextfontsize')-1), end
+set(double(gca), 'layer', 'top') % line(xlim, [0 0], 'color', get(double(gca), 'xcolor'))
 xlabel(label)
 
-ans = get(gca, 'title');  set(ans, 'color', get(gca, 'xcolor'))
+ans = get(double(gca), 'title');  set(ans, 'color', get(double(gca), 'xcolor'))
 if ~isempty(observed) & ~isempty(boundaries)
 	ans = (observed > boundaries(lims > 0.5)); if isempty(ans), ans = 0; end, panic = mean(ans);
 	ans = (observed < boundaries(lims < 0.5)); if isempty(ans), ans = 0; end, panic = max(panic, mean(ans));
-	ans = get(gca, 'title');  set(ans, 'color', get(ans, 'color') * (1 - panic) + [1 0 0] * panic)
+	ans = get(double(gca), 'title');  set(ans, 'color', get(ans, 'color') * (1 - panic) + [1 0 0] * panic)
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -189,7 +189,7 @@ ha1=col(histc(ant1RT, edg));
 ha0=col(histc(ant0RT, edg)*-1);
 
 h=bar(edg,[hp1 hp0 ha1 ha0]);
-set(gca,'XLim', [0.25 max(trncRT)+0.5]);
+set(double(gca),'XLim', [0.25 max(trncRT)+0.5]);
 set(h(3),'EdgeColor',[.8 .5 .5])
 set(h(3),'FaceColor',[.8 .5 .5])
 set(h(4),'FaceColor',[.8 .5 .5])

@@ -160,7 +160,7 @@ switch action,
     SessionDefinition(obj,   'init', x, y, value(myfig)); next_row(y, 2); %#ok<NASGU>
     next_row(y, 1.5);
         
-    figpos = get(gcf, 'Position');
+    figpos = get(double(gcf), 'Position');
     [expmtr, rname]=SavingSection(obj, 'get_info');
     HeaderParam(obj, 'prot_title', [mfilename ': ' expmtr ', ' rname], ...
       x, y, 'position', [10 figpos(4)-25, 800 20]);

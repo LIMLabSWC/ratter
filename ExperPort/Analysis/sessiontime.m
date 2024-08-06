@@ -26,7 +26,7 @@ ylbls = hour2str(yrange);
 
 figure;
 plot(1:length(times), times, '.b');
-set(gca,'XTickLabel', dates,'XTick', 1:rows(dates),'XLim', [0 rows(dates)+1],...
+set(double(gca),'XTickLabel', dates,'XTick', 1:rows(dates),'XLim', [0 rows(dates)+1],...
     'YTick',yrange,'YTickLabel',ylbls,'YLim',[0.5 1.5]);
 xlabel('Session date');
 ylabel('Session duration (in hours)');

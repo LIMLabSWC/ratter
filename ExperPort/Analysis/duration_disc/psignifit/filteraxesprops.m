@@ -31,9 +31,9 @@ else
 		else
 			lasterr('')
 			if strmatch(lower(keys{i}), {'xlabel', 'ylabel', 'title'}, 'exact')
-				eval('set(get(gca, keys{i}), ''string'', values{i})', '');
+				eval('set(get(double(gca), keys{i}), ''string'', values{i})', '');
 			else
-				eval('set(gca, keys{i}, values{i})', '');
+				eval('set(double(gca), keys{i}, values{i})', '');
 			end
 			if ~isempty(lasterr)
 				err = ['could not set the supplied value for property ''' keys{i}(1,:) ''' of either line or axes'];

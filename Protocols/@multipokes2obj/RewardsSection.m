@@ -4,7 +4,7 @@ function [x, y] = RewardsSection(obj, action, x, y)
    
    switch action
     case 'init',
-      SoloParamHandle(obj, 'my_xyfig', 'value', [x y gcf]);
+      SoloParamHandle(obj, 'my_xyfig', 'value', [x y double(gcf)]);
 
       SoloParamHandle(obj, 'pstruct');
       SoloParamHandle(obj, 'LastTrialEvents', 'value', []);

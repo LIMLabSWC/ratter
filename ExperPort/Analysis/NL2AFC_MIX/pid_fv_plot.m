@@ -155,8 +155,8 @@ switch action
                 xlim([temp(1,1)-0.01 temp(end,1)]); ylim([y1-0.01 y2+0.01]);
                 xlabel('Time (s)','FontSize', 13); ylabel('PID Voltage (volts)', 'FontSize', 13);
                 hold off;
-                saveas(gcf, [filename(1:end-4) '_' num2str(final_valve_delay(i)) '.fig']);
-                saveas(gcf, [filename(1:end-4) '_' num2str(final_valve_delay(i)) '.jpg']);
+                saveas(double(gcf), [filename(1:end-4) '_' num2str(final_valve_delay(i)) '.fig']);
+                saveas(double(gcf), [filename(1:end-4) '_' num2str(final_valve_delay(i)) '.jpg']);
                 traces = []; counts = 0; 
                 
                 % next find the rising time of each average trace

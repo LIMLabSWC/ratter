@@ -38,8 +38,8 @@ plot(1:length(event_dur), event_dur, '.r');
 diffs = event_dur - vpd;
 
 plot(1:length(diffs), diffs,'.g');
-%set(gca,'XLim',[20 30]);
+%set(double(gca),'XLim',[20 30]);
 t=title(sprintf('Trial Length for %s on %s', ratname, getdate(doffset)));
 set(t,'FontSize',14);
-set(gcf,'Toolbar','none');
+set(double(gcf),'Toolbar','none');
 

@@ -13,7 +13,7 @@ short_varmax = short_vartime - (minpre+minpost);
 long_varmax = long_vartime - (minpre+minpost);
 
 figure;
-set(gcf,'Menubar','none','Toolbar','none');
+set(double(gcf),'Menubar','none','Toolbar','none');
 
 line([0 len],[1 1], 'Color','b','LineWidth',4);
 text(0.1, 1.5, sprintf('%1.1f-%1.1f', minpre, short_varmax));
@@ -21,6 +21,6 @@ text(0.1, 1.5, sprintf('%1.1f-%1.1f', minpre, short_varmax));
  line([0 len], [3 3], 'Color','g','LineWidth',4);
 text(0.1, 3.5, sprintf('%1.1f-%1.1f', minpre, long_varmax));
  
- set(gca,'XLim', [-0.2 len+0.2], ...
+ set(double(gca),'XLim', [-0.2 len+0.2], ...
          'YTickLabel',{},'YTick',[],  'YLim',[0 4], ...
          'XTick', 0:0.2:len);

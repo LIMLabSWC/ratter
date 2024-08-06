@@ -53,9 +53,9 @@ for i = 1:length(c);
     if strcmp(get(c(i),'name'),'GlobalControlSystem'); break; end; 
 end
 posp = get(c(i),'position');
-posc = get(gcf, 'position');
+posc = get(double(gcf), 'position');
 
-set(gcf,'position',[posp(1)+200,posp(2)+100,posc(3),posc(4)]);
+set(double(gcf),'position',[posp(1)+200,posp(2)+100,posc(3),posc(4)]);
 
 
 handles.output = hObject;
@@ -72,7 +72,7 @@ function varargout = GCS_Confirm_OutputFcn(hObject, eventdata, handles)  %#ok<IN
 
 waitforbuttonpress;
 varargout{1} = get(gco,'string');
-close(gcf);
+close(double(gcf));
 
 
 % --- Executes on button press in confirm_button.

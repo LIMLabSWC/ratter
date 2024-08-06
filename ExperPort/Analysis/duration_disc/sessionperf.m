@@ -87,7 +87,7 @@ ht = 680;
 % if strcmpi(task(1:3), 'dua'), nump = 2; ht = 680 * (2/3); end;
 
 
-set(gcf,'Menubar','none', 'Toolbar','none', 'Position', [200 100 750 ht]);
+set(double(gcf),'Menubar','none', 'Toolbar','none', 'Position', [200 100 750 ht]);
 
 % Plot 1: Hit rates -----------
 subplot(nump,1,1);
@@ -97,8 +97,8 @@ if sum(v) > 1,
 else
     hit_rates(rat, task, date, 'bout_size', winsize);
 end;
-set(gca, 'XTick', [0:20:length(hh)-winsize],'XLim', [1 length(hh)],'YLim',[0.5 1]);
-axes__format(gca);
+set(double(gca), 'XTick', [0:20:length(hh)-winsize],'XLim', [1 length(hh)],'YLim',[0.5 1]);
+axes__format(double(gca));
 
 % Plot 3: Whatever your heart desires ----------
 % if nump == 3,
@@ -130,7 +130,7 @@ elseif strcmpi(third,'loc')
     idx = find(strcmpi(tone_loc, 'on'));
     toneloc(idx) = 1;
     plot(1:length(goloc), goloc, '.g', 1:length(toneloc), toneloc, '-b');
-    set(gca, 'YLim', [-1 2], 'YTickLabel', {'', 'off', 'on', ''}, 'YTick', ...
+    set(double(gca), 'YLim', [-1 2], 'YTickLabel', {'', 'off', 'on', ''}, 'YTick', ...
         -1:1:2, 'XLim', ...
         [1 length(hh)]);
     s = sprintf('%s: %s (%s)\nTone & GO Localisation', make_title(rat), make_title(task), date);
@@ -159,9 +159,9 @@ elseif strcmpi(third, 'bias'),
     text(length(hh)-20, 0.22, 'b=0.2', 'Color','r');
     text(length(hh)-20, -0.22, 'b=-0.2', 'Color','r');
 
-    set(gca,'YLim', [-0.5 0.5],'XLim',[1 length(hh)]);
+    set(double(gca),'YLim', [-0.5 0.5],'XLim',[1 length(hh)]);
     xlabel('Trial #'); ylabel('(Hit rate)L - (Hit rate)R');
-    set(gca,'XTick', 0:20:length(temp));
+    set(double(gca),'XTick', 0:20:length(temp));
     s = sprintf('%s: %s (%s)\nBias (trial-by-trial)', make_title(rat), ...
         make_title(task), date);
     title(s);

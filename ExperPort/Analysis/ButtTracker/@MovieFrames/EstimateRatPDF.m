@@ -153,7 +153,7 @@ end
 %     % <<<<<<ERASE ME!
 %     tmp=obj.Frames{k}; colormap gray; 
 %     tmp(isoutellipse)=128;
-%     imagesc(tmp); colormap gray; set(gca,'position',[0 0 1 1]);
+%     imagesc(tmp); colormap gray; set(double(gca),'position',[0 0 1 1]);
 %     drawnow
 % %     ki=input('>','s');
 % %     if strcmp(ki,'k'), keyboard; end
@@ -187,7 +187,7 @@ end
 %     % <<<<<<ERASE ME!
 %     tmp=obj.Frames{k}; colormap gray; 
 %     tmp(~isoutellipse)=128;
-%     imagesc(tmp); colormap gray; set(gca,'position',[0 0 1 1]);
+%     imagesc(tmp); colormap gray; set(double(gca),'position',[0 0 1 1]);
 %     drawnow
 % %     pause;
 %     % ERASE ME!>>>>>>

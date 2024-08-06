@@ -102,10 +102,10 @@ function [] = simulate_bias(rat, task, date)
 %  subplot(3,1,3);
 %  plot(1:length(right_zero), right_zero+left_ones, '-r', ...
 %       1:length(right_notleft), right_notleft+left_ones, '-b');
-%  set(gca,'YTick', [14 15 16], 'YLim', [12 17]);
+%  set(double(gca),'YTick', [14 15 16], 'YLim', [12 17]);
   
   subplot(3,1,3);
   title('B value (1) -- zero, (2) -- 15-Left');
   xlabel('Trial window'); ylabel('b-value');
   plot(1:length(bs1), bs1, '-r', 1:length(bs2), bs2,'b');
-   set(gca,'YLim', [-0.4 0.4]);
+   set(double(gca),'YLim', [-0.4 0.4]);

@@ -65,6 +65,6 @@ else % Binary coding
       tind = tind + 1;
    end
 end
-%axis([get(gca,'xlim') 0 (tind)]);
+%axis([get(double(gca),'xlim') 0 (tind)]);
 
 return

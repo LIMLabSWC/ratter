@@ -162,7 +162,7 @@ switch action
         
         subplot(5,1,2); sub__plotval(to_num, ratlist, '% no Timeout', isdur, ...
             'markred', 'val < 0.5'); 
-        set(gca,'YLim',[0 1],'YTick',0:0.25:1, 'YTickLabel',0:25:100);
+        set(double(gca),'YLim',[0 1],'YTick',0:0.25:1, 'YTickLabel',0:25:100);
         for y = 0.25:0.25:1
             line([0 length(ratlist)+1], [y y], 'LineStyle',':','Color',[1 1 1]*0.5,'LineWidth',2);
             hold on;
@@ -187,7 +187,7 @@ switch action
         sub__plotval(drk_tm, ratlist, 'drktm(s)', isdur,...
             'range_min', drk_min, 'range_max', drk_max, ...
             'markred', 'val > 16');
-        set(gca,'YLim',[0 60]); 
+        set(double(gca),'YLim',[0 60]); 
         idx = find(drk_max > 120); 
         plot(idx,ones(size(idx))*118, '*r','MarkerSize',20);
         else % show side lick range
@@ -209,14 +209,14 @@ switch action
             plot(ones(size(right_licks{r}))*(r+0.1), right_licks{r}, '.r', 'Color', [1 0.5 0.5]);            
             line([r+0.1 r+0.1], [rt_mean - rt_sd, rt_mean+rt_sd], 'LineWidth',2);            
         end;
-        set(gca,'XTick', 1:length(ratlist), 'XTickLabel', ratlist);
+        set(double(gca),'XTick', 1:length(ratlist), 'XTickLabel', ratlist);
 %        min(yl(2), 120) 
-        yl = get(gca,'YLim'); set(gca,'YLim',[0 30],'XLim',[0 length(ratlist)+1]); 
+        yl = get(double(gca),'YLim'); set(double(gca),'YLim',[0 30],'XLim',[0 length(ratlist)+1]); 
         
         end;
             
 
-        set(gcf,'Position', [-70 60 1500 650]);
+        set(double(gcf),'Position', [-70 60 1500 650]);
 
     case 'plot_singlerat'
         metric_daily_save('load','outfile', outfile);
@@ -227,26 +227,26 @@ switch action
         blen = eval(['data2save.' ratname '.basestate_len;']);
         plot(blen,'.r');ylabel('base (s)');
         t=title(sprintf('%s:%s', ratname, eval(['data2save.' ratname '.dates{1};'])));      
-        set(gca,'XLim',[0 length(blen)]);
+        set(double(gca),'XLim',[0 length(blen)]);
         set(t,'FontSize',14,'FontWeight','bold');
 
         subplot(4,1,2);
         to = eval(['data2save.' ratname '.timeout_count;']);
         plot(to,'.k'); ylabel('TO#');
-                set(gca,'XLim',[0 length(blen)]);
+                set(double(gca),'XLim',[0 length(blen)]);
 
         subplot(4,1,3);
         dt = eval(['data2save.' ratname '.dead_time_len;']); plot(dt,'.r');
-        set(gca,'XLim',[0 length(dt)]);
+        set(double(gca),'XLim',[0 length(dt)]);
         ylabel('ded-tm (s)');
 
         subplot(4,1,4);
         dk = eval(['data2save.' ratname '.drk_len;']); plot(dk,'.g'); ylabel('drk-tm (s)');
-        set(gca,'YLim',[0 65]);
+        set(double(gca),'YLim',[0 65]);
         line([0 length(dk)+1], [30 30], 'LineStyle',':');
         idx = find(dk > 60); hold on;
         plot(idx, ones(size(idx))*60, '*r');
-        set(gca,'XLim',[0 length(dk)]);
+        set(double(gca),'XLim',[0 length(dk)]);
         
         tr = eval(['data2save.' ratname '.n_done_trials;']);
         
@@ -427,10 +427,10 @@ idx = find(eval(markred));
 plot(idx, val(idx),'*r', 'MarkerSize', 15);
 end;
 
-set(gca,'XLim',[0 r+1], 'XTick', 1:r, ...
+set(double(gca),'XLim',[0 r+1], 'XTick', 1:r, ...
     'XTickLabel',ratlist);
 ylabel(ylbl);
-axes__format(gca);
+axes__format(double(gca));
 
 % licks during a reward state (everything from reward state of current
 % state to wait_for_cpoke of next trial

@@ -55,7 +55,7 @@ text(3, 0.9, sprintf('Mean=%2.1f%%', overall_rate*100));
 
 %set(t,'FontSize',14,'FontWeight','bold');
 
-set(gca,'YLim',[0.4 1], 'YTick',0:0.2:1, 'YTickLabel', 0:20:100);
+set(double(gca),'YLim',[0.4 1], 'YTick',0:0.2:1, 'YTickLabel', 0:20:100);
 
 ylabel('Hit rate');
 xlabel('Trial #');

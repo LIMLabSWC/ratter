@@ -97,9 +97,9 @@ end;
 title('How grid resolution affects coverage computation');
 xlabel('grid side (in points)');
 ylabel('% coverage');
-axes__format(gca);
-set(gcf,'Position',[141         527        1091         308]);
-set(gca,'XTick', krange, 'XLim',[0, max(krange)+0.5]);
+axes__format(double(gca));
+set(double(gcf),'Position',[141         527        1091         308]);
+set(double(gca),'XTick', krange, 'XLim',[0, max(krange)+0.5]);
 2;
 
 % view of error
@@ -113,9 +113,9 @@ plot(krange, sds / sqrt(numloops), '.k');
 t=title('How grid resolution affects SEM'); set(t,'FontSize',14, 'FontWeight','bold');
 t=xlabel('grid side (in points)'); set(t,'FontSize',14, 'FontWeight','bold');
 t=ylabel('SEM of 5 runs (% coverage)'); set(t,'FontSize',14, 'FontWeight','bold');
-set(gcf,'Position',[141         227        1091*0.7         308*0.7]);
-set(gca,'XTick', krange,'FontSize', 14,'FontWEight','bold', 'XLim',[0, max(krange)+0.5]);
-ylim = get(gca,'YLim'); set(gca,'YTick',0:0.25:ylim(2));
+set(double(gcf),'Position',[141         227        1091*0.7         308*0.7]);
+set(double(gca),'XTick', krange,'FontSize', 14,'FontWEight','bold', 'XLim',[0, max(krange)+0.5]);
+ylim = get(double(gca),'YLim'); set(double(gca),'YTick',0:0.25:ylim(2));
 2;
 
 % plot time
@@ -134,5 +134,5 @@ ctr = 1;
 t=title('How grid resolution affects time'); set(t,'FontSize',14, 'FontWeight','bold');
 t=xlabel('grid side (in points)'); set(t,'FontSize',14, 'FontWeight','bold');
 t=ylabel('Time for the run (seconds)'); set(t,'FontSize',14, 'FontWeight','bold');
-set(gca,'XTick', krange,'FontSize', 14,'FontWEight','bold', 'XLim',[0, max(krange)+0.5]);
-set(gcf,'Position',[360   637   761   221]);
+set(double(gca),'XTick', krange,'FontSize', 14,'FontWEight','bold', 'XLim',[0, max(krange)+0.5]);
+set(double(gcf),'Position',[360   637   761   221]);

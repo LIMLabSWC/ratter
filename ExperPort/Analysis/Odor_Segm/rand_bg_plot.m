@@ -34,14 +34,14 @@ if ismember('random_bg', saved_history.BlockControl_block_update)
 
     [L_Score, R_Score, Score, score_blk] = rat_perform(saved,saved_history,taskname,0,...
         rand_trial(1), rand_trial(end));
-    set(gca,'YGrid','on')
+    set(double(gca),'YGrid','on')
     save_dir = [pwd filesep '..' filesep 'SoloData' filesep 'data' filesep ratname filesep 'analyse'];
     if ~exist(save_dir)
         mkdir(save_dir);
     end
     save_result_file = [save_dir filesep date_ses];
     save(save_result_file, 'L_Score', 'R_Score', 'Score','score_blk');
-    saveas(gcf, save_result_file, 'tif');
+    saveas(double(gcf), save_result_file, 'tif');
 end
 
 function [data_sorted] = sort_rand_trials(saved_data, rand_trial, idx)

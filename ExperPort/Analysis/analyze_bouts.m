@@ -46,8 +46,8 @@ switch action
         set(l, 'ButtonDownFcn', {@analyze_bouts, rat, task, date, ...
             'action', 'show_details', 'binmin', binmin, 'binmax', binmax, ...
             'last_win', last_win});
-        set(gca,'Position', [0.03 0.5 0.96 0.45]);
-        hgraph = gca;
+        set(double(gca),'Position', [0.03 0.5 0.96 0.45]);
+        hgraph = double(gca);
         if ~psychometric
             change_sets = tone_sets_alternate(rat, task, date, 'pitch_task',pitch_task);
             for k = 1:cols(change_sets)
@@ -61,18 +61,18 @@ switch action
 
         % Also show side bias information
         subplot(2,2,3);
-        set(gca, 'Position', [0.03 0.05 0.35 0.35], 'Tag','sides');
+        set(double(gca), 'Position', [0.03 0.05 0.35 0.35], 'Tag','sides');
         side_rewards(rat, task, date, 'windows', 50, 'show_trend',1);
 
         % Not to mention timeout distribution
         subplot(2,2,4);
-        set(gca, 'Position', [0.45 0.05 0.45 0.35], 'Tag', 'tohist')
+        set(double(gca), 'Position', [0.45 0.05 0.45 0.35], 'Tag', 'tohist')
         timeout_histogram(rat, task, date);
 
-        set(gcf,'Position',[50 175 690 620], 'MenuBar', 'none', 'Toolbar', 'none');
+        set(double(gcf),'Position',[50 175 690 620], 'MenuBar', 'none', 'Toolbar', 'none');
 
     case 'show_details'
-        k = get(gca, 'CurrentPoint');
+        k = get(double(gca), 'CurrentPoint');
         k = floor(k(1,1));
         if k < win, k = win+1; elseif k > last_win, k = last_win-5; end;
         show_detailed_hits(rat, task, date, k-win, k+win, 'binmin', binmin, 'binmax', binmax);

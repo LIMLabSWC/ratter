@@ -8,7 +8,7 @@ function [] = sign_fname(fighandle, fname)
 
 posf = get(fighandle, 'Position');
 
-currgcf = get(0,'CurrentFigure');
+currdouble(gcf) = get(0,'CurrentFigure');
 set(0,'CurrentFigure', fighandle);
 
 flen = length(fname)+150;
@@ -21,4 +21,4 @@ uicontrol('Style','text', 'BackgroundColor',[0.8 0.8 0.8], 'HorizontalAlignment'
     'String', ['Run on ' date],'Tag','rundate');
 
     
-set(0,'CurrentFigure',currgcf);
+set(0,'CurrentFigure',currdouble(gcf));

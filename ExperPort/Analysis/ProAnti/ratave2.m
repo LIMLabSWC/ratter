@@ -270,7 +270,7 @@ end;
 %% Stuff for plotting 
 
 %Figure number
-if isempty(fignum),   figure; fignum = gcf; end; %#ok<NODEF>
+if isempty(fignum),   figure; fignum = double(gcf); end; %#ok<NODEF>
 if ~ishandle(fignum), figure(fignum); end;
 ch = get(fignum, 'Children');
 if ~isempty(ch), delete(ch); end;

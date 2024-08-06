@@ -15,7 +15,7 @@ GetSoloFunctionArgs;
 switch action,
  case 'init',  % ---------- CASE INIT ----------
 
-   fig = gcf; % This is the protocol's main window, to which we add a menu:   
+   fig = double(gcf); % This is the protocol's main window, to which we add a menu:   
    MenuParam(obj, 'CurrentTrialPokes', {'hidden', 'view'}, 2, x, y); next_row(y);
    set_callback(CurrentTrialPokes, ...
                 {'CurrentTrialPokesSubSection', 'view'});

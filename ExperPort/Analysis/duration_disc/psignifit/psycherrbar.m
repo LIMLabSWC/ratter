@@ -95,5 +95,5 @@ plotArgs{3 - orientation} = base;
 lasterr(''), eval('h(2) = line(plotArgs{:}, ''tag'', ''psycherrbar_bars'', lineOpts{:}, ''marker'', ''none'');', '');
 error(lasterr)
 
-figure(gcf)
+figure(double(gcf))
 if nargout, hOut = h(:); end

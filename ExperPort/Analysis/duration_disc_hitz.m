@@ -73,6 +73,6 @@ for curr = 1:size(date_titles,1)
     histo = hist(bin_cell{curr}, x_bins);
     bar(x_bins, (histo/length(binned))*100);
     xlim([0.5 1]); ylim([0 100]); xlabel('Hit rate'); ylabel('% Trials');
-    %gca(set,'YTick',[10:10:100]);
+    %double(gca)(set,'YTick',[10:10:100]);
     title(date_titles{curr,2});
 end;

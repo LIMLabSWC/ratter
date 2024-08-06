@@ -90,10 +90,10 @@ for rat_i = 1:numel(all_rats)
     end;
     
     if isempty(fignum_in);
-        figure; fignum = gcf;
+        figure; fignum = double(gcf);
     elseif ~ishandle(fignum_in),
         figure(fignum_in);
-        fignum = gcf;
+        fignum = double(gcf);
     end;
     
     ch = get(fignum, 'Children');

@@ -64,7 +64,7 @@ function [pair_count] = pie_stimpair(rat, task, varargin)
   % %%%%
   
   figure;
-  set(gcf,'Menubar','none','Toolbar','none');
+  set(double(gcf),'Menubar','none','Toolbar','none');
   
   
   % Generate pie chart showing time spent in each stimulus pair(breakdown)

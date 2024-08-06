@@ -10,7 +10,7 @@ elseif tv == 6; d = 365;
 elseif tv == 7; d = 730;
 elseif tv == 8; d = 1826;
 end
-set(gca,'xlim',[now-d,now]); 
+set(double(gca),'xlim',[now-d,now]); 
 
-%ylm = get(gca,'ylim');
-%set(gca,'ylim',[ylm(1)-10,ylm(2)+10]);
+%ylm = get(double(gca),'ylim');
+%set(double(gca),'ylim',[ylm(1)-10,ylm(2)+10]);

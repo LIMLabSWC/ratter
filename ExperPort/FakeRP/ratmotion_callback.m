@@ -1,5 +1,5 @@
 function [] = ratmotion_callback(myobj, event, leftpos, centerpos, rightpos, outpos)
-% set(gcf, 'WindowButtonMotionFcn', {@ratmotion_callback, get(leftbutton, 'Position'), get(centerbutton, 'Position'), get(rightbutton, 'Position'), get(outbutton, 'Position')}, 'Interruptible', 'off', 'BusyAction', 'cancel')
+% set(double(gcf), 'WindowButtonMotionFcn', {@ratmotion_callback, get(leftbutton, 'Position'), get(centerbutton, 'Position'), get(rightbutton, 'Position'), get(outbutton, 'Position')}, 'Interruptible', 'off', 'BusyAction', 'cancel')
     persistent position
     if isempty(position), position = 'Out'; end;
     

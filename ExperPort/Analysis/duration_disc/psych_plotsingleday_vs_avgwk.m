@@ -103,7 +103,7 @@ if do_preavg > 0
             last_few_pre = length(dateset);
         end;
         [dateset xx yy basebinvals basebins] = sub__pooledpsych(ratname, dateset, task, binmin, binmax, numbins);
-        close gcf;
+        close double(gcf);
         figure;
         l = plot(xx,yy, '.k');
         last_plotted_errbar = l;
@@ -114,10 +114,10 @@ if do_preavg > 0
         err=NaN;
     else
         [dateset avgx avgy err basebinvals basebins]= psychfits_oversessions(ratname, 'last_few_pre',7);
-        if ~strcmpi(maniptype,'baseline'),     close gcf; end;
+        if ~strcmpi(maniptype,'baseline'),     close double(gcf); end;
 
         figure;
-        [last_plotted_errbar last_plotted_pts] = sub__drawbaselinegraph(gcf, avgx, avgy, err);
+        [last_plotted_errbar last_plotted_pts] = sub__drawbaselinegraph(double(gcf), avgx, avgy, err);
         %     last_plotted_errbar=errorbar(avgx, avgy, err, err,'.b'); hold on;
         %     set(last_plotted_errbar,'Color',[0.8 0.8 0.8],'LineWidth',1,'MarkerSize',2);
         %     last_plotted_pts = plot(avgx, avgy, '.k');
@@ -125,19 +125,19 @@ if do_preavg > 0
 
     eval(['basebins = ' logt  'basebins);']);
 
-    set(gca,'YLim',[0 1], 'YTick', 0:0.25:1, 'YTickLabel',0:25:100, ...
+    set(double(gca),'YLim',[0 1], 'YTick', 0:0.25:1, 'YTickLabel',0:25:100, ...
         'XLim', [xtk(1) xtk(3)], 'XTick', xtk,'XTickLabel', xtklbl);
 
     t=xlabel(xaxlbl);
-    fig = gcf;
+    fig = double(gcf);
     txt_handle=0;
 
-    if strcmpi(maniptype,'singleday_multi'), close gcf; end;
+    if strcmpi(maniptype,'singleday_multi'), close double(gcf); end;
 end;
 
 if strcmpi(maniptype,'baseline') > 0
     title(sprintf('%s: Baseline avg psych curve (%s to %s)', ratname, dateset{1}, dateset{end} ));
-    axes__format(gca);
+    axes__format(double(gca));
 
     return;
 end;
@@ -157,14 +157,14 @@ switch maniptype
         plot(bins, replong ./tally, 'or','MarkerSize', 9,'LineWidth',2,'Color', curvecolor);
         text(mult*xtk(3), 0.1, sprintf('n=%i',sum(tally)),'FontSize', 28,'FontWeight','bold');
 
-        set(gca,'YLim',[0 1], 'YTick', 0:0.25:1, 'YTickLabel',0:25:100, ...
+        set(double(gca),'YLim',[0 1], 'YTick', 0:0.25:1, 'YTickLabel',0:25:100, ...
             'XLim', [xtk(1) xtk(3)], 'XTick', xtk,'XTickLabel', xtklbl);
 
         t=xlabel(xaxlbl);
 
         title(sprintf('%s:%s', ratname, datetoplot));
-        axes__format(gca);
-        sign_fname(gcf,mfilename);
+        axes__format(double(gca));
+        sign_fname(double(gcf),mfilename);
 
     case 'singleday_multi'
         % collect baseline data
@@ -179,7 +179,7 @@ switch maniptype
 
             figure;
             if pool_baseline == 0
-                [last_plotted_errbar last_plotted_pts] = sub__drawbaselinegraph(gcf, base_x, base_y, base_err);
+                [last_plotted_errbar last_plotted_pts] = sub__drawbaselinegraph(double(gcf), base_x, base_y, base_err);
             else
                 plot(base_x,base_y,'.k');
 
@@ -193,21 +193,21 @@ switch maniptype
             plot(bins, replong ./tally, 'or','MarkerSize', 9,'LineWidth',2,'Color', curvecolor);
             text(mult*xtk(3), 0.1, sprintf('n=%i',sum(tally)),'FontSize', 28,'FontWeight','bold');
 
-            set(gca,'YLim',[0 1], 'YTick', 0:0.25:1, 'YTickLabel',0:25:100, ...
+            set(double(gca),'YLim',[0 1], 'YTick', 0:0.25:1, 'YTickLabel',0:25:100, ...
                 'XLim', [xtk(1) xtk(3)], 'XTick', xtk,'XTickLabel', xtklbl);
 
             t=xlabel(xaxlbl);
 
             title(sprintf('%s:%s', ratname, in_dateset{d}));
-            axes__format(gca);
-            sign_fname(gcf,mfilename);
+            axes__format(double(gca));
+            sign_fname(double(gcf),mfilename);
         end;
 
     case 'anyoldset'
         if pool_alldays == 0
             [dateset avgx avgy err]= psychfits_oversessions(ratname, 'use_dateset', 'given', 'given_dateset', in_dateset, ...
                 'color__range', 1);
-            %    close gcf;
+            %    close double(gcf);
             set(0,'CurrentFigure', fig); hold on;
             l=errorbar(avgx,avgy, err,err, '.b');
             last_plotted_errbar = l;
@@ -216,7 +216,7 @@ switch maniptype
             last_plotted_pts = plot(avgx, avgy, '.r');
         else
             [dateset xx yy] = sub__pooledpsych(ratname, in_dateset, task, binmin, binmax, numbins);
-            close gcf;
+            close double(gcf);
             set(0,'CurrentFigure', fig); hold on;
             l = plot(xx,yy, '.b');
             last_plotted_errbar = l;
@@ -443,8 +443,8 @@ switch maniptype
             'getalldata', 1);
 
         datetoplot = 'No infusion, Saline, Muscimol, and Anaesthesia';
-        set(gcf,'Position',[526   301   522   378]);
-        fig = gcf;
+        set(double(gcf),'Position',[526   301   522   378]);
+        fig = double(gcf);
 
         % now return the hit rates to the calling function
         out = 0;
@@ -481,8 +481,8 @@ switch maniptype
         set(t,'Color', pair2_color);
 
         datetoplot = [ pair1_text ' and ' pair2_text ];
-        set(gcf,'Position',[526   301   522   378]);
-        fig = gcf;
+        set(double(gcf),'Position',[526   301   522   378]);
+        fig = double(gcf);
 
         %         % plot difference in hit rate of both sets
         %         msize = 35;
@@ -490,10 +490,10 @@ switch maniptype
         %         errorbar(1, mean(shrate1), std(shrate1), std(shrate1), 'Color', pair1_color,'MarkerSize', msize,'LineWidth',2); hold on;
         %         errorbar(2, mean(shrate2), std(shrate2), std(shrate2), 'Color', pair2_color,'MarkerSize', msize,'LineWidth',2);
         %         plot([1 2], [mean(shrate1) mean(shrate2)], '.r', 'Color', 'k','MarkerSize', msize,'LineWidth',2);
-        %         set(gca,'XLim',[0.8 2.2], 'YLim',[0.5 1], 'YTick', 0.5:0.25:1, 'YTickLabel', 50:25:100);
-        %         set(gca,'XTick', [1 2],'XTickLabel', { pair1_text, pair2_text});
+        %         set(double(gca),'XLim',[0.8 2.2], 'YLim',[0.5 1], 'YTick', 0.5:0.25:1, 'YTickLabel', 50:25:100);
+        %         set(double(gca),'XTick', [1 2],'XTickLabel', { pair1_text, pair2_text});
         %         ylabel('Session hit rate (%)');
-        %         axes__format(gca);
+        %         axes__format(double(gca));
 
         % now return the hit rates to the calling function
         out = 0;
@@ -513,8 +513,8 @@ if ~strcmpi(maniptype,'singleday_multi')
     pfx1 = '';
     if do_preavg > 0, pfx1 = 'PRE averaged compared to'; end;
     title(sprintf('%s: %s %s', ratname, pfx1, datetoplot));
-    axes__format(gca);
-    sign_fname(gcf,mfilename);
+    axes__format(double(gca));
+    sign_fname(double(gcf),mfilename);
 end;
 
 

@@ -215,8 +215,8 @@ try
                 close(f);
             else
                 x = get(0,'MonitorPosition');
-                set(gcf,'position',x);
-                C = get(gca,'children');
+                set(double(gcf),'position',x);
+                C = get(double(gca),'children');
                 for c = 1:length(C)
                     try set(C(c),'fontsize',40); end %#ok<TRYNC>
                 end

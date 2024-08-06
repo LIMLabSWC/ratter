@@ -325,7 +325,7 @@ function [r,nums,seps] = recall(ratname, experimenter, varname, varargin)
          else
             title(sprintf('%s  tau=%g', ratname, running_avg{v}));
          end;
-         set(gca, 'YAxisLocation', 'right')
+         set(double(gca), 'YAxisLocation', 'right')
       end;
    end;
    

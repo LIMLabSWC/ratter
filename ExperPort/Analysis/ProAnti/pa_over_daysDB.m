@@ -131,7 +131,7 @@ for ri=1:numel(all_rats)
 	
 	
 	if isempty(fignum_in),  %#ok<NODEF>
-		figure; fignum = gcf;
+		figure; fignum = double(gcf);
 	end;
 	if ~ishandle(fignum_in),
 		figure(fignum);

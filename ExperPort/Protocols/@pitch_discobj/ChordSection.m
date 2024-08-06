@@ -18,7 +18,7 @@ GetSoloFunctionArgs;
 switch action,
     case 'init'
         % parent protocol window
-        fig = gcf; rpbox('InitRP3StereoSound'); figure(fig);
+        fig = double(gcf); rpbox('InitRP3StereoSound'); figure(fig);
         parentfig_x = x; parentfig_y =  y;
 
         % new popup window
@@ -95,7 +95,7 @@ switch action,
             ['ChordSection(' class(obj) '(''empty''), ''chord_param_hide'')']);
         set(value(chordfig), 'Position', [836 485 435 272]);
 
-        x = parentfig_x; y = parentfig_y; figure(fig);  % make master protocol figure gcf
+        x = parentfig_x; y = parentfig_y; figure(fig);  % make master protocol figure double(gcf)
         MenuParam(obj, 'ChordParameters', {'hidden', 'view'}, 1, x, y); next_row(y);
         set_callback({ChordParameters}, {'ChordSection', 'chord_param_view'});
 

@@ -76,13 +76,13 @@ function exportfig(varargin)
 %          point. 
 %
 %   Examples:
-%     exportfig(gcf,'fig1.eps','height',3);
+%     exportfig(double(gcf),'fig1.eps','height',3);
 %       Exports the current figure to the file named 'fig1.eps' with
 %       a height of 3 inches (assuming the figure's PaperUnits is 
 %       inches) and an aspect ratio the same as the figure's aspect
 %       ratio on screen.
 %
-%     exportfig(gcf, 'fig2.eps', 'FontMode', 'fixed',...
+%     exportfig(double(gcf), 'fig2.eps', 'FontMode', 'fixed',...
 %                'FontSize', 10, 'color', 'cmyk' );
 %       Exports the current figure to 'fig2.eps' in color with all
 %       text in 10 point fonts. The size of the exported figure is

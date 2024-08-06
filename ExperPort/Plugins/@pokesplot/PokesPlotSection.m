@@ -27,7 +27,7 @@ switch action,
     x = varargin{1}; y = varargin{2};
     
     SoloParamHandle(obj, 'I_am_PokesPlotSection');
-    SoloParamHandle(obj, 'my_xyfig', 'value', [x y gcf]);
+    SoloParamHandle(obj, 'my_xyfig', 'value', [x y double(gcf)]);
     ToggleParam(obj, 'PokesPlotShow', 1, x, y, 'OnString', 'PokesPlot showing', ...
       'OffString', 'PokesPlot hidden', 'TooltipString', 'Show/Hide Pokes Plot window'); next_row(y);
     set_callback(PokesPlotShow, {mfilename, 'show_hide'}); %#ok<NODEF> (Defined just above)
@@ -145,7 +145,7 @@ switch action,
     %     What plotclick does with this information depends on settings and
     %       toggles.
     set(value(axpokesplot), 'ButtonDownFcn', [mfilename ...
-        '(' class(obj) ', ''plotclick'', get(gca,''CurrentPoint''))']);
+        '(' class(obj) ', ''plotclick'', get(double(gca),''CurrentPoint''))']);
 
     % An axis for the color codes and labels:
     SoloParamHandle(obj, 'axhistlabels', 'saveable', 0, 'value', axes('Position', [0.15 0.29 0.7 0.03]));
@@ -156,7 +156,7 @@ switch action,
       hold on; t = text(i-0.5, -0.5, fnames{i});
       set(t, 'Interpreter', 'none', 'HorizontalAlignment', 'right', ...
         'VerticalAlignment', 'middle', 'Rotation', 90);
-      set(gca, 'Visible', 'off');
+      set(double(gca), 'Visible', 'off');
     end;
     ylim([0 1]); xlim([0 length(fnames)]);
               
@@ -421,7 +421,7 @@ switch action,
   % ------------------------------------------------------------------    
   case 'reinit'
     x = my_xyfig(1); y = my_xyfig(2); origfig = my_xyfig(3); scolors = value(my_state_colors);
-    currfig = gcf;
+    currfig = double(gcf);
     
     feval(mfilename, obj, 'close');
     
@@ -469,7 +469,7 @@ switch action,
         if length(varargin) ~= 1,
             error([mfilename '(obj,''plotclick'',<cp>) incorrectly' ...
                 ' called - current point matrix (e.g. from' ...
-                ' get(gca,''CurrentPoint'')) omitted, or extra' ...
+                ' get(double(gca),''CurrentPoint'')) omitted, or extra' ...
                 ' arguments passed in.']);
         end;
 

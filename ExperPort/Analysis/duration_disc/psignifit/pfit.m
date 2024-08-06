@@ -245,22 +245,22 @@ end
 if ~isempty(mOpts.genParams) & doFitPlot
 	if ~isempty(figHandle)
 		subplot(2, 3, 1)
-		ans = setdiff(get(gcf, 'children'), gca); set(gcf, 'children', [gca; ans(:)])
-		if ~strcmp(lower(get(gca, 'tag')), 'psychoplot'), cla, grid off, hold off, end
+		ans = setdiff(get(double(gcf), 'children'), double(gca)); set(double(gcf), 'children', [double(gca); ans(:)])
+		if ~strcmp(lower(get(double(gca), 'tag')), 'psychoplot'), cla, grid off, hold off, end
 	end
-	if strcmp(lower(get(gca, 'buttondownfcn')), 'clickplots(-gca)'), clickplots(-gca), end
+	if strcmp(lower(get(double(gca), 'buttondownfcn')), 'clickplots(-double(gca))'), clickplots(-double(gca)), end
 	h = psychoplot(dat, s, {mOpts.genShape, mOpts.genParams});
-	set(gca,'fontweight', 'bold')
+	set(double(gca),'fontweight', 'bold')
 
-	delete(findobj(gca, 'tag', 'pfit_rmtext'))
+	delete(findobj(double(gca), 'tag', 'pfit_rmtext'))
 	if mOpts.R > 0
 		h{5} = text(max(xlim)-diff(xlim)/30, min(ylim)+diff(ylim)/2, sprintf('R = %d', mOpts.R));
-		set(h{5}, 'horizontalAlignment', 'right', 'verticalAlignment', 'middle', 'fontsize', get(gca, 'defaulttextfontsize')-1, 'color', get(h{2}(1), 'color'), 'tag', 'pfit_rmtext')
+		set(h{5}, 'horizontalAlignment', 'right', 'verticalAlignment', 'middle', 'fontsize', get(double(gca), 'defaulttextfontsize')-1, 'color', get(h{2}(1), 'color'), 'tag', 'pfit_rmtext')
 		if ~isempty(x), if mean(x) > mean(xlim), ans = get(h{5}, 'position'); ans(1) = min(xlim)+diff(xlim)/30; set(h{5}, 'horizontalAlignment', 'left', 'position', ans); end, end
 	end
 	xlabel('stimulus'), ylabel('performance')
 		
-	figure(gcf)	
+	figure(double(gcf))	
 end
 drawnow
 
@@ -273,11 +273,11 @@ if doSens & ~isempty(s.sens.params)
 	if doFitPlot
 		sensFig = figure('numbertitle', 'off', 'name', 'sensitivity analysis', 'units', 'normalized', 'position', [0.45 0.05 0.5 0.5]);
 		sensHandle = sensplot(s.params.est, s.params.sim, sens.params, s.params.lims, sens.inside);
-		sensHandle = copyobj(sensHandle{2}, gca);
+		sensHandle = copyobj(sensHandle{2}, double(gca));
 		set(sensHandle, 'xdata', nan, 'ydata', nan, 'markerfacecolor', [0 1 0.5], 'markersize', get(sensHandle, 'markersize')+4)
-		set(gca, 'drawmode', 'fast')
+		set(double(gca), 'drawmode', 'fast')
 	end	
- 	if doFitPlot, bannerFig = gcf; figSetting1 = get(bannerFig, 'numbertitle'); figSetting2 = get(bannerFig, 'name'); end
+ 	if doFitPlot, bannerFig = double(gcf); figSetting1 = get(bannerFig, 'numbertitle'); figSetting2 = get(bannerFig, 'name'); end
 	if mOpts.verbose, disp(sprintf('running sensitivity analysis (%d points)', sens.nPoints)), end
 	tic
 	sensOpts = batch(opts, 'verbose', 0, 'sens', 0, 'refit', 0); 
@@ -319,7 +319,7 @@ if ~isempty(h{3}) & ~isempty(s.thresholds.worst)
 	delete(cat(1, h{1:4})), washeld = ishold; hold on
 	h(1:4) = psychoplot(dat, s, {mOpts.genShape, mOpts.genParams});
 	if ~isempty(h{5}), ans = get(h{5}, 'string'); set(h{5}, 'string', sprintf('%s\nm = %d', ans, s.sens.nPoints)), end
-	if ~washeld, hold off, end, figure(gcf), drawnow
+	if ~washeld, hold off, end, figure(double(gcf)), drawnow
 end
 
 s.gen = mOpts.genValues(:)';

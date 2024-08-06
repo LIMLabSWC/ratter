@@ -82,7 +82,7 @@ handles = [];
                ]; 
 
 if isempty(fignum),  %#ok<NODEF>
-  figure; fignum = gcf;
+  figure; fignum = double(gcf);
 elseif ~ishandle(fignum),
   figure(fignum);
 end;

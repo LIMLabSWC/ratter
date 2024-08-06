@@ -34,7 +34,7 @@ function [x, y] = WaterSection(obj, action, x, y)
     case 'init',
       % Save the figure and the position in the figure where we are
       % going to start adding GUI elements:
-      SoloParamHandle(obj, 'my_gui_info', 'value', [x y gcf]);
+      SoloParamHandle(obj, 'my_gui_info', 'value', [x y double(gcf)]);
 
       EditParam(obj, 'Right_volume', 20, x, y, 'position', [x y 80 20], ...
                 'labelfraction', 0.7, 'label', 'Right uL');  
@@ -87,7 +87,7 @@ function [x, y] = WaterSection(obj, action, x, y)
       
       
     case 'reinit',
-      currfig = gcf; 
+      currfig = double(gcf); 
 
       % Get the original GUI position and figure:
       x = my_gui_info(1); y = my_gui_info(2); figure(my_gui_info(3));
