@@ -1,20 +1,15 @@
 function [sm] = LoadSound(sm, trignum, sound, side, tau_ms, predelay_s, loop_fg)
    global BpodSystem
-   if ~isfield(BpodSystem.PluginObjects, 'SoundServerType')
-       error('LoadSound() requires a sound server. The current setup did not detect one.')
-   end
-   if BpodSystem.PluginObjects.SoundServerType == 1
-       if BpodSystem.Status.InStateMatrix == 0 % If pre-session, load in fast mode
-           if strcmp(BpodSystem.PluginObjects.SoundServer.LoadMode, 'Safe')
-               BpodSystem.PluginObjects.SoundServer.LoadMode = 'Fast';
-           end
-           % disp('Loading sounds in FAST mode!');
-       else % If running a session, load in safe mode
-           if strcmp(BpodSystem.PluginObjects.SoundServer.LoadMode, 'Fast')
-               BpodSystem.PluginObjects.SoundServer.LoadMode = 'Safe';
-           end
-           % disp('Loading sounds in SAFE mode!');
+   if BpodSystem.Status.InStateMatrix == 0 % If pre-session, load in fast mode
+       if strcmp(BpodSystem.PluginObjects.SoundServer.LoadMode, 'Safe')
+           BpodSystem.PluginObjects.SoundServer.LoadMode = 'Fast';
        end
+       % disp('Loading sounds in FAST mode!');
+   else % If running a session, load in safe mode
+       if strcmp(BpodSystem.PluginObjects.SoundServer.LoadMode, 'Fast')
+           BpodSystem.PluginObjects.SoundServer.LoadMode = 'Safe';
+       end
+       % disp('Loading sounds in SAFE mode!');
    end
    if nargin<7, loop_fg    = 0; end;
    if nargin<6, predelay_s = 0; end;
@@ -66,11 +61,7 @@ function [sm] = LoadSound(sm, trignum, sound, side, tau_ms, predelay_s, loop_fg)
    if strcmp(side, 'both'),
      mydata.(['sound' num2str(trignum)]) = sound;
      set(sm.myfig, 'UserData', mydata);
-     if BpodSystem.PluginObjects.SoundServerType == 1
-        BpodSystem.PluginObjects.SoundServer.loadSound(trignum, sound, loop_fg);
-     elseif BpodSystem.PluginObjects.SoundServerType == 2
-        BpodSystem.PluginObjects.SoundServer.load(trignum, sound, 'LoopMode', loop_fg);
-     end
+     BpodSystem.PluginObjects.SoundServer.loadSound(trignum, sound, loop_fg);
      return
    end;
    
@@ -104,11 +95,7 @@ function [sm] = LoadSound(sm, trignum, sound, side, tau_ms, predelay_s, loop_fg)
     
    mydata.(['sound' num2str(trignum)]) = nd;      
    set(sm.myfig, 'UserData', mydata);
-   if BpodSystem.PluginObjects.SoundServerType == 1
-       BpodSystem.PluginObjects.SoundServer.loadSound(trignum, sound, loop_fg);
-   elseif BpodSystem.PluginObjects.SoundServerType == 2
-       BpodSystem.PluginObjects.SoundServer.load(trignum, sound, 'LoopMode', loop_fg);
-   end
+   BpodSystem.PluginObjects.SoundServer.loadSound(trignum, nd, loop_fg);
    return;
    
    
