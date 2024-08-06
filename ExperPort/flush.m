@@ -14,7 +14,7 @@ clear classes;
 clear functions;
 
 %% Close all existing open serial objects
-objlist = instrfind;
+objlist = serialportfind;
 for ctr = 1:length(objlist)
     try
         fclose(objlist(ctr));
