@@ -345,12 +345,29 @@ try
             
             SoloFunctionAddVars(obj, 'PokesPlotSection', 'rw_args', {'btnPreferencesPane', 'btnCollapse'});
             
-            
+            % Start with the parent of the initial component
             fighandle = get(get_ghandle(btnPreferencesPane), 'Parent');
-            while ~isequal(round(fighandle), fighandle)
+            
+            % Loop until fighandle is no longer a container (i.e., until it's a figure)
+            while ~isempty(fighandle) && ~isa(fighandle, 'matlab.ui.Figure')
+                % Move up one level in the hierarchy
                 fighandle = get(fighandle, 'Parent');
             end
-            figure(fighandle);
+            
+            % Check if we've successfully found a figure
+            if isa(fighandle, 'matlab.ui.Figure')
+                % Bring the figure into focus
+                figure(fighandle);
+            else
+                % Handle the case where a figure wasn't found
+                warning('A top-level figure could not be found for the given component.');
+            end
+
+            % fighandle = get(get_ghandle(btnPreferencesPane), 'Parent');
+            % while ~isequal(round(fighandle), fighandle)
+            %     fighandle = get(fighandle, 'Parent');
+            % end
+            % figure(fighandle);
             
             SoloFunctionAddVars(obj, 'PokesPlotSection', 'rw_args', {'myfig_preferences', 'editMainSort', 'editSubSort', 'editTrialSelector'});
             
