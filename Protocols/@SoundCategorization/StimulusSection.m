@@ -96,7 +96,7 @@ switch action,
     y=5;
     next_column(x);
     SoloParamHandle(obj, 'existing_numClass', 'value', 0, 'saveable', 0);
-    SoloParamHandle(obj, 'my_window_info', 'value', [x, y, value(myfig)], 'saveable', 0);
+    SoloParamHandle(obj, 'my_window_info', 'value', [x, y, double(value(myfig))], 'saveable', 0);
     NumeditParam(obj,'numClass',4,x,y,'label','numClass','TooltipString','Number of stimuli');
     
     set_callback_on_load(numClass, 4); %#ok<NODEF>
