@@ -25,7 +25,7 @@ function [err] = sendsummary(obj, varargin)
             'protocol_data',    'NULL';...
             'peh',              get_parsed_events;...
             'last_comment',     cleanup(CommentsSection(obj,'get_latest'));...
-            'data_file',        SavingSection(obj,'get_get_data_file');...
+            'data_file',        SavingSection(obj,'get_data_file');...
             'technotes',        get_val('TechComment')... % Added technician comments field
         };
         parseargs(varargin, pairs);
@@ -92,54 +92,55 @@ function [err] = sendsummary(obj, varargin)
         
         %% Define SQL columns and placeholders
         colstr = [
-            'sessid, '
-            'ratname, '
-            'hostname, '
-            'experimenter, '
-            'endtime, '
-            'starttime, '
-            'sessiondate, '
-            'protocol, '
-            'n_done_trials, '
-            'total_correct, '
-            'right_correct, '
-            'left_correct, '
-            'percent_violations, '
-            'protocol_data, '
-            'comments, '
-            'data_file, '
-            'data_path, '
-            'left_pokes, '
-            'center_pokes, '
-            'right_pokes, '
-            'technotes, '
+            'sessid, ', ...
+            'ratname, ', ...
+            'hostname, ', ...
+            'experimenter, ', ...
+            'endtime, ', ...
+            'starttime, ', ...
+            'sessiondate, ', ...
+            'protocol, ', ...
+            'n_done_trials, ', ...
+            'total_correct, ', ...
+            'right_correct, ', ...
+            'left_correct, ', ...
+            'percent_violations, ', ...
+            'protocol_data, ', ...
+            'comments, ', ...
+            'data_file, ', ...
+            'data_path, ', ...
+            'left_pokes, ', ...
+            'center_pokes, ', ...
+            'right_pokes, ', ...
+            'technotes, ', ...
             'IP_addr'
         ];
-        
+
         valstr = [
-            '"{Si}", '    % sessid
-            '"{S}", '     % ratname
-            '"{S}", '     % hostname
-            '"{S}", '     % experimenter
-            '"{S}", '     % endtime
-            '"{S}", '     % starttime
-            '"{S}", '     % sessiondate
-            '"{S}", '     % protocol
-            '"{M}", '     % n_done_trials
-            '"{M}", '     % total_correct
-            '"{M}", '     % right_correct
-            '"{M}", '     % left_correct
-            '"{M}", '     % percent_violations
-            '"{S}", '     % protocol_data
-            '"{S}", '     % comments
-            '"{S}", '     % data_file
-            '"{S}", '     % data_path
-            '"{M}", '     % left_pokes
-            '"{M}", '     % center_pokes
-            '"{M}", '     % right_pokes
-            '"{S}", '     % technotes
-            '"{S}"'       % IP_addr
+            '"{Si}",', ...    % sessid
+            '"{S}",', ...     % ratname
+            '"{S}",', ...     % hostname
+            '"{S}",', ...     % experimenter
+            '"{S}",', ...     % endtime
+            '"{S}",', ...     % starttime
+            '"{S}",', ...     % sessiondate
+            '"{S}",', ...     % protocol
+            '"{M}",', ...     % n_done_trials
+            '"{M}",', ...     % total_correct
+            '"{M}",', ...     % right_correct
+            '"{M}",', ...     % left_correct
+            '"{M}",', ...     % percent_violations
+            '"{S}",', ...     % protocol_data
+            '"{S}",', ...     % comments
+            '"{S}",', ...     % data_file
+            '"{S}",', ...     % data_path
+            '"{M}",', ...     % left_pokes
+            '"{M}",', ...     % center_pokes
+            '"{M}",', ...     % right_pokes
+            '"{S}",', ...     % technotes
+            '"{S}"'           % IP_addr
         ];
+
 
 
         %% Construct SQL string
