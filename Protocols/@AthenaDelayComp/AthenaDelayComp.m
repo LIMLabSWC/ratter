@@ -241,7 +241,7 @@ switch action,
 
     %pd.stimul=stim_history(:);
     
-    sendsummary(obj,'protocol_data',pd);    
+    sendsummary(obj,'protocol_data','PLACEHOLDER it was just pd');    
       
       %% otherwise
    otherwise,

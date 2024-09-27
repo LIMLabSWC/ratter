@@ -125,18 +125,18 @@ function [err] = sendsummary(obj, varargin)
             '"{S}",', ...     % starttime
             '"{S}",', ...     % sessiondate
             '"{S}",', ...     % protocol
-            '"{M}",', ...     % n_done_trials
-            '"{M}",', ...     % total_correct
-            '"{M}",', ...     % right_correct
-            '"{M}",', ...     % left_correct
-            '"{M}",', ...     % percent_violations
+            '"{S}",', ...     % n_done_trials
+            '"{S}",', ...     % total_correct
+            '"{S}",', ...     % right_correct
+            '"{S}",', ...     % left_correct
+            '"{S}",', ...     % percent_violations
             '"{S}",', ...     % protocol_data
             '"{S}",', ...     % comments
             '"{S}",', ...     % data_file
             '"{S}",', ...     % data_path
-            '"{M}",', ...     % left_pokes
-            '"{M}",', ...     % center_pokes
-            '"{M}",', ...     % right_pokes
+            '"{S}",', ...     % left_pokes
+            '"{S}",', ...     % center_pokes
+            '"{S}",', ...     % right_pokes
             '"{S}",', ...     % technotes
             '"{S}"'           % IP_addr
         ];
