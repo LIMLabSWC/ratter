@@ -91,7 +91,7 @@
 %            solution is to use the following command:
 %             mym(INSERT INTO tbl(id,txt) VALUES(1000,"{S}")','abc{dfg}h');
 % HISTORY
--------
+% -------
 % v1.36   - fixed bug for Linux64 related to cross-platform compatibility. Blobs written on windows can be read under 
 % 		Linux 32/64 and vice-versa.
 % v1.35   - fixed bug with incorrect pointer increment under Linux
