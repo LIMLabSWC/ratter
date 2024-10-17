@@ -1,3 +1,22 @@
+%{
+----------------------------------------------------------------------------
+
+This file is part of the Sanworks Bpod repository
+Copyright (C) Sanworks LLC, Rochester, New York, USA
+
+----------------------------------------------------------------------------
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, version 3.
+
+This program is distributed  WITHOUT ANY WARRANTY and without even the
+implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+%}
 function ok = sendSM2Bpod(sma, varargin)
 global BpodSystem
 RunASAP = 0;
@@ -7,6 +26,9 @@ if nargin > 1
     end
 end
 AudioPlayerOutputCh = find(strcmp(BpodSystem.Modules.Name, 'AudioPlayer1'));
+if isempty(AudioPlayerOutputCh)
+    AudioPlayerOutputCh = find(strcmp(BpodSystem.Modules.Name, 'HiFi1'));
+end
 WavePlayerOutputCh = find(strcmp(BpodSystem.Modules.Name, 'WavePlayer1'));
 HasAudioPlayer = 0;
 if ~isempty(AudioPlayerOutputCh)
@@ -187,7 +209,11 @@ if HasAudioPlayer == 0
         error('Error: A Bpod AudioPlayer module is required to run this state matrix, but none is connected.')
     end
 else
-    BpodOutputMatrixCol_Snd = find(strcmp(BpodSystem.StateMachineInfo.OutputChannelNames, 'AudioPlayer1'));
+    if BpodSystem.PluginObjects.SoundServerType == 1
+        BpodOutputMatrixCol_Snd = find(strcmp(BpodSystem.StateMachineInfo.OutputChannelNames, 'AudioPlayer1'));
+    elseif BpodSystem.PluginObjects.SoundServerType == 2
+        BpodOutputMatrixCol_Snd = find(strcmp(BpodSystem.StateMachineInfo.OutputChannelNames, 'HiFi1'));
+    end
     nSoundsSupported = BpodSystem.PluginObjects.SoundServer.Info.maxSounds;
     SoundOut(SoundOut < 0) = (SoundOut(SoundOut < 0)*-1)+double(nSoundsSupported); % 1 more than the max number of sounds begins sound-off codes.
     SoundOut(1) = uint8('*'); % State 1 (equiv to state 0) sends a "push" signal to the sound server, to set newly
@@ -240,6 +266,22 @@ for i = 1:nWavesDeclared
         if SW(i).dio_line ~= -1
             % Map dio CHANNELS to Bpod (no bits)
             bsma.GlobalTimers.OutputChannel(i) = BpodSystem.PluginObjects.Bcontrol2Bpod_DO_Map(SW(i).dio_line+1);
+            % Set on and off events for FSM onboard channel type 
+            %(Analog and Sound module channels are set separately per module below)
+            switch BpodSystem.HW.Outputs(bsma.GlobalTimers.OutputChannel(i))
+                case 'P'
+                    bsma.GlobalTimers.OnMessage(i) = 255;
+                    bsma.GlobalTimers.OffMessage(i) = 0;
+                case 'B'
+                    bsma.GlobalTimers.OnMessage(i) = 1;
+                    bsma.GlobalTimers.OffMessage(i) = 0;
+                case 'W'
+                    bsma.GlobalTimers.OnMessage(i) = 1;
+                    bsma.GlobalTimers.OffMessage(i) = 0;
+                case 'V'
+                    bsma.GlobalTimers.OnMessage(i) = 1;
+                    bsma.GlobalTimers.OffMessage(i) = 0;
+            end
         end
     end
     if ~isempty(SW(i).analog_waveform)

@@ -27,7 +27,7 @@
 function [sm] = BpodSM(host,port,which_sm)
   sm.MIN_SERVER_VERSION = 0; % update this on protocol change
   sm.server_version = [];            % This value is obtained from the server on Initialize(sm);
-  sm.host = 'localhost'; %to be checked, sharbat 2019
+  sm.host = 'localhost';
   sm.port = 3333;
   sm.fsm_id = 0;
   sm.in_chan_type = 'ai'; % use analog input for input
