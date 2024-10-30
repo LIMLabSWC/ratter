@@ -24,8 +24,8 @@ switch action
         SoloParamHandle(obj, 'myfig', 'value', figure('closerequestfcn', [mfilename '(' class(obj) ', ''hide'');'], 'MenuBar', 'none', ...
             'Name', mfilename), 'saveable', 0);
         screen_size = get(0, 'ScreenSize');
-        set(value(myfig),'Position',[1 screen_size(4)-740, 1000 1000]); % put fig at top right
-        set(double(gcf), 'Visible', 'off');
+        set(value(myfig),'Position',[(screen_size(3)-1100)/2 (screen_size(4)-800)/2 1100 800]);
+        set(double(gcf), 'Visible', 'on');
         x=10;y=10;
 
         SoloParamHandle(obj, 'ax', 'saveable', 0, ...
