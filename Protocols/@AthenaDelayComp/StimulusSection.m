@@ -55,7 +55,7 @@ switch action
             'new', x, y, 'labelfraction', 0.35, 'TooltipString', sprintf(['\nnew means at each trial, a new noise pattern will be generated,\n' ...
             '"library" means for each trial stimulus is loaded from a library with limited number of noise patterns'])); next_row(y, 1.3)
         set_callback(StimulusType, {mfilename, 'StimulusType'});
-    	NumeditParam(obj,'nPatt',50,x,y,'label','Num Nois Patt','TooltipString','Number of Noise Patters for the library');
+        NumeditParam(obj,'nPatt',50,x,y,'label','Num Nois Patt','TooltipString','Number of Noise Patters for the library');
 
         next_row(y);
         next_row(y);
@@ -88,27 +88,27 @@ switch action
             '\n''EQUIRIP'':Eqiripple FIR filter ''HAMMING'': Hamming-window based FIR']));
         next_row(y, 1)
         DispParam(obj, 'A1_sigma', 0.01, x,y,'label','A1_sigma','TooltipString','Sigma value for the first stimulus');
-    	next_row(y);
-        DispParam(obj, 'A2_sigma', 0.01, x,y,'label','A2_sigma','TooltipString','Sigma value for the first stimulus');
-    	next_row(y);
-    	NumeditParam(obj,'fcut',110,x,y,'label','fcut','TooltipString','Cut off frequency on the original white noise');
         next_row(y);
-    	NumeditParam(obj,'lfreq',2000,x,y,'label','Modulator_LowFreq','TooltipString','Lower bound for the frequency modulator');
-    	next_row(y);
-    	NumeditParam(obj,'hfreq',20000,x,y,'label','Modulator_HighFreq','TooltipString','Upper bound for the frequency modulator');
+        DispParam(obj, 'A2_sigma', 0.01, x,y,'label','A2_sigma','TooltipString','Sigma value for the first stimulus');
+        next_row(y);
+        NumeditParam(obj,'fcut',110,x,y,'label','fcut','TooltipString','Cut off frequency on the original white noise');
+        next_row(y);
+        NumeditParam(obj,'lfreq',2000,x,y,'label','Modulator_LowFreq','TooltipString','Lower bound for the frequency modulator');
+        next_row(y);
+        NumeditParam(obj,'hfreq',20000,x,y,'label','Modulator_HighFreq','TooltipString','Upper bound for the frequency modulator');
         next_row(y);
         % 	NumeditParam(obj,'outband',60,x,y,'label','Outband','TooltipString','outband on the distribution from which white noise is produced');
         %     next_row(y);
-    	NumeditParam(obj,'minS1',0.007,x,y,'label','minS1','TooltipString','min sigma value for AUD1');
+        NumeditParam(obj,'minS1',0.007,x,y,'label','minS1','TooltipString','min sigma value for AUD1');
         next_row(y);
-    	DispParam(obj,'maxS',40,x,y,'label','maxS','TooltipString','max sigma value for AUD1');
+        DispParam(obj,'maxS',40,x,y,'label','maxS','TooltipString','max sigma value for AUD1');
         NumeditParam(obj,'s2_s1_ratio',2.6,x,y,'label','s2_s1_ratio','TooltipString','Intensity index i.e. Ind=(S1-S2)/(S1+S2)');
         next_row(y);
         ToggleParam(obj, 'psych_pairs', 0, x,y,...
             'OnString', 'Psych Pairs ON',...
             'OffString', 'Psych Pairs OFF',...
             'TooltipString', sprintf('If on (black) then it disable the presentation of psychometric pairs'));
-     	next_row(y);
+        next_row(y);
         NumeditParam(obj,'nPsych',6,x,y,'label','Num Psych Pairs','TooltipString','Number of psychometric pairs');
         next_row(y);
         NumeditParam(obj,'from',0.047,x,y,'label','lowest pair','TooltipString','Psychometric pairs will be put between this pair, and an upper pair based on Ratio');
