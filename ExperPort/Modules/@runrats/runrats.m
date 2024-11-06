@@ -115,26 +115,15 @@ switch action
         SoloParamHandle(obj,'myfig', 'value',fig);
         
         try
-            jf=get(value(myfig), 'JavaFrame');
+            set(myfig, 'WindowStyle', 'modal');
             pause(0.1);
-            javaMethod('setAlwaysOnTop', jf.fFigureClient.getWindow, 1);
-            %delete or change - sharbat
+            
         catch %#ok<CTCH>
         
             disp('WARNING: Failed to keep runrats on top');
         end
 
-
-        % try
-        %     jf=get(value(myfig), 'JavaFrame');
-        %     pause(0.1);
-        %     javaMethod('setAlwaysOnTop', jf.fFigureClient.getWindow, 1);
-        %     %delete or change - sharbat
-        % catch %#ok<CTCH>
-        %     disp('WARNING: Failed to keep runrats on top');
-        % end
-
-
+     
         %Create the non-gui variables we will need
         SoloParamHandle(obj,'RigID',           'value',bSettings('get','RIGS','Rig_ID')); %The rig ID
         SoloParamHandle(obj,'RatSch',          'value',cell(10,1)); %The rats that run in this rig in session order
