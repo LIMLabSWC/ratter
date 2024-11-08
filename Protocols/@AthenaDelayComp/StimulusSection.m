@@ -16,29 +16,37 @@ switch action
         end
         x = varargin{1}; y = varargin{2};
 
+        % Create toggle parameter for stimulus visibility
         ToggleParam(obj, 'StimulusShow', 0, x, y, 'OnString', 'Stimuli', ...
             'OffString', 'Stimuli', 'TooltipString', 'Show/Hide Stimulus panel');
         set_callback(StimulusShow, {mfilename, 'show_hide'}); %#ok<NODEF> (Defined just above)
         next_row(y);
 
-        SoloParamHandle(obj, 'myfig', 'value', figure('closerequestfcn', [mfilename '(' class(obj) ', ''hide'');'], 'MenuBar', 'none', ...
-            'Name', mfilename), 'saveable', 0);
+        % SoloParamHandle(obj, 'myfig', 'value', figure('closerequestfcn', [mfilename '(' class(obj) ', ''hide'');'], 'MenuBar', 'none', ...
+        %     'Name', mfilename), 'saveable', 0);
+
+        % creating figure window
+        SoloParamHandle(obj, 'myfig', 'value', figure('CloseRequestFcn', {@hide, obj}, ...
+            'MenuBar', 'none', 'Name', mfilename), 'saveable', 0);
         screen_size = get(0, 'ScreenSize');
         set(value(myfig),'Position',[(screen_size(3)-1100)/2 (screen_size(4)-800)/2 1100 800]);
         set(double(gcf), 'Visible', 'on');
-        x=10;y=10;
 
+        % adding plot
         SoloParamHandle(obj, 'ax', 'saveable', 0, ...
-            'value', axes('Position', [0.01 0.5 0.45 0.45]));
+            'value', axes('Position', [0.1 0.5 0.45 0.45]));
         ylabel('log_e \sigma_2','FontSize',16,'FontName','Cambria Math');
         set(value(ax),'Fontsize',15)
         xlabel('log_e \sigma_1','FontSize',16,'FontName','Cambria Math')
+        axis square;
 
+        % adding performance plot
         SoloParamHandle(obj, 'axperf', 'saveable', 0, ...
-            'value', axes('Position', [0.5 0.5 0.45 0.45]));
+            'value', axes('Position', [0.55 0.5 0.45 0.45]));
         ylabel('log_e \sigma_2','FontSize',16,'FontName','Cambria Math');
         set(value(axperf),'Fontsize',15)
         xlabel('log_e \sigma_1','FontSize',16,'FontName','Cambria Math')
+        axis square;
 
         SoundManagerSection(obj, 'declare_new_sound', 'StimAUD1')
         SoundManagerSection(obj, 'declare_new_sound', 'StimAUD2')
@@ -50,26 +58,33 @@ switch action
         SoloParamHandle(obj, 'h1', 'value', []);
         SoloParamHandle(obj, 'thisclass', 'value', []);
 
-        y=5;
+        x=5; y=5;
         MenuParam(obj, 'StimulusType', {'library', 'new'}, ...
-            'new', x, y, 'labelfraction', 0.35, 'TooltipString', sprintf(['\nnew means at each trial, a new noise pattern will be generated,\n' ...
-            '"library" means for each trial stimulus is loaded from a library with limited number of noise patterns'])); next_row(y, 1.3)
+            'new', x, y, 'labelfraction', 0.35, ...
+            'TooltipString', ...
+            sprintf(['\n"new" means at each trial, a new noise pattern will be generated,\n' ...
+            '"library" means for each trial stimulus is loaded from a library with limited number of noise patterns']) ...
+            );
+        next_row(y, 1.3)
         set_callback(StimulusType, {mfilename, 'StimulusType'});
         NumeditParam(obj,'nPatt',50,x,y,'label','Num Nois Patt','TooltipString','Number of Noise Patters for the library');
 
         next_row(y);
         next_row(y);
-        PushbuttonParam(obj, 'refresh_pairs', x,y , 'TooltipString', 'Instantiates the pairs given the new set of parameters');
+        PushbuttonParam(obj, 'refresh_pairs', x,y , ...
+            'TooltipString', 'Instantiates the pairs given the new set of parameters');
         set_callback(refresh_pairs, {mfilename, 'plot_pairs'});
 
         next_row(y);
-        PushbuttonParam(obj, 'plot_performance', x,y , 'TooltipString', 'Plots the class design with mean performance for each class');
+        PushbuttonParam(obj, 'plot_performance', x,y , ...
+            'TooltipString', 'Plots the class design with mean performance for each class');
         set_callback(plot_performance, {mfilename, 'plot_perf'});
 
         next_row(y);
         next_row(y);
         MenuParam(obj, 'Rule', {'S2>S1 Left','S2>S1 Right'}, ...
-            'S2>S1 Left', x, y, 'labelfraction', 0.35, 'TooltipString', sprintf(['\nThis bottom determines the rule\n', ...
+            'S2>S1 Left', x, y, 'labelfraction', 0.35, ...
+            'TooltipString', sprintf(['\nThis bottom determines the rule\n', ...
             '\n''S2>S1 Left'' means if Aud2 > Aud1 then reward will be delivered from the left water spout and if Aud2 < Aud1 then water comes form right\n',...
             '\n''S2>S1 Right'' means if Aud2 < Aud1 then reward will be delivered from the left water spout and if Aud2 > Aud1 then water comes from right\n']));
         next_row(y, 1)
@@ -82,48 +97,87 @@ switch action
         next_column(x);
         y=5;
         MenuParam(obj, 'filter_type', {'GAUS','LPFIR', 'FIRLS','BUTTER','MOVAVRG','KAISER','EQUIRIP','HAMMING'}, ...
-            'GAUS', x, y, 'labelfraction', 0.35, 'TooltipString', sprintf(['\nDifferent filters. ''LPFIR'': lowpass FIR ''FIRLS'': Least square linear-phase FIR filter design\n', ...
+            'GAUS', x, y, 'labelfraction', 0.35, ...
+            'TooltipString', sprintf(['\nDifferent filters. ''LPFIR'': lowpass FIR ''FIRLS'': Least square linear-phase FIR filter design\n', ...
             '\n''BUTTER'': IIR Butterworth lowpass filter ''GAUS'': Gaussian filter (window)\n', ...
             '\n''MOVAVRG'': Moving average FIR filter ''KAISER'': Kaiser-window FIR filtering\n', ...
             '\n''EQUIRIP'':Eqiripple FIR filter ''HAMMING'': Hamming-window based FIR']));
         next_row(y, 1)
-        DispParam(obj, 'A1_sigma', 0.01, x,y,'label','A1_sigma','TooltipString','Sigma value for the first stimulus');
+
+        DispParam(obj, 'A1_sigma', 0.01, x,y, ...
+            'label','A1_sigma', ...
+            'TooltipString','Sigma value for the first stimulus');
         next_row(y);
-        DispParam(obj, 'A2_sigma', 0.01, x,y,'label','A2_sigma','TooltipString','Sigma value for the first stimulus');
+
+        DispParam(obj, 'A2_sigma', 0.01, x,y, ...
+            'label','A2_sigma', ...
+            'TooltipString','Sigma value for the first stimulus');
         next_row(y);
-        NumeditParam(obj,'fcut',110,x,y,'label','fcut','TooltipString','Cut off frequency on the original white noise');
+
+        NumeditParam(obj,'fcut',110,x,y, ...
+            'label','fcut', ...
+            'TooltipString','Cut off frequency on the original white noise');
         next_row(y);
-        NumeditParam(obj,'lfreq',2000,x,y,'label','Modulator_LowFreq','TooltipString','Lower bound for the frequency modulator');
+
+        NumeditParam(obj,'lfreq',2000,x,y, ...
+            'label','Modulator_LowFreq', ...
+            'TooltipString','Lower bound for the frequency modulator');
         next_row(y);
-        NumeditParam(obj,'hfreq',20000,x,y,'label','Modulator_HighFreq','TooltipString','Upper bound for the frequency modulator');
+
+        NumeditParam(obj,'hfreq',20000,x,y, ...
+            'label','Modulator_HighFreq', ...
+            'TooltipString','Upper bound for the frequency modulator');
         next_row(y);
-        % 	NumeditParam(obj,'outband',60,x,y,'label','Outband','TooltipString','outband on the distribution from which white noise is produced');
+
+        % 	NumeditParam(obj,'outband',60,x,y,'label','Outband', ...
+        %   'TooltipString','outband on the distribution from which white noise is produced');
         %     next_row(y);
-        NumeditParam(obj,'minS1',0.007,x,y,'label','minS1','TooltipString','min sigma value for AUD1');
+
+        NumeditParam(obj,'minS1',0.007,x,y, ...
+            'label','minS1','TooltipString','min sigma value for AUD1');
         next_row(y);
+
         DispParam(obj,'maxS',40,x,y,'label','maxS','TooltipString','max sigma value for AUD1');
-        NumeditParam(obj,'s2_s1_ratio',2.6,x,y,'label','s2_s1_ratio','TooltipString','Intensity index i.e. Ind=(S1-S2)/(S1+S2)');
+
+        NumeditParam(obj,'s2_s1_ratio',2.6,x,y,'label','s2_s1_ratio', ...
+            'TooltipString','Intensity index i.e. Ind=(S1-S2)/(S1+S2)');
         next_row(y);
+
         ToggleParam(obj, 'psych_pairs', 0, x,y,...
             'OnString', 'Psych Pairs ON',...
             'OffString', 'Psych Pairs OFF',...
             'TooltipString', sprintf('If on (black) then it disable the presentation of psychometric pairs'));
         next_row(y);
-        NumeditParam(obj,'nPsych',6,x,y,'label','Num Psych Pairs','TooltipString','Number of psychometric pairs');
+
+        NumeditParam(obj,'nPsych',6,x,y, ...
+            'label','Num Psych Pairs','TooltipString','Number of psychometric pairs');
         next_row(y);
-        NumeditParam(obj,'from',0.047,x,y,'label','lowest pair','TooltipString','Psychometric pairs will be put between this pair, and an upper pair based on Ratio');
+
+        NumeditParam(obj,'from',0.047,x,y, ...
+            'label','lowest pair', ...
+            'TooltipString','Psychometric pairs will be put between this pair, and an upper pair based on Ratio');
         next_row(y);
+
         MenuParam(obj, 'psych_type', {'horizpairs', 'vertpairs'}, ...
-            'horizpairs', x, y, 'labelfraction', 0.35, 'TooltipString', sprintf(['\nhorizpairs means psychometric pairs will be built with "from" as their fixed S2 while S1 will increase,\n' ...
-            '"vertpairs" means psychometric pairs will be built with "from" as their fixed S1 while S2 will increase'])); next_row(y, 1.3)
-        NumeditParam(obj,'probpsych',0.9,x,y,'label','probpsych','TooltipString','probability of having a psychometric pair as the stimulus pair at each trial');
+            'horizpairs', x, y, 'labelfraction', 0.35, ...
+            'TooltipString', sprintf(['\n"horizpairs" means psychometric pairs will be built with "from" as their fixed S2 while S1 will increase,\n' ...
+            '"vertpairs" means psychometric pairs will be built with "from" as their fixed S1 while S2 will increase']));
+        next_row(y, 1.3)
+
+        NumeditParam(obj,'probpsych',0.9,x,y, ...
+            'label','probpsych', ...
+            'TooltipString','probability of having a psychometric pair as the stimulus pair at each trial');
         disable(nPatt);
         next_column(x);
         y=5;
+
         SoloParamHandle(obj, 'existing_numClassPsych', 'value', 0, 'saveable', 0);
         SoloParamHandle(obj, 'existing_numClass', 'value', 0, 'saveable', 0);
-        SoloParamHandle(obj, 'my_window_info', 'value', [x, y, double(value(myfig))], 'saveable', 0);
-        NumeditParam(obj,'numClass',4,x,y,'label','numClass','TooltipString','Number of stimulus pairs');
+        SoloParamHandle(obj, 'my_window_info', ...
+            'value', [x, y, double(value(myfig))], 'saveable', 0);
+
+        NumeditParam(obj,'numClass',4,x,y, ...
+            'label','numClass','TooltipString','Number of stimulus pairs');
 
         set_callback_on_load(numClass, 4); %#ok<NODEF>
         set_callback(numClass, {mfilename, 'numClass'});
@@ -466,123 +520,164 @@ switch action
 
         %% Case plot_pais
     case 'plot_pairs'
+        % Generate pairs and calculate max value
         StimulusSection(obj,'make_pairs');
-        maxS.value=max(thesepairs(:));
-        %% plot the pair set
-        cla(value(ax))
-        xd=log(thesepairs(:,1));
-        yd=log(thesepairs(:,2));
-        for ii=1:length(xd)
+        maxS.value = max(thesepairs(:));
+
+        %% Plot the pair set
+        cla(value(ax));
+
+        % Transform data to log scale
+        xd = log(thesepairs(:,1));
+        yd = log(thesepairs(:,2));
+
+        % Plot individual points
+        for ii = 1:length(xd)
             axes(value(ax));
-            plot(xd(ii),yd(ii),'s','MarkerSize',15,'MarkerEdgeColor',[0 0 0],'LineWidth',2)
-            hold on
-            eval(sprintf('hperf%d=text(xd(ii),yd(ii),num2str(ii));',ii));
-            hold on
+            plot(xd(ii), yd(ii), 's', 'MarkerSize', 15, 'MarkerEdgeColor', [0 0 0], 'LineWidth', 2);
+            hold on;
+            eval(sprintf('hperf%d=text(xd(ii),yd(ii),num2str(ii));', ii));
+            hold on;
         end
-        axis square
+
+        % Adjust plot appearance
+        axis square;
+
+        % Calculate and set tick values
         %      Ytick=get(value(ax),'YtickLabel');
         %      Xtick=get(value(ax),'XtickLabel');
-        set(value(ax),'ytick',((yd(1:1+value(midclass_pairs):(end-nPsych*psych_pairs)/2))),'xtick',((xd(1:1+value(midclass_pairs):(end-nPsych*psych_pairs)/2))));
-        set(value(ax),'yticklabel',num2str(exp(yd(1:1+value(midclass_pairs):(end-nPsych*psych_pairs)/2)),2),'xticklabel',num2str(exp(xd(1:1+value(midclass_pairs):(end-nPsych*psych_pairs)/2)),2));
-        ylabel('\sigma_2 in log scale','FontSize',16,'FontName','Cambria Math');
-        set(value(ax),'Fontsize',15)
-        xlabel('\sigma_1 in log scale','FontSize',16,'FontName','Cambria Math')
+        set(value(ax), 'ytick', ((yd(1:1+value(midclass_pairs):(end-nPsych*psych_pairs)/2))));
+        set(value(ax), 'xtick', ((xd(1:1+value(midclass_pairs):(end-nPsych*psych_pairs)/2))));
+        set(value(ax), 'yticklabel', num2str(exp(yd(1:1+value(midclass_pairs):(end-nPsych*psych_pairs)/2)), 2));
+        set(value(ax), 'xticklabel', num2str(exp(xd(1:1+value(midclass_pairs):(end-nPsych*psych_pairs)/2)), 2));
 
+        % Set labels and font sizes
+        ylabel('\sigma_2 in log scale', 'FontSize', 16, 'FontName', 'Cambria Math');
+        set(value(ax), 'Fontsize', 15);
+        xlabel('\sigma_1 in log scale', 'FontSize', 16, 'FontName', 'Cambria Math');
+
+        %% Select side and generate pair based on rule and trial
         SideSection(obj,'get_current_side');
-        if strcmp(Rule,'S2>S1 Left')
+
+        if strcmp(Rule, 'S2>S1 Left')
+            % Handle LEFT trial case
             if strcmp(ThisTrial, 'LEFT')
-                bag=[];
-                for cc=1:value(numClass)+(numClass-1)*value(midclass_pairs)
-                    eval(sprintf('pr=value(probClass%d);',cc+value(numClass)));
-                    bag=[bag ones(1,(10-10*value(probpsych))*pr)*value(cc)];
+                bag = [];
+                for cc = 1:value(numClass)+(numClass-1)*value(midclass_pairs)
+                    eval(sprintf('pr=value(probClass%d);', cc+value(numClass)));
+                    bag = [bag ones(1,(10-10*value(probpsych))*pr)*value(cc)];
                 end
 
-                if midclass_pairs ==1
-                    for cc=1:midclass_pairs
-                        bag=[bag value(cc)];
+                % Handle midclass pairs
+                if midclass_pairs == 1
+                    for cc = 1:midclass_pairs
+                        bag = [bag value(cc)];
                     end
                 end
 
-                pp=1;
-                if psych_pairs ==1
-                    for cc=value(numClass)+1:value(numClass)+value(nPsych)/2
+                % Handle psych pairs
+                pp = 1;
+                if psych_pairs == 1
+                    for cc = value(numClass)+1:value(numClass)+value(nPsych)/2
                         bag = [bag ones(1,(probpsych*10))*value(cc)];
                     end
                 end
-                pp=randsample(bag,length(bag));
-                thispair=[pairs_u(pp(1),1) pairs_u(pp(1),2)];
+
+                % Select pair
+                pp = randsample(bag, length(bag));
+                thispair = [pairs_u(pp(1),1) pairs_u(pp(1),2)];
+
+                % Determine class
                 if pp(1) > value(numClass*2)
-                    thisclass(n_done_trials+1)=pp(1)+numClass*2;
+                    thisclass(n_done_trials+1) = pp(1)+numClass*2;
                 else
-                    thisclass(n_done_trials+1)=pp(1)+numClass;
+                    thisclass(n_done_trials+1) = pp(1)+numClass;
                 end
             else
-
-                bag=[];
-                for cc=1:value(numClass)+(numClass-1)*value(midclass_pairs)
-                    eval(sprintf('pr=value(probClass%d);',cc));
-                    bag=[bag ones(1,(10-10*value(probpsych))*pr)*value(cc)];
+                % Handle RIGHT trial case
+                bag = [];
+                for cc = 1:value(numClass)+(numClass-1)*value(midclass_pairs)
+                    eval(sprintf('pr=value(probClass%d);', cc));
+                    bag = [bag ones(1,(10-10*value(probpsych))*pr)*value(cc)];
                 end
-                pp=1;
-                pp=randsample(bag,length(bag));
-                thispair=[pairs_d(pp(1),1) pairs_d(pp(1),2)];
+
+                % Select pair
+                pp = randsample(bag, length(bag));
+                thispair = [pairs_d(pp(1),1) pairs_d(pp(1),2)];
+
+                % Determine class
                 if pp(1) > value(numClass)
-                    thisclass(n_done_trials+1)=pp(1)+numClass;
+                    thisclass(n_done_trials+1) = pp(1)+numClass;
                 else
-                    thisclass(n_done_trials+1)=pp(1);
+                    thisclass(n_done_trials+1) = pp(1);
                 end
             end
+
         elseif strcmp(Rule,'S2>S1 Right')
+            % Handle RIGHT rule case
             if strcmp(ThisTrial, 'RIGHT')
-                bag=[];
-                for cc=1:value(numClass)+(numClass-1)*value(midclass_pairs)
-                    eval(sprintf('pr=value(probClass%d);',cc+value(numClass)));
-                    bag=[bag ones(1,(10-10*value(probpsych))*pr)*value(cc)];
+                bag = [];
+                for cc = 1:value(numClass)+(numClass-1)*value(midclass_pairs)
+                    eval(sprintf('pr=value(probClass%d);', cc+value(numClass)));
+                    bag = [bag ones(1,(10-10*value(probpsych))*pr)*value(cc)];
                 end
 
-                if psych_pairs ==1
-                    for cc=value(numClass)+1:value(numClass)+value(nPsych)/2
+                % Handle psych pairs
+                if psych_pairs == 1
+                    for cc = value(numClass)+1:value(numClass)+value(nPsych)/2
                         bag = [bag ones(1,(probpsych*10))*(value(cc)+numClass*2)];
                     end
                 end
 
-                pp=randsample(bag,length(bag));
-                thispair=[pairs_u(pp(1),1) pairs_u(pp(1),2)];
+                % Select pair
+                pp = randsample(bag, length(bag));
+                thispair = [pairs_u(pp(1),1) pairs_u(pp(1),2)];
+
+                % Determine class
                 if pp(1) > value(numClass*2)
-                    thisclass(n_done_trials+1)=pp(1)+numClass*2;
+                    thisclass(n_done_trials+1) = pp(1)+numClass*2;
                 else
-                    thisclass(n_done_trials+1)=pp(1)+numClass;
+                    thisclass(n_done_trials+1) = pp(1)+numClass;
                 end
-
             else
-                bag=[];
-                for cc=1:value(numClass)+(numClass-1)*value(midclass_pairs)
-                    eval(sprintf('pr=value(probClass%d);',cc));
-                    bag=[bag ones(1,(10-10*value(probpsych))*pr)*value(cc)];
+                % Handle LEFT trial case
+                bag = [];
+                for cc = 1:value(numClass)+(numClass-1)*value(midclass_pairs)
+                    eval(sprintf('pr=value(probClass%d);', cc));
+                    bag = [bag ones(1,(10-10*value(probpsych))*pr)*value(cc)];
                 end
 
-                if psych_pairs ==1
-                    for cc=value(numClass)+1:value(numClass)+value(nPsych)/2
+                % Handle psych pairs
+                if psych_pairs == 1
+                    for cc = value(numClass)+1:value(numClass)+value(nPsych)/2
                         bag = [bag ones(1,(probpsych*10))*(value(cc)+numClass)];
                     end
                 end
 
-                pp=randsample(bag,length(bag));
-                thispair=[pairs_d(pp(1),1) pairs_d(pp(1),2)];
+                % Select pair
+                pp = randsample(bag, length(bag));
+                thispair = [pairs_d(pp(1),1) pairs_d(pp(1),2)];
 
+                % Determine class
                 if pp(1) > value(numClass)
-                    thisclass(n_done_trials+1)=pp(1)+numClass;
+                    thisclass(n_done_trials+1) = pp(1)+numClass;
                 else
-                    thisclass(n_done_trials+1)=pp(1);
+                    thisclass(n_done_trials+1) = pp(1);
                 end
             end
         end
-        A1_sigma.value=thispair(1);
-        A2_sigma.value=thispair(2);
 
-        %% plot the pair
-        h1.value=plot(log(value(A1_sigma)),log(value(A2_sigma)),'s','color',[0.8 0.4 0.1],'markerfacecolor',[0.8 0.4 0.1],'MarkerSize',15,'LineWidth',3);
-        %LOGplotPairs(thesepairs(:,1),thesepairs(:,2),'s',15,'k',1,16,thispair(1),thispair(2),value(ax),'init')
+        % Set sigma values
+        A1_sigma.value = thispair(1);
+        A2_sigma.value = thispair(2);
+
+        %% Plot the selected pair
+        h1.value = plot(log(value(A1_sigma)),log(value(A2_sigma)),'s','color',[0.8 0.4 0.1],'markerfacecolor',[0.8 0.4 0.1],'MarkerSize',15,'LineWidth',3);
+
+        % Commented-out alternative plotting function
+        % LOGplotPairs(thesepairs(:,1),thesepairs(:,2),'s',15,'k',1,16,thispair(1),thispair(2),value(ax),'init')
+
+
 
         %% Case Plot_perf
     case 'plot_perf'
