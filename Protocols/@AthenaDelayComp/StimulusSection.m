@@ -39,7 +39,7 @@ switch action
             'value', axes('Position', [0.55 0.5 0.45 0.45]));
         ylabel('log_e \sigma_2');
         %set(value(axperf),'Fontsize',15)
-        %xlabel('log_e \sigma_1','FontSize',16,'FontName','Cambria Math')
+        xlabel('log_e \sigma_1')
         axis square;
    
 
