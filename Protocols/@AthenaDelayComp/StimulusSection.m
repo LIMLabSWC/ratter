@@ -14,13 +14,7 @@ switch action
         if length(varargin) < 2
             error('Need at least two arguments, x and y position, to initialize %s', mfilename);
         end
-        x = varargin{1}; y = varargin{2};
-
-        % Create toggle parameter for stimulus visibility
-        ToggleParam(obj, 'StimulusShow', 0, x, y, 'OnString', 'Stimuli', ...
-            'OffString', 'Stimuli', 'TooltipString', 'Show/Hide Stimulus panel');
-        set_callback(StimulusShow, {mfilename, 'show_hide'}); %#ok<NODEF> (Defined just above)
-        next_row(y);
+        % x = varargin{1}; y = varargin{2};        
 
         % SoloParamHandle(obj, 'myfig', 'value', figure('closerequestfcn', [mfilename '(' class(obj) ', ''hide'');'], 'MenuBar', 'none', ...
         %     'Name', mfilename), 'saveable', 0);
@@ -30,23 +24,24 @@ switch action
             'MenuBar', 'none', 'Name', mfilename), 'saveable', 0);
         screen_size = get(0, 'ScreenSize');
         set(value(myfig),'Position',[(screen_size(3)-1100)/2 (screen_size(4)-800)/2 1100 800]);
-        set(double(gcf), 'Visible', 'on');
+        % set(double(gcf), 'Visible', 'on');
 
         % adding plot
         SoloParamHandle(obj, 'ax', 'saveable', 0, ...
             'value', axes('Position', [0.1 0.5 0.45 0.45]));
-        ylabel('log_e \sigma_2','FontSize',16,'FontName','Cambria Math');
-        set(value(ax),'Fontsize',15)
-        xlabel('log_e \sigma_1','FontSize',16,'FontName','Cambria Math')
+        ylabel('log_e \sigma_2');
+        %set(value(ax),'Fontsize',15)
+        xlabel('log_e \sigma_1')
         axis square;
 
         % adding performance plot
         SoloParamHandle(obj, 'axperf', 'saveable', 0, ...
             'value', axes('Position', [0.55 0.5 0.45 0.45]));
-        ylabel('log_e \sigma_2','FontSize',16,'FontName','Cambria Math');
-        set(value(axperf),'Fontsize',15)
-        xlabel('log_e \sigma_1','FontSize',16,'FontName','Cambria Math')
+        ylabel('log_e \sigma_2');
+        %set(value(axperf),'Fontsize',15)
+        %xlabel('log_e \sigma_1','FontSize',16,'FontName','Cambria Math')
         axis square;
+   
 
         SoundManagerSection(obj, 'declare_new_sound', 'StimAUD1')
         SoundManagerSection(obj, 'declare_new_sound', 'StimAUD2')
@@ -59,8 +54,15 @@ switch action
         SoloParamHandle(obj, 'thisclass', 'value', []);
 
         x=5; y=5;
-        MenuParam(obj, 'StimulusType', {'library', 'new'}, ...
-            'new', x, y, 'labelfraction', 0.35, ...
+        % Create toggle parameter for stimulus visibility
+        ToggleParam(obj, 'StimulusShow', 0, x, y, ...
+            'OnString', 'Stimuli', 'OffString', 'Stimuli', ...
+            'TooltipString', 'Show/Hide Stimulus panel');
+        set_callback(StimulusShow, {mfilename, 'show_hide'}); %#ok<NODEF> (Defined just above)
+        next_row(y);
+        
+        MenuParam(obj, 'StimulusType', {'library', 'new'}, 'new', ...
+            x, y, 'labelfraction', 0.35, ...
             'TooltipString', ...
             sprintf(['\n"new" means at each trial, a new noise pattern will be generated,\n' ...
             '"library" means for each trial stimulus is loaded from a library with limited number of noise patterns']) ...
