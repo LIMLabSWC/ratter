@@ -88,8 +88,7 @@ switch action
             end
         end;
         
-%          sma = StateMachineAssembler('full_trial_structure','use_happenings',1, ...   
-%             'n_input_lines',4,'line_names','CLRA');
+            
 		sma = StateMachineAssembler('full_trial_structure','use_happenings', 1);
 				
 		sma = add_scheduled_wave(sma, 'name', 'center_poke', 'preamble', CP_duration, ...
@@ -108,7 +107,6 @@ switch action
         if value(imaging)==1
             sma = add_scheduled_wave(sma, 'name', 'TrigScope', 'preamble', 0, 'sustain', ...
                 0.5, 'DOut', trigscope, 'loop', 0);
-                %99999, 'DOut', trigscope, 'loop', 0); %for Miniscope Camera
         else
             sma = add_scheduled_wave(sma, 'name', 'TrigScope', 'preamble', 0, 'sustain', 0); %dummy wave.
         end
@@ -153,7 +151,7 @@ switch action
 			case 1  %%  center led on -> poke in the center -> go cue -> reward light and sound -- waiting time grows slowlly -stimuli can be present
 				
 				sma = add_state(sma,'name','wait_for_cpoke','self_timer',CenterLed_duration, ...
-					'output_actions', {'DOut', center1led,  'SchedWaveTrig','+TrigScope'}, ...
+					'output_actions', {'DOut', center1led}, ...
 					'input_to_statechange', {'Cin','cp';'Tup','timeout_state'});
 				
                 if stimuli_on ==0 || n_done_trials <1
@@ -344,8 +342,8 @@ switch action
 		
 		        
        sma = add_state(sma,'name','preclean_up_state','self_timer',0.5,...
-           'output_actions',{'SchedWaveTrig','-TrigScope'},...
-           'input_to_statechange',{'Tup','check_next_trial_ready'});
+            'output_actions',{ 'SchedWaveTrig','+TrigScope'},...
+            'input_to_statechange',{'Tup','check_next_trial_ready'});
         
 		varargout{2} = {'check_next_trial_ready'};
 		
