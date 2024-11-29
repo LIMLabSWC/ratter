@@ -20,13 +20,23 @@ ips ={
     '172.24.155.117',
     '172.24.155.118',
     '172.24.155.119',
-    '172.24.155.120'
-    };
+    '172.24.155.120',
+    '172.24.155.121',
+    '172.24.155.122',
+    '172.24.155.123',
+    '172.24.155.124',
+    '172.24.155.125',
+    '172.24.155.126',
+    '172.24.155.127',
+    '172.24.155.128',
+    '172.24.155.129',
+    '172.24.155.130',
+    '172.24.155.131'};
 rig_camIP = ips{rig_id};
 if strcmp(flag,'start')    
     filename = [rat_id,'_',datestr(date,'yymmdd')];
     disp('created filename')
-    command_string = ['plink.exe -ssh pi@',rig_camIP,' -pw raspberry cd Pi_camera; python3 streamnrecord.py ', ' ',filename,' ',rat_id,' ',protocol,' "COMMAND >/dev/null &"']; 
+    command_string = ['plink.exe -ssh pi@',rig_camIP,' -pw raspberry cd pi_camera; python3 streamnrecord.py ', ' ',filename,' ',rat_id,' ',protocol,' "COMMAND >/dev/null &"']; 
     system(command_string);
     disp('sent starting command')
 
