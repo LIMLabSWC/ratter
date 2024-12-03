@@ -355,10 +355,25 @@ try
             
             %% Formatting graphics elements
             %myfig
+            original_width = 0.46875;
+            original_height = 0.815;
+            
+            max_size = min(original_width, original_height);
+            aspect_ratio = original_width / original_height;
+            new_width = max_size;
+            new_height = new_width / aspect_ratio;
+            
+            center_x = 0.5 - (new_width / 2);
+            center_y = 0.5 - (new_height / 2);
+            
+            position_vector = [center_x center_y new_width new_height];
+
+
+
             set(value(myfig), ...
                 'Units', 'normalized', ...
                 'Name', mfilename, ...
-                'Position', [0.27031      0.0275     0.46875       0.815]);
+                'Position', position_vector);
             
             %textHeader
             set(get_ghandle(textHeader), ...
