@@ -553,15 +553,16 @@ switch action
         maxS.value = max(thesepairs(:));
 
         %% Plot the pair set
-        % cla(value(ax));
+        cla(value(ax));
 
         % Transform data to log scale
         xd = log(thesepairs(:,1));
         yd = log(thesepairs(:,2));
 
-        axes(value(ax));
+        
         % Plot individual points
         for ii = 1:length(xd)
+            axes(value(ax));
             plot(xd(ii), yd(ii), 's', 'MarkerSize', 15, 'MarkerEdgeColor', [0 0 0], 'LineWidth', 2);
             hold on;
             eval(sprintf('hperf%d=text(xd(ii),yd(ii),num2str(ii));', ii));
