@@ -47,8 +47,21 @@ switch action,
         set(value(myfig), 'Name', name, 'Tag', name, ...
             'closerequestfcn', 'dispatcher(''close_protocol'')', 'MenuBar', 'none');
         % At this point we have one SoloParamHandle, myfig
+        
         % Let's put the figure where we want it and give it a reasonable size:
-        set(value(myfig), 'Position', [485   144   850   680]);
+        original_width = 850;
+        original_height = 680;
+        
+        % Get screen size
+        scrsz = get(0,'ScreenSize');
+        
+        % Center the figure while maintaining original size
+        center_x = (scrsz(3) - original_width) / 2;
+        center_y = (scrsz(4) - original_height) / 2;
+        
+        position_vector = [center_x center_y original_width original_height];
+
+        set(value(myfig), 'Position', position_vector);
 
         SoloParamHandle(obj, 'nsessions_healthy_number_of_pokes', 'value', 0, 'save_with_settings', 1);
         SoloParamHandle(obj, 'post_DelComp_protocol', 'value', '', 'save_with_settings', 1);

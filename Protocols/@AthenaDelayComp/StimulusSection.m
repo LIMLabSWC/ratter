@@ -14,34 +14,71 @@ switch action
         if length(varargin) < 2
             error('Need at least two arguments, x and y position, to initialize %s', mfilename);
         end
-        % x = varargin{1}; y = varargin{2};        
+        % x = varargin{1}; y = varargin{2};
 
-        % SoloParamHandle(obj, 'myfig', 'value', figure('closerequestfcn', [mfilename '(' class(obj) ', ''hide'');'], 'MenuBar', 'none', ...
-        %     'Name', mfilename), 'saveable', 0);
-
-        % creating figure window
-        SoloParamHandle(obj, 'myfig', 'value', figure('CloseRequestFcn', {@hide, obj}, ...
-            'MenuBar', 'none', 'Name', mfilename), 'saveable', 0);
+        % creating pairs and performance figure window with axes
+        SoloParamHandle( ...
+            obj, 'pairs_plot_figure', ...
+            'value', figure( ...
+            'CloseRequestFcn', {@hide, obj}, ...
+            'MenuBar', 'none', ...
+            'Name', 'Pairs and performance'), ...
+            'saveable', 0);
         screen_size = get(0, 'ScreenSize');
-        set(value(myfig),'Position',[(screen_size(3)-1100)/2 (screen_size(4)-800)/2 1100 800]);
-        % set(double(gcf), 'Visible', 'on');
+        set(double(value(pairs_plot_figure)), ...
+            'Position',[ ...
+            (screen_size(3)-800)/2 ...
+            (screen_size(4)-600)/2 800 600]);
+
+        SoloParamHandle( ...
+            obj, 'ax2', ...
+            'saveable', 0, ...
+            'value', axes('Position',[0.05 0.3 0.45 0.45]));
+        ylabel('log_e \sigma_2');
+        xlabel('log_e \sigma_1');
+        axis square;
+
+        SoloParamHandle( ...
+            obj, 'axperf2', ...
+            'saveable', 0, ...
+            'value', axes('Position',[0.55 0.3 0.45 0.45]));
+        ylabel('log_e \sigma_2');
+        xlabel('log_e \sigma_1');
+        axis square;
+
+
+
+        % creating StimulusSection figure window for GUI elements       
+        SoloParamHandle( ...
+            obj, 'myfig', ...
+            'value', figure( ...
+            'CloseRequestFcn', {@hide, obj}, ...
+            'MenuBar', 'none', ...
+            'Name', mfilename), ...
+            'saveable', 0);
+        screen_size = get(0, 'ScreenSize');
+        set(double(value(myfig)), ...
+            'Position',[ ...
+            (screen_size(3)-1100)/2 ...
+            (screen_size(4)-300)/2 1100 300] ...
+            );
 
         % adding plot
-        SoloParamHandle(obj, 'ax', 'saveable', 0, ...
-            'value', axes('Position', [0.1 0.5 0.45 0.45]));
+        SoloParamHandle( ...
+            obj, 'ax', ...
+            'saveable', 0, ...
+            'value', axes('Position',[0.05 0.3 0.45 0.45]));
         ylabel('log_e \sigma_2');
-        %set(value(ax),'Fontsize',15)
-        xlabel('log_e \sigma_1')
+        xlabel('log_e \sigma_1');
         axis square;
 
         % adding performance plot
         SoloParamHandle(obj, 'axperf', 'saveable', 0, ...
-            'value', axes('Position', [0.55 0.5 0.45 0.45]));
+            'value', axes('Position',[0.55 0.3 0.45 0.45]));
         ylabel('log_e \sigma_2');
-        %set(value(axperf),'Fontsize',15)
-        xlabel('log_e \sigma_1')
+        xlabel('log_e \sigma_1');
         axis square;
-   
+
 
         SoundManagerSection(obj, 'declare_new_sound', 'StimAUD1')
         SoundManagerSection(obj, 'declare_new_sound', 'StimAUD2')
@@ -55,15 +92,22 @@ switch action
 
         x=5; y=5;
         % Create toggle parameter for stimulus visibility
-        ToggleParam(obj, 'StimulusShow', 0, x, y, ...
-            'OnString', 'Stimuli', 'OffString', 'Stimuli', ...
+        ToggleParam(                    ...
+            obj,                        ...
+            'StimulusShow', 0,          ...
+            x, y,                       ...
+            'OnString', 'Stimuli',      ...
+            'OffString', 'Stimuli',     ...
             'TooltipString', 'Show/Hide Stimulus panel');
         set_callback(StimulusShow, {mfilename, 'show_hide'}); %#ok<NODEF> (Defined just above)
         next_row(y);
-        
-        MenuParam(obj, 'StimulusType', {'library', 'new'}, 'new', ...
-            x, y, 'labelfraction', 0.35, ...
-            'TooltipString', ...
+
+        MenuParam(                      ...
+            obj, 'StimulusType',        ...
+            {'library', 'new'}, 'new',  ...
+            x, y,                       ...
+            'labelfraction', 0.35,      ...
+            'TooltipString',            ...
             sprintf(['\n"new" means at each trial, a new noise pattern will be generated,\n' ...
             '"library" means for each trial stimulus is loaded from a library with limited number of noise patterns']) ...
             );
@@ -183,7 +227,8 @@ switch action
 
         set_callback_on_load(numClass, 4); %#ok<NODEF>
         set_callback(numClass, {mfilename, 'numClass'});
-        numClass.value = 4; callback(numClass);
+        numClass.value = 4; 
+        callback(numClass);
         StimulusSection(obj,'plot_pairs');
         set_callback(psych_pairs, {mfilename, 'PsychPairs'});
 
@@ -528,11 +573,13 @@ switch action
 
         %% Plot the pair set
         cla(value(ax));
+        cla(value(ax2));
 
         % Transform data to log scale
         xd = log(thesepairs(:,1));
         yd = log(thesepairs(:,2));
 
+        
         % Plot individual points
         for ii = 1:length(xd)
             axes(value(ax));
@@ -548,15 +595,16 @@ switch action
         % Calculate and set tick values
         %      Ytick=get(value(ax),'YtickLabel');
         %      Xtick=get(value(ax),'XtickLabel');
+
         set(value(ax), 'ytick', ((yd(1:1+value(midclass_pairs):(end-nPsych*psych_pairs)/2))));
         set(value(ax), 'xtick', ((xd(1:1+value(midclass_pairs):(end-nPsych*psych_pairs)/2))));
         set(value(ax), 'yticklabel', num2str(exp(yd(1:1+value(midclass_pairs):(end-nPsych*psych_pairs)/2)), 2));
         set(value(ax), 'xticklabel', num2str(exp(xd(1:1+value(midclass_pairs):(end-nPsych*psych_pairs)/2)), 2));
 
         % Set labels and font sizes
-        ylabel('\sigma_2 in log scale', 'FontSize', 16, 'FontName', 'Cambria Math');
-        set(value(ax), 'Fontsize', 15);
-        xlabel('\sigma_1 in log scale', 'FontSize', 16, 'FontName', 'Cambria Math');
+        ylabel('log_e \sigma_2');
+        xlabel('log_e \sigma_1');
+
 
         %% Select side and generate pair based on rule and trial
         SideSection(obj,'get_current_side');
@@ -676,6 +724,9 @@ switch action
         %% Plot the selected pair
         h1.value = plot(log(value(A1_sigma)),log(value(A2_sigma)),'s','color',[0.8 0.4 0.1],'markerfacecolor',[0.8 0.4 0.1],'MarkerSize',15,'LineWidth',3);
 
+        axChil = ax.Children;
+        copyobj(axChil, value(ax2));
+
         % Commented-out alternative plotting function
         % LOGplotPairs(thesepairs(:,1),thesepairs(:,2),'s',15,'k',1,16,thispair(1),thispair(2),value(ax),'init')
 
@@ -742,23 +793,30 @@ switch action
         end
 
         %% plot the pair set
-        cla(value(axperf))
+        cla(value(axperf));
+        cla(value(axperf2));
+
         xd=log(thesepairs(:,1));
         yd=log(thesepairs(:,2));
+
+        axes(value(axperf));
+
         for ii=1:length(xd)
-            axes(value(axperf));
             plot(xd(ii),yd(ii),'s','MarkerSize',31,'MarkerEdgeColor',[0 0 0],'LineWidth',1.5)
             hold on
             eval(sprintf('perf=value(perfClass%d);',ii))
             text(xd(ii)-0.14,yd(ii),num2str(round(perf*1000)/10));
             hold on
         end
+
         axis square
-        set(value(ax),'ytick',((yd(1:1+value(midclass_pairs):(end-nPsych*psych_pairs)/2))),'xtick',((xd(1:1+value(midclass_pairs):(end-nPsych*psych_pairs)/2))));
-        set(value(ax),'yticklabel',num2str(exp(yd(1:1+value(midclass_pairs):(end-nPsych*psych_pairs)/2)),2),'xticklabel',num2str(exp(xd(1:1+value(midclass_pairs):(end-nPsych*psych_pairs)/2)),2));
-        ylabel('\sigma_2 in log scale','FontSize',16,'FontName','Cambria Math');
-        set(value(axperf),'Fontsize',15)
-        xlabel('\sigma_1 in log scale','FontSize',16,'FontName','Cambria Math')
+        set(value(axperf),'ytick',((yd(1:1+value(midclass_pairs):(end-nPsych*psych_pairs)/2))),'xtick',((xd(1:1+value(midclass_pairs):(end-nPsych*psych_pairs)/2))));
+        set(value(axperf),'yticklabel',num2str(exp(yd(1:1+value(midclass_pairs):(end-nPsych*psych_pairs)/2)),2),'xticklabel',num2str(exp(xd(1:1+value(midclass_pairs):(end-nPsych*psych_pairs)/2)),2));
+        ylabel('\sigma_2 in log scale');
+        xlabel('\sigma_1 in log scale');
+
+        axperfChil = axperf.Children;
+        copyobj(axperfChil, value(axperf2));
 
 
         %% Case psych_pairs
@@ -855,6 +913,7 @@ switch action
         %% Case hide
     case 'hide'
         StimulusShow.value = 0; set(value(myfig), 'Visible', 'off');
+        set(value(pairs_plot_figure), 'Visible', 'off');
         %% Case show
     case 'show'
         StimulusShow.value = 1; set(value(myfig), 'Visible', 'on');
