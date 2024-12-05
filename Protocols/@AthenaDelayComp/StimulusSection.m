@@ -16,7 +16,7 @@ switch action
         end
         % x = varargin{1}; y = varargin{2};
 
-
+        % creating pairs and performance figure window with axes
         SoloParamHandle( ...
             obj, 'pairs_plot_figure', ...
             'value', figure( ...
@@ -30,7 +30,25 @@ switch action
             (screen_size(3)-800)/2 ...
             (screen_size(4)-600)/2 800 600]);
 
-        % creating figure window
+        SoloParamHandle( ...
+            obj, 'ax2', ...
+            'saveable', 0, ...
+            'value', axes('Position',[0.05 0.3 0.45 0.45]));
+        ylabel('log_e \sigma_2');
+        xlabel('log_e \sigma_1');
+        axis square;
+
+        SoloParamHandle( ...
+            obj, 'axperf2', ...
+            'saveable', 0, ...
+            'value', axes('Position',[0.55 0.3 0.45 0.45]));
+        ylabel('log_e \sigma_2');
+        xlabel('log_e \sigma_1');
+        axis square;
+
+
+
+        % creating StimulusSection figure window for GUI elements       
         SoloParamHandle( ...
             obj, 'myfig', ...
             'value', figure( ...
@@ -209,7 +227,8 @@ switch action
 
         set_callback_on_load(numClass, 4); %#ok<NODEF>
         set_callback(numClass, {mfilename, 'numClass'});
-        numClass.value = 4; callback(numClass);
+        numClass.value = 4; 
+        callback(numClass);
         StimulusSection(obj,'plot_pairs');
         set_callback(psych_pairs, {mfilename, 'PsychPairs'});
 
@@ -554,6 +573,7 @@ switch action
 
         %% Plot the pair set
         cla(value(ax));
+        cla(value(ax2));
 
         % Transform data to log scale
         xd = log(thesepairs(:,1));
@@ -704,8 +724,8 @@ switch action
         %% Plot the selected pair
         h1.value = plot(log(value(A1_sigma)),log(value(A2_sigma)),'s','color',[0.8 0.4 0.1],'markerfacecolor',[0.8 0.4 0.1],'MarkerSize',15,'LineWidth',3);
 
-
-        ax2 = copyobj(double(ax), double(pairs_plot_figure));
+        axChil = ax.Children;
+        copyobj(axChil, value(ax2));
 
         % Commented-out alternative plotting function
         % LOGplotPairs(thesepairs(:,1),thesepairs(:,2),'s',15,'k',1,16,thispair(1),thispair(2),value(ax),'init')
@@ -773,7 +793,9 @@ switch action
         end
 
         %% plot the pair set
-        % cla(value(axperf))
+        cla(value(axperf));
+        cla(value(axperf2));
+
         xd=log(thesepairs(:,1));
         yd=log(thesepairs(:,2));
 
@@ -793,7 +815,8 @@ switch action
         ylabel('\sigma_2 in log scale');
         xlabel('\sigma_1 in log scale');
 
-        axperf2 = copyobj(double(axperf), double(pairs_plot_figure));
+        axperfChil = axperf.Children;
+        copyobj(axperfChil, value(axperf2));
 
 
         %% Case psych_pairs
