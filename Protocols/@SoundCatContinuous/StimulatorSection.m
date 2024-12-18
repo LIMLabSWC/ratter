@@ -40,7 +40,7 @@ switch action
       %NumeditParam(obj,'LCB_nostim', 0,x,y,'position',[x+100 y 100 20],'labelfraction',0.6); next_row(y);
       %SoloParamHandle(obj,'LegalCBrk_temp', 'value',0);
       
-      MenuParam(obj,'StimInterval',{'WholeTrial','S1','DelayDur','S2'},1,x,y,'labelfraction',0.30); next_row(y);
+      MenuParam(obj,'StimInterval',{'WholeTrial','S1','DelayDur','GoCue'},1,x,y,'labelfraction',0.30); next_row(y);
       set_callback(StimInterval, {mfilename, 'StimInterval'});
       MenuParam(obj,'StimOnSide',{'both','left','right'},1,x,y,'labelfraction',0.3); next_row(y);
       
@@ -77,7 +77,7 @@ switch action
       DispParam(obj,'PW',15,x,y,'position',[x+100 y 50 20],'labelfraction',0.4);
       DispParam(obj,'NP',1,x,y,'position',[x+150 y 50 20],'labelfraction',0.4); next_row(y);
       
-      NumeditParam(obj,'StimProb',     1,x,y,'position',[x     y 100 20],'labelfraction',0.65);
+      NumeditParam(obj,'StimProb',     0,x,y,'position',[x     y 100 20],'labelfraction',0.65);
       ToggleParam( obj,'ShuffleValues',0,x,y,'position',[x+100 y 100 20],'OnString','Shuffle','OffString','Lock');  next_row(y);
       
       SoloParamHandle(obj, 'stimulator_history',   'value', []);
@@ -96,7 +96,7 @@ switch action
   case 'update_values',
             
 	  StimulatorSection(obj,'StimInterval');
-      sh = value(stimulator_history); %#ok<NODEF>
+      sh = value(stimulator_history) %#ok<NODEF>
       %if n_done_trials == 0 || sh(end) == 0
       %    LegalCBrk_temp.value = value(LegalCBrk); %#ok<NODEF>
       %end
@@ -135,8 +135,8 @@ switch action
       sf = value(StimFreq);   
       pw = value(PulseWidth);
       np = value(NumPulses);  
-      ss = value(StimStates);
-      sl = value(StimLines);
+      ss = value(StimStates)
+      sl = value(StimLines)
 
       if value(ShuffleValues) == 1
           sd = sd(ceil(rand(1) * length(sd)));
@@ -196,12 +196,7 @@ switch action
       
       for i = 1:length(sl)
           stimline = bSettings('get','DIOLINES',psl{sl(i)}); 
-
-      disp('stimlinevalue')
-      psl{sl(i)}
-      disp('stimlinevalue2')
-        stimline
-
+      
           sma = add_scheduled_wave(sma,...
               'name',          ['stimulator_wave',num2str(i)],...
               'preamble',      (1/sf)-(pw/1000),... %%%% Remember: change it such that if this is negative makes it 0
@@ -245,21 +240,21 @@ switch action
     case 'StimInterval'
         
         if strcmp(StimInterval, 'WholeTrial');
-            PulseWidth.value = Total_CP_duration*1000 + 2000;
+            PulseWidth.value = Total_CP_duration*1000;
             StimFreq.value = 1000/PulseWidth;
             StartDelay.value = PreStim_time;
         elseif strcmp(StimInterval, 'S1');
             PulseWidth.value = A1_time*1000;
             StimFreq.value = 1000/PulseWidth;
             StartDelay.value = PreStim_time;
-        elseif strcmp(StimInterval, 'S2');
-            PulseWidth.value = (A2_time+time_bet_aud2_gocue+time_go_cue)*1000+2000;
-            StimFreq.value = 1000/PulseWidth;
-            StartDelay.value = PreStim_time + A1_time + Del_time;
         elseif strcmp(StimInterval, 'DelayDur');
-            PulseWidth.value = A1_time*1000;
+            PulseWidth.value = time_bet_aud1_gocue*1000;
             StimFreq.value = 1000/PulseWidth;
-            StartDelay.value = PreStim_time + A1_time*2;
+            StartDelay.value = PreStim_time + A1_time;
+        elseif strcmp(StimInterval, 'GoCue');
+            PulseWidth.value = time_go_cue*1000;
+            StimFreq.value = 1000/PulseWidth;
+            StartDelay.value = PreStim_time + A1_time + time_bet_aud1_gocue;
                 
         end
 %% set
