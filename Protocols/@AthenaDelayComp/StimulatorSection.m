@@ -49,6 +49,8 @@ switch action
       [dionums order] = sort(dionums);
       dionames2 = cell(0);
       for i = 1:length(dionums); if ~isnan(dionums(i)); dionames2{end+1} = dionames{order(i)}; end; end %#ok<AGROW>
+      dionames2 = cell(0);
+      dionames2{1} = 'opto';
       
       MenuParam(obj,'StimLine',dionames2,1,x,y,'labelfraction',0.30); next_row(y);
       
@@ -57,7 +59,7 @@ switch action
       states = fieldnames(SC);
       waves  = fieldnames(WC);
       states(2:end+1) = states;
-      states{1} = 'none';
+      states{1} = 'cp';
       states(end+1:end+length(waves)) = waves;
       
       MenuParam(obj,'StimState',states,1,x,y,'labelfraction',0.30); next_row(y);
@@ -68,14 +70,14 @@ switch action
       NumeditParam(obj,'StartDelay', 0,x,y,'position',[x     y 100 20],'labelfraction',0.60);
       NumeditParam(obj,'StimFreq',  20,x,y,'position',[x+100 y 100 20],'labelfraction',0.60); next_row(y);
       NumeditParam(obj,'PulseWidth',15,x,y,'position',[x     y 100 20],'labelfraction',0.60); 
-      NumeditParam(obj,'NumPulses', 10,x,y,'position',[x+100 y 100 20],'labelfraction',0.60); next_row(y);
+      NumeditParam(obj,'NumPulses', 1,x,y,'position',[x+100 y 100 20],'labelfraction',0.60); next_row(y);
       
       DispParam(obj,'SD',0 ,x,y,'position',[x     y 50 20],'labelfraction',0.4);
       DispParam(obj,'SF',20,x,y,'position',[x+50  y 50 20],'labelfraction',0.4);
       DispParam(obj,'PW',15,x,y,'position',[x+100 y 50 20],'labelfraction',0.4);
       DispParam(obj,'NP',1,x,y,'position',[x+150 y 50 20],'labelfraction',0.4); next_row(y);
       
-      NumeditParam(obj,'StimProb',     0,x,y,'position',[x     y 100 20],'labelfraction',0.65);
+      NumeditParam(obj,'StimProb',     1,x,y,'position',[x     y 100 20],'labelfraction',0.65);
       ToggleParam( obj,'ShuffleValues',0,x,y,'position',[x+100 y 100 20],'OnString','Shuffle','OffString','Lock');  next_row(y);
       
       SoloParamHandle(obj, 'stimulator_history',   'value', []);
@@ -159,6 +161,8 @@ switch action
           disp('StimState value greater than list of possible stim states');
       else
           StimState.value = ss;
+          disp('test ss')
+          value(ss)
       end
           
       if sl > length(psl)
@@ -192,7 +196,12 @@ switch action
       
       for i = 1:length(sl)
           stimline = bSettings('get','DIOLINES',psl{sl(i)}); 
-      
+
+      disp('stimlinevalue')
+      psl{sl(i)}
+      disp('stimlinevalue2')
+        stimline
+
           sma = add_scheduled_wave(sma,...
               'name',          ['stimulator_wave',num2str(i)],...
               'preamble',      (1/sf)-(pw/1000),... %%%% Remember: change it such that if this is negative makes it 0
