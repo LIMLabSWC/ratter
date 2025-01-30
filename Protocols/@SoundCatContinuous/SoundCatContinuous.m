@@ -133,7 +133,56 @@ switch action,
     figpos = get(double(gcf), 'Position');
     [expmtr, rname]=SavingSection(obj, 'get_info');
     HeaderParam(obj, 'prot_title', [mfilename ': ' expmtr ', ' rname], x, y, 'position', [10 figpos(4)-25, 800 20]);
-
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+    % Start Bonsai when the protocol starts
+    bonsai_path = 'C:\Users\akramilab\AppData\Local\Bonsai\Bonsai.exe'; 
+    file_path = 'C:\Users\akramilab\Desktop\camera.bonsai';
+    command = sprintf('"%s" "%s" --start', bonsai_path, file_path);
+    status = system([command, ' &']);
+    if status == 0
+        disp('Bonsai process started successfully');
+    else
+        disp('Error starting Bonsai process');
+        disp(cmdout);
+    end
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
     SoundCatSMA(obj, 'init');
     feval(mfilename, obj, 'prepare_next_trial');
          
@@ -194,6 +243,45 @@ switch action,
       
       %% close
    case 'close'
+    %
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+    % Stop Bonsai when the protocol ends
+    command = sprintf('"%s" "%s" --stop', bonsai_path, file_path);
+    [status, cmdout] = system(command);
+    if status == 0
+        disp('Bonsai process stopped successfully');
+    else
+        disp('Error stopping Bonsai process');
+        disp(cmdout);
+    end
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
     PokesPlotSection(obj, 'close');
     %PunishmentSection(obj, 'close');
 	SideSection(obj, 'close');
