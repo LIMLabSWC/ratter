@@ -136,7 +136,7 @@ switch action,
 
     % Start Bonsai when the protocol starts
     bonsai_path = 'C:\Users\akramilab\AppData\Local\Bonsai\Bonsai.exe'; 
-    file_path = 'C:\Users\akramilab\Desktop\camera.bonsai';
+    file_path = 'C:\ratter\camera.bonsai';
     command = sprintf('"%s" "%s" --start', bonsai_path, file_path);
     status= system([command, ' &']);
     if status == 0
