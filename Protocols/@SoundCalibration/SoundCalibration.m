@@ -238,12 +238,12 @@ switch action,
         % Calculate individual group width based on screen dimensions and number of groups
         groupwidth = floor((MP(3)/2)/numel(linegroups));
 
+        padding = 10 % padding around GUI elements
+
         % Calculate total width needed for all groups combined
-        total_width = floor(numel(linegroups) * groupwidth);
-
+        total_width = floor(numel(linegroups) * groupwidth+padding);
         total_height = 400 % total height of GUI
-        padding = 5 % padding around GUI elements
-
+        
         label_height = 140 % height of port label
         button_height = 25
 
@@ -253,7 +253,7 @@ switch action,
         % Set figure position with centered alignment and fixed height of 400 pixels
         % position vector: [left-right, down-up, width, height], the origo is
         % the bottom left corner
-        set(value(myfig), 'Position', [left_pos, floor((MP(4)-400)/2), total_width, total_height]);
+        set(value(myfig), 'Position', [left_pos, floor((MP(4)-total_height)/2), total_width, total_height]);
 
         % Initialize array to store line names
         line_names = [];
@@ -334,7 +334,7 @@ switch action,
             if ~isempty(linegroups{i}) && ~isempty(linegroups{i}{2,2})
                 ToggleParam(obj, ...
                     ['DIO',num2str(i),'_1'],0,0,0, ...
-                    'position',[((i-1)*groupwidth)+padding, 80, groupwidth-padding,button_height], ...
+                    'position',[((i-1)*groupwidth)+padding, 2*button_height+padding, groupwidth-padding,button_height], ...
                     'OnString', [linegroups{i}{2,2},' ON'], ...
                     'OffString', [linegroups{i}{2,2},' OFF']);
                 set_callback(eval(['DIO',num2str(i),'_1']),{mfilename,['toggle',num2str(i),'_1']});
@@ -344,7 +344,7 @@ switch action,
             if ~isempty(linegroups{i}) && ~isempty(linegroups{i}{3,2})
                 ToggleParam(obj, ...
                     ['DIO',num2str(i),'_2'],0,0,0, ...
-                    'position',[((i-1)*groupwidth)+padding, 50, groupwidth-padding,button_height], ...
+                    'position',[((i-1)*groupwidth)+padding, button_height+padding, groupwidth-padding,button_height], ...
                     'OnString', [linegroups{i}{3,2},' ON'], ...
                     'OffString', [linegroups{i}{3,2},' OFF']);
                 set_callback(eval(['DIO',num2str(i),'_2']),{mfilename,['toggle',num2str(i),'_2']});
