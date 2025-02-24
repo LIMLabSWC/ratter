@@ -188,16 +188,18 @@ switch action,
         T = 1;
         fcut = 110;
         filter_type = 'GAUS';
-        A1_sigma =  0.0500;
-        A2_sigma = 0.0260;
-        A3_sigma = 0.0135;
-        A4_sigma = 0.0070;
+        A1_sigma = 0.3199; %0.0500;
+        A2_sigma = 0.1230;%0.0260;
+        A3_sigma = 0.0473;%0.0135;
+        A4_sigma =  0.0182;%0.0070;    
+        A5_sigma = 0.0070;    
         [rawA1 rawA2 normA1 normA2]=noisestim(1,1,T,fcut,Fs,filter_type);
         modulator=singlenoise(1,T,[lfreq hfreq],Fs,'BUTTER');
         AUD1=normA1(1:T*sr).*modulator(1:T*sr).*A1_sigma;
         AUD2=normA1(1:T*sr).*modulator(1:T*sr).*A2_sigma;
         AUD3=normA1(1:T*sr).*modulator(1:T*sr).*A3_sigma;
         AUD4=normA1(1:T*sr).*modulator(1:T*sr).*A4_sigma;
+        AUD5=normA1(1:T*sr).*modulator(1:T*sr).*A5_sigma;
 %         snd = MakeBupperSwoop(sr,0,freq,freq, len/2, len/2, 0, 0.1, 'F1_volume_factor',0.07,'F2_volume_factor',0.07);
 %         silence_length = 0;
 %         presound_silence = zeros(1,sr*silence_length/1000);
@@ -209,7 +211,7 @@ switch action,
 %         SoundManagerSection(obj,'loop_sound','left_sound',1);
 %         SoundManagerSection(obj,'loop_sound','right_sound',1);
 % 
-%         SoundManagerSection(obj,'declare_new_sound','center_sound',[snd;snd([ceil((sr / freq) / 2):end,1:ceil((sr / freq) / 2)-1])]);
+%         SoundManager Section(obj,'declare_new_sound','center_sound',[snd;snd([ceil((sr / freq) / 2):end,1:ceil((sr / freq) / 2)-1])]);
 %         SoundManagerSection(obj,'loop_sound','center_sound',1);
 %         
     if ~isempty(AUD2)
@@ -223,6 +225,9 @@ switch action,
     end
     if ~isempty(AUD4)
         SoundManagerSection(obj, 'declare_new_sound', 'fourth_sound', [AUD4';  AUD4'])
+    end
+    if ~isempty(AUD5)
+        SoundManagerSection(obj, 'declare_new_sound', 'fifth_sound', [AUD5';  AUD5'])
     end
     SoundManagerSection(obj, 'send_not_yet_uploaded_sounds');
     end
@@ -257,11 +262,13 @@ switch action,
                 ToggleParam(obj,'FourthSound',      0,0,0,'position',[((i-1)*groupwidth)+1,  10, groupwidth-2,50],'OnString', 'Sound Four ON',       'OffString', 'Sound Four OFF');          
                 set_callback(FourthSound,{mfilename,'play_fourth_sound'});  
             end
+        elseif ~isempty(linegroups{i}) && isempty(linegroups{i}{1,2})
+            ToggleParam(obj,'FifthSound',      0,0,0,'position',[((i-1)*groupwidth)+1,  10, groupwidth-2,50],'OnString', 'Sound Five ON',       'OffString', 'Sound Five OFF');          
+            set_callback(FifthSound,{mfilename,'play_fifth_sound'});   
         end
         if ~isempty(linegroups{i}) && ~isempty(linegroups{i}{2,2})
-            ToggleParam(obj,['DIO',num2str(i),'_1'],0,0,0,'position',[((i-1)*groupwidth)+1, 210, groupwidth-2,50],'OnString', [linegroups{i}{2,2},' ON'], 'OffString', [linegroups{i}{2,2},' OFF']);
-            set_callback(eval(['DIO',num2str(i),'_1']),{mfilename,['toggle',num2str(i),'_1']});
-            
+             ToggleParam(obj,['DIO',num2str(i),'_1'],0,0,0,'position',[((i-1)*groupwidth)+1, 210, groupwidth-2,50],'OnString', [linegroups{i}{2,2},' ON'], 'OffString', [linegroups{i}{2,2},' OFF']);
+             set_callback(eval(['DIO',num2str(i),'_1']),{mfilename,['toggle',num2str(i),'_1']});           
         end
         if ~isempty(linegroups{i}) && ~isempty(linegroups{i}{3,2})
             ToggleParam(obj,['DIO',num2str(i),'_2'],0,0,0,'position',[((i-1)*groupwidth)+1, 110, groupwidth-2,50],'OnString', [linegroups{i}{3,2},' ON'], 'OffString', [linegroups{i}{3,2},' OFF']);
@@ -312,6 +319,13 @@ switch action,
             SoundManagerSection(obj,'play_sound','fourth_sound');
         else
             SoundManagerSection(obj,'stop_sound','fourth_sound');
+        end 
+    case 'play_fifth_sound' 
+        %% play_fifth_sound
+        if value(FifthSound) == 1
+            SoundManagerSection(obj,'play_sound','fifth_sound');
+        else
+            SoundManagerSection(obj,'stop_sound','fifth_sound');
         end  
     case 'toggle1_1'
         %% case toggle1_1
