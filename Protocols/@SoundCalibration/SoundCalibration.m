@@ -188,11 +188,11 @@ switch action,
             T = 1;
             fcut = 110;
             filter_type = 'GAUS';
-            A1_sigma = 0.3199; %0.0500;
-            A2_sigma = 0.1230;%0.0260;
-            A3_sigma = 0.0473;%0.0135;
-            A4_sigma =  0.0182;%0.0070;
-            A5_sigma = 0.0070;
+            A1_sigma = 0.007%0.3199; %0.0500;
+            A2_sigma = exp((log(0.05) + log(0.007)) / 2) %0.1230;%0.0260;
+            A3_sigma = 0.05 %0.0473;%0.0135;
+            A4_sigma = 0.05 %0.0182;%0.0070;
+            A5_sigma = 0.05 %0.0070;
             [rawA1 rawA2 normA1 normA2]=noisestim(1,1,T,fcut,Fs,filter_type);
             modulator=singlenoise(1,T,[lfreq hfreq],Fs,'BUTTER');
             AUD1=normA1(1:T*sr).*modulator(1:T*sr).*A1_sigma;
