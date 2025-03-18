@@ -7,32 +7,32 @@ function [obj] = Arpit_CentrePokeTraining(varargin)
 % we inherit only from Plugins
 
 obj = class(struct, mfilename, pokesplot2, saveload, sessionmodel, soundmanager, soundui, antibias, ...
-  water, distribui, punishui, comments, soundtable, sqlsummary,reinforcement);
+  water, distribui, punishui, comments, soundtable, sqlsummary,reinforcement,softpokestay2);
 
 %---------------------------------------------------------------
 %   BEGIN SECTION COMMON TO ALL PROTOCOLS, DO NOT MODIFY
 %---------------------------------------------------------------
 
 % If creating an empty object, return without further ado:
-if nargin==0 || (nargin==1 && ischar(varargin{1}) && strcmp(varargin{1}, 'empty')),
+if nargin==0 || (nargin==1 && ischar(varargin{1}) && strcmp(varargin{1}, 'empty'))
    return;
-end;
+end
 
-if isa(varargin{1}, mfilename), % If first arg is an object of this class itself, we are
+if isa(varargin{1}, mfilename) % If first arg is an object of this class itself, we are
    % Most likely responding to a callback from
    % a SoloParamHandle defined in this mfile.
    if length(varargin) < 2 || ~ischar(varargin{2}),
       error(['If called with a "%s" object as first arg, a second arg, a ' ...
          'string specifying the action, is required\n']);
    else action = varargin{2}; varargin = varargin(3:end); %#ok<NASGU>
-   end;
+   end
 else % Ok, regular call with first param being the action string.
    action = varargin{1}; varargin = varargin(2:end); %#ok<NASGU>
-end;
+end
 
 GetSoloFunctionArgs(obj);
 
-switch action,
+switch action
    
    %% init
    case 'init'
@@ -124,12 +124,12 @@ switch action,
     
     next_column(x); y=5;
 	[x, y] = OverallPerformanceSection(obj, 'init', x, y);
-    [x, y] = StimulatorSection(obj, 'init', x, y); next_row(y, 1.3);
+    % [x, y] = StimulatorSection(obj, 'init', x, y); next_row(y, 1.3);
 	[x, y] = ParamsSection(obj,  'init', x, y); %#ok<NASGU>
     [x, y] = SoundSection(obj,'init',x,y);
 %    [x, y] = PlayStimuli(obj,'init',x,y);
     % [x, y] = StimulusSection(obj,'init',x,y);
-    % [x, y] = SoftPokeStayInterface(obj, 'add', 'soft_cp', x, y);
+    [x, y] = SoftPokeStayInterface(obj, 'add', 'soft_cp', x, y);
     figpos = get(double(gcf), 'Position');
     [expmtr, rname]=SavingSection(obj, 'get_info');
     HeaderParam(obj, 'prot_title', [mfilename ': ' expmtr ', ' rname], x, y, 'position', [10 figpos(4)-25, 800 20]);
@@ -155,7 +155,7 @@ switch action,
 	% Run SessionDefinition *after* ParamsSection so we know whether the
 	% trial was a violation or not
        SessionDefinition(obj, 'next_trial');
-       StimulatorSection(obj, 'update_values');
+       % StimulatorSection(obj, 'update_values');
        OverallPerformanceSection(obj, 'evaluate');
        % StimulusSection(obj,'prepare_next_trial');
        SoundManagerSection(obj, 'send_not_yet_uploaded_sounds');

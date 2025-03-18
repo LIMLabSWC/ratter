@@ -45,7 +45,6 @@ switch action
 
     case 'init'
 
-        SoftPokeStayInterface(obj, 'add', 'soft_cp', x, y);
 
     case 'prepare_next_trial'
 
