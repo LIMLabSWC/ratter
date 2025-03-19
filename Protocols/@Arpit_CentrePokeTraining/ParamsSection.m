@@ -37,27 +37,27 @@ switch action
 		SubheaderParam(obj, 'title', 'Params Section', x, y);
 		next_row(y, 1.5);
 		next_column(x); y = 5;
+        next_row(y);
+        NumeditParam(obj, 'reward_delay', 0.01, x,y,'label','Reward Delay','TooltipString','Delay between side poke and reward delivery');
+		next_row(y);
+		NumeditParam(obj, 'drink_time', 1, x,y,'label','Drink Time','TooltipString','waits to finish water delivery');
+		next_row(y);
+		NumeditParam(obj, 'timeout_iti', 5, x,y,'label','No Choice Timeout','TooltipString','ITI on timeout trials');
+		next_row(y);
+		NumeditParam(obj, 'violation_iti', 1, x,y,'label','Violation Timeout','TooltipString','Center poke violation duration');
         % Reward Collection
+        next_row(y);
 		NumeditParam(obj, 'RewardCollection_duration', 10, x,y,'label','RewardCollection_dur','TooltipString','Wait until rat collects the reward else a timeout');
 		next_row(y);
 		NumeditParam(obj, 'SideLed_duration', 1, x,y,'label','Side LED duration','TooltipString','Duration of SideLed');
         % Centre Poke
 		next_row(y);
-		NumeditParam(obj, 'legal_cbreak', 0.1, x,y, 'position', [x, y, 175 20], 'TooltipString','Time in sec for which it is ok to be outside the center port before a violation occurs.');
+		NumeditParam(obj, 'legal_cbreak', 0.1, x,y, 'TooltipString','Time in sec for which it is ok to be outside the center port before a violation occurs.');
         set_callback(legal_cbreak, {mfilename, 'new_legal_cbreak'}); 
         next_row(y);
-		NumeditParam(obj, 'SettlingIn_time', 0.2, x,y, 'position', [x, y, 175 20], 'TooltipString','Initial settling period during which there is no violation');
-		next_row(y);
-        NumeditParam(obj, 'A1_time_Min', 0.4, x,y,'label','Min time AUD1','TooltipString','Min value to select the Duration of fixed stimulus');
-        set_callback(A1_time_Min, {mfilename, 'new_CP_duration'});
+		NumeditParam(obj, 'SettlingIn_time', 0.2, x,y, 'TooltipString','Initial settling period during which there is no violation');
         next_row(y);
-        NumeditParam(obj, 'A1_time', 0.4, x,y,'label','AUD1 Time','TooltipString','Actual Duration of fixed stimulus');
-        next_row(y);
-        set_callback(A1_time, {mfilename, 'new_CP_duration'});
-        next_row(y);
-        NumeditParam(obj, 'A1_time_Max', 0.4, x,y,'label','Max time AUD1','TooltipString','Max value to select the Duration of fixed stimulus');
-        set_callback(A1_time_Max, {mfilename, 'new_CP_duration'});
-        next_row(y);
+        % PreStim
         NumeditParam(obj, 'PreStim_time_Min', 0.20, x,y,'label','Pre-Stim Min','TooltipString','Min Time in NIC before starting the stimulus');
         set_callback(PreStim_time_Min, {mfilename, 'new_CP_duration'});
         next_row(y);
@@ -67,11 +67,21 @@ switch action
         NumeditParam(obj, 'PreStim_time_Max', 0.40, x,y,'label','Pre-Stim Max','TooltipString','Max Time in NIC before starting the stimulus');
         set_callback(PreStim_time_Max, {mfilename, 'new_CP_duration'});
         next_row(y);
+        % A1 Time
+        NumeditParam(obj, 'A1_time_Min', 0.4, x,y,'label','Min time AUD1','TooltipString','Min value to select the Duration of fixed stimulus');
+        set_callback(A1_time_Min, {mfilename, 'new_CP_duration'});
+        next_row(y);
+        NumeditParam(obj, 'A1_time', 0.4, x,y,'label','AUD1 Time','TooltipString','Actual Duration of fixed stimulus');
+        set_callback(A1_time, {mfilename, 'new_CP_duration'});
+        next_row(y);
+        NumeditParam(obj, 'A1_time_Max', 0.4, x,y,'label','Max time AUD1','TooltipString','Max value to select the Duration of fixed stimulus');
+        set_callback(A1_time_Max, {mfilename, 'new_CP_duration'});
+        next_row(y);
+        % Time b/w stim and Go Cue
         NumeditParam(obj, 'time_bet_aud1_gocue_Min', 0.2, x,y,'label','Min A1-GoCue time','TooltipString','Min time between the end of the stimulus and the go cue ');
         set_callback(time_bet_aud1_gocue_Min, {mfilename, 'new_CP_duration'});
         next_row(y);
         NumeditParam(obj, 'time_bet_aud1_gocue', 0.2, x,y,'label','A1-GoCue time','TooltipString','Actual time between the end of the stimulus and the go cue ');
-        next_row(y);
         set_callback(time_bet_aud1_gocue, {mfilename, 'new_CP_duration'});
         next_row(y);
         NumeditParam(obj, 'time_bet_aud1_gocue_Max', 2, x,y,'label','Max A1-GoCue time','TooltipString','Max time between the end of the stimulus and the go cue ');
@@ -82,7 +92,7 @@ switch action
         DispParam(obj, 'CP_duration', PreStim_time+A1_time+time_bet_aud1_gocue, x,y,'label','CP duration','TooltipString','Duration of Nose in Central Poke before Go cue starts (see Total_CP_duration)');
 		set_callback(CP_duration, {mfilename, 'new_CP_duration'});
 		next_row(y);
-		NumeditParam(obj, 'time_go_cue' ,0.1, x,y,'label','Go Cue Duration','TooltipString','duration of go cue (see Total_CP_duration)');
+		NumeditParam(obj, 'time_go_cue' ,0.2, x,y,'label','Go Cue Duration','TooltipString','duration of go cue (see Total_CP_duration)');
 		set_callback(time_go_cue, {mfilename, 'new_time_go_cue'});
 		next_row(y);
 		DispParam(obj, 'Total_CP_duration', CP_duration+time_go_cue, x, y, 'TooltipString', 'Total expected(rat can poke out anytime after Go cue onset) nose in center port time, in secs. Sum of CP_duration and Go Cue duration'); %#ok<*NODEF>
@@ -92,16 +102,6 @@ switch action
 			'OffString', 'Warmup OFF',...
 			'TooltipString', sprintf(['If on (Yellow) then it applies the initial warming up phase, during which the\n',...
             'CP_duration starts small and gradually grows to last_session_max_cp_duration']));
-        next_row(y);
-	
-        NumeditParam(obj, 'reward_delay', 0.01, x,y,'label','Reward Delay','TooltipString','Delay between side poke and reward delivery');
-		next_row(y);
-		NumeditParam(obj, 'drink_time', 1, x,y,'label','Drink Time','TooltipString','waits to finish water delivery');
-		next_row(y);
-		NumeditParam(obj, 'timeout_iti', 5, x,y,'label','No Choice Timeout','TooltipString','ITI on timeout trials');
-		next_row(y);
-		NumeditParam(obj, 'violation_iti', 1, x,y,'label','Violation Timeout','TooltipString','Center poke violation duration');
-
         next_row(y);
         ToggleParam(obj, 'random_PreStim_time', 0, x,y,...
         'OnString', 'random PreStim_time ON',...
@@ -176,7 +176,7 @@ switch action
 		AntibiasSectionAthena(obj, 'update_biashitfrac', value(LeftProb));
 		
     case 'new_legal_cbreak'
-    	SoftPokeStayInterface(obj, 'set', 'soft_cp', 'Grace',   legal_cbreak);
+    	SoftPokeStayInterface(obj, 'set', 'soft_cp', 'Grace',   value(legal_cbreak));
 
 	case 'new_CP_duration' 
 
