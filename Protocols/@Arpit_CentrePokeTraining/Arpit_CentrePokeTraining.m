@@ -6,11 +6,11 @@ function [obj] = Arpit_CentrePokeTraining(varargin)
 % Default object is of our own class (mfilename);
 % we inherit only from Plugins
 
-obj = class(struct, mfilename, pokesplot2, saveload, sessionmodel, soundmanager, soundui, antibias, ...
+obj = class(struct, mfilename, pokesplot2, saveload, sessionmodel2, soundmanager, soundui, antibias, ...
   water, distribui, punishui, comments, soundtable, sqlsummary,reinforcement,softpokestay2);
 
 %---------------------------------------------------------------
-%   BEGIN SECTION COMMON TO ALL PROTOCOLS, DO NOT MODIFY
+%   BEGIN SECTION COMMONSoundTableSection TO ALL PROTOCOLS, DO NOT MODIFY
 %---------------------------------------------------------------
 
 % If creating an empty object, return without further ado:
@@ -21,10 +21,11 @@ end
 if isa(varargin{1}, mfilename) % If first arg is an object of this class itself, we are
    % Most likely responding to a callback from
    % a SoloParamHandle defined in this mfile.
-   if length(varargin) < 2 || ~ischar(varargin{2}),
+   if length(varargin) < 2 || ~ischar(varargin{2})
       error(['If called with a "%s" object as first arg, a second arg, a ' ...
          'string specifying the action, is required\n']);
-   else action = varargin{2}; varargin = varargin(3:end); %#ok<NASGU>
+   else 
+       action = varargin{2}; varargin = varargin(3:end); %#ok<NASGU>
    end
 else % Ok, regular call with first param being the action string.
    action = varargin{1}; varargin = varargin(2:end); %#ok<NASGU>
@@ -58,11 +59,6 @@ switch action
     SoloParamHandle(obj, 'hit_history', 'value', []);
     DeclareGlobals(obj, 'ro_args', {'hit_history'});
     SoloFunctionAddVars('ParamsSection', 'rw_args', 'hit_history');
-    
-    %pair_history changed to stimulus_history (from AthenaDelayComp)
-    % SoloParamHandle(obj, 'stimulus_history', 'value', []);
-    % DeclareGlobals(obj, 'ro_args', {'stimulus_history'});
-    % SoloFunctionAddVars('StimulusSection', 'rw_args', 'stimulus_history');
     
     SoloParamHandle(obj, 'violation_history', 'value', []);
     DeclareGlobals(obj, 'ro_args', {'violation_history'});
@@ -118,27 +114,27 @@ switch action
     struct('states',  my_state_colors, 'pokes', my_poke_colors)); next_row(y);
 
     [x, y] = CommentsSection(obj, 'init', x, y);
-    SessionDefinition(obj, 'init', x, y, value(myfig)); next_row(y, 2); %#ok<NASGU>
-    SessionDefinition(obj, 'set_old_style_parsing_flag',0);
+    
     % [x, y] = PunishmentSection(obj, 'init', x, y); %#ok<NASGU>
     
     next_column(x); y=5;
 	[x, y] = OverallPerformanceSection(obj, 'init', x, y);
-    % [x, y] = StimulatorSection(obj, 'init', x, y); next_row(y, 1.3);
 	[x, y] = ParamsSection(obj,  'init', x, y); %#ok<NASGU>
     [x, y] = SoundSection(obj,'init',x,y);
-%    [x, y] = PlayStimuli(obj,'init',x,y);
-    % [x, y] = StimulusSection(obj,'init',x,y);
     [x, y] = SoftPokeStayInterface(obj, 'add', 'soft_cp', x, y);
+    
     figpos = get(double(gcf), 'Position');
     [expmtr, rname]=SavingSection(obj, 'get_info');
     HeaderParam(obj, 'prot_title', [mfilename ': ' expmtr ', ' rname], x, y, 'position', [10 figpos(4)-25, 800 20]);
 
     Arpit_CentrePokeTrainingSMA(obj, 'init');
     
+    SessionDefinition(obj, 'init', x, y, value(myfig)); next_row(y, 2); %#ok<NASGU>
+    SessionDefinition(obj, 'set_old_style_parsing_flag',0);
+
     feval(mfilename, obj, 'prepare_next_trial');
          
-      %% change_water_modulation_params
+   %% change_water_modulation_params
    case 'change_water_modulation_params'
 	   display_guys = [1 150 300];
        for i=1:numel(display_guys)
@@ -148,18 +144,15 @@ switch action
            myvar.value = maxasymp + (minasymp/(1+(t/inflp)^slp).^assym);
        end
 	
-      %% prepare next trial
+   %% prepare next trial
    case 'prepare_next_trial'
 
        ParamsSection(obj, 'prepare_next_trial');
 	% Run SessionDefinition *after* ParamsSection so we know whether the
 	% trial was a violation or not
        SessionDefinition(obj, 'next_trial');
-       % StimulatorSection(obj, 'update_values');
        OverallPerformanceSection(obj, 'evaluate');
-       % StimulusSection(obj,'prepare_next_trial');
        SoundManagerSection(obj, 'send_not_yet_uploaded_sounds');
-    
     
        nTrials.value = n_done_trials;
 
@@ -179,24 +172,25 @@ switch action
             prot_title.value=[mfilename ' on rig ' get_hostname ' : ' expmtr ', ' rname  '.  Started at ' datestr(now, 'HH:MM')];
        end
       
-       try send_n_done_trials(obj); end
+       try send_n_done_trials(obj);
+       end
 
-      %% trial_completed
+   %% trial_completed
    case 'trial_completed'
        
     % Do any updates in the protocol that need doing:
     feval(mfilename, 'update');
     % And PokesPlot needs completing the trial:
     PokesPlotSection(obj, 'trial_completed');
-      %% update
+     
+   %% update
    case 'update'
       PokesPlotSection(obj, 'update');
       
       
-      %% close
+   %% close
    case 'close'
     PokesPlotSection(obj, 'close');
-    %PunishmentSection(obj, 'close');
 	ParamsSection(obj, 'close');
     StimulusSection(obj,'close');
     
@@ -214,19 +208,11 @@ switch action
       %% pre_saving_settings
    case 'pre_saving_settings'
        
-    StimulusSection(obj,'hide');
     SessionDefinition(obj, 'run_eod_logic_without_saving');
     perf    = OverallPerformanceSection(obj, 'evaluate');
     cp_durs = ParamsSection(obj, 'get_cp_history');
-%     [classperf tot_perf]= StimulusSection(obj, 'get_class_perform');
-    
-    %%
-    % YOU NEED TO CHANGE THIS
-%     [stimuli] = StimulusSection(obj,'get_stimuli');
-    %%
     
     [stim1dur] = ParamsSection(obj,'get_stimdur_history');
-    %stim_history = StimulatorSection(obj,'get_history');
     
 % 	CommentsSection(obj, 'append_line', ...
 % 		sprintf(['ntrials = %d, violations = %.2f, timeouts=%.2f, hits = %.2f\n', ...
