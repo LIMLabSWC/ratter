@@ -214,6 +214,7 @@ switch action
         else
 
             enable(training_stage); % user can change the training stages
+            delay_time.value=0;
             trials_in_stage.value=0;
 
             switch value(training_stage)
@@ -273,6 +274,9 @@ switch action
 
 	case 'prepare_next_trial'
 		
+        delay_time.value=0;
+        trials_in_stage.value=0;
+
 		switch value(training_stage)
 			
             case {1,2}                  %% learning the reward sound association -left or right led on -> poke -> sound+reward
