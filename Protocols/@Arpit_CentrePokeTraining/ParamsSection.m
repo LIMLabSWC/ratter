@@ -34,7 +34,7 @@ switch action
 		DispParam(obj, 'ThisTrial', 'LEFT', x, y); next_row(y);
 		SoloParamHandle(obj, 'previous_sides', 'value', []);
 		DeclareGlobals(obj, 'ro_args', 'previous_sides');
-		SubheaderParam(obj, 'title', 'Sides Section', x, y);
+		SubheaderParam(obj, 'title', 'Params Section', x, y);
 		next_row(y, 1.5);
 		next_column(x); y = 5;
         % Reward Collection
@@ -128,7 +128,7 @@ switch action
         set_callback(training_stage, {mfilename, 'Training_Stage'});
 		next_row(y);
 		ToggleParam(obj,'use_training',0,x,y,'OnString','Using Autotrain','OffString','Manual Settings');
-		set_callback(training_stage, {mfilename, 'Training_Stage'});
+		set_callback(use_training, {mfilename, 'Training_Stage'});
 
         next_row(y);
 		NumeditParam(obj, 'ntrial_correct_bias', 0, x, y, ...
@@ -147,8 +147,8 @@ switch action
 			'TooltipString', 'all right reward times are multiplied by this number');
 		next_row(y);
 		ToggleParam(obj, 'antibias_wtr_mult', 0, x,y,...
-			'OnString', 'AB ON',...
-			'OffString', 'AB OFF',...
+			'OnString', 'AntiBias Water ON',...
+			'OffString', 'AntiBias Water OFF',...
 			'TooltipString', sprintf(['If on (black) then it disables the wtr_mult entries\n'...
 			'and uses hitfrac to adjust the water times']));
 		
@@ -232,6 +232,8 @@ switch action
 
 
                 case {3,4} % Centre poke without the A1_Stim but has violation in 4
+
+                    time_go_cue.value=0.100;
                     enable(SettlingIn_time);
                     disable(PreStim_time);
                     disable(A1_time);
@@ -246,6 +248,7 @@ switch action
 
                 case {5,6,7} %
 
+                    time_go_cue.value=0.100;
                     enable(SettlingIn_time);
                     enable(PreStim_time);
                     enable(A1_time);
@@ -292,20 +295,23 @@ switch action
 				
 				
             case {3,4} % Centre poke without the A1_Stim but has violation in 4
-                   enable(SettlingIn_time);
-                   disable(PreStim_time);
-                   disable(A1_time);
-                   disable(time_bet_aud1_gocue);
-                              
+
+                time_go_cue.value=0.100;
+                enable(SettlingIn_time);
+                disable(PreStim_time);
+                disable(A1_time);
+                disable(time_bet_aud1_gocue);
+
                 if n_done_trials <1 && warmup_on ==1
                     CP_duration.value=value(init_CP_duration);
                 else
-    				CP_duration.value=CP_duration;
+                    CP_duration.value=CP_duration;
                 end
                 Total_CP_duration.value = CP_duration + time_go_cue; %#ok<*NASGU>
 
                 case {5,6,7} % 
                    
+                   time_go_cue.value=0.100;
                    enable(SettlingIn_time);
                    enable(PreStim_time);
                    enable(A1_time);
