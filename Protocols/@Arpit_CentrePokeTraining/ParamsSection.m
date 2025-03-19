@@ -126,10 +126,10 @@ switch action
 		NumeditParam(obj,'trials_in_stage',1,x,y,'label','Trial Counter');
 		next_row(y);
 		NumeditParam(obj,'training_stage',1,x,y,'label','Training Stage');
-        set_callback(training_stage, {mfilename, 'Training_Stage'});
+        set_callback(training_stage, {mfilename, 'Changed_Training_Stage'});
 		next_row(y);
 		ToggleParam(obj,'use_training',0,x,y,'OnString','Using Autotrain','OffString','Manual Settings');
-		set_callback(use_training, {mfilename, 'Training_Stage'});
+		set_callback(use_training, {mfilename, 'Changed_Training_Stage'});
 
         next_row(y);
 		NumeditParam(obj, 'ntrial_correct_bias', 0, x, y, ...
@@ -206,7 +206,7 @@ switch action
 		Total_CP_duration.value = CP_duration + time_go_cue;
 		SoundInterface(obj, 'set', 'GoSound', 'Dur1', value(time_go_cue));
         
-    case 'training_stage'
+    case 'Changed_Training_Stage'
 
         if value(use_training) == 1
 
