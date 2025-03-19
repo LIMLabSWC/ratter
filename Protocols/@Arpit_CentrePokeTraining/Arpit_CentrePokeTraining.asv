@@ -68,21 +68,21 @@ switch action
     DeclareGlobals(obj, 'ro_args', {'timeout_history'});
     SoloFunctionAddVars('ParamsSection', 'rw_args', 'timeout_history');
    
-    % SoloParamHandle(obj, 'Stage_Trial_Counter', 'value', zeros(1,7));
-    % DeclareGlobals(obj, 'ro_args', {'Stage_Trial_Counter'});
-    % SoloFunctionAddVars('ParamsSection', 'rw_args', 'Stage_Trial_Counter');
-    % 
-    % SoloParamHandle(obj, 'Stage_ValidTrial_Counter', 'value', zeros(1,7));
-    % DeclareGlobals(obj, 'ro_args', {'Stage_ValidTrial_Counter'});
-    % SoloFunctionAddVars('ParamsSection', 'rw_args', 'Stage_ValidTrial_Counter');
-    % 
-    % SoloParamHandle(obj, 'Stage_ViolationTrial_Counter', 'value', zeros(1,7));
-    % DeclareGlobals(obj, 'ro_args', {'Stage_ViolationTrial_Counter'});
-    % SoloFunctionAddVars('ParamsSection', 'rw_args', 'Stage_ViolationTrial_Counter');
-    % 
-    % SoloParamHandle(obj, 'Stage_TimeoutTrial_Counter', 'value', zeros(1,7));
-    % DeclareGlobals(obj, 'ro_args', {'Stage_TimeoutTrial_Counter'});
-    % SoloFunctionAddVars('ParamsSection', 'rw_args', 'Stage_TimeoutTrial_Counter');
+    SoloParamHandle(obj, 'Stage_Trial_Counter', 'value', zeros(1,7));
+    DeclareGlobals(obj, 'ro_args', {'Stage_Trial_Counter'});
+    SoloFunctionAddVars('ParamsSection', 'rw_args', 'Stage_Trial_Counter');
+
+    SoloParamHandle(obj, 'Stage_ValidTrial_Counter', 'value', zeros(1,7));
+    DeclareGlobals(obj, 'ro_args', {'Stage_ValidTrial_Counter'});
+    SoloFunctionAddVars('ParamsSection', 'rw_args', 'Stage_ValidTrial_Counter');
+
+    SoloParamHandle(obj, 'Stage_ViolationTrial_Counter', 'value', zeros(1,7));
+    DeclareGlobals(obj, 'ro_args', {'Stage_ViolationTrial_Counter'});
+    SoloFunctionAddVars('ParamsSection', 'rw_args', 'Stage_ViolationTrial_Counter');
+
+    SoloParamHandle(obj, 'Stage_TimeoutTrial_Counter', 'value', zeros(1,7));
+    DeclareGlobals(obj, 'ro_args', {'Stage_TimeoutTrial_Counter'});
+    SoloFunctionAddVars('ParamsSection', 'rw_args', 'Stage_TimeoutTrial_Counter');
 
 
     SoundManagerSection(obj, 'init');
