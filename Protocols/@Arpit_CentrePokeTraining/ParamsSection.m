@@ -13,15 +13,6 @@ switch action
 		SoloParamHandle(obj, 'my_gui_info', 'value', [x y double(gcf)], 'saveable', 0);
 		y0 = y;
  
-        [x, y] = AntibiasSectionAthena(obj,     'init', x, y);
-		       
-        
-        ToggleParam(obj, 'antibias_LRprob', 0, x,y,...
-			'OnString', 'AB_Prob ON',...
-			'OffString', 'AB_Prob OFF',...
-			'TooltipString', sprintf(['If on (Yellow) then it enables the AntiBias algorithm\n'...
-			'based on changing the probablity of Left vs Right']));
-
 		next_row(y);
 		NumeditParam(obj, 'LeftProb', 0.5, x, y); next_row(y);
 		set_callback(LeftProb, {mfilename, 'new_leftprob'});
@@ -34,6 +25,8 @@ switch action
 		DispParam(obj, 'ThisTrial', 'LEFT', x, y); next_row(y);
 		SoloParamHandle(obj, 'previous_sides', 'value', []);
 		DeclareGlobals(obj, 'ro_args', 'previous_sides');
+
+
 		SubheaderParam(obj, 'title', 'Params Section', x, y);
 		next_row(y, 1.5);
 		next_column(x); y = 5;
@@ -47,11 +40,14 @@ switch action
 		NumeditParam(obj, 'violation_iti', 1, x,y,'label','Violation Timeout','TooltipString','Center poke violation duration');
         % Reward Collection
         next_row(y);
-		NumeditParam(obj, 'RewardCollection_duration', 10, x,y,'label','RewardCollection_dur','TooltipString','Wait until rat collects the reward else a timeout');
+		NumeditParam(obj, 'RewardCollection_duration', 6, x,y,'label','RewardCollection_dur','TooltipString','Wait until rat collects the reward else a timeout');
 		next_row(y);
 		NumeditParam(obj, 'SideLed_duration', 1, x,y,'label','Side LED duration','TooltipString','Duration of SideLed');
+        next_row(y);
         % Centre Poke
 		next_row(y);
+        NumeditParam(obj, 'cp_timeout', 5, x,y, 'TooltipString','Time from trial start for rat to centre poke else timeout');
+        next_row(y);
 		NumeditParam(obj, 'legal_cbreak', 0.1, x,y, 'TooltipString','Time in sec for which it is ok to be outside the center port before a violation occurs.');
         set_callback(legal_cbreak, {mfilename, 'new_legal_cbreak'}); 
         next_row(y);
@@ -68,7 +64,7 @@ switch action
         set_callback(PreStim_time_Max, {mfilename, 'new_CP_duration'});
         next_row(y);
         % A1 Time
-        NumeditParam(obj, 'A1_time_Min', 0.4, x,y,'label','Min time AUD1','TooltipString','Min value to select the Duration of fixed stimulus');
+        NumeditParam(obj, 'A1_time_Min', 0.1, x,y,'label','Min time AUD1','TooltipString','Min value to select the Duration of fixed stimulus');
         set_callback(A1_time_Min, {mfilename, 'new_CP_duration'});
         next_row(y);
         NumeditParam(obj, 'A1_time', 0.4, x,y,'label','AUD1 Time','TooltipString','Actual Duration of fixed stimulus');
@@ -123,9 +119,10 @@ switch action
     
         next_column(x);
 		y=5;
-		NumeditParam(obj,'trials_in_stage',1,x,y,'label','Trial Counter');
-		next_row(y);
-		NumeditParam(obj,'training_stage',1,x,y,'label','Training Stage');
+        MenuParam(obj, 'training_stage', {'Stage 1'; 'Stage 2'; 'Stage 3';...
+            'Stage 4'; 'Stage 5'; 'Stage 6'; 'Stage 7'}, 1, x, y, ...
+            'label', 'Active Stage', 'TooltipString', 'the current training stage');
+		% NumeditParam(obj,'training_stage',1,x,y,'label','Training Stage');
         set_callback(training_stage, {mfilename, 'Changed_Training_Stage'});
 		next_row(y);
 		ToggleParam(obj,'use_training',0,x,y,'OnString','Using Autotrain','OffString','Manual Settings');
@@ -161,17 +158,18 @@ switch action
             'A1_time';'time_bet_aud1_gocue' ; 'PreStim_time';
 			'drink_time';'reward_delay';'left_wtr_mult';...
 			'right_wtr_mult';'antibias_wtr_mult';...
-			'timeout_iti';'violation_iti'});
+			'cp_timeout';'timeout_iti';'violation_iti'});
         
-        %   History of hit/miss:
-        SoloParamHandle(obj, 'deltaf_history',      'value', []);
-      
-		SoloFunctionAddVars('OverallPerformanceSection', 'ro_args', ...
-			{'training_stage'});
-				
+        
+		SoloFunctionAddVars('SessionPerformanceSection', 'ro_args', ...
+			{'training_stage'});		
 		
 		SoloParamHandle(obj, 'previous_parameters', 'value', []);
 		
+
+
+ %%%%%%%%% Switch b/w Actions within ParamSection %%%%%%%%%%%%%
+
 	case 'new_leftprob'
 		AntibiasSectionAthena(obj, 'update_biashitfrac', value(LeftProb));
 		
@@ -199,28 +197,27 @@ switch action
         end
 
         CP_duration.value= SettlingIn_time + PreStim_time + A1_time + time_bet_aud1_gocue;
-		Total_CP_duration.value = CP_duration + time_go_cue; %#ok<*NASGU>
-        SoftPokeStayInterface(obj, 'set', 'soft_cp', 'Duration',  PreStim_time + A1_time + time_bet_aud1_gocue );
+		Total_CP_duration.value = CP_duration + time_go_cue; %#ok<*NASGU> 
 
 	case 'new_time_go_cue'
 		Total_CP_duration.value = CP_duration + time_go_cue;
-		SoundInterface(obj, 'set', 'GoSound', 'Dur1', value(time_go_cue));
         
     case 'Changed_Training_Stage'
 
         if value(use_training) == 1
 
             disable(training_stage); % user cannot change the training stages
+            disable(PreStim_time);
+            disable(time_bet_aud1_gocue);
         else
 
             enable(training_stage); % user can change the training stages
-            trials_in_stage.value=0;
+            % trials_in_stage.value=0;
 
             switch value(training_stage)
 
                 case {1,2}                  %% learning the reward sound association -left or right led on -> poke -> sound+reward
 
-                    time_go_cue.value=0.200;
                     disable(SettlingIn_time);
                     disable(PreStim_time);
                     disable(A1_time);
@@ -229,11 +226,10 @@ switch action
 
                 case {3,4} % Centre poke without the A1_Stim but has violation in 4
 
-                    time_go_cue.value=0.100;
                     enable(SettlingIn_time);
                     disable(PreStim_time);
                     disable(A1_time);
-                    disable(time_bet_aud1_gocue);
+                    enable(time_bet_aud1_gocue);
 
                     if n_done_trials <1 && warmup_on ==1
                         CP_duration.value=value(init_CP_duration);
@@ -244,28 +240,30 @@ switch action
 
                 case {5,6,7} %
 
-                    time_go_cue.value=0.100;
                     enable(SettlingIn_time);
                     enable(PreStim_time);
                     enable(A1_time);
                     enable(time_bet_aud1_gocue);
 
                     if random_prego_time == 1
-                        time_bet_aud1_gocue = randi([time_bet_aud1_gocue_Min, time_bet_aud1_gocue_Max],1,1);
+                        time_range_go_cue = time_bet_aud1_gocue_Min:0.01:time_bet_aud1_gocue_Max;
+                        time_bet_aud1_gocue = time_range_go_cue(randi([1, numel(time_range_go_cue)],1,1));
                     end
 
                     if random_A1_time == 1
-                        A1_time = randi([A1_time_Min, A1_time_Max],1,1);
+                        time_range_A1_time = A1_time_Min: 0.01 : A1_time_Max;
+                        A1_time = time_range_A1_time(randi([1, numel(time_range_A1_time)],1,1));
                     end
 
                     if random_PreStim_time == 1
-                        PreStim_time = randi([PreStim_time_Min, PreStim_time_Max],1,1);
+                        time_range_PreStim_time = PreStim_time_Min : 0.01 : PreStim_time_Max;
+                        PreStim_time = time_range_PreStim_time(randi([1, numel(time_range_PreStim_time)],1,1));
                     end
 
                     if n_done_trials <1 && warmup_on ==1
-                        CP_duration.value=value(init_CP_duration);
+                        CP_duration.value = value(init_CP_duration);
                     else
-                        CP_duration.value=SettlingIn_time + A1_time + PreStim_time + time_bet_aud1_gocue;
+                        CP_duration.value = SettlingIn_time + A1_time + PreStim_time + time_bet_aud1_gocue;
                     end
                     Total_CP_duration.value = CP_duration + time_go_cue; %#ok<*NASGU>
             end
@@ -290,7 +288,7 @@ switch action
                 enable(SettlingIn_time);
                 disable(PreStim_time);
                 disable(A1_time);
-                disable(time_bet_aud1_gocue);
+                enable(time_bet_aud1_gocue);
 
                 if n_done_trials <1 && warmup_on ==1
                     CP_duration.value=value(init_CP_duration);
@@ -330,9 +328,8 @@ switch action
 		end
 		
 		
-		%% update hit_history, previous_sides, etc
+		%% update violation, timeout, previous_sides, etc
         was_viol=false;
-        was_hit=false;
         was_timeout=false;
         if n_done_trials>0
             if ~isempty(parsed_events)
@@ -352,77 +349,26 @@ switch action
 
             ParamsSection(obj,'update_side_history');
 
-            if ~was_viol && ~was_timeout
-                %was_hit=rows(parsed_events.states.hit_state)>0;
-                was_hit=rows(parsed_events.states.second_hit_state)==0;
-                hit_history.value=[hit_history(:); was_hit];
-
-            else
-                % There was a violation or timeout
-                hit_history.value=[hit_history(:); nan];
-            end
-
-            % Now calculate the deltaF and sides - this maybe interesting
-            % even in a violation or timeout case.
-
-            fn=fieldnames(parsed_events.states);
-            led_states=find(strncmp('led',fn,3));
-            deltaF=0;
-            n_l=0;
-            n_r=0;
-            for lx=1:numel(led_states)
-                lind=led_states(lx);
-                if rows(parsed_events.states.(fn{lind}))>0
-                    if fn{lind}(end)=='l'
-                        deltaF=deltaF-1;
-                        n_l=n_l+1;
-                    elseif fn{lind}(end)=='r'
-                        deltaF=deltaF+1;
-                        n_r=n_r+1;
-                    elseif fn{lind}(end)=='b'
-                        n_l=n_l+1;
-                        n_r=n_r+1;
-
-                    end
-                end
-
-            end
-
-            % if deltaF>0 then a right poke is a hit
-            % if deltaF<0 then a left poke is a hit
-
-            deltaf_history.value=[deltaf_history(:); deltaF];
-
         end
 
-        if antibias_LRprob ==1
-            if n_done_trials >ntrial_correct_bias && ~was_viol && ~was_timeout
-                nonan_hit_history=value(hit_history);
-                nonan_hit_history(isnan(nonan_hit_history))=[];
-                nonan_previous_sides=value(previous_sides);
-                nan_history=value(hit_history);
-                nonan_previous_sides(isnan(nan_history))=[];
-                AntibiasSectionAthena(obj, 'update', value(LeftProb), nonan_hit_history(:)',nonan_previous_sides(:)); % <~> Transposed hit history so that it is the expected column vector. (Antibias errors out otherwise.) 2007.09.05 01:39
+        %% Choose Side for the Next Trial
+        
+        if ~isinf(MaxSame) && length(previous_sides) > MaxSame && ...
+                all(previous_sides(n_done_trials-MaxSame+1:n_done_trials) == previous_sides(n_done_trials)) %#ok<NODEF>
+            if previous_sides(end)=='l'
+                ThisTrial.value = 'RIGHT';
+            else
+                ThisTrial.value = 'LEFT';
             end
 
-
-            if ~isinf(MaxSame) && length(previous_sides) > MaxSame && ...
-                    all(previous_sides(n_done_trials-MaxSame+1:n_done_trials) == previous_sides(n_done_trials)) %#ok<NODEF>
-                if previous_sides(end)=='l'
-                    ThisTrial.value = 'RIGHT';
-                else
-                    ThisTrial.value = 'LEFT';
-                end
+            if previous_sides(end)=='r'
+                ThisTrial.value = 'LEFT';
             else
-                choiceprobs = AntibiasSectionAthena(obj, 'get_posterior_probs');
-                if rand(1) <= choiceprobs(1)
-                    ThisTrial.value = 'LEFT';
-                else
-                    ThisTrial.value = 'RIGHT';
-                end
+                ThisTrial.value = 'RIGHT';
             end
 
         else
+
             if (rand(1)<=LeftProb)
                 ThisTrial.value='LEFT';
 
@@ -432,7 +378,7 @@ switch action
 
         end
         
-        
+        %%
 		
 		
 % 		%% Do the anti-bias with changing reward delivery
@@ -485,15 +431,15 @@ switch action
 		x = cell2mat(get_history(A1_time));
   
 	case 'update_side_history'
-		if strcmp(ThisTrial, 'LEFT')
-			ps=value(previous_sides);
-			ps(n_done_trials)='l';
-			previous_sides.value=ps;
-			
-		else
-			ps=value(previous_sides);
-			ps(n_done_trials)='r';
-			previous_sides.value=ps;
+        if strcmp(ThisTrial, 'LEFT')
+            ps=value(previous_sides);
+            ps(n_done_trials)='l';
+            previous_sides.value=ps;
+
+        else
+            ps=value(previous_sides);
+            ps(n_done_trials)='r';
+            previous_sides.value=ps;
         end
 		
 	case 'get_current_side'
