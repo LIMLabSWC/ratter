@@ -6,8 +6,8 @@ function [obj] = Arpit_CentrePokeTraining(varargin)
 % Default object is of our own class (mfilename);
 % we inherit only from Plugins
 
-obj = class(struct, mfilename, pokesplot2, saveload, sessionmodel2, soundmanager, soundui, antibias, ...
-  water, distribui, punishui, comments, soundtable, sqlsummary,reinforcement,softpokestay2);
+obj = class(struct, mfilename, pokesplot2, saveload, sessionmodel2, soundmanager, soundui, ...
+  water, comments, soundtable, sqlsummary);
 
 %---------------------------------------------------------------
 %   BEGIN SECTION COMMONSoundTableSection TO ALL PROTOCOLS, DO NOT MODIFY
@@ -37,7 +37,7 @@ switch action
    
    %% init
    case 'init'
-    dispatcher('set_trialnum_indicator_flag');
+ 
     hackvar = 10; SoloFunctionAddVars('SessionModel', 'ro_args', 'hackvar'); %#ok<NASGU>
     SoloParamHandle(obj, 'myfig', 'saveable', 0); myfig.value = figure;
 
@@ -54,11 +54,6 @@ switch action
     SoloParamHandle(obj, 'nsessions_healthy_number_of_pokes', 'value', 0, 'save_with_settings', 1);
     SoloParamHandle(obj, 'post_DelComp_protocol', 'value', '', 'save_with_settings', 1);
     SoloParamHandle(obj, 'post_DelComp_settings_filename', 'value', '', 'save_with_settings', 1);
-
-    
-    SoloParamHandle(obj, 'hit_history', 'value', []);
-    DeclareGlobals(obj, 'ro_args', {'hit_history'});
-    SoloFunctionAddVars('ParamsSection', 'rw_args', 'hit_history');
     
     SoloParamHandle(obj, 'violation_history', 'value', []);
     DeclareGlobals(obj, 'ro_args', {'violation_history'});
@@ -72,17 +67,6 @@ switch action
     % DeclareGlobals(obj, 'ro_args', {'Stage_Trial_Counter'});
     % SoloFunctionAddVars('ParamsSection', 'rw_args', 'Stage_Trial_Counter');
     % 
-    % SoloParamHandle(obj, 'Stage_ValidTrial_Counter', 'value', zeros(1,7));
-    % DeclareGlobals(obj, 'ro_args', {'Stage_ValidTrial_Counter'});
-    % SoloFunctionAddVars('ParamsSection', 'rw_args', 'Stage_ValidTrial_Counter');
-    % 
-    % SoloParamHandle(obj, 'Stage_ViolationTrial_Counter', 'value', zeros(1,7));
-    % DeclareGlobals(obj, 'ro_args', {'Stage_ViolationTrial_Counter'});
-    % SoloFunctionAddVars('ParamsSection', 'rw_args', 'Stage_ViolationTrial_Counter');
-    % 
-    % SoloParamHandle(obj, 'Stage_TimeoutTrial_Counter', 'value', zeros(1,7));
-    % DeclareGlobals(obj, 'ro_args', {'Stage_TimeoutTrial_Counter'});
-    % SoloFunctionAddVars('ParamsSection', 'rw_args', 'Stage_TimeoutTrial_Counter');
 
 
     SoundManagerSection(obj, 'init');
@@ -134,10 +118,9 @@ switch action
     % [x, y] = PunishmentSection(obj, 'init', x, y); %#ok<NASGU>
     
     next_column(x); y=5;
-	[x, y] = OverallPerformanceSection(obj, 'init', x, y);
+	[x, y] = SessionPerformanceSection(obj, 'init', x, y);
 	[x, y] = ParamsSection(obj,  'init', x, y); %#ok<NASGU>
     [x, y] = SoundSection(obj,'init',x,y);
-    [x, y] = SoftPokeStayInterface(obj, 'add', 'soft_cp', x, y);
     
     figpos = get(double(gcf), 'Position');
     [expmtr, rname]=SavingSection(obj, 'get_info');
@@ -167,7 +150,7 @@ switch action
 	% Run SessionDefinition *after* ParamsSection so we know whether the
 	% trial was a violation or not
        SessionDefinition(obj, 'next_trial');
-       OverallPerformanceSection(obj, 'evaluate');
+       SessionPerformanceSection(obj, 'evaluate');
        SoundManagerSection(obj, 'send_not_yet_uploaded_sounds');
     
        nTrials.value = n_done_trials;
@@ -225,7 +208,7 @@ switch action
    case 'pre_saving_settings'
        
     SessionDefinition(obj, 'run_eod_logic_without_saving');
-    perf    = OverallPerformanceSection(obj, 'evaluate');
+    perf    = SessionPerformanceSection(obj, 'evaluate');
     cp_durs = ParamsSection(obj, 'get_cp_history');
     
     [stim1dur] = ParamsSection(obj,'get_stimdur_history');
@@ -236,22 +219,12 @@ switch action
 %         'Low = %.2f, High = %.2f'], ...
 % 		perf(1), perf(2), perf(3), perf(6), cp_durs(1), cp_durs(end), cp_durs(end)-cp_durs(1), classperf(1),classperf(2)));
 
-    pd.hits=hit_history(:);
     pd.sides=previous_sides(:);
     pd.viols=violation_history(:);
     pd.timeouts=timeout_history(:);
 %     pd.performance=tot_perf(:);
     pd.cp_durs=cp_durs(:);
     
-   
-%     pd.stimuli=stimuli(:);
-    % Athena: look into pair_history perhaps stimulus_history and stimuli
-    % are the same
-    %pd.stimulus=stimulus_history(:);
-    
-    pd.stim1dur=stim1dur(:);
-
-    %pd.stimul=stim_history(:);
     
     sendsummary(obj,'protocol_data',pd);    
       

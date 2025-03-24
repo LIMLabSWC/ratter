@@ -27,23 +27,19 @@ switch action,
       'Name', mfilename), 'saveable', 0);
     set(double(gcf), 'Visible', 'off');
     x=10;y=10;
-    
-    [x,y]=SoundInterface(obj,'add','ViolationSound',x,y,'Volume',0.005,'Freq',9000,'Duration',0.5); 
-%     [x,y]=SoundInterface(obj,'add','ViolationSound',x,y,'Style','WhiteNoise','Volume',0.01);
-    [x,y]=SoundInterface(obj,'add','ErrorSound',x,y,'Style','WhiteNoise','Volume',0.08);
+
+    [x,y]=SoundInterface(obj,'add','ViolationSound',x,y,'Volume',0.005,'Freq',1000,'Duration',0.5); 
+%     [x,y]=SoundInterface(obj,'add','ViolationSound',x,y,'Style','WhiteNoise','Volume',0.01);    
     [x,y]=SoundInterface(obj,'add','TimeoutSound',x,y,'Style','WhiteNoise','Volume',0.08,'Duration',0.5);
+    [x,y]=SoundInterface(obj,'add','RewardSound',x,y,'Style','Bups','Volume',1,'Freq',5,'Duration',1.5);
+    [x,y]=SoundInterface(obj,'add','ErrorSound',x,y,'Style','WhiteNoise','Volume',0.08);
     next_column(x);
     y=10;
     [x,y]=SoundInterface(obj,'add','GoSound',x,y,'Style','Tone','Volume',0.005,'Freq',3000,'Duration',0.2);
-	SoundInterface(obj, 'disable', 'GoSound', 'Dur1');
-
-	[x,y]=SoundInterface(obj,'add','RewardSound',x,y,'Style','Bups','Volume',1,'Freq',5,'Duration',1.5);
-    [x,y]=SoundInterface(obj,'add','SOneSound',x,y,'Style','Tone','Volume',0.005,'Freq',3000,'Duration',0.2);
-    SoundInterface(obj, 'disable', 'GoSound', 'Dur1');
+	SoundInterface(obj, 'disable', 'GoSound', 'Dur1');	
     SoundInterface(obj, 'disable', 'GoSound', 'Freq1');
+    [x,y]=SoundInterface(obj,'add','SOneSound',x,y,'Style','Tone','Volume',0.005,'Freq',3000,'Duration',0.2);
     [x,y]=SoundInterface(obj,'add','STwoSound',x,y,'Style','WhiteNoise','Volume',0.08);
-    
-    
     
     x=oldx; y=oldy;
     figure(parentfig);
