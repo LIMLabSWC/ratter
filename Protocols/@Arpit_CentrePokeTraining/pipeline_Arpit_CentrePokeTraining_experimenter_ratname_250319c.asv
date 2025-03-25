@@ -650,15 +650,12 @@ else
 end
 
 if n_completed_trials >= 1
-    cp_length = value(ParamsSection_CP_duration) - value(ParamsSection_SettlingIn_time);
-    [ParamsSection_PreStim_time.value ,ParamsSection_A1_time.value,ParamsSection_time_bet_aud1_gocue.value] = param_time_within_range(warmup_completed,...
-        cp_length,prestim_min,prestim_max, random_prestim, prestim_time,...
-        a1_time_min,a1_time_max, random_A1, a1_time,prego_min,prego_max, random_prego, prego_time);
+    cp_length = value(ParamsSection_CP_duration) - value(ParamsSection_Setting)
+[ParamsSection_PreStim_time.value ,ParamsSection_A1_time.value,ParamsSection_time_bet_aud1_gocue.value] = param_time_within_range(warmup_completed,...
+    cp_length,prestim_min,prestim_max, random_prestim, prestim_time,...
+    a1_time_min,a1_time_max, random_A1, a1_time,prego_min,prego_max, random_prego, prego_time);
 
-    callback(ParamsSection_PreStim_time);
-    callback(ParamsSection_A1_time);
-    callback(ParamsSection_time_bet_aud1_gocue);
-    ParamsSection_CP_duration = value(ParamsSection_SettlingIn_time) + value(ParamsSection_PreStim_time) + value(ParamsSection_A1_time) + value(ParamsSection_time_bet_aud1_gocue);
+callback(ParamsSection_PreStim_time);
 end
 callback(ParamsSection_CP_duration);
 %</STAGE_ALGORITHM>

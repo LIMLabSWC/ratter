@@ -123,7 +123,7 @@ switch action
 		% NumeditParam(obj,'training_stage',1,x,y,'label','Training Stage');
         set_callback(training_stage, {mfilename, 'Changed_Training_Stage'});
 		next_row(y);
-		ToggleParam(obj,'use_training',0,x,y,'OnString','Using Autotrain','OffString','Manual Settings');
+		ToggleParam(obj,'use_auto_train',1,x,y,'OnString','Using Autotrain','OffString','Manual Settings');
 		set_callback(use_training, {mfilename, 'Changed_Training_Stage'});
 
         next_row(y);
@@ -195,7 +195,7 @@ switch action
         
     case 'Changed_Training_Stage'
 
-        if value(use_training) == 1
+        if value(use_auto_train) == 1
 
             disable(training_stage); % user cannot change the training stages
             disable(PreStim_time);
@@ -203,7 +203,7 @@ switch action
         else
 
             enable(training_stage); % user can change the training stages
-            SessionDefinition_CURRENT_ACTIVE_STAGE = value(training_stage);
+            SessionDefinition(obj, 'jump_to_stage',value(training_stage));
 
             switch value(training_stage)
 
