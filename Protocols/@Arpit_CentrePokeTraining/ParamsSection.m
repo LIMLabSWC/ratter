@@ -15,7 +15,6 @@ switch action
  
 		next_row(y);
 		NumeditParam(obj, 'LeftProb', 0.5, x, y); next_row(y);
-		set_callback(LeftProb, {mfilename, 'new_leftprob'});
 		MenuParam(obj, 'MaxSame', {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, Inf}, Inf, x, y, ...
 			'TooltipString', sprintf(['\nMaximum number of consecutive trials where correct\n' ...
 			'response is on the same side. Overrides antibias. Thus, for\n' ...
@@ -49,7 +48,6 @@ switch action
         NumeditParam(obj, 'cp_timeout', 5, x,y, 'TooltipString','Time from trial start for rat to centre poke else timeout');
         next_row(y);
 		NumeditParam(obj, 'legal_cbreak', 0.1, x,y, 'TooltipString','Time in sec for which it is ok to be outside the center port before a violation occurs.');
-        set_callback(legal_cbreak, {mfilename, 'new_legal_cbreak'}); 
         next_row(y);
 		NumeditParam(obj, 'SettlingIn_time', 0.2, x,y, 'TooltipString','Initial settling period during which there is no violation');
         next_row(y);
@@ -156,8 +154,7 @@ switch action
 			'RewardCollection_duration';'training_stage'; ...
 			'legal_cbreak' ; 'SettlingIn_time'; 'time_go_cue'; ...
             'A1_time';'time_bet_aud1_gocue' ; 'PreStim_time';
-			'drink_time';'reward_delay';'left_wtr_mult';...
-			'right_wtr_mult';'antibias_wtr_mult';...
+			'drink_time';'reward_delay';'antibias_wtr_mult';...
 			'cp_timeout';'timeout_iti';'violation_iti'});
         
         
@@ -169,12 +166,6 @@ switch action
 
 
  %%%%%%%%% Switch b/w Actions within ParamSection %%%%%%%%%%%%%
-
-	case 'new_leftprob'
-		AntibiasSectionAthena(obj, 'update_biashitfrac', value(LeftProb));
-		
-    case 'new_legal_cbreak'
-    	SoftPokeStayInterface(obj, 'set', 'soft_cp', 'Grace',   value(legal_cbreak));
 
 	case 'new_CP_duration' 
 
@@ -378,9 +369,7 @@ switch action
 
         end
         
-        %%
-		
-		
+       				
 % 		%% Do the anti-bias with changing reward delivery
 % 		% reset anti-bias
 % 		left_wtr_mult.value=1;
@@ -402,9 +391,19 @@ switch action
 % 			end
 % 		end
 		
-		
+    case 'get_water_amount'
 
-		
+        %% Calculate the water amount for each side valve
+        WaterAmount=maxasymp + (minasymp./(1+(n_done_trials/inflp).^slp).^assym);
+        %         WaterValvesSection(obj, 'set_water_amounts', WaterAmount, WaterAmount);
+        %         [LeftWValveTime RightWValveTime] = WaterValvesSection(obj, 'get_water_times');
+        WValveTimes = GetValveTimes(WaterAmount, [2 3]);
+        LeftWValveTime = WValveTimes(1);
+        RightWValveTime = WValveTimes(2);
+        [LeftWMult, RightWMult] = ParamsSection(obj, 'get_water_mult');
+        LeftWValveTime=LeftWValveTime*LeftWMult;
+        RightWValveTime=RightWValveTime*RightWMult;
+
 	case 'get_water_mult'
         
         %% Modulating Water Time

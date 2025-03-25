@@ -536,6 +536,20 @@ cp_max = 5;
 n_trial_warmup = 20;
 starting_total_cp = 0.5;
 warmup_completed = 0;
+warm_up_on = 0;
+random_prestim = 0;
+random_prego = 0;
+random_A1 = 0;
+prestim_min = 0;
+prestim_max = 0;
+prestim_time = 0;
+prego_min =0;
+prego_max = 0;
+prego_time = 0;
+a1_time = 0;
+a1_time_min = 0;
+a1_time_max = 0;
+
 %</HELPER_VARS>
 end
 if stage_algorithm_eval
@@ -551,19 +565,37 @@ stage7_violation_percent = ((stage7_violation_percent * stage7_trial_counter) + 
 if stage7_trial_counter < 2000
     % the rat has been not been trained for good amount of sessions wait for the user
     % to play around with the settings
-    ParamsSection_warmup_on.value = 1;
-    ParamsSection_random_PreStim_time.value = 1;
-    ParamsSection_random_prego_time.value = 1;
-    ParamsSection_random_A1_time.value = 0;
-    ParamsSection_PreStim_time_Min.value = 0.2;
-    ParamsSection_PreStim_time_Max.value = 2;
-    ParamsSection_time_bet_aud1_gocue_Min.value = 0.2;
-    ParamsSection_time_bet_aud1_gocue_Min.value = 2;
-    ParamsSection_A1_time.value = 0.4;
+    warm_up_on = 1;
+    random_prestim = 1;
+    random_prego = 1;
+    random_A1 = 0;
+    prestim_min = 0.2;
+    prestim_max = 2;
+    prestim_time = 0.2;
+    prego_min = 0.2;
+    prego_max = 2;
+    prego_time = 0.2;
+    a1_time = 0.4;
+    a1_time_min = 0.4;
+    a1_time_max = 0.4;
+else
+    warm_up_on = value(ParamsSection_warmup_on);
+    random_prestim = value(ParamsSection_random_PreStim_time);
+    random_prego = value(ParamsSection_random_prego_time);
+    random_A1 = value(ParamsSection_random_A1_time);
+    prestim_min = value(ParamsSection_PreStim_time_Min);
+    prestim_max = value(ParamsSection_PreStim_time_Max);
+    prestim_time = value(ParamsSection_PreStim_time);
+    prego_min = value(ParamsSection_time_bet_aud1_gocue_Min);
+    prego_max = value(ParamsSection_time_bet_aud1_gocue_Max);
+    prego_time = value(ParamsSection_time_bet_aud1_gocue);
+    a1_time = value(ParamsSection_A1_time);
+    a1_time_min = value(ParamsSection_A1_time_Min);
+    a1_time_max = value(ParamsSection_A1_time_Max);
 end
 
 % Warm Up If starting a new session
-if ParamsSection_warmup_on == 1
+if warm_up_on == 1
     if n_completed_trials == 0
         ParamsSection_CP_duration.value = value(ParamsSection_init_CP_duration);
         warmup_completed = 0;
@@ -589,20 +621,10 @@ else
     warmup_completed = 1;
 end
 
-if warmup_completed == 1
-    if value(ParamsSection_random_A1_time)
-        time_range_A1_time = ParamsSection_A1_time_Min : 0.1 : ParamsSection_A1_time_Max;
-        ParamsSection_A1_time.value = time_range_A1_time(randi([1, numel(time_range_A1_time)],1,1));
-    end
-    if value(ParamsSection_random_PreStim_time)
-        time_range_PreStim_time = ParamsSection_PreStim_time_Min : 0.1 : ParamsSection_PreStim_time_Max;
-        ParamsSection_PreStim_time.value = time_range_PreStim_time(randi([1, numel(time_range_PreStim_time)],1,1));
-    end
-    if value(ParamsSection_random_prego_time)
-        time_range_prego_time = ParamsSection_time_bet_aud1_gocue_Min : 0.1 : ParamsSection_time_bet_aud1_gocue_Min;
-        ParamsSection_time_bet_aud1_gocue.value = time_range_prego_time(randi([1, numel(time_range_prego_time)],1,1));
-    end
-end
+[ParamsSection_PreStim_time.value ,ParamsSection_A1_time.value,ParamsSection_time_bet_aud1_gocue.value] = param_time_within_range(warmup_completed,...
+    cp_length,prestim_min,prestim_max, random_prestim, prestim_time,...
+    a1_time_min,a1_time_max, random_A1, a1_time,prego_min,prego_max, random_prego, prego_time);
+
 %</STAGE_ALGORITHM>
 end
 if completion_test_eval
@@ -635,6 +657,95 @@ end
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %<HELPER_FUNCTIONS>
+
+function [prestim,A1,prego] = param_time_within_range(fixed_length,cp_length,range_min_prestim,range_max_prestim, is_random_prestim, provided_time_prestim,...
+    range_min_A1,range_max_A1, is_random_A1, provided_time_A1,range_min_prego,range_max_prego, is_random_prego, provided_time_prego)
+
+if fixed_length == 1 % warm up stage where cp length is increasing
+% then calculate the range/typical value
+    if cp_length <= 0.3
+        prestim = 0.1;
+        A1 = 0.1;
+        prego = 0.1;
+    else
+        range_size = round(0.3 * cp_length,1);
+        if range_size > 0.4
+            step_size = 0.1;
+        else
+            step_size = 0.01;
+        end
+
+        timerange = 0.1:step_size:range_size;
+
+        if is_random_prestim == 1
+            prestim = timerange(randi([1, numel(timerange)],1,1));
+        else
+            if provided_time_prestim <= range_size
+                prestim = provided_time_prestim;
+            else
+                prestim = range_size;
+            end
+
+        end
+
+        if is_random_A1 == 1
+            A1 = timerange(randi([1, numel(timerange)],1,1));
+        else
+            if provided_time_A1 <= range_size
+                A1 = provided_time_A1;
+            else
+                A1 = range_size;
+            end
+        end
+
+        prego = cp_length - prestim - A1;
+
+    end
+
+else
+
+    if is_random_prestim == 1
+        range_size_prestim = range_max_prestim - range_min_prestim;
+        if range_size_prestim > 0.4
+            step_size_prestim = 0.1;
+        else
+            step_size_prestim = 0.01;
+        end
+        time_range_prestim = range_min_prestim:step_size_prestim:range_max_prestim;
+        prestim = time_range_prestim(randi([1, numel(time_range_prestim)],1,1));
+    else
+        prestim = provided_time_prestim;
+    end
+
+    if is_random_A1 == 1
+        range_size_A1 = range_max_A1 - range_min_A1;
+        if range_size_A1 > 0.4
+            step_size_A1 = 0.1;
+        else
+            step_size_A1 = 0.01;
+        end
+        time_range_A1 = range_min_A1:step_size_A1:range_max_A1;
+        A1 = time_range_A1(randi([1, numel(time_range_A1)],1,1));
+    else
+        A1 = provided_time_A1;
+    end
+
+    if is_random_prego == 1
+        range_size_prego = range_max_prego - range_min_prego;
+        if range_size_prego > 0.4
+            step_size_prego = 0.1;
+        else
+            step_size_prego = 0.01;
+        end
+        time_range_prego = range_min_prego:step_size_prego:range_max_prego;
+        prego = time_range_prego(randi([1, numel(time_range_prego)],1,1));
+    else
+        prego = provided_time_prego;
+    end
+
+end
+end
+
 
 %</HELPER_FUNCTIONS>
 

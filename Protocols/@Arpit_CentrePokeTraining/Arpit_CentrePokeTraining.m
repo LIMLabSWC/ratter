@@ -96,7 +96,7 @@ switch action
 	feval(mfilename, obj, 'change_water_modulation_params');
 	
 	%AthenaSMA changed to SoundCatSMA (From AthenaDelayComp)
-    SoloFunctionAddVars('Arpit_CentrePokeTrainingSMA', 'ro_args', ...
+    SoloFunctionAddVars('ParamsSection', 'ro_args', ...
 			{'maxasymp';'slp';'inflp';'minasymp';'assym'});
     [x, y] = WaterValvesSection(obj,  'init', x, y);
     
