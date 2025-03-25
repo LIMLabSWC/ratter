@@ -68,19 +68,7 @@ switch action
         to_sound_id       = SoundManagerSection(obj, 'get_sound_id', 'TimeoutSound');
         timeout_snd_duration  = SoundManagerSection(obj, 'get_sound_duration', 'TimeoutSound');
 
-        %% Declare variables
-        % These will get moved to other functions as SoloParamHandles.
-
-        WaterAmount=maxasymp + (minasymp./(1+(n_done_trials/inflp).^slp).^assym);
-        %         WaterValvesSection(obj, 'set_water_amounts', WaterAmount, WaterAmount);
-        %         [LeftWValveTime RightWValveTime] = WaterValvesSection(obj, 'get_water_times');
-        WValveTimes = GetValveTimes(WaterAmount, [2 3]);
-        LeftWValveTime = WValveTimes(1);
-        RightWValveTime = WValveTimes(2);
-        [LeftWMult, RightWMult] = ParamsSection(obj, 'get_water_mult');
-        LeftWValveTime=LeftWValveTime*LeftWMult;
-        RightWValveTime=RightWValveTime*RightWMult;
-
+        [LeftWValveTime,RightWValveTime] = ParamsSection(obj, 'get_water_amount');
         side = ParamsSection(obj, 'get_current_side');
 
         if side == 'l'
@@ -114,7 +102,7 @@ switch action
 
         sma = add_scheduled_wave(sma, 'name', 'settling_period', 'preamble', SettlingIn_time); % intial fidgety period without violation
 
-        if value(training_stage) == 3
+        if CP_duration > (SettlingIn_time + legal_cbreak)
             sma = add_scheduled_wave(sma, 'name', 'CP_Duration_wave', 'preamble', CP_duration); % total length of centre poke to consider success
         else
             sma = add_scheduled_wave(sma, 'name', 'CP_Duration_wave', 'preamble', CP_duration - SettlingIn_time); % total length of centre poke minus the inital fidgety time to consider success
@@ -151,6 +139,9 @@ switch action
                 sma = add_state(sma,'name','preclean_up_state','self_timer',0.5,...
                     'input_to_statechange',{'Tup','check_next_trial_ready'});
 
+                sma = add_state(sma, 'name', 'timeout_state');
+                sma = add_state(sma, 'name', 'violation_state');
+
                 % For Training Stage 2
 
             case 2  %% STILL LEARNING THE REWARD SOUND ASSOCIATION -LEFT OR RIGHT LED ON -> POKE -> SOUND+REWARD BUT
@@ -181,6 +172,8 @@ switch action
 
                 sma = add_state(sma,'name','preclean_up_state','self_timer',0.5,...
                     'input_to_statechange',{'Tup','check_next_trial_ready'});
+
+                sma = add_state(sma, 'name', 'violation_state');
 
                 % Training Stage 3
 
@@ -377,7 +370,7 @@ switch action
          % stages. So we send to dispatcher only those states that are
          % defined.
          state_names = get_labels(sma); state_names = state_names(:,1);
-         prepare_next_trial_states = {'side_led_wait_RewardCollection','hit_state','second_hit_state','drink_state', 'violation_state','timeout_state'};
+         prepare_next_trial_states = {'side_led_wait_RewardCollection','hit_state','second_hit_state','drink_state', 'violation_state','timeout_state','preclean_up_state'};
 
          dispatcher('send_assembler', sma, intersect(state_names, prepare_next_trial_states));
 
