@@ -187,11 +187,11 @@ switch action
             time_bet_aud1_gocue.value = value(time_bet_aud1_gocue);
         end
 
-        CP_duration.value= SettlingIn_time + PreStim_time + A1_time + time_bet_aud1_gocue;
-		Total_CP_duration.value = CP_duration + time_go_cue; %#ok<*NASGU> 
+        CP_duration.value= value(SettlingIn_time) + value(PreStim_time) + value(A1_time) + value(time_bet_aud1_gocue);
+		Total_CP_duration.value = value(CP_duration) + value(time_go_cue); %#ok<*NASGU> 
 
 	case 'new_time_go_cue'
-		Total_CP_duration.value = CP_duration + time_go_cue;
+		Total_CP_duration.value = value(CP_duration) + value(time_go_cue);
         
     case 'Changed_Training_Stage'
 
@@ -203,7 +203,7 @@ switch action
         else
 
             enable(training_stage); % user can change the training stages
-            % trials_in_stage.value=0;
+            SessionDefinition_CURRENT_ACTIVE_STAGE = value(training_stage);
 
             switch value(training_stage)
 
@@ -222,12 +222,12 @@ switch action
                     disable(A1_time);
                     enable(time_bet_aud1_gocue);
 
-                    if n_done_trials <1 && warmup_on ==1
-                        CP_duration.value=value(init_CP_duration);
+                    if n_done_trials <1 && value(warmup_on) ==1
+                        CP_duration.value = value(init_CP_duration);
                     else
-                        CP_duration.value=CP_duration;
+                        CP_duration.value = value(CP_duration);
                     end
-                    Total_CP_duration.value = CP_duration + time_go_cue; %#ok<*NASGU>
+                    Total_CP_duration.value = value(CP_duration) + value(time_go_cue); %#ok<*NASGU>
 
                 case {5,6,7} %
 
@@ -237,26 +237,26 @@ switch action
                     enable(time_bet_aud1_gocue);
 
                     if random_prego_time == 1
-                        time_range_go_cue = time_bet_aud1_gocue_Min:0.01:time_bet_aud1_gocue_Max;
-                        time_bet_aud1_gocue = time_range_go_cue(randi([1, numel(time_range_go_cue)],1,1));
+                        time_range_go_cue = value(time_bet_aud1_gocue_Min):0.01:value(time_bet_aud1_gocue_Max);
+                        time_bet_aud1_gocue.value = time_range_go_cue(randi([1, numel(time_range_go_cue)],1,1));
                     end
 
                     if random_A1_time == 1
-                        time_range_A1_time = A1_time_Min: 0.01 : A1_time_Max;
-                        A1_time = time_range_A1_time(randi([1, numel(time_range_A1_time)],1,1));
+                        time_range_A1_time = value(A1_time_Min): 0.01 : value(A1_time_Max);
+                        A1_time.value = time_range_A1_time(randi([1, numel(time_range_A1_time)],1,1));
                     end
 
                     if random_PreStim_time == 1
-                        time_range_PreStim_time = PreStim_time_Min : 0.01 : PreStim_time_Max;
-                        PreStim_time = time_range_PreStim_time(randi([1, numel(time_range_PreStim_time)],1,1));
+                        time_range_PreStim_time = value(PreStim_time_Min) : 0.01 : value(PreStim_time_Max);
+                        PreStim_time.value = time_range_PreStim_time(randi([1, numel(time_range_PreStim_time)],1,1));
                     end
 
                     if n_done_trials <1 && warmup_on ==1
                         CP_duration.value = value(init_CP_duration);
                     else
-                        CP_duration.value = SettlingIn_time + A1_time + PreStim_time + time_bet_aud1_gocue;
+                        CP_duration.value = value(SettlingIn_time) + value(A1_time) + value(PreStim_time) + value(time_bet_aud1_gocue);
                     end
-                    Total_CP_duration.value = CP_duration + time_go_cue; %#ok<*NASGU>
+                    Total_CP_duration.value = value(CP_duration) + value(time_go_cue); %#ok<*NASGU>
             end
         end
 
@@ -282,11 +282,11 @@ switch action
                 enable(time_bet_aud1_gocue);
 
                 if n_done_trials <1 && warmup_on ==1
-                    CP_duration.value=value(init_CP_duration);
+                    CP_duration.value = value(init_CP_duration);
                 else
-                    CP_duration.value=CP_duration;
+                    CP_duration.value = value(CP_duration);
                 end
-                Total_CP_duration.value = CP_duration + time_go_cue; %#ok<*NASGU>
+                Total_CP_duration.value = value(CP_duration) + value(time_go_cue); %#ok<*NASGU>
 
                 case {5,6,7} % 
                    
@@ -297,23 +297,26 @@ switch action
                    enable(time_bet_aud1_gocue);
 
                    if random_prego_time == 1
-                       time_bet_aud1_gocue = randi([time_bet_aud1_gocue_Min, time_bet_aud1_gocue_Max],1,1);
-                   end
+                        time_range_go_cue = value(time_bet_aud1_gocue_Min):0.01:value(time_bet_aud1_gocue_Max);
+                        time_bet_aud1_gocue.value = time_range_go_cue(randi([1, numel(time_range_go_cue)],1,1));
+                    end
 
-                   if random_A1_time == 1
-                       A1_time = randi([A1_time_Min, A1_time_Max],1,1);
-                   end
+                    if random_A1_time == 1
+                        time_range_A1_time = value(A1_time_Min): 0.01 : value(A1_time_Max);
+                        A1_time.value = time_range_A1_time(randi([1, numel(time_range_A1_time)],1,1));
+                    end
 
-                   if random_PreStim_time == 1
-                       PreStim_time = randi([PreStim_time_Min, PreStim_time_Max],1,1);
-                   end
+                    if random_PreStim_time == 1
+                        time_range_PreStim_time = value(PreStim_time_Min) : 0.01 : value(PreStim_time_Max);
+                        PreStim_time.value = time_range_PreStim_time(randi([1, numel(time_range_PreStim_time)],1,1));
+                    end
 
-                   if n_done_trials <1 && warmup_on ==1
-                       CP_duration.value=value(init_CP_duration);
-                   else
-       				CP_duration.value=SettlingIn_time + A1_time + PreStim_time + time_bet_aud1_gocue;
-                   end
-                   Total_CP_duration.value = CP_duration + time_go_cue; %#ok<*NASGU>
+                    if n_done_trials <1 && warmup_on ==1
+                        CP_duration.value = value(init_CP_duration);
+                    else
+                        CP_duration.value = value(SettlingIn_time) + value(A1_time) + value(PreStim_time) + value(time_bet_aud1_gocue);
+                    end
+                    Total_CP_duration.value = value(CP_duration) + value(time_go_cue); %#ok<*NASGU>
 
 
 		end

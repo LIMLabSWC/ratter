@@ -103,7 +103,7 @@ switch action
                 violation_recent.value = nan;
                 violation_stage.value = nan;
 
-                if n_completed_trails >= 20
+                if n_completed_trials >= 20
                     timeout_recent.value = numel(find(timeout_history(end-19:end)))/20;
                 else
                     timeout_recent.value = nan;
@@ -120,7 +120,7 @@ switch action
                     timeout_rate.value = numel(find(timeout_history))/n_completed_trials;
                 end
 
-                if n_completed_trails >= 20
+                if n_completed_trials >= 20
                     timeout_recent.value = numel(find(timeout_history(end-19:end)))/20;
                     violation_recent.value = numel(find(violation_history(end-19:end)))/20;
                 else
