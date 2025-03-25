@@ -122,9 +122,10 @@ switch action
             'label', 'Active Stage', 'TooltipString', 'the current training stage');
 		% NumeditParam(obj,'training_stage',1,x,y,'label','Training Stage');
         set_callback(training_stage, {mfilename, 'Changed_Training_Stage'});
+        disable(training_stage);
 		next_row(y);
 		ToggleParam(obj,'use_auto_train',1,x,y,'OnString','Using Autotrain','OffString','Manual Settings');
-		set_callback(use_training, {mfilename, 'Changed_Training_Stage'});
+		set_callback(use_auto_train, {mfilename, 'Changed_Training_Stage'});
 
         next_row(y);
 		NumeditParam(obj, 'ntrial_correct_bias', 0, x, y, ...
