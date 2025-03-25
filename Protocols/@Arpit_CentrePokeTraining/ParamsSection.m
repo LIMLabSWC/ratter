@@ -401,8 +401,8 @@ switch action
         LeftWValveTime = WValveTimes(1);
         RightWValveTime = WValveTimes(2);
         [LeftWMult, RightWMult] = ParamsSection(obj, 'get_water_mult');
-        LeftWValveTime=LeftWValveTime*LeftWMult;
-        RightWValveTime=RightWValveTime*RightWMult;
+        x=LeftWValveTime*LeftWMult;
+        y=RightWValveTime*RightWMult;
 
 	case 'get_water_mult'
         
