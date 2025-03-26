@@ -118,6 +118,7 @@ switch action
     % [x, y] = PunishmentSection(obj, 'init', x, y); %#ok<NASGU>
     
     next_column(x); y=5;
+    [x,y] = Training_ParamsSection(obj, 'init', x, y);
 	[x, y] = SessionPerformanceSection(obj, 'init', x, y);
 	[x, y] = ParamsSection(obj,  'init', x, y); %#ok<NASGU>
     [x, y] = SoundSection(obj,'init',x,y);
