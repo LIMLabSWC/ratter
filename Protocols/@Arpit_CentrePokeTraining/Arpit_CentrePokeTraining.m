@@ -137,7 +137,7 @@ switch action
     Arpit_CentrePokeTrainingSMA(obj, 'init');
     
     SessionDefinition(obj, 'init', x, y, value(myfig)); next_row(y, 2); %#ok<NASGU>
-    SessionDefinition(obj, 'set_old_style_parsing_flag',0);
+    % SessionDefinition(obj, 'set_old_style_parsing_flag',0);
 
     feval(mfilename, obj, 'prepare_next_trial');
          

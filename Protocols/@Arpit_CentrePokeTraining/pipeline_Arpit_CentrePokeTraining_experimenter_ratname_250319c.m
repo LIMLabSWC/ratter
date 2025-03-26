@@ -54,7 +54,7 @@ clear('ans');
 %<COMPLETION_TEST>
 % only run it if its the start of the day, so number of trials the rat did
 % is less
-if n_completed_trial < 100
+if n_completed_trials < 100
     if stage1_trial_counter > value(Training_ParamsSection_total_trials) && stage1_trial_counter_oppSide > value(Training_ParamsSection_total_trials_opp)
         SessionDefinition(obj, 'jump_to_stage', 'Timeout Rewarded Side Pokes');
     end
@@ -146,7 +146,7 @@ GetSoloFunctionArgs(obj);
 ClearHelperVarsNotOwned(obj);
 clear('ans');
 %<COMPLETION_TEST>
-if n_completed_trial > 50
+if n_completed_trials > 50
     if stage2_trial_counter > value(Training_ParamsSection_total_trials) && stage2_trial_counter_oppSide > value(Training_ParamsSection_total_trials_opp)
          SessionDefinition(obj, 'jump_to_stage', 'Introduce Centre Poke');
     end
@@ -448,7 +448,7 @@ GetSoloFunctionArgs(obj);
 ClearHelperVarsNotOwned(obj);
 clear('ans');
 %<COMPLETION_TEST>
-if value(ParamsSection_CP_duration) >= cp_max && stage5_trial_counter > value(Training_ParamsSection_total_trials)
+if value(ParamsSection_CP_duration) >= value(Training_ParamsSection_max_CP) && stage5_trial_counter > value(Training_ParamsSection_total_trials)
     if SessionPerformanceSection_violation_recent < value(Training_ParamsSection_recent_violation) && SessionPerformanceSection_timeout_recent < value(Training_ParamsSection_recent_timeout) && ...
         stage5_violation_percent < value(Training_ParamsSection_stage_violation) && n_completed_trials > 100
         SessionDefinition(obj, 'jump_to_stage', 'Vary Stimuli location during Centre Poke');
