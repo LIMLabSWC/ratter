@@ -118,7 +118,7 @@ switch action
         next_column(x);
 		y=5;
         MenuParam(obj, 'training_stage', {'1'; '2'; '3';...
-            '4'; '5'; '6'; '7'}, 1, x, y, ...
+            '4'; '5'; '6'; '7';'8'}, 1, x, y, ...
             'label', 'Active Stage', 'TooltipString', 'the current training stage');
 		% NumeditParam(obj,'training_stage',1,x,y,'label','Training Stage');
         set_callback(training_stage, {mfilename, 'Changed_Training_Stage'});
@@ -160,7 +160,10 @@ switch action
         
         
 		SoloFunctionAddVars('SessionPerformanceSection', 'ro_args', ...
-			{'training_stage'});		
+			{'training_stage'});
+
+        SoloFunctionAddVars('SessionPerformanceSection', 'ro_args', ...
+			{'training_stage'});
 		
 		SoloParamHandle(obj, 'previous_parameters', 'value', []);
 		
@@ -195,7 +198,7 @@ switch action
 		Total_CP_duration.value = value(CP_duration) + value(time_go_cue);
         
     case 'Changed_Training_Stage'
-
+        
         if value(use_auto_train) == 1
 
             disable(training_stage); % user cannot change the training stages
@@ -205,6 +208,7 @@ switch action
 
             enable(training_stage); % user can change the training stages
             SessionDefinition(obj, 'jump_to_stage',value(training_stage));
+            [x,y] = Training_ParamsSection(obj, 'init', x, y); % update the training params as well
 
             switch value(training_stage)
 
@@ -230,7 +234,7 @@ switch action
                     end
                     Total_CP_duration.value = value(CP_duration) + value(time_go_cue); %#ok<*NASGU>
 
-                case {5,6,7} %
+                case {5,6,7,8} %
 
                     enable(SettlingIn_time);
                     enable(PreStim_time);
@@ -289,7 +293,7 @@ switch action
                 end
                 Total_CP_duration.value = value(CP_duration) + value(time_go_cue); %#ok<*NASGU>
 
-                case {5,6,7} % 
+                case {5,6,7,8} % 
                    
                    time_go_cue.value=0.100;
                    enable(SettlingIn_time);

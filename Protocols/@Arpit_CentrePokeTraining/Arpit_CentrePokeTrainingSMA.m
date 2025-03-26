@@ -226,7 +226,7 @@ switch action
                     'input_to_statechange',{'Tup','check_next_trial_ready'});
 
               
-            case {4,5,6,7} % STAGE 4 - LEARN TO NOSE POKE BEYOND SETTLING TIME WITH THE INTRODUCTION OF VIOLATION, THIS IS UNTIL CP = 1 SEC
+            case {4,5,6,7,8} % STAGE 4 - LEARN TO NOSE POKE BEYOND SETTLING TIME WITH THE INTRODUCTION OF VIOLATION, THIS IS UNTIL CP = 1 SEC
                 % STAGE 5 ONWARDS - THE STIMULI IS INTRODUCED FROM THE STAGE 5 ONWARDS
 
                 sma = add_state(sma,'name','wait_for_cpoke','self_timer',cp_timeout, ...
