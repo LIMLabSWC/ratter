@@ -70,7 +70,7 @@ switch action
 		DispParam(obj, 'violation_stage', 0, x, y,'label','Stage Violation', 'TooltipString', ...
 			'Fraction of violations in this training stage'); 
         next_row(y);
-		DispParam(obj, 'violation_stage', 0, x, y,'label','Stage Timeout', 'TooltipString', ...
+		DispParam(obj, 'timeout_stage', 0, x, y,'label','Stage Timeout', 'TooltipString', ...
 			'Fraction of timeouts in this training stage'); 
         next_row(y);
 		SubheaderParam(obj, 'title', 'Overall Performance', x, y);
@@ -115,7 +115,7 @@ switch action
                 timeout_stage.value = nan;
 
             
-            case {4,5,6,7}        
+            case {4,5,6,7,8}        
 
                 if n_completed_trials > 1
                     ntrials.value        = n_completed_trials;

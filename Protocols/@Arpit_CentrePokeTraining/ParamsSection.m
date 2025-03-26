@@ -162,7 +162,7 @@ switch action
 		SoloFunctionAddVars('SessionPerformanceSection', 'ro_args', ...
 			{'training_stage'});
 
-        SoloFunctionAddVars('SessionPerformanceSection', 'ro_args', ...
+        SoloFunctionAddVars('Training_ParamsSection', 'ro_args', ...
 			{'training_stage'});
 		
 		SoloParamHandle(obj, 'previous_parameters', 'value', []);
@@ -208,7 +208,7 @@ switch action
 
             enable(training_stage); % user can change the training stages
             SessionDefinition(obj, 'jump_to_stage',value(training_stage));
-            [x,y] = Training_ParamsSection(obj, 'init', x, y); % update the training params as well
+            [stage_fig_x,stage_fig_y] = Training_ParamsSection(obj, 'reinit', value(stage_fig_x),value(stage_fig_y)); % update the training params as well
 
             switch value(training_stage)
 
