@@ -209,6 +209,7 @@ switch action
             enable(training_stage); % user can change the training stages
             SessionDefinition(obj, 'jump_to_stage',value(training_stage));
             [stage_fig_x,stage_fig_y] = Training_ParamsSection(obj, 'reinit', value(stage_fig_x),value(stage_fig_y)); % update the training params as well
+            Arpit_CentrePokeTrainingSMA(obj,'reinit');
 
             switch value(training_stage)
 
