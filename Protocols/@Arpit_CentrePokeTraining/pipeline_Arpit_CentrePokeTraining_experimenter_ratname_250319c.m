@@ -23,9 +23,9 @@ case 'Familiarize with Reward Side Pokes'
         GetSoloFunctionArgs(obj);
         ClearHelperVarsNotOwned(obj);
         %<HELPER_VARS>
-        stage1_trial_counter = 0;
-        stage1_trial_counter_today = 0;
-        stage1_trial_counter_oppSide = 0;
+        stage1_trial_counter.value = 0;
+        stage1_trial_counter_today.value = 0;
+        stage1_trial_counter_oppSide.value = 0;
         %</HELPER_VARS>
     end
     if stage_algorithm_eval
@@ -36,14 +36,14 @@ case 'Familiarize with Reward Side Pokes'
         callback(ParamsSection_MaxSame);
         ParamsSection_training_stage.value = 1;
         callback(ParamsSection_training_stage);
-        stage1_trial_counter = stage1_trial_counter + 1;
-        SessionPerformanceSection_ntrials_stage.value = stage1_trial_counter;
+        stage1_trial_counter.value = value(stage1_trial_counter) + 1;
+        SessionPerformanceSection_ntrials_stage.value = value(stage1_trial_counter);
         callback(SessionPerformanceSection_ntrials_stage)
-        stage1_trial_counter_today = stage1_trial_counter_today + 1;
-        SessionPerformanceSection_ntrials_stage_today.value = stage1_trial_counter_today;
+        stage1_trial_counter_today.value = value(stage1_trial_counter_today) + 1;
+        SessionPerformanceSection_ntrials_stage_today.value = value(stage1_trial_counter_today);
         callback(SessionPerformanceSection_ntrials_stage_today)
         if value(previous_sides(end)) ~= value(ParamsSection_ThisTrial)
-            stage1_trial_counter_oppSide = stage1_trial_counter_oppSide + 1;
+            stage1_trial_counter_oppSide.value = value(stage1_trial_counter_oppSide) + 1;
         end
         %</STAGE_ALGORITHM>
     end
@@ -55,7 +55,7 @@ clear('ans');
 % only run it if its the start of the day, so number of trials the rat did
 % is less
 if n_completed_trials < 100
-    if stage1_trial_counter > value(Training_ParamsSection_total_trials) && stage1_trial_counter_oppSide > value(Training_ParamsSection_total_trials_opp)
+    if value(stage1_trial_counter) > value(Training_ParamsSection_total_trials) && value(stage1_trial_counter_oppSide) > value(Training_ParamsSection_total_trials_opp)
         SessionDefinition(obj, 'jump_to_stage', 'Timeout Rewarded Side Pokes');
     end
 end
@@ -70,8 +70,8 @@ if eod_logic_eval
 GetSoloFunctionArgs(obj);
 ClearHelperVarsNotOwned(obj);
 %<END_OF_DAY_LOGIC>
-stage1_trial_counter_today = 0;
-if stage1_trial_counter > value(Training_ParamsSection_total_trials) && stage1_trial_counter_oppSide > value(Training_ParamsSection_total_trials_opp)
+stage1_trial_counter_today.value = 0;
+if value(stage1_trial_counter) > value(Training_ParamsSection_total_trials) && value(stage1_trial_counter_oppSide) > value(Training_ParamsSection_total_trials_opp)
      SessionDefinition(obj, 'jump_to_stage', 'Timeout Rewarded Side Pokes');
 end
 %</END_OF_DAY_LOGIC>
@@ -86,11 +86,11 @@ if helper_vars_eval
 GetSoloFunctionArgs(obj);
 ClearHelperVarsNotOwned(obj);
 %<HELPER_VARS>
-stage2_trial_counter = 0;
-stage2_trial_counter_today = 0;
-stage2_trial_counter_oppSide = 0;
-opp_side_trials = 0;
-stage2_timeout_percent = 0;
+stage2_trial_counter.value = 0;
+stage2_trial_counter_today.value = 0;
+stage2_trial_counter_oppSide.value = 0;
+opp_side_trials.value = 0;
+stage2_timeout_percent.value = 0;
 %</HELPER_VARS>
 end
 if stage_algorithm_eval
@@ -101,31 +101,31 @@ ParamsSection_MaxSame.value = 3;
 callback(ParamsSection_MaxSame);
 ParamsSection_training_stage.value = 2;
 callback(ParamsSection_training_stage);
-stage2_trial_counter = stage2_trial_counter + 1;
-SessionPerformanceSection_ntrials_stage.value = stage2_trial_counter;
+stage2_trial_counter.value = value(stage2_trial_counter) + 1;
+SessionPerformanceSection_ntrials_stage.value = value(stage2_trial_counter);
 callback(SessionPerformanceSection_ntrials_stage);
-stage2_trial_counter_today = stage2_trial_counter_today + 1;
-SessionPerformanceSection_ntrials_stage_today.value = stage2_trial_counter_today;
+stage2_trial_counter_today.value = value(stage2_trial_counter_today) + 1;
+SessionPerformanceSection_ntrials_stage_today.value = value(stage2_trial_counter_today);
 callback(SessionPerformanceSection_ntrials_stage_today);
 
 if value(previous_sides(end)) ~= value(ParamsSection_ThisTrial)
-    stage2_trial_counter_oppSide = stage2_trial_counter_oppSide + 1;
-    opp_side_trials = opp_side_trials + 1;
+    stage2_trial_counter_oppSide.value = value(stage2_trial_counter_oppSide) + 1;
+    opp_side_trials.value = value(opp_side_trials) + 1;
 end
 % Update the reward collection time based upon behav
 if size(timeout_history) > 5
-    if all(value(timeout_history(end-1:end))) && opp_side_trials >= 2
+    if all(value(timeout_history(end-1:end))) && value(opp_side_trials) >= 2
         ParamsSection_RewardCollection_duration.value = min([value(ParamsSection_RewardCollection_duration) + 1,...
             value(Training_ParamsSection_max_rColl_dur)]);
         callback(ParamsSection_RewardCollection_duration);
-        opp_side_trials = 0;
+        opp_side_trials.value = 0;
     end
 
-    if ~any(value(timeout_history(end-1:end)))  && opp_side_trials >= 2
+    if ~any(value(timeout_history(end-1:end)))  && value(opp_side_trials) >= 2
         ParamsSection_RewardCollection_duration.value = max([value(ParamsSection_RewardCollection_duration) - 1,...
             value(Training_ParamsSection_min_rColl_dur)]);
         callback(ParamsSection_RewardCollection_duration);
-        opp_side_trials = 0;
+        opp_side_trials.value = 0;
     end
 end
 
@@ -136,8 +136,8 @@ if size(timeout_history) > 20
     end
 end
 
-stage2_timeout_percent = ((stage2_timeout_percent * stage2_trial_counter) + double(timeout_history(end)))/(stage2_trial_counter + 1);
-SessionPerformanceSection_timeout_stage.value = stage2_timeout_percent;
+stage2_timeout_percent.value = ((value(stage2_timeout_percent) * value(stage2_trial_counter)) + double(timeout_history(end)))/(value(stage2_trial_counter) + 1);
+SessionPerformanceSection_timeout_stage.value = value(stage2_timeout_percent);
 callback(SessionPerformanceSection_timeout_stage);
 %</STAGE_ALGORITHM>
 end
@@ -147,7 +147,7 @@ ClearHelperVarsNotOwned(obj);
 clear('ans');
 %<COMPLETION_TEST>
 if n_completed_trials > 50
-    if stage2_trial_counter > value(Training_ParamsSection_total_trials) && stage2_trial_counter_oppSide > value(Training_ParamsSection_total_trials_opp)
+    if value(stage2_trial_counter) > value(Training_ParamsSection_total_trials) && value(stage2_trial_counter_oppSide) > value(Training_ParamsSection_total_trials_opp)
          SessionDefinition(obj, 'jump_to_stage', 'Introduce Centre Poke');
     end
 end
@@ -162,7 +162,7 @@ if eod_logic_eval
 GetSoloFunctionArgs(obj);
 ClearHelperVarsNotOwned(obj);
 %<END_OF_DAY_LOGIC>
-stage2_trial_counter_today = 0;
+stage2_trial_counter_today.value = 0;
 %</END_OF_DAY_LOGIC>
 end
 %</TRAINING_STAGE>
@@ -176,14 +176,14 @@ GetSoloFunctionArgs(obj);
 ClearHelperVarsNotOwned(obj);
 %<HELPER_VARS>
 % Maximum & Minimum duration of center poke, in secs:
-cp_max = value(ParamsSection_SettlingIn_time) + value(ParamsSection_legal_cbreak);
-cp_min = value(ParamsSection_init_CP_duration);
+cp_max.value = value(ParamsSection_SettlingIn_time) + value(ParamsSection_legal_cbreak);
+cp_min.value = value(ParamsSection_init_CP_duration);
 % Minimum increment (in secs) in center poke duration every time there is a non-cp-violation trial:
-cp_minimum_increment = 0.001;
-stage3_trial_counter = 0;
-stage3_trial_counter_today = 0;
-stage3_timeout_percent = 0;
-last_session_cp = 0;
+cp_minimum_increment.value = 0.001;
+stage3_trial_counter.value = 0;
+stage3_trial_counter_today.value = 0;
+stage3_timeout_percent.value = 0;
+last_session_cp.value = 0;
 %</HELPER_VARS>
 end
 if stage_algorithm_eval
@@ -194,21 +194,21 @@ ParamsSection_MaxSame.value = Inf;
 callback(ParamsSection_MaxSame);
 ParamsSection_training_stage.value = 3;
 callback(ParamsSection_training_stage);
-stage3_trial_counter = stage3_trial_counter + 1;
-SessionPerformanceSection_ntrials_stage.value = stage3_trial_counter;
+stage3_trial_counter.value = value(stage3_trial_counter) + 1;
+SessionPerformanceSection_ntrials_stage.value = value(stage3_trial_counter);
 callback(SessionPerformanceSection_ntrials_stage);
-stage3_trial_counter_today = stage3_trial_counter_today + 1;
-SessionPerformanceSection_ntrials_stage_today.value = stage3_trial_counter_today;
+stage3_trial_counter_today.value = value(stage3_trial_counter_today) + 1;
+SessionPerformanceSection_ntrials_stage_today.value = value(stage3_trial_counter_today);
 callback(SessionPerformanceSection_ntrials_stage_today);
-stage3_timeout_percent = ((stage3_timeout_percent * stage3_trial_counter) + double(timeout_history(end)))/(stage3_trial_counter + 1);
-SessionPerformanceSection_timeout_stage.value = stage3_timeout_percent;
+stage3_timeout_percent.value = ((value(stage3_timeout_percent) * value(stage3_trial_counter)) + double(timeout_history(end)))/(value(stage3_trial_counter) + 1);
+SessionPerformanceSection_timeout_stage.value = value(stage3_timeout_percent);
 callback(SessionPerformanceSection_timeout_stage);
 
 % Change the value of CP Duration
 if n_completed_trials < 1
     ParamsSection_CP_duration.value = value(ParamsSection_init_CP_duration);
 else
-    if ~timeout_history(end) && value(ParamsSection_CP_duration) < cp_max
+    if ~timeout_history(end) && value(ParamsSection_CP_duration) < value(cp_max)
         increment = value(ParamsSection_CP_duration) * value(Training_ParamsSection_CPfraction_inc);
         if increment < value(cp_minimum_increment)
             increment = value(cp_minimum_increment);
@@ -224,7 +224,7 @@ GetSoloFunctionArgs(obj);
 ClearHelperVarsNotOwned(obj);
 clear('ans');
 %<COMPLETION_TEST>
-if value(ParamsSection_CP_duration) >= cp_max
+if value(ParamsSection_CP_duration) >= value(cp_max)
     SessionDefinition(obj, 'jump_to_stage', 'Introduce Violation for Centre Poke');
 end
 %</COMPLETION_TEST>
@@ -238,8 +238,8 @@ if eod_logic_eval
 GetSoloFunctionArgs(obj);
 ClearHelperVarsNotOwned(obj);
 %<END_OF_DAY_LOGIC>
-stage3_trial_counter_today = 0;
-last_session_cp = value(ParamsSection_CP_duration);
+stage3_trial_counter_today.value = 0;
+last_session_cp.value = value(ParamsSection_CP_duration);
 %</END_OF_DAY_LOGIC>
 end
 %</TRAINING_STAGE>
