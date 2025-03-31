@@ -60,6 +60,7 @@ switch action
         %% Setup sounds
         sone_sound_id     = SoundManagerSection(obj, 'get_sound_id', 'SOneSound');
         stwo_sound_id     = SoundManagerSection(obj, 'get_sound_id', 'STwoSound');
+        A1_sound_id       = SoundManagerSection(obj, 'get_sound_id', 'StimAUD1');
         sound_duration    = value(A1_time); % SoundManagerSection(obj, 'get_sound_duration', 'SOneSound');
         go_sound_id       = SoundManagerSection(obj, 'get_sound_id', 'GoSound');
         go_cue_duration   = value(time_go_cue); % SoundManagerSection(obj, 'get_sound_duration', 'GoSound');
@@ -74,32 +75,31 @@ switch action
         if side == 'l'
             HitEvent = 'Lin';
             ErrorEvent = 'Rin';
+            sound_id = sone_sound_id;
             SideLight  = left1led;
+            WValveTime = LeftWValveTime;
+            WValveSide = left1water;
         else
             HitEvent = 'Rin';
             ErrorEvent = 'Lin';
+            sound_id = stwo_sound_id;
             SideLight  = right1led;
+            WValveTime = RightWValveTime;
+            WValveSide = right1water;
         end
 
 
         sma = StateMachineAssembler('full_trial_structure','use_happenings', 1);
 
-        if side=='l'
-            sma = add_scheduled_wave(sma, 'name', 'reward_delivery', 'preamble', reward_delay, ...
-                'sustain', LeftWValveTime, 'DOut', left1water); %  % activating the left side water port
-            
+        % scheduled wave for stimuli/fixed sound, could be based upon side
+        if stimuli_on
             sma = add_scheduled_wave(sma, 'name', 'stimplay', 'preamble', PreStim_time, ...
-            'sustain', sound_duration, 'sound_trig', sone_sound_id); % to play a sound before Go Cue
-
+                'sustain', sound_duration, 'sound_trig', A1_sound_id); % to play a sound before Go Cue
         else
-            sma = add_scheduled_wave(sma, 'name', 'reward_delivery', 'preamble', reward_delay, ...
-                'sustain', RightWValveTime, 'DOut', right1water); % activating the right side water port
-
             sma = add_scheduled_wave(sma, 'name', 'stimplay', 'preamble', PreStim_time, ...
-            'sustain', sound_duration, 'sound_trig', stwo_sound_id); % to play a sound before Go Cue
-
+                'sustain', sound_duration, 'sound_trig', sound_id); % to play a sound before Go Cue
         end
-
+        % Scheduled wave for CP Duration
         if CP_duration <= (SettlingIn_time + legal_cbreak)
             sma = add_scheduled_wave(sma, 'name', 'CP_Duration_wave', 'preamble', CP_duration); % total length of centre poke to consider success
         else
@@ -110,11 +110,14 @@ switch action
         sma = add_scheduled_wave(sma, 'name', 'Go_Cue', 'preamble', 0.001, ...
             'sustain', go_cue_duration, 'sound_trig', go_sound_id); % to play the Go Cue/Reward Sound
 
+        % scheduled wave for rewarded side either of the side
+        sma = add_scheduled_wave(sma, 'name', 'reward_delivery', 'preamble', reward_delay, ...
+            'sustain', WValveTime, 'DOut', WValveSide); % water delivery side
         sma = add_scheduled_wave(sma, 'name', 'reward_collection_dur', 'preamble', SideLed_duration + RewardCollection_duration); % time to collect the reward
 
-        % For Training Stage 1
-
         switch value(training_stage)
+
+            % For Training Stage 1
 
             case 1  % LEARNING THE REWARD SOUND ASSOCIATION -LEFT OR RIGHT LED ON -> POKE -> SOUND+REWARD GIVEN
                 % INFINITE TIME AND CHANCES TO SELF CORRECT

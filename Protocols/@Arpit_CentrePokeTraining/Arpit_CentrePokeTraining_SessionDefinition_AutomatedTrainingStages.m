@@ -2,7 +2,7 @@
 %Please use the session automator window exclusively
 %to edit this file.
 
-function varargout = pipeline_Arpit_CentrePokeTraining_experimenter_ratname_250319c(obj, action, varargin)
+function varargout = Arpit_CentrePokeTraining_SessionDefinition_AutomatedTrainingStages(obj, action, varargin)
 
 GetSoloFunctionArgs('func_owner', ['@' class(obj)], 'func_name', 'SessionModel');
 

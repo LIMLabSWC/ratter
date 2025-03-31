@@ -63,11 +63,10 @@ switch action
     DeclareGlobals(obj, 'ro_args', {'timeout_history'});
     SoloFunctionAddVars('ParamsSection', 'rw_args', 'timeout_history');
    
-    % SoloParamHandle(obj, 'Stage_Trial_Counter', 'value', zeros(1,7));
-    % DeclareGlobals(obj, 'ro_args', {'Stage_Trial_Counter'});
-    % SoloFunctionAddVars('ParamsSection', 'rw_args', 'Stage_Trial_Counter');
-    % 
-
+    SoloParamHandle(obj, 'stimulus_history', 'value', []);
+    DeclareGlobals(obj, 'ro_args', {'stimulus_history'});
+    SoloFunctionAddVars('StimulusSection', 'rw_args', 'stimulus_history');
+    
 
     SoundManagerSection(obj, 'init');
     x = 5; y = 5;             % Initial position on main GUI window
@@ -121,6 +120,7 @@ switch action
 	[x, y] = SessionPerformanceSection(obj, 'init', x, y);
 	[x, y] = ParamsSection(obj,  'init', x, y); %#ok<NASGU>
     [x, y] = SoundSection(obj,'init',x,y);
+    [x, y] = StimulusSection(obj,'init',x,y);
     [stage_fig_x,stage_fig_y] = Training_ParamsSection(obj, 'init', x, y);
    
     SoloParamHandle(obj, 'stage_fig_x', 'value', stage_fig_x);
@@ -160,8 +160,7 @@ switch action
        SessionDefinition(obj, 'next_trial');
        SessionPerformanceSection(obj, 'evaluate');
        SoundManagerSection(obj, 'send_not_yet_uploaded_sounds');
-    
-       nTrials.value = n_done_trials;
+       StimulusSection(obj,'prepare_next_trial');
 
        [sma, prepare_next_trial_states] = Arpit_CentrePokeTrainingSMA(obj, 'prepare_next_trial');
 
@@ -214,7 +213,8 @@ switch action
       
       %% pre_saving_settings
    case 'pre_saving_settings'
-       
+    
+    StimulusSection(obj,'hide');   
     SessionDefinition(obj, 'run_eod_logic_without_saving');
     perf    = SessionPerformanceSection(obj, 'evaluate');
     cp_durs = ParamsSection(obj, 'get_cp_history');
@@ -232,6 +232,7 @@ switch action
     pd.timeouts=timeout_history(:);
 %     pd.performance=tot_perf(:);
     pd.cp_durs=cp_durs(:);
+    pd.stim1dur=stim1dur(:);
     
     
     sendsummary(obj,'protocol_data',pd);    
