@@ -146,11 +146,11 @@ ClearHelperVarsNotOwned(obj);
 ParamsSection_MaxSame.value = 3;
 callback(ParamsSection_MaxSame);
 stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
+this_stage_trial_counter = value(stages_trial_counter);
 % ParamsSection_training_stage.value = stage_no;
 % callback(ParamsSection_training_stage);
 if n_completed_trials > value(stage_start_completed_trial)
-    % Update the helper vars
-    this_stage_trial_counter = value(stages_trial_counter);
+    % Update the helper vars    
     this_stage_trial_counter(stage_no) = this_stage_trial_counter(stage_no) + 1;
     SessionPerformanceSection_ntrials_stage.value = this_stage_trial_counter(stage_no);
     callback(SessionPerformanceSection_ntrials_stage);
@@ -271,11 +271,11 @@ ParamsSection_MaxSame.value = Inf;
 callback(ParamsSection_MaxSame);
 
 stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
+this_stage_trial_counter = value(stages_trial_counter);
 % ParamsSection_training_stage.value = stage_no;
 % callback(ParamsSection_training_stage);
 if n_completed_trials > value(stage_start_completed_trial)
-    % Update the helper vars
-    this_stage_trial_counter = value(stages_trial_counter);
+    % Update the helper vars    
     this_stage_trial_counter(stage_no) = this_stage_trial_counter(stage_no) + 1;
     SessionPerformanceSection_ntrials_stage.value = this_stage_trial_counter(stage_no);
     callback(SessionPerformanceSection_ntrials_stage);
@@ -294,7 +294,11 @@ if n_completed_trials > value(stage_start_completed_trial)
     stages_timeout_rate.value = this_stage_timeout_percent;
 end
 % Change the value of CP Duration
-if n_completed_trials < 1
+if value(last_session_CP) == 0 && this_stage_trial_counter(stage_no) < 2
+    ParamsSection_CP_duration.value = cp_min; % initialize to min_CP
+end
+
+if n_completed_trials < 1 % intialize to min value at the start of each session/day
     ParamsSection_CP_duration.value = value(ParamsSection_init_CP_duration);
 else
     if ~timeout_history(end) && value(ParamsSection_CP_duration) < cp_max
@@ -321,6 +325,7 @@ if value(ParamsSection_CP_duration) >= cp_max
     callback(ParamsSection_training_stage);
     ParamsSection(obj, 'Changed_Training_Stage');
     SessionDefinition(obj, 'jump_to_stage', 'Introduce Violation for Centre Poke');
+    last_session_CP.value = value(ParamsSection_CP_duration);
 end
 %</COMPLETION_TEST>
 if exist('ans', 'var')
@@ -377,17 +382,17 @@ cp_fraction = value(Training_ParamsSection_CPfraction_inc);
 cp_minimum_increment = 0.001;
 
 stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
+this_stage_trial_counter = value(stages_trial_counter);
+this_stage_trial_counter_today = value(stages_trial_counter_today);
 % ParamsSection_training_stage.value = stage_no;
 % callback(ParamsSection_training_stage);
 if n_completed_trials > value(stage_start_completed_trial)
-    % Update the helper vars
-    this_stage_trial_counter = value(stages_trial_counter);
+    % Update the helper vars    
     this_stage_trial_counter(stage_no) = this_stage_trial_counter(stage_no) + 1;
     SessionPerformanceSection_ntrials_stage.value = this_stage_trial_counter(stage_no);
     callback(SessionPerformanceSection_ntrials_stage);
     stages_trial_counter.value = this_stage_trial_counter;
-
-    this_stage_trial_counter_today = value(stages_trial_counter_today);
+  
     this_stage_trial_counter_today(stage_no) = this_stage_trial_counter_today(stage_no) + 1;
     SessionPerformanceSection_ntrials_stage_today.value = this_stage_trial_counter_today(stage_no);
     callback(SessionPerformanceSection_ntrials_stage_today);
@@ -406,6 +411,10 @@ if n_completed_trials > value(stage_start_completed_trial)
     stages_violation_rate.value = this_stage_violation_percent;
 end
 % Change the value of CP Duration
+if this_stage_trial_counter(stage_no) < 2
+    ParamsSection_CP_duration.value = cp_min; % initialize to min_CP
+end
+
 if n_completed_trials < 1
     ParamsSection_CP_duration.value = value(ParamsSection_init_CP_duration);
 else
