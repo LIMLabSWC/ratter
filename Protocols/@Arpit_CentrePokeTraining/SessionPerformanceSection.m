@@ -112,8 +112,6 @@ switch action
                     timeout_recent.value = nan;
                 end
 
-                timeout_stage.value = nan;
-
             
             case {4,5,6,7,8}        
 
@@ -130,8 +128,7 @@ switch action
                     timeout_recent.value = nan;
                     violation_recent.value = nan;
                 end
-
-            
+                
         end
 		
         if nargout > 0
