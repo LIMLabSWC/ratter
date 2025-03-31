@@ -95,7 +95,7 @@ switch action
         ToggleParam(obj, 'stimuli_on', 0, x,y,...
         'OnString', 'Use Stimuli',...
         'OffString', 'Fixed Sound',...
-        'TooltipString', sprintf('If on (black) then it enables training with stimuli else a fixed sound'));
+        'TooltipString', sprintf('If on (black) then it enables training with stimuli else using a fixed sound from Stage 5'));
         next_row(y);
         ToggleParam(obj, 'warmup_on', 1, x,y,...
 			'OnString', 'Warmup ON',...
@@ -169,8 +169,9 @@ switch action
 			{'training_stage'});
 
         SoloFunctionAddVars('StimulusSection', 'ro_args', ...
-			{'training_stage','stimuli_on'});
-
+			{'training_stage';'stimuli_on';'ThisTrial';'A1_time';...
+            'time_bet_aud1_gocue' ;'PreStim_time'});
+        
         SoloFunctionAddVars('Training_ParamsSection', 'ro_args', ...
 			{'training_stage'});
 		
@@ -209,14 +210,12 @@ switch action
     case 'Changed_Training_Stage'
         
         if value(use_auto_train) == 1
-
-            disable(training_stage); % user cannot change the training stages
-            disable(PreStim_time);
-            disable(time_bet_aud1_gocue);
+            disable(training_stage); % user cannot change the training stages    
         else
-
             enable(training_stage); % user can change the training stages
             SessionDefinition(obj, 'jump_to_stage',value(training_stage));
+        end
+
             [stage_fig_x,stage_fig_y] = Training_ParamsSection(obj, 'reinit', value(stage_fig_x),value(stage_fig_y)); % update the training params as well
             Arpit_CentrePokeTrainingSMA(obj,'reinit');
 
@@ -273,7 +272,6 @@ switch action
                     end
                     Total_CP_duration.value = value(CP_duration) + value(time_go_cue); %#ok<*NASGU>
             end
-        end
 
 	case 'prepare_next_trial'
 		

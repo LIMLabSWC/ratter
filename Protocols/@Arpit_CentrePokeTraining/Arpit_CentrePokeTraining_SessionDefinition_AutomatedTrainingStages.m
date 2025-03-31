@@ -30,7 +30,7 @@ CreateHelperVar(obj,'stages_trial_counter_today','value',zeros(1,8));
 CreateHelperVar(obj,'stages_trial_counter_oppSide','value',zeros(1,8));
 CreateHelperVar(obj,'stages_timeout_rate','value',zeros(1,8));
 CreateHelperVar(obj,'stages_violation_rate','value',zeros(1,8));
-CreateHelperVar(obj,'stage_start_completed_trial','value',n_completed_trials,'forceinit',true);
+CreateHelperVar(obj,'stage_start_completed_trial','value',n_completed_trials,'force_init',true);
 %</HELPER_VARS>
 end
 
@@ -44,8 +44,8 @@ ClearHelperVarsNotOwned(obj);
 ParamsSection_MaxSame.value = 4;
 callback(ParamsSection_MaxSame);
 stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
-ParamsSection_training_stage.value = stage_no;
-callback(ParamsSection_training_stage);
+% ParamsSection_training_stage.value = stage_no;
+% callback(ParamsSection_training_stage);
 if n_completed_trials > value(stage_start_completed_trial)
     this_stage_trial_counter = value(stages_trial_counter);
     this_stage_trial_counter(stage_no) = this_stage_trial_counter(stage_no) + 1;
@@ -78,6 +78,9 @@ this_stage_trial_counter = value(stages_trial_counter);
 % only run it if its the start of the day, number of trials is small
 if n_completed_trials < 100
     if this_stage_trial_counter(stage_no) > value(Training_ParamsSection_total_trials) && this_stage_trial_counter_oppSide(stage_no) > value(Training_ParamsSection_total_trials_opp)
+        ParamsSection_training_stage.value = stage_no + 1;
+        callback(ParamsSection_training_stage);
+        ParamsSection(obj, 'Changed_Training_Stage');
         SessionDefinition(obj, 'jump_to_stage', 'Timeout Rewarded Side Pokes');
     end
 end
@@ -99,7 +102,10 @@ this_stage_trial_counter_oppSide = value(stages_trial_counter_oppSide);
 this_stage_trial_counter = value(stages_trial_counter);
 stages_trial_counter_today.value = zeros(1,8);
 if this_stage_trial_counter(stage_no) > value(Training_ParamsSection_total_trials) && this_stage_trial_counter_oppSide(stage_no) > value(Training_ParamsSection_total_trials_opp)
-     SessionDefinition(obj, 'jump_to_stage', 'Timeout Rewarded Side Pokes');
+    ParamsSection_training_stage.value = stage_no + 1;
+    callback(ParamsSection_training_stage);
+    ParamsSection(obj, 'Changed_Training_Stage');
+    SessionDefinition(obj, 'jump_to_stage', 'Timeout Rewarded Side Pokes');
 end
 %</END_OF_DAY_LOGIC>
 end
@@ -126,8 +132,8 @@ CreateHelperVar(obj,'stages_trial_counter_today','value',zeros(1,8));
 CreateHelperVar(obj,'stages_trial_counter_oppSide','value',zeros(1,8));
 CreateHelperVar(obj,'stages_timeout_rate','value',zeros(1,8));
 CreateHelperVar(obj,'stages_violation_rate','value',zeros(1,8));
-CreateHelperVar(obj,'this_stage_opp_side_trials', 'value', '0', 'forceinit','true');
-CreateHelperVar(obj,'stage_start_completed_trial','value',n_completed_trials,'forceinit',true);
+CreateHelperVar(obj,'this_stage_opp_side_trials', 'value', '0', 'force_init',true);
+CreateHelperVar(obj,'stage_start_completed_trial','value',n_completed_trials,'force_init',true);
 %</HELPER_VARS>
 end
 
@@ -140,8 +146,8 @@ ClearHelperVarsNotOwned(obj);
 ParamsSection_MaxSame.value = 3;
 callback(ParamsSection_MaxSame);
 stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
-ParamsSection_training_stage.value = stage_no;
-callback(ParamsSection_training_stage);
+% ParamsSection_training_stage.value = stage_no;
+% callback(ParamsSection_training_stage);
 if n_completed_trials > value(stage_start_completed_trial)
     % Update the helper vars
     this_stage_trial_counter = value(stages_trial_counter);
@@ -206,6 +212,9 @@ this_stage_trial_counter = value(stages_trial_counter);
 % only run it if its the start of the day, number of trials is small
 if n_completed_trials > 50
     if this_stage_trial_counter(stage_no) > value(Training_ParamsSection_total_trials) && this_stage_trial_counter_oppSide(stage_no) > value(Training_ParamsSection_total_trials_opp)
+        ParamsSection_training_stage.value = stage_no + 1;
+        callback(ParamsSection_training_stage);
+        ParamsSection(obj, 'Changed_Training_Stage');
         SessionDefinition(obj, 'jump_to_stage', 'Introduce Centre Poke');
     end
 end 
@@ -244,7 +253,7 @@ CreateHelperVar(obj,'stages_trial_counter_oppSide','value',zeros(1,8));
 CreateHelperVar(obj,'stages_timeout_rate','value',zeros(1,8));
 CreateHelperVar(obj,'stages_violation_rate','value',zeros(1,8));
 CreateHelperVar(obj,'last_session_CP','value',0);
-CreateHelperVar(obj,'stage_start_completed_trial','value',n_completed_trials,'forceinit',true);
+CreateHelperVar(obj,'stage_start_completed_trial','value',n_completed_trials,'force_init',true);
 %</HELPER_VARS>
 end
 
@@ -262,8 +271,8 @@ ParamsSection_MaxSame.value = Inf;
 callback(ParamsSection_MaxSame);
 
 stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
-ParamsSection_training_stage.value = stage_no;
-callback(ParamsSection_training_stage);
+% ParamsSection_training_stage.value = stage_no;
+% callback(ParamsSection_training_stage);
 if n_completed_trials > value(stage_start_completed_trial)
     % Update the helper vars
     this_stage_trial_counter = value(stages_trial_counter);
@@ -308,6 +317,9 @@ clear('ans');
 %<COMPLETION_TEST>
 cp_max = value(ParamsSection_SettlingIn_time) + value(ParamsSection_legal_cbreak);
 if value(ParamsSection_CP_duration) >= cp_max
+    ParamsSection_training_stage.value = 4;
+    callback(ParamsSection_training_stage);
+    ParamsSection(obj, 'Changed_Training_Stage');
     SessionDefinition(obj, 'jump_to_stage', 'Introduce Violation for Centre Poke');
 end
 %</COMPLETION_TEST>
@@ -345,7 +357,7 @@ CreateHelperVar(obj,'stages_trial_counter_oppSide','value',zeros(1,8));
 CreateHelperVar(obj,'stages_timeout_rate','value',zeros(1,8));
 CreateHelperVar(obj,'stages_violation_rate','value',zeros(1,8));
 CreateHelperVar(obj,'last_session_CP','value',0);
-CreateHelperVar(obj,'stage_start_completed_trial','value',n_completed_trials,'forceinit',true);
+CreateHelperVar(obj,'stage_start_completed_trial','value',n_completed_trials,'force_init',true);
 %</HELPER_VARS>
 end
 
@@ -365,8 +377,8 @@ cp_fraction = value(Training_ParamsSection_CPfraction_inc);
 cp_minimum_increment = 0.001;
 
 stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
-ParamsSection_training_stage.value = stage_no;
-callback(ParamsSection_training_stage);
+% ParamsSection_training_stage.value = stage_no;
+% callback(ParamsSection_training_stage);
 if n_completed_trials > value(stage_start_completed_trial)
     % Update the helper vars
     this_stage_trial_counter = value(stages_trial_counter);
@@ -423,6 +435,9 @@ cp_max = value(Training_ParamsSection_max_CP);
 if value(ParamsSection_CP_duration) >= cp_max  && n_completed_trials > 100
 if SessionPerformanceSection_violation_recent < value(Training_ParamsSection_recent_violation) && SessionPerformanceSection_timeout_recent < value(Training_ParamsSection_recent_timeout) && ...
         SessionPerformanceSection_violation_stage < value(Training_ParamsSection_stage_violation)
+    ParamsSection_training_stage.value = 5;
+    callback(ParamsSection_training_stage);
+    ParamsSection(obj, 'Changed_Training_Stage');
     SessionDefinition(obj, 'jump_to_stage', 'Introduce Stimuli Sound during Centre Poke');
     last_session_CP.value = value(ParamsSection_CP_duration);
 end
@@ -465,7 +480,7 @@ CreateHelperVar(obj,'stages_trial_counter_oppSide','value',zeros(1,8));
 CreateHelperVar(obj,'stages_timeout_rate','value',zeros(1,8));
 CreateHelperVar(obj,'stages_violation_rate','value',zeros(1,8));
 CreateHelperVar(obj,'last_session_CP','value',0);
-CreateHelperVar(obj,'stage_start_completed_trial','value',n_completed_trials,'forceinit',true);
+CreateHelperVar(obj,'stage_start_completed_trial','value',n_completed_trials,'force_init',true);
 %</HELPER_VARS>
 end
 
@@ -486,8 +501,8 @@ starting_cp = value(Training_ParamsSection_starting_CP) + value(ParamsSection_Se
 n_trial_warmup = value(Training_ParamsSection_warm_up_trials);
 
 stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
-ParamsSection_training_stage.value = stage_no;
-callback(ParamsSection_training_stage);
+% ParamsSection_training_stage.value = stage_no;
+% callback(ParamsSection_training_stage);
 if n_completed_trials > value(stage_start_completed_trial)
     % Update the helper vars
     this_stage_trial_counter = value(stages_trial_counter);
@@ -588,6 +603,9 @@ this_stage_trial_counter = value(stages_trial_counter);
 if value(ParamsSection_CP_duration) >= value(Training_ParamsSection_max_CP) && this_stage_trial_counter(stage_no) > value(Training_ParamsSection_total_trials)
     if SessionPerformanceSection_violation_recent < value(Training_ParamsSection_recent_violation) && SessionPerformanceSection_timeout_recent < value(Training_ParamsSection_recent_timeout) && ...
         SessionPerformanceSection_violation_stage < value(Training_ParamsSection_stage_violation) && n_completed_trials > 100
+        ParamsSection_training_stage.value = stage_no + 1;
+        callback(ParamsSection_training_stage);
+        ParamsSection(obj, 'Changed_Training_Stage');
         SessionDefinition(obj, 'jump_to_stage', 'Vary Stimuli location during Centre Poke');
         last_session_CP.value = value(ParamsSection_CP_duration);
     end
@@ -629,7 +647,7 @@ CreateHelperVar(obj,'stages_trial_counter_oppSide','value',zeros(1,8));
 CreateHelperVar(obj,'stages_timeout_rate','value',zeros(1,8));
 CreateHelperVar(obj,'stages_violation_rate','value',zeros(1,8));
 CreateHelperVar(obj,'last_session_CP','value',0);
-CreateHelperVar(obj,'stage_start_completed_trial','value',n_completed_trials,'forceinit',true);
+CreateHelperVar(obj,'stage_start_completed_trial','value',n_completed_trials,'force_init',true);
 %</HELPER_VARS>
 end
 
@@ -649,8 +667,8 @@ prestim_max = value(Training_ParamsSection_max_prestim);
 stim_dur = value(Training_ParamsSection_stim_dur);
 
 stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
-ParamsSection_training_stage.value = stage_no;
-callback(ParamsSection_training_stage);
+% ParamsSection_training_stage.value = stage_no;
+% callback(ParamsSection_training_stage);
 if n_completed_trials > value(stage_start_completed_trial)
     % Update the helper vars
     this_stage_trial_counter = value(stages_trial_counter);
@@ -730,6 +748,9 @@ this_stage_trial_counter = value(stages_trial_counter);
 if this_stage_trial_counter(stage_no) > value(Training_ParamsSection_total_trials)
     if SessionPerformanceSection_violation_recent < value(Training_ParamsSection_recent_violation) && SessionPerformanceSection_timeout_recent < value(Training_ParamsSection_recent_timeout) && ...
         SessionPerformanceSection_violation_stage < value(Training_ParamsSection_stage_violation) && n_completed_trials > 100
+        ParamsSection_training_stage.value = stage_no + 1;
+        callback(ParamsSection_training_stage);
+        ParamsSection(obj, 'Changed_Training_Stage');
         SessionDefinition(obj, 'jump_to_stage', 'Variable Stimuli Go Cue location during Centre Poke');
     end
 end
@@ -768,7 +789,7 @@ CreateHelperVar(obj,'stages_trial_counter_oppSide','value',zeros(1,8));
 CreateHelperVar(obj,'stages_timeout_rate','value',zeros(1,8));
 CreateHelperVar(obj,'stages_violation_rate','value',zeros(1,8));
 CreateHelperVar(obj,'last_session_CP','value',0);
-CreateHelperVar(obj,'stage_start_completed_trial','value',n_completed_trials,'forceinit',true);
+CreateHelperVar(obj,'stage_start_completed_trial','value',n_completed_trials,'force_init',true);
 %</HELPER_VARS>
 end
 
@@ -799,8 +820,8 @@ random_prego = 1;
 random_A1 = 0;
 
 stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
-ParamsSection_training_stage.value = stage_no;
-callback(ParamsSection_training_stage);
+% ParamsSection_training_stage.value = stage_no;
+% callback(ParamsSection_training_stage);
 if n_completed_trials > value(stage_start_completed_trial)
     % Update the helper vars
     this_stage_trial_counter = value(stages_trial_counter);
@@ -881,6 +902,9 @@ this_stage_trial_counter = value(stages_trial_counter);
 if this_stage_trial_counter(stage_no) > value(Training_ParamsSection_total_trials)
     if SessionPerformanceSection_violation_recent < value(Training_ParamsSection_recent_violation) && SessionPerformanceSection_timeout_recent < value(Training_ParamsSection_recent_timeout) && ...
         SessionPerformanceSection_violation_stage < value(Training_ParamsSection_stage_violation)
+        ParamsSection_training_stage.value = stage_no + 1;
+        callback(ParamsSection_training_stage);
+        ParamsSection(obj, 'Changed_Training_Stage');
         SessionDefinition(obj, 'jump_to_stage', 'User Setting');
     end
 end
@@ -919,7 +943,7 @@ CreateHelperVar(obj,'stages_trial_counter_oppSide','value',zeros(1,8));
 CreateHelperVar(obj,'stages_timeout_rate','value',zeros(1,8));
 CreateHelperVar(obj,'stages_violation_rate','value',zeros(1,8));
 CreateHelperVar(obj,'last_session_CP','value',0);
-CreateHelperVar(obj,'stage_start_completed_trial','value',n_completed_trials,'forceinit',true);
+CreateHelperVar(obj,'stage_start_completed_trial','value',n_completed_trials,'force_init',true);
 %</HELPER_VARS>
 end
 
