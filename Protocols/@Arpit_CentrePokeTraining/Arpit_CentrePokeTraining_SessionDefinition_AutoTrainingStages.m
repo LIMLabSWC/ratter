@@ -2,7 +2,7 @@
 %Please use the session automator window exclusively
 %to edit this file.
 
-function varargout = Arpit_CentrePokeTraining_SessionDefinition_AutomatedTrainingStages(obj, action, varargin)
+function varargout = Arpit_CentrePokeTraining_SessionDefinition_AutoTrainingStages(obj, action, varargin)
 
 GetSoloFunctionArgs('func_owner', ['@' class(obj)], 'func_name', 'SessionModel');
 
