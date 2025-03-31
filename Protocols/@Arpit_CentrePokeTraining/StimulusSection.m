@@ -16,8 +16,8 @@ switch action
         end
         x = varargin{1}; y = varargin{2};
 
-        ToggleParam(obj, 'StimulusShow', 0, x, y, 'OnString', 'Stimuli', ...
-            'OffString', 'Stimuli', 'TooltipString', 'Show/Hide Stimulus panel');
+        ToggleParam(obj, 'StimulusShow', 1, x, y, 'OnString', 'Stimuli Show', ...
+            'OffString', 'Stimuli Hidden', 'TooltipString', 'Show/Hide Stimulus panel');
         set_callback(StimulusShow, {mfilename, 'show_hide'}); %#ok<NODEF> (Defined just above)
         next_row(y);
 
@@ -34,11 +34,11 @@ switch action
         set(value(ax),'Fontsize',15)
         xlabel('Sound Categorization','FontSize',16,'FontName','Cambria Math')
 
-        SoloParamHandle(obj, 'axperf', 'saveable', 0, ...
-            'value', axes('Position', [0.5 0.5 0.45 0.45]));
-        ylabel('log_e A','FontSize',16,'FontName','Cambria Math');
-        set(value(axperf),'Fontsize',15)
-        xlabel('Sound Categorization','FontSize',16,'FontName','Cambria Math')
+        % SoloParamHandle(obj, 'axperf', 'saveable', 0, ...
+        %     'value', axes('Position', [0.5 0.5 0.45 0.45]));
+        % ylabel('log_e A','FontSize',16,'FontName','Cambria Math');
+        % set(value(axperf),'Fontsize',15)
+        % xlabel('Sound Categorization','FontSize',16,'FontName','Cambria Math')
 
         SoundManagerSection(obj, 'declare_new_sound', 'StimAUD1')
         SoloParamHandle(obj, 'thisstim', 'value', []);
@@ -63,35 +63,36 @@ switch action
 
         next_column(x);
         y=5;
+        next_row(y, 1)
         MenuParam(obj, 'filter_type', {'GAUS','LPFIR', 'FIRLS','BUTTER','MOVAVRG','KAISER','EQUIRIP','HAMMING'}, ...
             'GAUS', x, y, 'labelfraction', 0.35, 'TooltipString', sprintf(['\nDifferent filters. ''LPFIR'': lowpass FIR ''FIRLS'': Least square linear-phase FIR filter design\n', ...
             '\n''BUTTER'': IIR Butterworth lowpass filter ''GAUS'': Gaussian filter (window)\n', ...
             '\n''MOVAVRG'': Moving average FIR filter ''KAISER'': Kaiser-window FIR filtering\n', ...
             '\n''EQUIRIP'':Eqiripple FIR filter ''HAMMING'': Hamming-window based FIR']));
-        next_row(y, 1)
+        next_row(y);
     	NumeditParam(obj,'fcut',110,x,y,'label','fcut','TooltipString','Cut off frequency on the original white noise');
         next_row(y);
     	NumeditParam(obj,'lfreq',2000,x,y,'label','Modulator_LowFreq','TooltipString','Lower bound for the frequency modulator');
     	next_row(y);
     	NumeditParam(obj,'hfreq',20000,x,y,'label','Modulator_HighFreq','TooltipString','Upper bound for the frequency modulator');
         next_row(y);
-        DispParam(obj, 'A1_sigma', 0.01, x,y,'label','A1_sigma','TooltipString','Sigma value for the first stimulus');
-    	next_row(y);
-        DispParam(obj, 'A1_freq', 0.01, x,y,'label','A1_freq','TooltipString','Sigma value for the first stimulus');
-    	next_row(y);
-    	NumeditParam(obj,'minS1',0.007,x,y,'label','minS1','TooltipString','min sigma value for AUD1');
+        NumeditParam(obj,'minS1',0.007,x,y,'label','minS1','TooltipString','min sigma value for AUD1');
         set_callback(minS1, {mfilename, 'Cal_Boundary'});
         next_row(y);
     	NumeditParam(obj,'maxS1',0.05,x,y,'label','maxS1','TooltipString','max sigma value for AUD1');
         set_callback(maxS1, {mfilename, 'Cal_Boundary'});
         next_row(y);
+        DispParam(obj, 'A1_sigma', 0.01, x,y,'label','A1_sigma','TooltipString','Sigma value for the first stimulus');
+    	next_row(y);
     	NumeditParam(obj,'minF1',4,x,y,'label','minF1','TooltipString','min frequency value for AUD1');
         set_callback(minF1, {mfilename, 'Cal_Boundary'});
         next_row(y);
     	NumeditParam(obj,'maxF1',10,x,y,'label','maxF1','TooltipString','max frequency value for AUD1');
         set_callback(maxF1, {mfilename, 'Cal_Boundary'});
-        next_row(y);
-    	DispParam(obj,'boundary',-3.9,x,y,'label','boundary','TooltipString','decision boundary for categorisation (log)');
+        next_row(y);   
+        DispParam(obj, 'A1_freq', 0.01, x,y,'label','A1_freq','TooltipString','Sigma value for the first stimulus');
+    	next_row(y);
+    	DispParam(obj,'boundary',-3.9,x,y,'label','boundary(log)','TooltipString','decision boundary for categorisation (log)');
         next_row(y);
         MenuParam(obj, 'mu_location', {'center', 'side'}, ...
             'center', x, y, 'labelfraction', 0.35, 'TooltipString', sprintf('\nLocation of boundary'));
@@ -103,6 +104,7 @@ switch action
             'TooltipString', sprintf('If on (black) then it enables the presentation of pure tones'));
         set_callback(frequency_categorization, {mfilename, 'Cal_Boundary'});
         set_callback(frequency_categorization, {mfilename, 'FrequencyCategorization'});
+        make_invisible(maxF1);make_invisible(minF1);make_invisible(A1_freq);
         next_row(y);
         MenuParam(obj, 'DistributionType', {'uniform','unim-unif', 'unif-unim', 'unimodal', 'bimodal', 'asym-unif', 'Unim-Unif', 'Unif-Unim'}, ...
             'uniform', x, y, 'labelfraction', 0.35, 'TooltipString', sprintf('\nDifferent distributions'));
@@ -381,9 +383,11 @@ switch action
         if frequency_categorization == 1
             make_visible(maxF1);make_visible(minF1);make_visible(A1_freq);
             make_invisible(maxS1);make_invisible(minS1);make_invisible(A1_sigma);
+            make_invisible(fcut);make_invisible(lfreq);make_invisible(hfreq); make_invisible(filter_type);
             StimulusSection(obj,'plot_stimuli');
         else
             make_visible(maxS1);make_visible(minS1);make_visible(A1_sigma);
+            make_visible(fcut);make_visible(lfreq);make_visible(hfreq); make_visible(filter_type);
             make_invisible(maxF1);make_invisible(minF1);make_invisible(A1_freq);
             StimulusSection(obj,'plot_stimuli');
         end

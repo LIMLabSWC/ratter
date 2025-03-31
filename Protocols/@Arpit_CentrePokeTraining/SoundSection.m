@@ -4,16 +4,16 @@ function [x, y] = SoundSection(obj, action, varargin)
 
 GetSoloFunctionArgs(obj);
 
-switch action,
+switch action
     
   % ------------------------------------------------------------------
   %              INIT
   % ------------------------------------------------------------------    
 
   case 'init'
-    if length(varargin) < 2,
+    if length(varargin) < 2
       error('Need at least two arguments, x and y position, to initialize %s', mfilename);
-    end;
+    end
     x = varargin{1}; y = varargin{2};
     
     ToggleParam(obj, 'SoundsShow', 0, x, y, 'OnString', 'Sounds', ...
@@ -37,23 +37,26 @@ switch action,
     y=10;
     [x,y]=SoundInterface(obj,'add','GoSound',x,y,'Style','Tone','Volume',0.005,'Freq',3000,'Duration',0.2);
 	SoundInterface(obj, 'disable', 'GoSound', 'Dur1');	
-    SoundInterface(obj, 'disable', 'GoSound', 'Freq1');
     [x,y]=SoundInterface(obj,'add','SOneSound',x,y,'Style','Tone','Volume',0.005,'Freq',3000,'Duration',0.2);
     [x,y]=SoundInterface(obj,'add','STwoSound',x,y,'Style','WhiteNoise','Volume',0.08);
     
     x=oldx; y=oldy;
     figure(parentfig);
     
-  case 'hide',
-    SoundsShow.value = 0; set(value(myfig), 'Visible', 'off');
+  case 'hide'
+    SoundsShow.value = 0; 
+    set(value(myfig), 'Visible', 'off');
 
-  case 'show',
-    SoundsShow.value = 1; set(value(myfig), 'Visible', 'on');
+  case 'show'
+    SoundsShow.value = 1; 
+    set(value(myfig), 'Visible', 'on');
 
-  case 'show_hide',
-    if SoundsShow == 1, set(value(myfig), 'Visible', 'on'); %#ok<NODEF> (defined by GetSoloFunctionArgs)
-    else                   set(value(myfig), 'Visible', 'off');
-    end;
+  case 'show_hide'
+    if SoundsShow == 1
+        set(value(myfig), 'Visible', 'on'); % (defined by GetSoloFunctionArgs)
+    else                   
+        set(value(myfig), 'Visible', 'off');
+    end
     
 end
     

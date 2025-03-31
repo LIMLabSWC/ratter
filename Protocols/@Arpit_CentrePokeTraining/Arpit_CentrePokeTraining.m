@@ -113,32 +113,30 @@ switch action
     struct('states',  my_state_colors, 'pokes', my_poke_colors)); next_row(y);
 
     [x, y] = CommentsSection(obj, 'init', x, y);
-    
     % [x, y] = PunishmentSection(obj, 'init', x, y); %#ok<NASGU>
     
     next_column(x); y=5; 
 	[x, y] = SessionPerformanceSection(obj, 'init', x, y);
 	[x, y] = ParamsSection(obj,  'init', x, y); %#ok<NASGU>
-    [x, y] = SoundSection(obj,'init',x,y);
-    [x, y] = StimulusSection(obj,'init',x,y);
+    
+    [x, y] = SoundSection(obj,'init',x,y);   
     [stage_fig_x,stage_fig_y] = Training_ParamsSection(obj, 'init', x, y);
-   
     SoloParamHandle(obj, 'stage_fig_x', 'value', stage_fig_x);
     SoloFunctionAddVars('ParamsSection', 'rw_args', 'stage_fig_x');
-
     SoloParamHandle(obj, 'stage_fig_y', 'value', stage_fig_y);
     SoloFunctionAddVars('ParamsSection', 'rw_args', 'stage_fig_y');
-
-
+  
     figpos = get(double(gcf), 'Position');
     [expmtr, rname]=SavingSection(obj, 'get_info');
     HeaderParam(obj, 'prot_title', [mfilename ': ' expmtr ', ' rname], x, y, 'position', [10 figpos(4)-25, 800 20]);
+    
+    [x, y] = StimulusSection(obj,'init',x,y);
 
     Arpit_CentrePokeTrainingSMA(obj, 'init');
-    
+   
+    next_row(y);  next_row(y);
     SessionDefinition(obj, 'init', x, y, value(myfig)); next_row(y, 2); %#ok<NASGU>
-    % SessionDefinition(obj, 'set_old_style_parsing_flag',0);
-
+    
     feval(mfilename, obj, 'prepare_next_trial');
          
    %% change_water_modulation_params
