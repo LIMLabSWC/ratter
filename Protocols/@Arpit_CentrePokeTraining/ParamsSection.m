@@ -338,6 +338,7 @@ switch action
 		%% update violation, timeout, previous_sides, etc
         was_viol=false;
         was_timeout=false;
+        was_hit=false;
         if n_done_trials>0
             if ~isempty(parsed_events)
                 if isfield(parsed_events,'states')
@@ -355,7 +356,15 @@ switch action
             timeout_history.value=[timeout_history(:); was_timeout];
 
             ParamsSection(obj,'update_side_history');
-
+            % Update Hit History
+            if ~was_viol && ~was_timeout
+                was_hit=rows(parsed_events.states.second_hit_state)==0;
+				hit_history.value=[hit_history(:); was_hit];
+				
+			else
+				% There was a violation or timeout
+				hit_history.value=[hit_history(:); nan];
+            end
         end
 
         %% Choose Side for the Next Trial
