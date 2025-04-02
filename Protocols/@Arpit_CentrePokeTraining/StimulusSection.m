@@ -55,11 +55,44 @@ switch action
 
         next_row(y);
         next_row(y);
-        MenuParam(obj, 'Rule', {'S2>S_boundry Left','S2>S_boundry Right'}, ...
-            'S2>S_boundry Left', x, y, 'labelfraction', 0.35, 'TooltipString', sprintf(['\nThis bottom determines the rule\n', ...
-            '\n''S2>S_boundry Left'' means if Aud2 > Aud_boundry then reward will be delivered from the left water spout and if Aud2 < Aud_boundry then water comes form right\n',...
-            '\n''S2>S_boundry Right'' means if Aud2 < Aud_boundry then reward will be delivered from the left water spout and if Aud2 > Aud_boundry then water comes from right\n']));
+        MenuParam(obj, 'Rule', {'S1>S_boundary Left','S1>S_boundary Right'}, ...
+            'S1>S_boundary Left', x, y, 'labelfraction', 0.35, 'TooltipString', sprintf(['\nThis buttom determines the rule\n', ...
+            '\n''S1>S_boundary Left'' means if Aud1 > Aud_boundry then reward will be delivered from the left water spout and if Aud1 < Aud_boundry then water comes from right\n',...
+            '\n''S1>S_boundary Right'' means if Aud1 < Aud_boundry then reward will be delivered from the left water spout and if Aud1 > Aud_boundry then water comes from right\n']));
         next_row(y, 1)
+
+        MenuParam(obj, 'Prob_Dist_Left', {'Uniform','Half Normal','Normal','Sinusoidal','Anti Half Normal','Anti Sinusoidal','Monotonic Increase'}, ...
+            'Uniform', x, y, 'labelfraction', 0.35, 'TooltipString', sprintf(['\n Different Probability Distributions for Category A.\n', ...
+            '\n''Normal - the mean is at mid point of range. Half Normal - truncated normal with mean at boundary.\n',...
+            '\n''Anti Half Normal - the mean/max is at the side edge of the range.\n',...
+            '\n''Sinosidal - using sine function instead of half normal and Anti Sinusoidal is when max is at the edge, same as anti half normal.\n',...
+            '\n''Monotonic - increases and decreases in steps from min to max (removing the random']));
+        set_callback(Prob_Dist_Left, {mfilename, 'Cal_Mean'});
+        next_row(y);
+        DispParam(obj, 'mean_Left', 0.01, x,y,'label','μ Left','TooltipString','mean/max log stim value for the left side distribution');
+    	next_row(y);
+        DispParam(obj, 'sigma_Left', 0.01, x,y,'label','μ Left','TooltipString','mean/max log stim value for the left side distribution');
+        next_row(y);
+        NumeditParam(obj, 'sigma_range_Left', 1, x,y,'label','3σ Left','TooltipString',sprintf(['\n A way to reduce the range and increase more distribution towards mean\n', ...
+           '\n''A value b/w range [0.2 - 1] is acceptable, signifying 3 Sigma (99.7%) value for the left side distribution']));
+    	set_callback(sigma_range_Left, {mfilename, 'Cal_Sigma'});
+        next_row(y);
+
+        MenuParam(obj, 'Prob_Dist_Right', {'Uniform','Half Normal','Normal','Sinusoidal','Anti Half Normal','Anti Sinusoidal'}, ...
+            'Uniform', x, y, 'labelfraction', 0.35, 'TooltipString', sprintf(['\n Different Probability Distributions for Category A.\n', ...
+            '\n''Normal - the mean is at mid point of range (side edge - boundary). Half Normal - truncated normal with mean at boundary.\n',...
+            '\n''Anti Half Normal - the mean/max is at the side edge of the range.\n',...
+            '\n''Sinosidal - using sine function instead of half normal and Anti Sinusoidal is when max is at the edge, same as anti half normal']));
+        set_callback(Prob_Dist_Right, {mfilename, 'Cal_Mean'});
+        next_row(y);
+        DispParam(obj, 'mean_Right', 0.01, x,y,'label','μ Right','TooltipString','mean/max log stim value for the right side distribution');
+    	next_row(y);
+        DispParam(obj, 'sigma_Right', 0.01, x,y,'label','μ Left','TooltipString','mean/max log stim value for the left side distribution');
+        next_row(y);
+        DispParam(obj, 'sigma_range_Right', 1, x,y,'label','3σ Right','TooltipString',sprintf(['\n A way to reduce the range and increase more distribution towards mean\n', ...
+           '\n''A value b/w range [0.2 - 1] is acceptable, signifying 3 Sigma (99.7%) value for the right side distribution']));
+    	set_callback(sigma_range_Right, {mfilename, 'Cal_Sigma'});
+        next_row(y);
 
         next_column(x);
         y=5;
@@ -78,17 +111,21 @@ switch action
         next_row(y);
         NumeditParam(obj,'minS1',0.007,x,y,'label','minS1','TooltipString','min sigma value for AUD1');
         set_callback(minS1, {mfilename, 'Cal_Boundary'});
+        set_callback(minS1, {mfilename, 'Cal_Mean'});
         next_row(y);
     	NumeditParam(obj,'maxS1',0.05,x,y,'label','maxS1','TooltipString','max sigma value for AUD1');
         set_callback(maxS1, {mfilename, 'Cal_Boundary'});
+        set_callback(maxS1, {mfilename, 'Cal_Mean'});
         next_row(y);
         DispParam(obj, 'A1_sigma', 0.01, x,y,'label','A1_sigma','TooltipString','Sigma value for the first stimulus');
     	next_row(y);
     	NumeditParam(obj,'minF1',4,x,y,'label','minF1','TooltipString','min frequency value for AUD1');
         set_callback(minF1, {mfilename, 'Cal_Boundary'});
+        set_callback(minF1, {mfilename, 'Cal_Mean'});
         next_row(y);
     	NumeditParam(obj,'maxF1',10,x,y,'label','maxF1','TooltipString','max frequency value for AUD1');
         set_callback(maxF1, {mfilename, 'Cal_Boundary'});
+        set_callback(maxF1, {mfilename, 'Cal_Mean'});
         next_row(y);   
         DispParam(obj, 'A1_freq', 0.01, x,y,'label','A1_freq','TooltipString','Sigma value for the first stimulus');
     	next_row(y);
@@ -97,6 +134,7 @@ switch action
         MenuParam(obj, 'mu_location', {'center', 'side'}, ...
             'center', x, y, 'labelfraction', 0.35, 'TooltipString', sprintf('\nLocation of boundary'));
         set_callback(mu_location, {mfilename, 'Cal_Boundary'});
+        set_callback(mu_location, {mfilename, 'Cal_Mean'});
         next_row(y);
         ToggleParam(obj, 'frequency_categorization', 0, x,y,...
             'OnString', 'Frequency(Tone)',...
@@ -104,16 +142,14 @@ switch action
             'TooltipString', sprintf('If on (black) then it enables the presentation of pure tones'));
         set_callback(frequency_categorization, {mfilename, 'Cal_Boundary'});
         set_callback(frequency_categorization, {mfilename, 'FrequencyCategorization'});
+        set_callback(frequency_categorization, {mfilename, 'Cal_Mean'});
         make_invisible(maxF1);make_invisible(minF1);make_invisible(A1_freq);
         next_row(y);
-        MenuParam(obj, 'DistributionType', {'uniform','unim-unif', 'unif-unim', 'unimodal', 'bimodal', 'asym-unif', 'Unim-Unif', 'Unif-Unim'}, ...
-            'uniform', x, y, 'labelfraction', 0.35, 'TooltipString', sprintf('\nDifferent distributions'));
         
         StimulusSection(obj,'plot_stimuli');
         
     case 'prepare_next_trial'
 
-        ParamsSection(obj,'get_current_side');
         StimulusSection(obj,'pick_current_stimulus');
         srate=SoundManagerSection(obj,'get_sample_rate');
         Fs=srate;
@@ -121,9 +157,8 @@ switch action
 
         if frequency_categorization
             % produce the tone
-            A1_freq.value=exp(value(thisstim));
-            A1_sigma.value=0;
-            A1 = value(thisstim);
+            A1_freq.value = value(thisstim);
+            A1 = value(thisstimlog(n_completed_trials+1));
             dur1 = A1_time*1000;
             bal=0;
             freq1=A1_freq*1000;
@@ -138,9 +173,8 @@ switch action
             AUD1 = RW;
         else
            % produce noise pattern
-            A1_sigma.value=exp(value(thisstim));
-            A1_freq.value=0;
-            A1 = value(thisstim);
+            A1_sigma.value = value(thisstim);
+            A1 = value(thisstimlog(n_completed_trials+1));
             [rawA1, rawA2, normA1, normA2]=noisestim(1,1,T,value(fcut),Fs,value(filter_type));
             modulator=singlenoise(1,T,[value(lfreq) value(hfreq)],Fs,'BUTTER');
             AUD1=normA1(1:A1_time*srate).*modulator(1:A1_time*srate).*A1_sigma;
@@ -160,123 +194,13 @@ switch action
             set(value(h1), 'YData', value(A1), 'color',[0.8 0.4 0.1],'markerfacecolor',[0.8 0.4 0.1]);
         end
    
-        if n_completed_trials >0
+        if n_completed_trials > 0
             if ~violation_history(n_completed_trials) && ~timeout_history(n_completed_trials)
                 StimulusSection(obj,'update_stimulus_history');
             else
                 StimulusSection(obj,'update_stimulus_history_nan');
             end
         end
-
-
-        %% Case make_stimuli
-    case 'make_stimuli'
-        if nargout>0
-            if frequency_categorization
-                stim_min_log = log(value(minF1));
-                stim_max_log = log(value(maxF1));
-            else
-                stim_min_log = log(value(minS1));
-                stim_max_log = log(value(maxS1));
-            end
-
-            stim_range_log = stim_max_log - stim_min_log;
-            if strcmp(DistributionType,'uniform')
-                stim_i_log = stim_min_log + rand() * (stim_max_log - stim_min_log);
-           
-            elseif strcmp(DistributionType,'unimodal')
-                mu_1 = value(boundary);
-                sigma = 0.4;
-                stim_tot = [];
-                for i = 1:1000
-                    stim_i_log = stim_max_log +1;
-                    while (stim_i_log > stim_max_log) ||(stim_i_log < stim_min_log)
-                        stim_i_log = normrnd(mu_1,sigma);
-                    end
-                    stim_tot = [stim_tot stim_i_log];
-                end
-
-                %             stim_tot = []
-                %             for i = 1:1000
-                %             stim_i_log = stim_min_log + rand() * (stim_max_log - stim_min_log);
-                %             stim_i_log = stim_i_log + 0.4 * cos(2 * pi * 0.5 * (stim_i_log - stim_min_log)/(stim_max_log - stim_min_log))
-                %             stim_i_log = stim_i_log - 0.4;
-                %             stim_i_log = stim_min_log + (stim_i_log - stim_min_log) * stim_range_log/(stim_range_log - 0.8)
-                %             stim_tot = [stim_tot stim_i_log];
-                %             end
-
-            elseif strcmp(DistributionType,'bimodal')
-                mu_1 = (stim_min_log + value(boundary))/2;
-                mu_2 = (stim_max_log + value(boundary))/2;
-                sigma = 0.2;
-                %             stim_tot = [];
-                %             for i = 1:1000
-                stim_i_log = stim_max_log + 1;
-                while (stim_i_log > stim_max_log) ||(stim_i_log < stim_min_log)
-                    if rand()>0.5
-                        stim_i_log = normrnd(mu_1,sigma);
-                    else
-                        stim_i_log = normrnd(mu_2,sigma);
-                    end
-                end
-                %             stim_tot = [stim_tot stim_i_log];
-                %             end
-                %             stim_tot = [stim_tot stim_i_log];
-
-
-                %             stim_tot = []
-                %             for i = 1:1000
-                %             stim_i_log = stim_min_log + rand() * (stim_max_log - stim_min_log);
-                %             stim_i_log = stim_i_log + 0.07 * cos(2 * pi * 1.5 * (stim_i_log - stim_min_log)/(stim_max_log - stim_min_log))
-                %             stim_i_log = stim_i_log - 0.07;
-                %             stim_i_log = stim_min_log + (stim_i_log - stim_min_log) * stim_range_log/(stim_range_log - 0.14)
-                %             stim_tot = [stim_tot stim_i_log];
-                %             end
-
-            elseif strcmp(DistributionType,'unim-unif')
-                stim_i_log = stim_min_log + rand() * (stim_max_log - stim_min_log);
-                if stim_i_log < (stim_max_log + stim_min_log) / 2
-                    for i = 1:30
-                        stim_i_log = stim_i_log - 0.01 * sin(2 * pi * 0.5 * (stim_i_log - stim_min_log) / (stim_range_log/2));
-                    end
-                end
-            elseif strcmp(DistributionType,'unif-unim')
-                stim_i_log = stim_min_log + rand() * (stim_max_log - stim_min_log);
-                if stim_i_log > (stim_max_log + stim_min_log) / 2
-                    for i = 1:30
-                        stim_i_log = stim_i_log - 0.01 * sin(2 * pi * 0.5 * (stim_i_log - stim_min_log) / (stim_range_log/2));
-                    end
-                end
-            elseif strcmp(DistributionType,'Unim-Unif')
-                stim_i_log = stim_min_log + rand() * (stim_max_log - stim_min_log);
-                if stim_i_log < (stim_max_log + stim_min_log) / 2
-                    for i = 1:30
-                        stim_i_log = stim_i_log + 0.01 * sin(2 * pi * 0.5 * (stim_i_log - stim_min_log) / (stim_range_log/2));
-                    end
-                end
-            elseif strcmp(DistributionType,'Unif-Unim')
-                stim_i_log = stim_min_log + rand() * (stim_max_log - stim_min_log);
-                if stim_i_log > (stim_max_log + stim_min_log) / 2
-                    for i = 1:30
-                        stim_i_log = stim_i_log + 0.01 * sin(2 * pi * 0.5 * (stim_i_log - stim_min_log) / (stim_range_log/2));
-                    end
-                end
-            elseif strcmp(DistributionType,'asym-unif')
-                %             stim_tot = [];
-                stim_half_log = value(boundary) - stim_min_log;
-                %             for i = 1:1000
-                stim_i_log = stim_min_log + rand() * (stim_max_log - stim_min_log);
-                if stim_i_log < (stim_min_log + value(boundary)) / 2
-                    for i = 1:30
-                        stim_i_log = stim_i_log - 0.01 * sin(2 * pi * 0.5 * (stim_i_log - stim_min_log) / (stim_half_log/2));
-                    end
-                end
-                %             stim_tot = [stim_tot stim_i_log];
-                %             end
-            end
-            x = stim_i_log;
-        end
-
 
         %% Case pick_current_stimulus
     case 'pick_current_stimulus'
@@ -287,33 +211,72 @@ switch action
             stim_min_log = log(value(minS1));
             stim_max_log = log(value(maxS1));
         end
-        if strcmp(Rule,'S2>S_boundry Left')
-            if strcmp(ThisTrial, 'LEFT')
-                stim_i_log = stim_min_log;
-                while stim_i_log <= value(boundary)
-                    stim_i_log = StimulusSection(obj,'make_stimuli');
-                end
-            else
-                stim_i_log = stim_max_log;
-                while stim_i_log >= value(boundary)
-                    stim_i_log = StimulusSection(obj,'make_stimuli');
-                end
+
+        if strcmpi(ThisTrial, 'LEFT')
+            dist_type  = value(Prob_Dist_Left);
+            dist_mean  = value(mean_Left);
+            dist_sigma = value(sigma_Left);
+            dist_range_multiplier = value(sigma_range_Left);
+            if strcmp(Rule,'S1>S_boundary Left')
+                edge_max = stim_max_log;
+                edge_min = value(boundary);
+                edge_max = edge_min + dist_range_multiplier * (edge_max - edge_min);
+            else % the rule is S1>S_boundary Right
+                edge_min = stim_min_log;
+                edge_max = value(boundary);
+                edge_min = edge_max - dist_range_multiplier * (edge_max - edge_min);
             end
-        elseif strcmp(Rule,'S2>S_boundry Right')
-            if strcmp(ThisTrial, 'LEFT')
-                stim_i_log = stim_max_log;
-                while stim_i_log >= value(boundary)
-                    stim_i_log = StimulusSection(obj,'make_stimuli');
-                end
-            else
-                stim_i_log = stim_min_log;
-                while stim_i_log <= value(boundary)
-                    stim_i_log = StimulusSection(obj,'make_stimuli');
-                end
+
+        else % trial is Right
+            dist_type  = value(Prob_Dist_Right);
+            dist_mean  = value(mean_Right);
+            dist_sigma = value(sigma_Right);
+            dist_range_multiplier = value(sigma_range_Right);
+            if strcmp(Rule,'S1>S_boundary Right')
+                edge_max = stim_max_log;
+                edge_min = value(boundary);
+                edge_max = edge_min + dist_range_multiplier * (edge_max - edge_min);
+            else % the rule is S1>S_boundary Left
+                edge_min = stim_min_log;
+                edge_max = value(boundary);
+                edge_min = edge_max - dist_range_multiplier * (edge_max - edge_min);
             end
         end
-        thisstim.value=stim_i_log;
-        thisstimlog(n_completed_trials+1)= stim_i_log;
+
+        % Create a Stimuli with the selected Distribution and Side
+        switch dist_type
+
+            case 'Uniform' % uniform distribution
+                stim_i_log = random('Uniform',edge_min,edge_max);
+
+            case 'Half Normal'
+                if edge_min == value(boundary)
+                    stim_i_log = random('Half Normal',dist_mean,dist_sigma);
+                    while stim_i_log < edge_min || stim_i_log > edge_max
+                        stim_i_log = random('Half Normal',dist_mean,dist_sigma);
+                    end
+                else
+                    stim_i_log = CreateSamples_from_Distribution('normal',dist_mean,dist_sigma,edge_min,edge_max,1);
+                end
+
+            case 'Anti Half Normal'
+
+                stim_i_log = CreateSamples_from_Distribution('normal',dist_mean,dist_sigma,edge_min,edge_max,1);
+
+            case 'Normal'
+                stim_i_log = random('Normal',dist_mean,dist_sigma);
+                while stim_i_log < edge_min || stim_i_log > edge_max
+                    stim_i_log = random('Normal',dist_mean,dist_sigma);
+                end
+
+            case 'Sinusoidal' | 'Anti Sinusoidal'
+
+                stim_i_log = CreateSamples_from_Distribution('Sinusoidal',dist_mean,dist_sigma,edge_min,edge_max,1);
+            
+        end
+
+        thisstim.value=exp(stim_i_log);
+        thisstimlog(n_completed_trials+1) = stim_i_log;
 
         %% Case plot_pais
     case 'plot_stimuli'
@@ -351,9 +314,7 @@ switch action
         set(value(ax),'Fontsize',15)
         xlabel('S1','FontSize',16,'FontName','Cambria Math')
 
-        ParamsSection(obj,'get_current_side');
         StimulusSection(obj,'pick_current_stimulus');
-
         A1 = value(thisstim);
 
         %% plot the stimulus;
@@ -377,6 +338,112 @@ switch action
         elseif strcmp(mu_location,'side')
             boundary.value = (min_val + val_boundary)/2;
         end
+    
+    %% Updated Mean/Max for Each Side based upon Distribution Selected
+    case 'Cal_Mean'
+
+        if frequency_categorization
+            edge_max = log(value(maxF1));
+            edge_min = log(value(minF1));
+        else
+            edge_max = log(value(maxS1));
+            edge_min = log(value(minS1));
+        end
+
+        % Calculation for Left Side
+        
+        % Sigma
+
+        dist_sigma_multiplier = value(sigma_range_Left);
+        if dist_sigma_multiplier < 0.2
+            dist_sigma_multiplier = 0.2;
+        end
+        if dist_sigma_multiplier > 1
+            dist_sigma_multiplier = 1;
+        end
+        sigma_Left.value = (dist_sigma_multiplier * (edge_max - edge_min)) / 3; % as we asked user to provide 3 sigma
+
+        % Mean
+        if matches(Prob_Dist_Left,{'Uniform','Half Normal','Sinusoidal'})
+            mean_Left.value = value(boundary);
+        else
+            if strcmp(Rule,'S1>S_boundary Left')
+                if matches(Prob_Dist_Left,{'Anti Half Normal','Anti Sinusoidal'})
+                    mean_Left.value = edge_max;
+                elseif matches(Prob_Dist_Left,'Normal')
+                    mean_Left.value = (edge_max + value(boundary))/2;
+                end
+            else
+                if matches(Prob_Dist_Left,{'Anti Half Normal','Anti Sinusoidal'})
+                    mean_Left.value = edge_min;
+                elseif matches(Prob_Dist_Left,'Normal')
+                    mean_Left.value = (edge_min + value(boundary))/2;
+                end
+            end
+        end
+        
+        % Calculation for Right Side
+        
+        % Sigma
+        dist_sigma_multiplier = value(sigma_range_Right);
+        if dist_sigma_multiplier < 0.2
+            dist_sigma_multiplier = 0.2;
+        end
+        if dist_sigma_multiplier > 1
+            dist_sigma_multiplier = 1;
+        end
+        sigma_Right.value = (dist_sigma_multiplier * (edge_max - edge_min)) / 3; % as we asked user to provide 3 sigma
+
+        % Mean
+        if matches(Prob_Dist_Right,{'Uniform','Half Normal','Sinusoidal'})
+            mean_Right.value = value(boundary);
+        else
+            if strcmp(Rule,'S1>S_boundary Right')
+                if matches(Prob_Dist_Right,{'Anti Half Normal','Anti Sinusoidal'})
+                    mean_Right.value = edge_max;
+                elseif matches(Prob_Dist_Right,'Normal')
+                    mean_Right.value = (edge_max + value(boundary))/2;
+                end
+            else
+                if matches(Prob_Dist_Right,{'Anti Half Normal','Anti Sinusoidal'})
+                    mean_Right.value = edge_min;
+                elseif matches(Prob_Dist_Right,'Normal')
+                    mean_Right.value = (edge_min + value(boundary))/2;
+                end
+            end
+        end
+        
+    %% Calculate Sigma
+    case 'Cal_Sigma'
+
+        if frequency_categorization
+            edge_max = log(value(maxF1));
+            edge_min = log(value(minF1));
+        else
+            edge_max = log(value(maxS1));
+            edge_min = log(value(minS1));
+        end
+
+        % Calculation for Left Side Sigma
+        dist_sigma_multiplier = value(sigma_range_Left);
+        if dist_sigma_multiplier < 0.2
+            dist_sigma_multiplier = 0.2;
+        end
+        if dist_sigma_multiplier > 1
+            dist_sigma_multiplier = 1;
+        end
+        sigma_Left.value = (dist_sigma_multiplier * (edge_max - edge_min)) / 3; % as we asked user to provide 3 sigma
+
+        % Calculation for Right Side Sigma
+        dist_sigma_multiplier = value(sigma_range_Right);
+        if dist_sigma_multiplier < 0.2
+            dist_sigma_multiplier = 0.2;
+        end
+        if dist_sigma_multiplier > 1
+            dist_sigma_multiplier = 1;
+        end
+        sigma_Right.value = (dist_sigma_multiplier * (edge_max - edge_min)) / 3; % as we asked user to provide 3 sigma
+
 
     %% Case frequency ON
     case 'FrequencyCategorization'
@@ -408,10 +475,6 @@ switch action
         end
         delete_sphandle('owner', ['^@' class(obj) '$'], ...
             'fullname', ['^' mfilename]);
-
-    %% Case update_stimuli
-    case 'update_stimuli'
-        StimulusSection(obj,'plot_stimuli');
 
     case 'update_stimulus_history'
         ps=value(stimulus_history);

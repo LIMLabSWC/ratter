@@ -67,6 +67,9 @@ switch action
     DeclareGlobals(obj, 'ro_args', {'stimulus_history'});
     SoloFunctionAddVars('StimulusSection', 'rw_args', 'stimulus_history');
     
+    SoloParamHandle(obj, 'hit_history', 'value', []);
+    DeclareGlobals(obj, 'ro_args', {'hit_history'});
+    SoloFunctionAddVars('SideSection', 'rw_args', 'hit_history');
 
     SoundManagerSection(obj, 'init');
     x = 5; y = 5;             % Initial position on main GUI window
@@ -155,11 +158,11 @@ switch action
        ParamsSection(obj, 'prepare_next_trial');
 	% Run SessionDefinition *after* ParamsSection so we know whether the
 	% trial was a violation or not
+       push_helper_vars_tosql(obj,n_done_trials);
        SessionDefinition(obj, 'next_trial');
        SessionPerformanceSection(obj, 'evaluate');
-       SoundManagerSection(obj, 'send_not_yet_uploaded_sounds');
        StimulusSection(obj,'prepare_next_trial');
-
+       SoundManagerSection(obj, 'send_not_yet_uploaded_sounds');
        [sma, prepare_next_trial_states] = Arpit_CentrePokeTrainingSMA(obj, 'prepare_next_trial');
 
     % Default behavior of following call is that every 20 trials, the data
@@ -176,7 +179,8 @@ switch action
             prot_title.value=[mfilename ' on rig ' get_hostname ' : ' expmtr ', ' rname  '.  Started at ' datestr(now, 'HH:MM')];
        end
       
-       try send_n_done_trials(obj);
+       try 
+           send_n_done_trials(obj);
        end
 
    %% trial_completed
@@ -224,11 +228,11 @@ switch action
 % 		'pre-Go cue went from %.3f to %.3f  (delta=%.3f)\n', ...
 %         'Low = %.2f, High = %.2f'], ...
 % 		perf(1), perf(2), perf(3), perf(6), cp_durs(1), cp_durs(end), cp_durs(end)-cp_durs(1), classperf(1),classperf(2)));
-
+    
+    pd.hits=hit_history(:);
     pd.sides=previous_sides(:);
     pd.viols=violation_history(:);
     pd.timeouts=timeout_history(:);
-%     pd.performance=tot_perf(:);
     pd.cp_durs=cp_durs(:);
     pd.stim1dur=stim1dur(:);
     
