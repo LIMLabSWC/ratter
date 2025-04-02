@@ -111,17 +111,21 @@ switch action
         next_row(y);
         NumeditParam(obj,'minS1',0.007,x,y,'label','minS1','TooltipString','min sigma value for AUD1');
         set_callback(minS1, {mfilename, 'Cal_Boundary'});
+        set_callback(minS1, {mfilename, 'Cal_Mean'});
         next_row(y);
     	NumeditParam(obj,'maxS1',0.05,x,y,'label','maxS1','TooltipString','max sigma value for AUD1');
         set_callback(maxS1, {mfilename, 'Cal_Boundary'});
+        set_callback(maxS1, {mfilename, 'Cal_Mean'});
         next_row(y);
         DispParam(obj, 'A1_sigma', 0.01, x,y,'label','A1_sigma','TooltipString','Sigma value for the first stimulus');
     	next_row(y);
     	NumeditParam(obj,'minF1',4,x,y,'label','minF1','TooltipString','min frequency value for AUD1');
         set_callback(minF1, {mfilename, 'Cal_Boundary'});
+        set_callback(minF1, {mfilename, 'Cal_Mean'});
         next_row(y);
     	NumeditParam(obj,'maxF1',10,x,y,'label','maxF1','TooltipString','max frequency value for AUD1');
         set_callback(maxF1, {mfilename, 'Cal_Boundary'});
+        set_callback(maxF1, {mfilename, 'Cal_Mean'});
         next_row(y);   
         DispParam(obj, 'A1_freq', 0.01, x,y,'label','A1_freq','TooltipString','Sigma value for the first stimulus');
     	next_row(y);
@@ -455,6 +459,7 @@ switch action
         end
 
         StimulusSection(obj,'Cal_Boundary'); % update the boundary
+        StimulusSection(obj,'Cal_Mean'); % update the mean and sigma values for each side
 
 
     %% Case get_stimuli
