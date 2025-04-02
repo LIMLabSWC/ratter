@@ -59,10 +59,10 @@ switch action
             'S1>S_boundary Left', x, y, 'labelfraction', 0.35, 'TooltipString', sprintf(['\nThis buttom determines the rule\n', ...
             '\n''S1>S_boundary Left'' means if Aud1 > Aud_boundry then reward will be delivered from the left water spout and if Aud1 < Aud_boundry then water comes from right\n',...
             '\n''S1>S_boundary Right'' means if Aud1 < Aud_boundry then reward will be delivered from the left water spout and if Aud1 > Aud_boundry then water comes from right\n']));
-        next_row(y, 1)
+        next_row(y, 1);next_row(y, 1);
 
-        MenuParam(obj, 'Prob_Dist_Left', {'Uniform','Half Normal','Normal','Sinusoidal','Anti Half Normal','Anti Sinusoidal','Monotonic Increase'}, ...
-            'Uniform', x, y, 'labelfraction', 0.35, 'TooltipString', sprintf(['\n Different Probability Distributions for Category A.\n', ...
+        MenuParam(obj, 'Prob_Dist_Left',  {'Uniform','Half Normal','Normal','Sinusoidal','Anti Half Normal','Anti Sinusoidal','Monotonic Increase'}, ...
+            'Uniform', x, y,'label','Left Dist', 'labelfraction', 0.35, 'TooltipString', sprintf(['\n Different Probability Distributions for Category A.\n', ...
             '\n''Normal - the mean is at mid point of range. Half Normal - truncated normal with mean at boundary.\n',...
             '\n''Anti Half Normal - the mean/max is at the side edge of the range.\n',...
             '\n''Sinosidal - using sine function instead of half normal and Anti Sinusoidal is when max is at the edge, same as anti half normal.\n',...
@@ -71,15 +71,15 @@ switch action
         next_row(y);
         DispParam(obj, 'mean_Left', 0.01, x,y,'label','μ Left','TooltipString','mean/max log stim value for the left side distribution');
     	next_row(y);
-        DispParam(obj, 'sigma_Left', 0.01, x,y,'label','μ Left','TooltipString','mean/max log stim value for the left side distribution');
+        DispParam(obj, 'sigma_Left', 0.01, x,y,'label','σ Left','TooltipString','mean/max log stim value for the left side distribution');
         next_row(y);
         NumeditParam(obj, 'sigma_range_Left', 1, x,y,'label','3σ Left','TooltipString',sprintf(['\n A way to reduce the range and increase more distribution towards mean\n', ...
            '\n''A value b/w range [0.2 - 1] is acceptable, signifying 3 Sigma (99.7%) value for the left side distribution']));
     	set_callback(sigma_range_Left, {mfilename, 'Cal_Sigma'});
-        next_row(y);
+        next_row(y); next_row(y);
 
         MenuParam(obj, 'Prob_Dist_Right', {'Uniform','Half Normal','Normal','Sinusoidal','Anti Half Normal','Anti Sinusoidal'}, ...
-            'Uniform', x, y, 'labelfraction', 0.35, 'TooltipString', sprintf(['\n Different Probability Distributions for Category A.\n', ...
+            'Uniform', x, y, 'label','Right Dist', 'labelfraction', 0.35, 'TooltipString', sprintf(['\n Different Probability Distributions for Category A.\n', ...
             '\n''Normal - the mean is at mid point of range (side edge - boundary). Half Normal - truncated normal with mean at boundary.\n',...
             '\n''Anti Half Normal - the mean/max is at the side edge of the range.\n',...
             '\n''Sinosidal - using sine function instead of half normal and Anti Sinusoidal is when max is at the edge, same as anti half normal']));
@@ -87,9 +87,9 @@ switch action
         next_row(y);
         DispParam(obj, 'mean_Right', 0.01, x,y,'label','μ Right','TooltipString','mean/max log stim value for the right side distribution');
     	next_row(y);
-        DispParam(obj, 'sigma_Right', 0.01, x,y,'label','μ Left','TooltipString','mean/max log stim value for the left side distribution');
+        DispParam(obj, 'sigma_Right', 0.01, x,y,'label','σ Right','TooltipString','mean/max log stim value for the left side distribution');
         next_row(y);
-        DispParam(obj, 'sigma_range_Right', 1, x,y,'label','3σ Right','TooltipString',sprintf(['\n A way to reduce the range and increase more distribution towards mean\n', ...
+        NumeditParam(obj, 'sigma_range_Right', 1, x,y,'label','3σ Right','TooltipString',sprintf(['\n A way to reduce the range and increase more distribution towards mean\n', ...
            '\n''A value b/w range [0.2 - 1] is acceptable, signifying 3 Sigma (99.7%) value for the right side distribution']));
     	set_callback(sigma_range_Right, {mfilename, 'Cal_Sigma'});
         next_row(y);
@@ -364,7 +364,7 @@ switch action
         sigma_Left.value = (dist_sigma_multiplier * (edge_max - edge_min)) / 3; % as we asked user to provide 3 sigma
 
         % Mean
-        if matches(Prob_Dist_Left,{'Uniform','Half Normal','Sinusoidal'})
+        if matches(value(Prob_Dist_Left),{'Uniform','Half Normal','Sinusoidal'})
             mean_Left.value = value(boundary);
         else
             if strcmp(Rule,'S1>S_boundary Left')
@@ -374,9 +374,9 @@ switch action
                     mean_Left.value = (edge_max + value(boundary))/2;
                 end
             else
-                if matches(Prob_Dist_Left,{'Anti Half Normal','Anti Sinusoidal'})
+                if matches(value(Prob_Dist_Left),{'Anti Half Normal','Anti Sinusoidal'})
                     mean_Left.value = edge_min;
-                elseif matches(Prob_Dist_Left,'Normal')
+                elseif matches(value(Prob_Dist_Left),'Normal')
                     mean_Left.value = (edge_min + value(boundary))/2;
                 end
             end
@@ -395,17 +395,17 @@ switch action
         sigma_Right.value = (dist_sigma_multiplier * (edge_max - edge_min)) / 3; % as we asked user to provide 3 sigma
 
         % Mean
-        if matches(Prob_Dist_Right,{'Uniform','Half Normal','Sinusoidal'})
+        if matches(value(Prob_Dist_Right),{'Uniform','Half Normal','Sinusoidal'})
             mean_Right.value = value(boundary);
         else
             if strcmp(Rule,'S1>S_boundary Right')
-                if matches(Prob_Dist_Right,{'Anti Half Normal','Anti Sinusoidal'})
+                if matches(value(Prob_Dist_Right),{'Anti Half Normal','Anti Sinusoidal'})
                     mean_Right.value = edge_max;
-                elseif matches(Prob_Dist_Right,'Normal')
+                elseif matches(value(Prob_Dist_Right),'Normal')
                     mean_Right.value = (edge_max + value(boundary))/2;
                 end
             else
-                if matches(Prob_Dist_Right,{'Anti Half Normal','Anti Sinusoidal'})
+                if matches(value(Prob_Dist_Right),{'Anti Half Normal','Anti Sinusoidal'})
                     mean_Right.value = edge_min;
                 elseif matches(Prob_Dist_Right,'Normal')
                     mean_Right.value = (edge_min + value(boundary))/2;
