@@ -44,8 +44,10 @@ ClearHelperVarsNotOwned(obj);
 ParamsSection_MaxSame.value = 4;
 callback(ParamsSection_MaxSame);
 stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
-% ParamsSection_training_stage.value = stage_no;
-% callback(ParamsSection_training_stage);
+if stage_no ~= value(ParamsSection_training_stage)
+    ParamsSection_training_stage.value = stage_no;
+    callback(ParamsSection_training_stage);
+end
 if n_completed_trials > value(stage_start_completed_trial)
     this_stage_trial_counter = value(stages_trial_counter);
     this_stage_trial_counter(stage_no) = this_stage_trial_counter(stage_no) + 1;
@@ -72,16 +74,18 @@ GetSoloFunctionArgs(obj);
 ClearHelperVarsNotOwned(obj);
 clear('ans');
 %<COMPLETION_TEST>
-stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
-this_stage_trial_counter_oppSide = value(stages_trial_counter_oppSide);
-this_stage_trial_counter = value(stages_trial_counter);
-% only run it if its the start of the day, number of trials is small
-if n_completed_trials < 100
-    if this_stage_trial_counter(stage_no) > value(Training_ParamsSection_total_trials) && this_stage_trial_counter_oppSide(stage_no) > value(Training_ParamsSection_total_trials_opp)
-        ParamsSection_training_stage.value = stage_no + 1;
-        callback(ParamsSection_training_stage);
-        ParamsSection(obj, 'Changed_Training_Stage');
-        SessionDefinition(obj, 'jump_to_stage', 'Timeout Rewarded Side Pokes');
+if ParamsSection_use_auto_train % do completion check if auto training
+    stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
+    this_stage_trial_counter_oppSide = value(stages_trial_counter_oppSide);
+    this_stage_trial_counter = value(stages_trial_counter);
+    % only run it if its the start of the day, number of trials is small
+    if n_completed_trials < 100
+        if this_stage_trial_counter(stage_no) > value(Training_ParamsSection_total_trials) && this_stage_trial_counter_oppSide(stage_no) > value(Training_ParamsSection_total_trials_opp)
+            ParamsSection_training_stage.value = stage_no + 1;
+            callback(ParamsSection_training_stage);
+            ParamsSection(obj, 'Changed_Training_Stage');
+            SessionDefinition(obj, 'jump_to_stage', 'Timeout Rewarded Side Pokes');
+        end
     end
 end
 %</COMPLETION_TEST>
@@ -147,8 +151,10 @@ ParamsSection_MaxSame.value = 3;
 callback(ParamsSection_MaxSame);
 stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
 this_stage_trial_counter = value(stages_trial_counter);
-% ParamsSection_training_stage.value = stage_no;
-% callback(ParamsSection_training_stage);
+if stage_no ~= value(ParamsSection_training_stage)
+    ParamsSection_training_stage.value = stage_no;
+    callback(ParamsSection_training_stage);
+end
 if n_completed_trials > value(stage_start_completed_trial)
     % Update the helper vars    
     this_stage_trial_counter(stage_no) = this_stage_trial_counter(stage_no) + 1;
@@ -206,18 +212,20 @@ GetSoloFunctionArgs(obj);
 ClearHelperVarsNotOwned(obj);
 clear('ans');
 %<COMPLETION_TEST>
-stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
-this_stage_trial_counter_oppSide = value(stages_trial_counter_oppSide);
-this_stage_trial_counter = value(stages_trial_counter);
-% only run it if its the start of the day, number of trials is small
-if n_completed_trials > 50
-    if this_stage_trial_counter(stage_no) > value(Training_ParamsSection_total_trials) && this_stage_trial_counter_oppSide(stage_no) > value(Training_ParamsSection_total_trials_opp)
-        ParamsSection_training_stage.value = stage_no + 1;
-        callback(ParamsSection_training_stage);
-        ParamsSection(obj, 'Changed_Training_Stage');
-        SessionDefinition(obj, 'jump_to_stage', 'Introduce Centre Poke');
+if ParamsSection_use_auto_train % do completion check if auto training
+    stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
+    this_stage_trial_counter_oppSide = value(stages_trial_counter_oppSide);
+    this_stage_trial_counter = value(stages_trial_counter);
+    % only run it if its the start of the day, number of trials is small
+    if n_completed_trials > 50
+        if this_stage_trial_counter(stage_no) > value(Training_ParamsSection_total_trials) && this_stage_trial_counter_oppSide(stage_no) > value(Training_ParamsSection_total_trials_opp)
+            ParamsSection_training_stage.value = stage_no + 1;
+            callback(ParamsSection_training_stage);
+            ParamsSection(obj, 'Changed_Training_Stage');
+            SessionDefinition(obj, 'jump_to_stage', 'Introduce Centre Poke');
+        end
     end
-end 
+end
 %</COMPLETION_TEST>
 if exist('ans', 'var')
 varargout{1}=logical(ans); clear('ans');
@@ -272,8 +280,10 @@ callback(ParamsSection_MaxSame);
 
 stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
 this_stage_trial_counter = value(stages_trial_counter);
-% ParamsSection_training_stage.value = stage_no;
-% callback(ParamsSection_training_stage);
+if stage_no ~= value(ParamsSection_training_stage)
+    ParamsSection_training_stage.value = stage_no;
+    callback(ParamsSection_training_stage);
+end
 if n_completed_trials > value(stage_start_completed_trial)
     % Update the helper vars    
     this_stage_trial_counter(stage_no) = this_stage_trial_counter(stage_no) + 1;
@@ -319,13 +329,15 @@ GetSoloFunctionArgs(obj);
 ClearHelperVarsNotOwned(obj);
 clear('ans');
 %<COMPLETION_TEST>
-cp_max = value(ParamsSection_SettlingIn_time) + value(ParamsSection_legal_cbreak);
-if value(ParamsSection_CP_duration) >= cp_max
-    ParamsSection_training_stage.value = 4;
-    callback(ParamsSection_training_stage);
-    ParamsSection(obj, 'Changed_Training_Stage');
-    SessionDefinition(obj, 'jump_to_stage', 'Introduce Violation for Centre Poke');
-    last_session_CP.value = value(ParamsSection_CP_duration);
+if ParamsSection_use_auto_train % do completion check if auto training
+    cp_max = value(ParamsSection_SettlingIn_time) + value(ParamsSection_legal_cbreak);
+    if value(ParamsSection_CP_duration) >= cp_max
+        ParamsSection_training_stage.value = 4;
+        callback(ParamsSection_training_stage);
+        ParamsSection(obj, 'Changed_Training_Stage');
+        SessionDefinition(obj, 'jump_to_stage', 'Introduce Violation for Centre Poke');
+        last_session_CP.value = value(ParamsSection_CP_duration);
+    end
 end
 %</COMPLETION_TEST>
 if exist('ans', 'var')
@@ -384,8 +396,10 @@ cp_minimum_increment = 0.001;
 stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
 this_stage_trial_counter = value(stages_trial_counter);
 this_stage_trial_counter_today = value(stages_trial_counter_today);
-% ParamsSection_training_stage.value = stage_no;
-% callback(ParamsSection_training_stage);
+if stage_no ~= value(ParamsSection_training_stage)
+    ParamsSection_training_stage.value = stage_no;
+    callback(ParamsSection_training_stage);
+end
 if n_completed_trials > value(stage_start_completed_trial)
     % Update the helper vars    
     this_stage_trial_counter(stage_no) = this_stage_trial_counter(stage_no) + 1;
@@ -440,16 +454,16 @@ GetSoloFunctionArgs(obj);
 ClearHelperVarsNotOwned(obj);
 clear('ans');
 %<COMPLETION_TEST>
-cp_max = value(Training_ParamsSection_max_CP);
-if value(ParamsSection_CP_duration) >= cp_max  && n_completed_trials > 100
-if SessionPerformanceSection_violation_recent < value(Training_ParamsSection_recent_violation) && SessionPerformanceSection_timeout_recent < value(Training_ParamsSection_recent_timeout) && ...
-        SessionPerformanceSection_violation_stage < value(Training_ParamsSection_stage_violation)
-    ParamsSection_training_stage.value = 5;
-    callback(ParamsSection_training_stage);
-    ParamsSection(obj, 'Changed_Training_Stage');
-    SessionDefinition(obj, 'jump_to_stage', 'Introduce Stimuli Sound during Centre Poke');
-    last_session_CP.value = value(ParamsSection_CP_duration);
-end
+if ParamsSection_use_auto_train % do completion check if auto training
+    cp_max = value(Training_ParamsSection_max_CP);
+    if value(ParamsSection_CP_duration) >= cp_max  && n_completed_trials > 100 && SessionPerformanceSection_violation_recent < value(Training_ParamsSection_recent_violation) && SessionPerformanceSection_timeout_recent < value(Training_ParamsSection_recent_timeout) && ...
+            SessionPerformanceSection_violation_stage < value(Training_ParamsSection_stage_violation)
+        ParamsSection_training_stage.value = 5;
+        callback(ParamsSection_training_stage);
+        ParamsSection(obj, 'Changed_Training_Stage');
+        SessionDefinition(obj, 'jump_to_stage', 'Introduce Stimuli Sound during Centre Poke');
+        last_session_CP.value = value(ParamsSection_CP_duration);
+    end
 end
 %</COMPLETION_TEST>
 if exist('ans', 'var')
@@ -510,8 +524,10 @@ starting_cp = value(Training_ParamsSection_starting_CP) + value(ParamsSection_Se
 n_trial_warmup = value(Training_ParamsSection_warm_up_trials);
 
 stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
-% ParamsSection_training_stage.value = stage_no;
-% callback(ParamsSection_training_stage);
+if stage_no ~= value(ParamsSection_training_stage)
+    ParamsSection_training_stage.value = stage_no;
+    callback(ParamsSection_training_stage);
+end
 if n_completed_trials > value(stage_start_completed_trial)
     % Update the helper vars
     this_stage_trial_counter = value(stages_trial_counter);
@@ -607,16 +623,18 @@ GetSoloFunctionArgs(obj);
 ClearHelperVarsNotOwned(obj);
 clear('ans');
 %<COMPLETION_TEST>
-stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
-this_stage_trial_counter = value(stages_trial_counter);
-if value(ParamsSection_CP_duration) >= value(Training_ParamsSection_max_CP) && this_stage_trial_counter(stage_no) > value(Training_ParamsSection_total_trials)
-    if SessionPerformanceSection_violation_recent < value(Training_ParamsSection_recent_violation) && SessionPerformanceSection_timeout_recent < value(Training_ParamsSection_recent_timeout) && ...
-        SessionPerformanceSection_violation_stage < value(Training_ParamsSection_stage_violation) && n_completed_trials > 100
-        ParamsSection_training_stage.value = stage_no + 1;
-        callback(ParamsSection_training_stage);
-        ParamsSection(obj, 'Changed_Training_Stage');
-        SessionDefinition(obj, 'jump_to_stage', 'Vary Stimuli location during Centre Poke');
-        last_session_CP.value = value(ParamsSection_CP_duration);
+if ParamsSection_use_auto_train % do completion check if auto training
+    stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
+    this_stage_trial_counter = value(stages_trial_counter);
+    if value(ParamsSection_CP_duration) >= value(Training_ParamsSection_max_CP) && this_stage_trial_counter(stage_no) > value(Training_ParamsSection_total_trials)
+        if SessionPerformanceSection_violation_recent < value(Training_ParamsSection_recent_violation) && SessionPerformanceSection_timeout_recent < value(Training_ParamsSection_recent_timeout) && ...
+                SessionPerformanceSection_violation_stage < value(Training_ParamsSection_stage_violation) && n_completed_trials > 100
+            ParamsSection_training_stage.value = stage_no + 1;
+            callback(ParamsSection_training_stage);
+            ParamsSection(obj, 'Changed_Training_Stage');
+            SessionDefinition(obj, 'jump_to_stage', 'Vary Stimuli location during Centre Poke');
+            last_session_CP.value = value(ParamsSection_CP_duration);
+        end
     end
 end
 %</COMPLETION_TEST>
@@ -676,8 +694,10 @@ prestim_max = value(Training_ParamsSection_max_prestim);
 stim_dur = value(Training_ParamsSection_stim_dur);
 
 stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
-% ParamsSection_training_stage.value = stage_no;
-% callback(ParamsSection_training_stage);
+if stage_no ~= value(ParamsSection_training_stage)
+    ParamsSection_training_stage.value = stage_no;
+    callback(ParamsSection_training_stage);
+end
 if n_completed_trials > value(stage_start_completed_trial)
     % Update the helper vars
     this_stage_trial_counter = value(stages_trial_counter);
@@ -752,15 +772,17 @@ GetSoloFunctionArgs(obj);
 ClearHelperVarsNotOwned(obj);
 clear('ans');
 %<COMPLETION_TEST>
-stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
-this_stage_trial_counter = value(stages_trial_counter);
-if this_stage_trial_counter(stage_no) > value(Training_ParamsSection_total_trials)
-    if SessionPerformanceSection_violation_recent < value(Training_ParamsSection_recent_violation) && SessionPerformanceSection_timeout_recent < value(Training_ParamsSection_recent_timeout) && ...
-        SessionPerformanceSection_violation_stage < value(Training_ParamsSection_stage_violation) && n_completed_trials > 100
-        ParamsSection_training_stage.value = stage_no + 1;
-        callback(ParamsSection_training_stage);
-        ParamsSection(obj, 'Changed_Training_Stage');
-        SessionDefinition(obj, 'jump_to_stage', 'Variable Stimuli Go Cue location during Centre Poke');
+if ParamsSection_use_auto_train % do completion check if auto training
+    stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
+    this_stage_trial_counter = value(stages_trial_counter);
+    if this_stage_trial_counter(stage_no) > value(Training_ParamsSection_total_trials)
+        if SessionPerformanceSection_violation_recent < value(Training_ParamsSection_recent_violation) && SessionPerformanceSection_timeout_recent < value(Training_ParamsSection_recent_timeout) && ...
+                SessionPerformanceSection_violation_stage < value(Training_ParamsSection_stage_violation) && n_completed_trials > 100
+            ParamsSection_training_stage.value = stage_no + 1;
+            callback(ParamsSection_training_stage);
+            ParamsSection(obj, 'Changed_Training_Stage');
+            SessionDefinition(obj, 'jump_to_stage', 'Variable Stimuli Go Cue location during Centre Poke');
+        end
     end
 end
 %</COMPLETION_TEST>
@@ -829,8 +851,10 @@ random_prego = 1;
 random_A1 = 0;
 
 stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
-% ParamsSection_training_stage.value = stage_no;
-% callback(ParamsSection_training_stage);
+if stage_no ~= value(ParamsSection_training_stage)
+    ParamsSection_training_stage.value = stage_no;
+    callback(ParamsSection_training_stage);
+end
 if n_completed_trials > value(stage_start_completed_trial)
     % Update the helper vars
     this_stage_trial_counter = value(stages_trial_counter);
@@ -982,8 +1006,10 @@ a1_time_min = value(ParamsSection_A1_time_Min);
 a1_time_max = value(ParamsSection_A1_time_Max);
 
 stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
-ParamsSection_training_stage.value = stage_no;
-callback(ParamsSection_training_stage);
+if stage_no ~= value(ParamsSection_training_stage)
+    ParamsSection_training_stage.value = stage_no;
+    callback(ParamsSection_training_stage);
+end
 
 if n_completed_trials > value(stage_start_completed_trial)
     % Update the helper vars
