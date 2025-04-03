@@ -84,7 +84,7 @@ switch action
         DispParam(obj, 'init_CP_duration', 0.01, x,y,'label','init_CP duration','TooltipString','Duration of Nose in Central Poke before Go cue starts (see Total_CP_duration)');
     	next_row(y);
         DispParam(obj, 'CP_duration', PreStim_time+A1_time+time_bet_aud1_gocue, x,y,'label','CP duration','TooltipString','Duration of Nose in Central Poke before Go cue starts (see Total_CP_duration)');
-		set_callback(CP_duration, {mfilename, 'new_CP_duration'});
+		% set_callback(CP_duration, {mfilename, 'new_CP_duration'});
 		next_row(y);
 		NumeditParam(obj, 'time_go_cue' ,0.2, x,y,'label','Go Cue Duration','TooltipString','duration of go cue (see Total_CP_duration)');
 		set_callback(time_go_cue, {mfilename, 'new_time_go_cue'});
@@ -219,36 +219,52 @@ switch action
             [stage_fig_x,stage_fig_y] = Training_ParamsSection(obj, 'reinit', value(stage_fig_x),value(stage_fig_y)); % update the training params as well
             Arpit_CentrePokeTrainingSMA(obj,'reinit');
             SessionPerformanceSection(obj, 'evaluate');
+           
             switch value(training_stage)
 
                 case {1,2}                  %% learning the reward sound association -left or right led on -> poke -> sound+reward
 
-                    disable(SettlingIn_time);
-                    disable(PreStim_time);
-                    disable(A1_time);
-                    disable(time_bet_aud1_gocue);
-
+                    make_invisible(SettlingIn_time); make_invisible(legal_cbreak); make_invisible(cp_timeout);
+                    make_invisible(PreStim_time); make_invisible(PreStim_time_Min); make_invisible(PreStim_time_Max);
+                    make_invisible(A1_time); make_invisible(A1_time_Min); make_invisible(A1_time_Max);
+                    make_invisible(time_bet_aud1_gocue);make_invisible(time_bet_aud1_gocue_Min);make_invisible(time_bet_aud1_gocue_Max);
+                    make_invisible(CP_duration); make_invisible(Total_CP_duration); make_invisible(init_CP_duration);
 
                 case {3,4} % Centre poke without the A1_Stim but has violation in 4
 
-                    enable(SettlingIn_time);
-                    disable(PreStim_time);
-                    disable(A1_time);
-                    enable(time_bet_aud1_gocue);
+                    make_visible(SettlingIn_time); make_visible(legal_cbreak); make_visible(cp_timeout);
+                    make_invisible(PreStim_time); make_invisible(PreStim_time_Min); make_invisible(PreStim_time_Max);
+                    make_invisible(A1_time); make_invisible(A1_time_Min); make_invisible(A1_time_Max);
+                    make_invisible(time_bet_aud1_gocue);make_invisible(time_bet_aud1_gocue_Min);make_invisible(time_bet_aud1_gocue_Max);
+                    make_visible(CP_duration); make_visible(Total_CP_duration); make_visible(init_CP_duration);
 
                     if n_done_trials <1 && value(warmup_on) ==1
                         CP_duration.value = value(init_CP_duration);
-                    else
-                        CP_duration.value = value(CP_duration);
                     end
+
                     Total_CP_duration.value = value(CP_duration) + value(time_go_cue); %#ok<*NASGU>
 
-                case {5,6,7,8} %
+                case {5,6,7} %
 
-                    enable(SettlingIn_time);
-                    enable(PreStim_time);
-                    enable(A1_time);
-                    enable(time_bet_aud1_gocue);
+                    make_visible(SettlingIn_time); make_visible(legal_cbreak); make_visible(cp_timeout);
+                    make_visible(PreStim_time); make_invisible(PreStim_time_Min); make_invisible(PreStim_time_Max);
+                    make_visible(A1_time); make_invisible(A1_time_Min); make_invisible(A1_time_Max);
+                    make_visible(time_bet_aud1_gocue);make_invisible(time_bet_aud1_gocue_Min);make_invisible(time_bet_aud1_gocue_Max);
+                    make_visible(CP_duration); make_visible(Total_CP_duration); make_visible(init_CP_duration);
+
+                    if n_done_trials <1 && warmup_on ==1
+                        CP_duration.value = value(init_CP_duration);
+                    end
+
+                    Total_CP_duration.value = value(CP_duration) + value(time_go_cue); %#ok<*NASGU>
+
+                case 8
+
+                    make_visible(SettlingIn_time); make_visible(legal_cbreak); make_visible(cp_timeout);
+                    make_visible(PreStim_time); make_visible(PreStim_time_Min); make_visible(PreStim_time_Max);
+                    make_visible(A1_time); make_visible(A1_time_Min); make_visible(A1_time_Max);
+                    make_visible(time_bet_aud1_gocue);make_visible(time_bet_aud1_gocue_Min);make_visible(time_bet_aud1_gocue_Max);
+                    make_visible(CP_duration); make_visible(Total_CP_duration); make_visible(init_CP_duration);
 
                     if random_prego_time == 1
                         time_range_go_cue = value(time_bet_aud1_gocue_Min):0.01:value(time_bet_aud1_gocue_Max);
@@ -271,70 +287,43 @@ switch action
                         CP_duration.value = value(SettlingIn_time) + value(A1_time) + value(PreStim_time) + value(time_bet_aud1_gocue);
                     end
                     Total_CP_duration.value = value(CP_duration) + value(time_go_cue); %#ok<*NASGU>
+
             end
 
 	case 'prepare_next_trial'
-		
-        if value(use_auto_train) == 0
-            switch value(training_stage)
+		            
+        if value(training_stage) ==  8 % user setting
 
-                case {1,2}                  %% learning the reward sound association -left or right led on -> poke -> sound+reward
+            make_visible(SettlingIn_time);
+            make_visible(PreStim_time); make_visible(PreStim_time_Min); make_visible(PreStim_time_Max);
+            make_visible(A1_time); make_visible(A1_time_Min); make_visible(A1_time_Max);
+            make_visible(time_bet_aud1_gocue);make_visible(time_bet_aud1_gocue_Min);make_visible(time_bet_aud1_gocue_Max);
+            make_visible(CP_duration); make_visible(Total_CP_duration); make_visible(init_CP_duration);
 
-                    time_go_cue.value=0.200;
-                    disable(SettlingIn_time);
-                    disable(PreStim_time);
-                    disable(A1_time);
-                    disable(time_bet_aud1_gocue);
-
-
-                case {3,4} % Centre poke without the A1_Stim but has violation in 4
-
-                    time_go_cue.value=0.100;
-                    enable(SettlingIn_time);
-                    disable(PreStim_time);
-                    disable(A1_time);
-                    enable(time_bet_aud1_gocue);
-
-                    if n_done_trials <1 && warmup_on ==1
-                        CP_duration.value = value(init_CP_duration);
-                    else
-                        CP_duration.value = value(CP_duration);
-                    end
-                    Total_CP_duration.value = value(CP_duration) + value(time_go_cue); %#ok<*NASGU>
-
-                case {5,6,7,8} %
-
-                    time_go_cue.value=0.100;
-                    enable(SettlingIn_time);
-                    enable(PreStim_time);
-                    enable(A1_time);
-                    enable(time_bet_aud1_gocue);
-
-                    if random_prego_time == 1
-                        time_range_go_cue = value(time_bet_aud1_gocue_Min):0.01:value(time_bet_aud1_gocue_Max);
-                        time_bet_aud1_gocue.value = time_range_go_cue(randi([1, numel(time_range_go_cue)],1,1));
-                    end
-
-                    if random_A1_time == 1
-                        time_range_A1_time = value(A1_time_Min): 0.01 : value(A1_time_Max);
-                        A1_time.value = time_range_A1_time(randi([1, numel(time_range_A1_time)],1,1));
-                    end
-
-                    if random_PreStim_time == 1
-                        time_range_PreStim_time = value(PreStim_time_Min) : 0.01 : value(PreStim_time_Max);
-                        PreStim_time.value = time_range_PreStim_time(randi([1, numel(time_range_PreStim_time)],1,1));
-                    end
-
-                    if n_done_trials <1 && warmup_on ==1
-                        CP_duration.value = value(init_CP_duration);
-                    else
-                        CP_duration.value = value(SettlingIn_time) + value(A1_time) + value(PreStim_time) + value(time_bet_aud1_gocue);
-                    end
-                    Total_CP_duration.value = value(CP_duration) + value(time_go_cue); %#ok<*NASGU>
-
+            if random_prego_time == 1
+                time_range_go_cue = value(time_bet_aud1_gocue_Min):0.01:value(time_bet_aud1_gocue_Max);
+                time_bet_aud1_gocue.value = time_range_go_cue(randi([1, numel(time_range_go_cue)],1,1));
             end
+
+            if random_A1_time == 1
+                time_range_A1_time = value(A1_time_Min): 0.01 : value(A1_time_Max);
+                A1_time.value = time_range_A1_time(randi([1, numel(time_range_A1_time)],1,1));
+            end
+
+            if random_PreStim_time == 1
+                time_range_PreStim_time = value(PreStim_time_Min) : 0.01 : value(PreStim_time_Max);
+                PreStim_time.value = time_range_PreStim_time(randi([1, numel(time_range_PreStim_time)],1,1));
+            end
+
+            if n_done_trials <1 && warmup_on ==1
+                CP_duration.value = value(init_CP_duration);
+            else
+                CP_duration.value = value(SettlingIn_time) + value(A1_time) + value(PreStim_time) + value(time_bet_aud1_gocue);
+            end
+
+            Total_CP_duration.value = value(CP_duration) + value(time_go_cue); %#ok<*NASGU>
+
         end
-		
 		
 		%% update violation, timeout, previous_sides, etc
         was_viol=false;
