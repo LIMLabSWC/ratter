@@ -132,7 +132,7 @@ CreateHelperVar(obj,'stages_trial_counter_today','value',zeros(1,8));
 CreateHelperVar(obj,'stages_trial_counter_oppSide','value',zeros(1,8));
 CreateHelperVar(obj,'stages_timeout_rate','value',zeros(1,8));
 CreateHelperVar(obj,'stages_violation_rate','value',zeros(1,8));
-CreateHelperVar(obj,'this_stage_opp_side_trials', 'value', '0', 'force_init',true);
+CreateHelperVar(obj,'this_stage_opp_side_trials', 'value', 0, 'force_init',true);
 CreateHelperVar(obj,'stage_start_completed_trial','value',n_completed_trials,'force_init',true);
 %</HELPER_VARS>
 end
@@ -176,7 +176,7 @@ if n_completed_trials > value(stage_start_completed_trial)
     stages_timeout_rate.value = this_stage_timeout_percent;
 end
 % Update the reward collection time based upon behav
-if size(timeout_history) > 5
+if length(timeout_history) > 5
     if all(value(timeout_history(end-1:end))) && value(this_stage_opp_side_trials) >= 2
         ParamsSection_RewardCollection_duration.value = min([value(ParamsSection_RewardCollection_duration) + 1,...
             value(Training_ParamsSection_max_rColl_dur)]);
@@ -190,7 +190,7 @@ if size(timeout_history) > 5
         this_stage_opp_side_trials.value = 0;
     end
 end
-if size(timeout_history) > 20
+if length(timeout_history) > 20
     if all(value(timeout_history(end-19:end)))
         ParamsSection_RewardCollection_duration.value = 30;
         callback(ParamsSection_RewardCollection_duration);
