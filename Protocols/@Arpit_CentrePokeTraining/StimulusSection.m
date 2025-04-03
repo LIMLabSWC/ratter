@@ -24,9 +24,8 @@ switch action
         SoloParamHandle(obj, 'myfig', 'value', figure('closerequestfcn', [mfilename '(' class(obj) ', ''hide'');'], 'MenuBar', 'none', ...
             'Name', mfilename), 'saveable', 0);
         screen_size = get(0, 'ScreenSize');
-        set(value(myfig),'Position',[1 screen_size(4)-740, 300 300]); % put fig at top right
-        % set(double(gcf), 'Visible', 'off');
-        % x=10;y=10;
+        set(value(myfig),'Position',[1 screen_size(4)-740, 400 400]); % put fig at top right
+        % set(gcf, 'Visible', 'off');
 
         SoundManagerSection(obj, 'declare_new_sound', 'StimAUD1')
         SoloParamHandle(obj, 'thisstim', 'value', []);
@@ -130,8 +129,10 @@ switch action
         next_row(y);
         
         % next_column(y)
-        ax = axes(gcf,'Position',[x y 200 200]);
-        set(gca, 'Visible', 'on');
+        stim_dist_fig = figure;
+        SoloParamHandle(obj, 'stim_dist_fig', 'value', figure('closerequestfcn', [mfilename '(' class(obj) ', ''hide'');'], 'MenuBar', 'none', ...
+            'Name', mfilename), 'saveable', 0);
+        ax = axes(stim_dist_fig,'Position',[0.1 0.1 0.9 0.9]);
         plot(ax,randi(1,10));
         ylabel('log_e A','FontSize',16,'FontName','Cambria Math');
         set(ax,'Fontsize',15)
