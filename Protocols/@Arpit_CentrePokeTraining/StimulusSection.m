@@ -129,10 +129,9 @@ switch action
         next_row(y);
         
         % next_column(y)
-        stim_dist_fig = figure;
         SoloParamHandle(obj, 'stim_dist_fig', 'value', figure('closerequestfcn', [mfilename '(' class(obj) ', ''hide'');'], 'MenuBar', 'none', ...
-            'Name', mfilename), 'saveable', 0);
-        ax = axes(stim_dist_fig,'Position',[0.1 0.1 0.9 0.9]);
+            'Name', 'StimulusPlot'), 'saveable', 0);
+        ax = axes(value(stim_dist_fig),'Position',[0.1 0.1 0.9 0.9]);
         plot(ax,randi(1,10));
         ylabel('log_e A','FontSize',16,'FontName','Cambria Math');
         set(ax,'Fontsize',15)
@@ -488,18 +487,22 @@ switch action
     case 'hide'
         StimulusShow.value = 0;
         set(value(myfig), 'Visible', 'off');
+        set(value(stim_dist_fig), 'Visible', 'off');
 
     %% Case show
     case 'show'
         StimulusShow.value = 1;
         set(value(myfig), 'Visible', 'on');
+        set(value(stim_dist_fig), 'Visible', 'on');
 
     %% Case Show_hide
     case 'show_hide'
         if StimulusShow == 1
-            set(value(myfig), 'Visible', 'on'); %#ok<NODEF> (defined by GetSoloFunctionArgs)
+            set(value(myfig), 'Visible', 'on'); 
+            set(value(stim_dist_fig), 'Visible', 'on');%#ok<NODEF> (defined by GetSoloFunctionArgs)
         else
             set(value(myfig), 'Visible', 'off');
+            set(value(stim_dist_fig), 'Visible', 'off');
         end
 
 end
