@@ -180,11 +180,11 @@ switch action
 
             % Plot current stimulus and move to saving stimulus history
 
-            if value(thisstimlog(n_completed_trials+1)) > value(boundary)%value(numClass)
-                set(value(h1), 'YData', value(A1), 'color',[0.4 0.8 0.1],'markerfacecolor',[0.4 0.8 0.1]);
-            else
-                set(value(h1), 'YData', value(A1), 'color',[0.8 0.4 0.1],'markerfacecolor',[0.8 0.4 0.1]);
-            end
+            % if value(thisstimlog(n_completed_trials+1)) > value(boundary)%value(numClass)
+            %     set(value(h1), 'YData', value(A1), 'color',[0.4 0.8 0.1],'markerfacecolor',[0.4 0.8 0.1]);
+            % else
+            %     set(value(h1), 'YData', value(A1), 'color',[0.8 0.4 0.1],'markerfacecolor',[0.8 0.4 0.1]);
+            % end
 
             if n_completed_trials > 0
                 if ~violation_history(n_completed_trials) && ~timeout_history(n_completed_trials)

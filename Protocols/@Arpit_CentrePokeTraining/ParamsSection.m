@@ -275,7 +275,7 @@ switch action
 
 	case 'prepare_next_trial'
 		
-        if value(use_auto_train) == 1
+        if value(use_auto_train) == 0
             switch value(training_stage)
 
                 case {1,2}                  %% learning the reward sound association -left or right led on -> poke -> sound+reward
