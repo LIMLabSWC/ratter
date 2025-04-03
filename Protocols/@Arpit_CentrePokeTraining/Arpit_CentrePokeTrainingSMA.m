@@ -420,7 +420,8 @@ switch action
         %             'hit',               [0    1    0]
 
 
-
+    case 'close'
+        
 
     case 'reinit'
         currfig = double(gcf);

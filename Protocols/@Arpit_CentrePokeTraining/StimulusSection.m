@@ -24,28 +24,16 @@ switch action
         SoloParamHandle(obj, 'myfig', 'value', figure('closerequestfcn', [mfilename '(' class(obj) ', ''hide'');'], 'MenuBar', 'none', ...
             'Name', mfilename), 'saveable', 0);
         screen_size = get(0, 'ScreenSize');
-        set(value(myfig),'Position',[1 screen_size(4)-740, 1000 1000]); % put fig at top right
-        set(double(gcf), 'Visible', 'off');
-        x=10;y=10;
-
-        SoloParamHandle(obj, 'ax', 'saveable', 0, ...
-            'value', axes('Position', [0.01 0.5 0.45 0.45]));
-        ylabel('log_e A','FontSize',16,'FontName','Cambria Math');
-        set(value(ax),'Fontsize',15)
-        xlabel('Sound Categorization','FontSize',16,'FontName','Cambria Math')
-
-        % SoloParamHandle(obj, 'axperf', 'saveable', 0, ...
-        %     'value', axes('Position', [0.5 0.5 0.45 0.45]));
-        % ylabel('log_e A','FontSize',16,'FontName','Cambria Math');
-        % set(value(axperf),'Fontsize',15)
-        % xlabel('Sound Categorization','FontSize',16,'FontName','Cambria Math')
+        set(value(myfig),'Position',[1 screen_size(4)-740, 300 300]); % put fig at top right
+        % set(double(gcf), 'Visible', 'off');
+        % x=10;y=10;
 
         SoundManagerSection(obj, 'declare_new_sound', 'StimAUD1')
         SoloParamHandle(obj, 'thisstim', 'value', []);
         SoloParamHandle(obj, 'thisstimlog', 'value', []);
         SoloParamHandle(obj, 'h1', 'value', []);
 
-        y=5;
+        x = 10; y=5;
 
         next_row(y);
         next_row(y);
@@ -71,10 +59,11 @@ switch action
         next_row(y);
         DispParam(obj, 'mean_Left', 0.01, x,y,'label','μ Left','TooltipString','mean/max log stim value for the left side distribution');
     	next_row(y);
-        DispParam(obj, 'sigma_Left', 0.01, x,y,'label','σ Left','TooltipString','mean/max log stim value for the left side distribution');
+        DispParam(obj, 'sigma_Left', 0.01, x,y,'label','σ Left','TooltipString','sigma value(log) for normal distribution for the left side distribution');
         next_row(y);
         NumeditParam(obj, 'sigma_range_Left', 1, x,y,'label','3σ Left','TooltipString',sprintf(['\n A way to reduce the range and increase more distribution towards mean\n', ...
-           '\n''A value b/w range [0.2 - 1] is acceptable, signifying 3 Sigma (99.7%) value for the left side distribution']));
+           '\n''signifying 3 Sigma (99.7%%) value for the left side distribution, \n',...
+           '\n''A value b/w range [0.2 - 1] is acceptable.']));
     	set_callback(sigma_range_Left, {mfilename, 'Cal_Sigma'});
         next_row(y); next_row(y);
 
@@ -87,10 +76,11 @@ switch action
         next_row(y);
         DispParam(obj, 'mean_Right', 0.01, x,y,'label','μ Right','TooltipString','mean/max log stim value for the right side distribution');
     	next_row(y);
-        DispParam(obj, 'sigma_Right', 0.01, x,y,'label','σ Right','TooltipString','mean/max log stim value for the left side distribution');
+        DispParam(obj, 'sigma_Right', 0.01, x,y,'label','σ Right','TooltipString','sigma value (log) for normal distribution for the right side distribution');
         next_row(y);
         NumeditParam(obj, 'sigma_range_Right', 1, x,y,'label','3σ Right','TooltipString',sprintf(['\n A way to reduce the range and increase more distribution towards mean\n', ...
-           '\n''A value b/w range [0.2 - 1] is acceptable, signifying 3 Sigma (99.7%) value for the right side distribution']));
+            '\n''signifying 3 Sigma (99.7 %%) value for the right side distribution, \n',...
+            '\n''A value b/w range [0.2 - 1] is acceptable.']));
     	set_callback(sigma_range_Right, {mfilename, 'Cal_Sigma'});
         next_row(y);
 
@@ -139,62 +129,71 @@ switch action
         make_invisible(maxF1);make_invisible(minF1);make_invisible(A1_freq);
         next_row(y);
         
+        % next_column(y)
+        ax = axes(gcf,'Position',[x y 200 200]);
+        set(gca, 'Visible', 'on');
+        plot(ax,randi(1,10));
+        ylabel('log_e A','FontSize',16,'FontName','Cambria Math');
+        set(ax,'Fontsize',15)
+        xlabel('Sound Categorization','FontSize',16,'FontName','Cambria Math')
+        SoloParamHandle(obj, 'ax', 'saveable', 0,  'value', ax);
+
         StimulusSection(obj,'plot_stimuli');
         
     case 'prepare_next_trial'
+        if value(training_stage) > 4 && stimuli_on
+            StimulusSection(obj,'pick_current_stimulus');
+            srate=SoundManagerSection(obj,'get_sample_rate');
+            Fs=srate;
+            T=value(A1_time);
 
-        StimulusSection(obj,'pick_current_stimulus');
-        srate=SoundManagerSection(obj,'get_sample_rate');
-        Fs=srate;
-        T=value(A1_time);
-
-        if frequency_categorization
-            % produce the tone
-            A1_freq.value = value(thisstim);
-            A1 = value(thisstimlog(n_completed_trials+1));
-            dur1 = A1_time*1000;
-            bal=0;
-            freq1=A1_freq*1000;
-            vol=0.001;
-            RVol=vol*min(1,(1+bal));
-            LVol=vol*min(1,(1-bal));
-            t=0:(1/srate):(dur1/1000);
-            t = t(1:end-1);
-            tw=sin(t*2*pi*freq1);
-            RW=RVol*tw;
-            %w=[LW;RW];
-            AUD1 = RW;
-        else
-           % produce noise pattern
-            A1_sigma.value = value(thisstim);
-            A1 = value(thisstimlog(n_completed_trials+1));
-            [rawA1, rawA2, normA1, normA2]=noisestim(1,1,T,value(fcut),Fs,value(filter_type));
-            modulator=singlenoise(1,T,[value(lfreq) value(hfreq)],Fs,'BUTTER');
-            AUD1=normA1(1:A1_time*srate).*modulator(1:A1_time*srate).*A1_sigma;
-        end
-
-        if ~isempty(AUD1)
-            SoundManagerSection(obj, 'set_sound', 'StimAUD1', [AUD1';  AUD1'])
-        end
-
-        SoundManagerSection(obj, 'send_not_yet_uploaded_sounds');
-
-        % Plot current stimulus and move to saving stimulus history
-
-        if value(thisstimlog(n_completed_trials+1)) > value(boundary)%value(numClass)
-            set(value(h1), 'YData', value(A1), 'color',[0.4 0.8 0.1],'markerfacecolor',[0.4 0.8 0.1]);
-        else
-            set(value(h1), 'YData', value(A1), 'color',[0.8 0.4 0.1],'markerfacecolor',[0.8 0.4 0.1]);
-        end
-   
-        if n_completed_trials > 0
-            if ~violation_history(n_completed_trials) && ~timeout_history(n_completed_trials)
-                StimulusSection(obj,'update_stimulus_history');
+            if frequency_categorization
+                % produce the tone
+                A1_freq.value = value(thisstim);
+                A1 = value(thisstimlog(n_completed_trials+1));
+                dur1 = A1_time*1000;
+                bal=0;
+                freq1=A1_freq*1000;
+                vol=0.001;
+                RVol=vol*min(1,(1+bal));
+                LVol=vol*min(1,(1-bal));
+                t=0:(1/srate):(dur1/1000);
+                t = t(1:end-1);
+                tw=sin(t*2*pi*freq1);
+                RW=RVol*tw;
+                %w=[LW;RW];
+                AUD1 = RW;
             else
-                StimulusSection(obj,'update_stimulus_history_nan');
+                % produce noise pattern
+                A1_sigma.value = value(thisstim);
+                A1 = value(thisstimlog(n_completed_trials+1));
+                [rawA1, rawA2, normA1, normA2]=noisestim(1,1,T,value(fcut),Fs,value(filter_type));
+                modulator=singlenoise(1,T,[value(lfreq) value(hfreq)],Fs,'BUTTER');
+                AUD1=normA1(1:A1_time*srate).*modulator(1:A1_time*srate).*A1_sigma;
+            end
+
+            if ~isempty(AUD1)
+                SoundManagerSection(obj, 'set_sound', 'StimAUD1', [AUD1';  AUD1'])
+            end
+
+            SoundManagerSection(obj, 'send_not_yet_uploaded_sounds');
+
+            % Plot current stimulus and move to saving stimulus history
+
+            if value(thisstimlog(n_completed_trials+1)) > value(boundary)%value(numClass)
+                set(value(h1), 'YData', value(A1), 'color',[0.4 0.8 0.1],'markerfacecolor',[0.4 0.8 0.1]);
+            else
+                set(value(h1), 'YData', value(A1), 'color',[0.8 0.4 0.1],'markerfacecolor',[0.8 0.4 0.1]);
+            end
+
+            if n_completed_trials > 0
+                if ~violation_history(n_completed_trials) && ~timeout_history(n_completed_trials)
+                    StimulusSection(obj,'update_stimulus_history');
+                else
+                    StimulusSection(obj,'update_stimulus_history_nan');
+                end
             end
         end
-
         %% Case pick_current_stimulus
     case 'pick_current_stimulus'
         if frequency_categorization
