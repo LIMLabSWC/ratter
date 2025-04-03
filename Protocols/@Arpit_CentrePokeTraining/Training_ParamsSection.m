@@ -52,7 +52,7 @@ switch action
             
             case 5
              % STAGE RUNNING PARAMETERS
-            NumeditParam(obj, 'max_CP', 1.5, x, y,'label','CP_Dur_Max','TooltipString','max CP duration being trained in this stage'); next_row(y);
+            NumeditParam(obj, 'max_CP', 5, x, y,'label','CP_Dur_Max','TooltipString','max CP duration being trained in this stage'); next_row(y);
             NumeditParam(obj, 'CPfraction_inc', 0.002, x, y,'label','CP_frac_Increase','TooltipString','CP duration is increased by this fraction'); next_row(y);
             NumeditParam(obj, 'min_CP', 1.5, x, y,'label','CP_Dur_Min','TooltipString','min CP duration being trained in this stage'); next_row(y);
             NumeditParam(obj, 'starting_CP', 0.3, x, y,'TooltipString','min CP duration (minus the settling-in time) during warm up'); next_row(y);

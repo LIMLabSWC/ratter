@@ -218,7 +218,7 @@ switch action
 
             [stage_fig_x,stage_fig_y] = Training_ParamsSection(obj, 'reinit', value(stage_fig_x),value(stage_fig_y)); % update the training params as well
             Arpit_CentrePokeTrainingSMA(obj,'reinit');
-
+            SessionPerformanceSection(obj, 'evaluate');
             switch value(training_stage)
 
                 case {1,2}                  %% learning the reward sound association -left or right led on -> poke -> sound+reward

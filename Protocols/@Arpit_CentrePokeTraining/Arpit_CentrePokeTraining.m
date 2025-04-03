@@ -159,6 +159,7 @@ switch action
 	% Run SessionDefinition *after* ParamsSection so we know whether the trial was a violation or not
 	
     % push_helper_vars_tosql(obj,n_done_trials); 
+       
        SessionDefinition(obj, 'next_trial');
        SessionPerformanceSection(obj, 'evaluate');
        StimulusSection(obj,'prepare_next_trial');
