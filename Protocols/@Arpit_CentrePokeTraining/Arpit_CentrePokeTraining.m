@@ -156,9 +156,9 @@ switch action
    case 'prepare_next_trial'
 
        ParamsSection(obj, 'prepare_next_trial');
-	% Run SessionDefinition *after* ParamsSection so we know whether the
-	% trial was a violation or not
-       push_helper_vars_tosql(obj,n_done_trials);
+	% Run SessionDefinition *after* ParamsSection so we know whether the trial was a violation or not
+	
+    % push_helper_vars_tosql(obj,n_done_trials); 
        SessionDefinition(obj, 'next_trial');
        SessionPerformanceSection(obj, 'evaluate');
        StimulusSection(obj,'prepare_next_trial');
@@ -179,9 +179,9 @@ switch action
             prot_title.value=[mfilename ' on rig ' get_hostname ' : ' expmtr ', ' rname  '.  Started at ' datestr(now, 'HH:MM')];
        end
       
-       try 
-           send_n_done_trials(obj);
-       end
+       % try 
+       %     send_n_done_trials(obj);
+       % end
 
    %% trial_completed
    case 'trial_completed'

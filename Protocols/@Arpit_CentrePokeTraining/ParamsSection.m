@@ -275,41 +275,42 @@ switch action
 
 	case 'prepare_next_trial'
 		
-		switch value(training_stage)
-			
-            case {1,2}                  %% learning the reward sound association -left or right led on -> poke -> sound+reward
-				
-				time_go_cue.value=0.200;
-				disable(SettlingIn_time);
-                disable(PreStim_time);
-                disable(A1_time);
-                disable(time_bet_aud1_gocue);
-				
-				
-            case {3,4} % Centre poke without the A1_Stim but has violation in 4
+        if value(use_auto_train) == 1
+            switch value(training_stage)
 
-                time_go_cue.value=0.100;
-                enable(SettlingIn_time);
-                disable(PreStim_time);
-                disable(A1_time);
-                enable(time_bet_aud1_gocue);
+                case {1,2}                  %% learning the reward sound association -left or right led on -> poke -> sound+reward
 
-                if n_done_trials <1 && warmup_on ==1
-                    CP_duration.value = value(init_CP_duration);
-                else
-                    CP_duration.value = value(CP_duration);
-                end
-                Total_CP_duration.value = value(CP_duration) + value(time_go_cue); %#ok<*NASGU>
+                    time_go_cue.value=0.200;
+                    disable(SettlingIn_time);
+                    disable(PreStim_time);
+                    disable(A1_time);
+                    disable(time_bet_aud1_gocue);
 
-                case {5,6,7,8} % 
-                   
-                   time_go_cue.value=0.100;
-                   enable(SettlingIn_time);
-                   enable(PreStim_time);
-                   enable(A1_time);
-                   enable(time_bet_aud1_gocue);
 
-                   if random_prego_time == 1
+                case {3,4} % Centre poke without the A1_Stim but has violation in 4
+
+                    time_go_cue.value=0.100;
+                    enable(SettlingIn_time);
+                    disable(PreStim_time);
+                    disable(A1_time);
+                    enable(time_bet_aud1_gocue);
+
+                    if n_done_trials <1 && warmup_on ==1
+                        CP_duration.value = value(init_CP_duration);
+                    else
+                        CP_duration.value = value(CP_duration);
+                    end
+                    Total_CP_duration.value = value(CP_duration) + value(time_go_cue); %#ok<*NASGU>
+
+                case {5,6,7,8} %
+
+                    time_go_cue.value=0.100;
+                    enable(SettlingIn_time);
+                    enable(PreStim_time);
+                    enable(A1_time);
+                    enable(time_bet_aud1_gocue);
+
+                    if random_prego_time == 1
                         time_range_go_cue = value(time_bet_aud1_gocue_Min):0.01:value(time_bet_aud1_gocue_Max);
                         time_bet_aud1_gocue.value = time_range_go_cue(randi([1, numel(time_range_go_cue)],1,1));
                     end
@@ -331,8 +332,8 @@ switch action
                     end
                     Total_CP_duration.value = value(CP_duration) + value(time_go_cue); %#ok<*NASGU>
 
-
-		end
+            end
+        end
 		
 		
 		%% update violation, timeout, previous_sides, etc
