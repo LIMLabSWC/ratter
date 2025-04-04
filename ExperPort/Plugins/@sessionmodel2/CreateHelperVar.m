@@ -7,8 +7,8 @@ function CreateHelperVar(obj, varname, varargin)
 %
 %   'value', varval: Sets the helper var to varval if the helper var does
 %   not already exist. If this option is not specified, varval defaults to
-%   the empty matrix.
-%
+%   the empty matrix. 
+%  
 %   'force_init', true: Forces the helper var to be set to the specified
 %   value. If this option is not specified, 'force_init' is assumed to be
 %   false.
@@ -21,11 +21,22 @@ if nargin<2
 elseif ~isvarname(varname)
     error('varname has to be a valid MATLAB variable name');
 end
-
+%% ARPIT %%
+% Changing the name from 'value' to 'var_value' because
+%   there already exist a function named value and cannot have a variable
+%   also named the same.
+varargin_names = varargin(1:2:end);
+value_idx = find(cellfun(@(x) contains(x,'value'),varargin_names));
+if ~isempty(value_idx)
+    varargin{(value_idx - 1) * 2 + 1} = 'var_value';
+end
 pairs = {'force_init', false;
-    'value', []};
+    'var_value', []};
 parseargs(varargin, pairs);
-varval = value; clear('value');
+varval = var_value;
+% clear('var_value');
+
+%%
 
 try
     force_init = logical(force_init); %#ok<NODEF>
