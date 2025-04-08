@@ -185,7 +185,7 @@ switch action,
             lfreq=2000;
             hfreq=20000;
             freq = 100;
-            T = 1;
+            T = 5;
             fcut = 110;
             filter_type = 'GAUS';
             A1_sigma = 0.0500;
