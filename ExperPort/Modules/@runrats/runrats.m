@@ -1420,28 +1420,28 @@ switch action
         % end
 
         % If using USB Webcam, then try using it
-        try
-            disp('Connecting to USB HD Camera')
-            webcam_connected = webcamlist;
-            webcam_idx = find(contains(webcam_connected,'USB'));
-            if ~isempty(webcam_idx) % USB Camera connected
-                cam = webcam(webcam_connected{webcam_idx});
-                fig = figure('NumberTitle','off','MenuBar','none');
-                fig.Name = 'My Camera';
-                ax = axes(fig);
-                frame = snapshot(cam);
-                im = image(ax,zeros(size(frame),'uint8'));
-                axis(ax,'image');
-                preview(cam,im)
-                Camera_Fig_window.value = fig;
-                Camera_Obj.value = cam;
-                Camera_Image.value = im;
-            else
-                disp('No USB camera connected')
-            end            
-        catch
-            disp('failed to connect to USB camera')
-        end
+        % try
+        %     disp('Connecting to USB HD Camera')
+        %     webcam_connected = webcamlist;
+        %     webcam_idx = find(contains(webcam_connected,'USB'));
+        %     if ~isempty(webcam_idx) % USB Camera connected
+        %         cam = webcam(webcam_connected{webcam_idx});
+        %         fig = figure('NumberTitle','off','MenuBar','none');
+        %         fig.Name = 'My Camera';
+        %         ax = axes(fig);
+        %         frame = snapshot(cam);
+        %         im = image(ax,zeros(size(frame),'uint8'));
+        %         axis(ax,'image');
+        %         preview(cam,im)
+        %         Camera_Fig_window.value = fig;
+        %         Camera_Obj.value = cam;
+        %         Camera_Image.value = im;
+        %     else
+        %         disp('No USB camera connected')
+        %     end            
+        % catch
+        %     disp('failed to connect to USB camera')
+        % end
 
         %Enable the Multi button so the user can stop the session
         enable(Multi);
@@ -1482,15 +1482,15 @@ switch action
         % end
 
         % Stop USB Camera
-        try
-            closePreview(value(Camera_Obj))
-            clear(value(Camera_Image))
-            clear(value(Camera_Obj));
-            close(value(Camera_Fig_window));
-            disp('USB camera stopped')
-        catch
-            disp('failed to stop USB camera')
-        end
+        % try
+        %     closePreview(value(Camera_Obj))
+        %     clear(value(Camera_Image))
+        %     clear(value(Camera_Obj));
+        %     close(value(Camera_Fig_window));
+        %     disp('USB camera stopped')
+        % catch
+        %     disp('failed to stop USB camera')
+        % end
 
         %Stop dispatcher and wait for it to respond
         dispatcher(value(dispobj),'Stop'); %#ok<NODEF>
