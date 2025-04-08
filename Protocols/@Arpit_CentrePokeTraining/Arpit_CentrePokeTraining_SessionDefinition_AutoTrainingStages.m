@@ -917,7 +917,7 @@ if n_completed_trials >= 1
     callback(ParamsSection_PreStim_time);
     callback(ParamsSection_A1_time);
     callback(ParamsSection_time_bet_aud1_gocue);
-    ParamsSection_CP_duration = value(ParamsSection_SettlingIn_time) + value(ParamsSection_PreStim_time) + value(ParamsSection_A1_time) + value(ParamsSection_time_bet_aud1_gocue);
+    ParamsSection_CP_duration.value = value(ParamsSection_SettlingIn_time) + value(ParamsSection_PreStim_time) + value(ParamsSection_A1_time) + value(ParamsSection_time_bet_aud1_gocue);
 end
 callback(ParamsSection_CP_duration);
 %</STAGE_ALGORITHM>
@@ -1073,7 +1073,7 @@ if n_completed_trials >= 1
     callback(ParamsSection_PreStim_time);
     callback(ParamsSection_A1_time);
     callback(ParamsSection_time_bet_aud1_gocue);
-    ParamsSection_CP_duration = value(ParamsSection_SettlingIn_time) + value(ParamsSection_PreStim_time) + value(ParamsSection_A1_time) + value(ParamsSection_time_bet_aud1_gocue);
+    ParamsSection_CP_duration.value = value(ParamsSection_SettlingIn_time) + value(ParamsSection_PreStim_time) + value(ParamsSection_A1_time) + value(ParamsSection_time_bet_aud1_gocue);
 end
 callback(ParamsSection_CP_duration);
 %</STAGE_ALGORITHM>

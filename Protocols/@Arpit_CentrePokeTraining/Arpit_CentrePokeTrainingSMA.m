@@ -93,7 +93,7 @@ switch action
         sma = StateMachineAssembler('full_trial_structure','use_happenings', 1);
 
         % scheduled wave for stimuli/fixed sound, based upon side
-        if stimuli_on && value(training_stage) > 4
+        if stimuli_on && value(training_stage) > 5
             sma = add_scheduled_wave(sma, 'name', 'stimplay', 'preamble', PreStim_time, ...
                 'sustain', sound_duration, 'sound_trig', A1_sound_id); % to play a sound before Go Cue
         else
