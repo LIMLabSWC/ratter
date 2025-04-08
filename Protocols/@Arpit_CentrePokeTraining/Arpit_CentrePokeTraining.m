@@ -10,7 +10,7 @@ obj = class(struct, mfilename, pokesplot2, saveload, sessionmodel2, soundmanager
   water, comments, soundtable, sqlsummary);
 
 %---------------------------------------------------------------
-%   BEGIN SECTION COMMONSoundTableSection TO ALL PROTOCOLS, DO NOT MODIFY
+%   BEGIN SECTION COMMON TO ALL PROTOCOLS, DO NOT MODIFY
 %---------------------------------------------------------------
 
 % If creating an empty object, return without further ado:
@@ -32,6 +32,72 @@ else % Ok, regular call with first param being the action string.
 end
 
 GetSoloFunctionArgs(obj);
+
+
+%---------------------------------------------------------------
+%   END OF SECTION COMMON TO ALL PROTOCOLS, MODIFY AFTER THIS LINE
+%---------------------------------------------------------------
+
+% ---- From here on is where you can put the code you like.
+%
+% Your protocol will be called, at the appropriate times, with the
+% following possible actions:
+%
+%   'init'     To initialize -- make figure windows, variables, etc.
+%
+%   'update'   Called periodically within a trial
+%
+%   'prepare_next_trial'  Called when a trial has ended and your protocol is expected
+%              to produce the StateMachine diagram for the next trial;
+%              i.e., somewhere in your protocol's response to this call, it
+%              should call "dispatcher('send_assembler', sma,
+%              prepare_next_trial_set);" where sma is the
+%              StateMachineAssembler object that you have prepared and
+%              prepare_next_trial_set is either a single string or a cell
+%              with elements that are all strings. These strings should
+%              correspond to names of states in sma.
+%                 Note that after the prepare_next_trial call, further
+%              events may still occur while your protocol is thinking,
+%              before the new StateMachine diagram gets sent. These events
+%              will be available to you when 'state0' is called on your
+%              protocol (see below).
+%
+%   'trial_completed'   Called when the any of the prepare_next_trial set
+%              of states is reached.
+%
+%   'close'    Called when the protocol is to be closed.
+%
+%
+% VARIABLES THAT DISPATCHER WILL ALWAYS INSTANTIATE FOR YOU AS READ_ONLY
+% GLOBALS IN YOUR PROTOCOL:
+%
+% n_done_trials     How many trials have been finished; when a trial reaches
+%                   one of the prepare_next_trial states for the first
+%                   time, this variable is incremented by 1.
+%
+% n_started_trials  How many trials have been started. This variable gets
+%                   incremented by 1 every time the state machine goes
+%                   through state 0.
+%
+% parsed_events     The result of running disassemble.m, with the
+%                   parsed_structure flag set to 1, on all events from the
+%                   start of the current trial to now.
+%
+% latest_parsed_events     The result of running disassemble.m, with the
+%                   parsed_structure flag set to 1, on all new events from
+%                   the last time 'update' was called to now.
+%
+% raw_events        All the events obtained in the current trial, not parsed
+%                   or disassembled, but raw as gotten from the State
+%                   Machine object.
+%
+% current_assembler The StateMachineAssembler object that was used to
+%                   generate the State Machine diagram in effect in the
+%                   current trial.
+%
+% Trial-by-trial history of parsed_events, raw_events, and
+% current_assembler, are automatically stored for you in your protocol by
+% dispatcher.m.
 
 switch action
    

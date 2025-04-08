@@ -48,7 +48,7 @@ switch action
             '\n''S1>S_boundary Right'' means if Aud1 < Aud_boundry then reward will be delivered from the left water spout and if Aud1 > Aud_boundry then water comes from right\n']));
         next_row(y, 1);next_row(y, 1);
 
-        MenuParam(obj, 'Prob_Dist_Left',  {'Uniform','Half Normal','Normal','Sinusoidal','Anti Half Normal','Anti Sinusoidal','Monotonic Increase'}, ...
+        MenuParam(obj, 'Prob_Dist_Left',  {'Uniform','Exponential','Half Normal','Normal','Sinusoidal','Anti Exponential','Anti Half Normal','Anti Sinusoidal','Monotonic Increase'}, ...
             'Uniform', x, y,'label','Left Dist', 'labelfraction', 0.35, 'TooltipString', sprintf(['\n Different Probability Distributions for Category A.\n', ...
             '\n''Normal - the mean is at mid point of range. Half Normal - truncated normal with mean at boundary.\n',...
             '\n''Anti Half Normal - the mean/max is at the side edge of the range.\n',...
@@ -66,7 +66,7 @@ switch action
     	set_callback(sigma_range_Left, {mfilename, 'Cal_Sigma'});
         next_row(y); next_row(y);
 
-        MenuParam(obj, 'Prob_Dist_Right', {'Uniform','Half Normal','Normal','Sinusoidal','Anti Half Normal','Anti Sinusoidal'}, ...
+        MenuParam(obj, 'Prob_Dist_Right', {'Uniform','Exponential','Half Normal','Normal','Sinusoidal','Anti Exponential','Anti Half Normal','Anti Sinusoidal','Monotonic Increase'}, ...
             'Uniform', x, y, 'label','Right Dist', 'labelfraction', 0.35, 'TooltipString', sprintf(['\n Different Probability Distributions for Category A.\n', ...
             '\n''Normal - the mean is at mid point of range (side edge - boundary). Half Normal - truncated normal with mean at boundary.\n',...
             '\n''Anti Half Normal - the mean/max is at the side edge of the range.\n',...
@@ -132,7 +132,6 @@ switch action
         SoloParamHandle(obj, 'stim_dist_fig', 'value', figure('closerequestfcn', [mfilename '(' class(obj) ', ''hide'');'], 'MenuBar', 'none', ...
             'Name', 'StimulusPlot'), 'saveable', 0);
         ax = axes(value(stim_dist_fig),'Position',[0.1 0.1 0.9 0.9]);
-        plot(ax,randi(1,10));
         ylabel('log_e A','FontSize',16,'FontName','Cambria Math');
         set(ax,'Fontsize',15)
         xlabel('Sound Categorization','FontSize',16,'FontName','Cambria Math')
@@ -141,7 +140,7 @@ switch action
         StimulusSection(obj,'plot_stimuli');
         
     case 'prepare_next_trial'
-        if value(training_stage) > 4 && stimuli_on
+        if value(training_stage) > 5 && stimuli_on
             StimulusSection(obj,'pick_current_stimulus');
             srate=SoundManagerSection(obj,'get_sample_rate');
             Fs=srate;
@@ -270,31 +269,51 @@ switch action
         thisstim.value=exp(stim_i_log);
         thisstimlog(n_completed_trials+1) = stim_i_log;
 
-        %% Case plot_pais
+        %% Case plot stimuli distribution
     case 'plot_stimuli'
 
-        %% plot the stimuli
-        if frequency_categorization
-            boundary.value = (log(value(minF1)) + log(value(maxF1)))/2;
+         if frequency_categorization
             stim_min_log = log(value(minF1));
             stim_max_log = log(value(maxF1));
-            stim_min = value(minF1);
-            stim_max = value(maxF1);
         else
-            boundary.value = (log(value(minS1)) + log(value(maxS1)))/2;
-            if strcmp(mu_location,'center')
-                boundary.value = value(boundary);
-            elseif strcmp(mu_location,'side')
-                boundary.value = (log(value(minS1)) + value(boundary))/2;
-            end
             stim_min_log = log(value(minS1));
             stim_max_log = log(value(maxS1));
-            stim_min = value(minS1);
-            stim_max = value(maxS1);
         end
+
+            dist_type_left  = value(Prob_Dist_Left);
+            dist_mean_left  = value(mean_Left);
+            dist_sigma_left = value(sigma_Left);
+            dist_type_right  = value(Prob_Dist_Right);
+            dist_mean_right  = value(mean_Right);
+            dist_sigma_right = value(sigma_Right);
+            dist_range_multiplier_left = value(sigma_range_Left);
+            dist_range_multiplier_right = value(sigma_range_Right);
+
+            if strcmp(Rule,'S1>S_boundary Left')
+                edge_max_left = stim_max_log;
+                edge_min_left = value(boundary);
+                edge_max_left = edge_min_left + dist_range_multiplier_left * (edge_max_left - edge_min_left);
+                edge_max_right = value(boundary);
+                edge_min_right = stim_min_log;
+                edge_min_right = edge_max_right - dist_range_multiplier_right * (edge_max_right - edge_min_right);
+
+            else % the rule is S1>S_boundary Right
+
+                edge_min_left = stim_min_log;
+                edge_max_left = value(boundary);
+                edge_min_left = edge_max_left - dist_range_multiplier_left * (edge_max_left - edge_min_left);
+                edge_max_right = stim_max_log;
+                edge_min_right = value(boundary);
+                edge_max_right = edge_min_right + dist_range_multiplier_right * (edge_max_right - edge_min_right);
+            end
+
+        
         cla(value(ax))
-        xd=1;
-        axes(value(ax));
+        ax_axes = axes(value(ax));
+
+        plot_stimuliDistribution(ax_axes,[edge_min, value(boundary), edge_max], dist_type_left,dist_mean_left,dist_sigma_left,...
+            [edge_min_left edge_max_left],dist_type_right,dist_mean_right,dist_sigma_right,[edge_min_right edge_max_right]);
+
         plot(xd,stim_min_log,'s','MarkerSize',15,'MarkerEdgeColor',[0 0 0],'LineWidth',2)
         hold on
         plot(xd,stim_max_log,'s','MarkerSize',15,'MarkerEdgeColor',[0 0 0],'LineWidth',2)
@@ -355,23 +374,32 @@ switch action
         if dist_sigma_multiplier > 1
             dist_sigma_multiplier = 1;
         end
-        sigma_Left.value = (dist_sigma_multiplier * (edge_max - edge_min)) / 3; % as we asked user to provide 3 sigma
+
+        if strcmp(Rule,'S1>S_boundary Left')
+            edge_min_left = value(boundary);
+            edge_max_left = edge_min_left + dist_sigma_multiplier * (edge_max - edge_min_left);
+        else % the rule is S1>S_boundary Right
+            edge_max_left = value(boundary);
+            edge_min_left = edge_max_left - dist_sigma_multiplier * (edge_max_left - edge_min);
+        end
+
+        sigma_Left.value = (edge_max_left - edge_min_left) / 3; % as we asked user to provide 3 sigma
 
         % Mean
-        if matches(value(Prob_Dist_Left),{'Uniform','Half Normal','Sinusoidal'})
+        if matches(value(Prob_Dist_Left),{'Uniform','Half Normal','Sinusoidal','Exponential'})
             mean_Left.value = value(boundary);
         else
             if strcmp(Rule,'S1>S_boundary Left')
-                if matches(Prob_Dist_Left,{'Anti Half Normal','Anti Sinusoidal'})
-                    mean_Left.value = edge_max;
+                if matches(Prob_Dist_Left,{'Anti Half Normal','Anti Sinusoidal','Anti Exponential'})
+                    mean_Left.value = edge_max_left;
                 elseif matches(Prob_Dist_Left,'Normal')
-                    mean_Left.value = (edge_max + value(boundary))/2;
+                    mean_Left.value = (edge_max_left + value(boundary))/2;
                 end
             else
-                if matches(value(Prob_Dist_Left),{'Anti Half Normal','Anti Sinusoidal'})
-                    mean_Left.value = edge_min;
+                if matches(value(Prob_Dist_Left),{'Anti Half Normal','Anti Sinusoidal','Anti Exponential'})
+                    mean_Left.value = edge_min_left;
                 elseif matches(value(Prob_Dist_Left),'Normal')
-                    mean_Left.value = (edge_min + value(boundary))/2;
+                    mean_Left.value = (edge_min_left + value(boundary))/2;
                 end
             end
         end
@@ -386,23 +414,33 @@ switch action
         if dist_sigma_multiplier > 1
             dist_sigma_multiplier = 1;
         end
-        sigma_Right.value = (dist_sigma_multiplier * (edge_max - edge_min)) / 3; % as we asked user to provide 3 sigma
+        
+        if strcmp(Rule,'S1>S_boundary Right')
+            edge_min_right = value(boundary);
+            edge_max_right = edge_min_right + dist_sigma_multiplier * (edge_max - edge_min_right);
+        else % the rule is S1>S_boundary Right
+            edge_max_right = value(boundary);
+            edge_min_right = edge_max_right - dist_sigma_multiplier * (edge_max_right - edge_min);
+        end
+
+        sigma_Right.value = (edge_max_right - edge_min_right) / 3; % as we asked user to provide 3 sigma
+
 
         % Mean
-        if matches(value(Prob_Dist_Right),{'Uniform','Half Normal','Sinusoidal'})
+        if matches(value(Prob_Dist_Right),{'Uniform','Half Normal','Sinusoidal','Exponential'})
             mean_Right.value = value(boundary);
         else
             if strcmp(Rule,'S1>S_boundary Right')
-                if matches(value(Prob_Dist_Right),{'Anti Half Normal','Anti Sinusoidal'})
-                    mean_Right.value = edge_max;
+                if matches(value(Prob_Dist_Right),{'Anti Half Normal','Anti Sinusoidal','Anti Exponential'})
+                    mean_Right.value = edge_max_right;
                 elseif matches(value(Prob_Dist_Right),'Normal')
-                    mean_Right.value = (edge_max + value(boundary))/2;
+                    mean_Right.value = (edge_max_right + value(boundary))/2;
                 end
             else
-                if matches(value(Prob_Dist_Right),{'Anti Half Normal','Anti Sinusoidal'})
-                    mean_Right.value = edge_min;
+                if matches(value(Prob_Dist_Right),{'Anti Half Normal','Anti Sinusoidal','Anti Exponential'})
+                    mean_Right.value = edge_min_right;
                 elseif matches(Prob_Dist_Right,'Normal')
-                    mean_Right.value = (edge_min + value(boundary))/2;
+                    mean_Right.value = (edge_min_right + value(boundary))/2;
                 end
             end
         end
