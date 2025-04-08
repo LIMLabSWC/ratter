@@ -291,32 +291,32 @@ switch action
             set(mh,'Position', [main_header_pos main_header_size],'FontSize', main_header_font_size,...
                 'BackgroundColor', main_header_bgcolor,'ForegroundColor',main_header_fgcolor);
             
-            SubHeaderParam(obj, 'sub_header_3',sub_header_3_string,20,20,'TooltipString','Change them at your own risk!!!');
+            SubheaderParam(obj, 'sub_header_3',sub_header_3_string,20,20,'TooltipString','Change them at your own risk!!!');
             mh=get_ghandle(sub_header_3);
             set(mh,'Position', [sub_header_3_pos sub_header_3_size],'FontSize', sub_header_3_font_size,...
                 'BackgroundColor', sub_header_3_bgcolor,'ForegroundColor',sub_header_3_fgcolor);
             
-            SubHeaderParam(obj, 'sub_header_2',sub_header_2_string,20,20);
+            SubheaderParam(obj, 'sub_header_2',sub_header_2_string,20,20);
             mh=get_ghandle(sub_header_2);
             set(mh,'Position', [sub_header_2_pos sub_header_2_size],'FontSize', sub_header_2_font_size,...
                 'BackgroundColor', sub_header_2_bgcolor,'ForegroundColor',sub_header_2_fgcolor);
             
-            SubHeaderParam(obj, 'sub_header_1',sub_header_1_string,20,20);
+            SubheaderParam(obj, 'sub_header_1',sub_header_1_string,20,20);
             mh=get_ghandle(sub_header_1);
             set(mh,'Position', [sub_header_1_pos sub_header_1_size],'FontSize', sub_header_1_font_size,...
                 'BackgroundColor', sub_header_1_bgcolor,'ForegroundColor',sub_header_1_fgcolor);
             
-            SubHeaderParam(obj, 'sub_header_4',sub_header_4_string,20,20);
+            SubheaderParam(obj, 'sub_header_4',sub_header_4_string,20,20);
             mh=get_ghandle(sub_header_4);
             set(mh,'Position', [sub_header_4_pos sub_header_4_size],'FontSize', sub_header_4_font_size,...
                 'BackgroundColor', sub_header_4_bgcolor,'ForegroundColor',sub_header_4_fgcolor);
             
-            SubHeaderParam(obj, 'sub_header_5',sub_header_5_string,20,20,'TooltipString','These are the estimates of pulse times which will be used to achieve the next target under consideration');
+            SubheaderParam(obj, 'sub_header_5',sub_header_5_string,20,20,'TooltipString','These are the estimates of pulse times which will be used to achieve the next target under consideration');
             mh=get_ghandle(sub_header_5);
             set(mh,'Position', [sub_header_5_pos sub_header_5_size],'FontSize', sub_header_5_font_size,...
                 'BackgroundColor', sub_header_5_bgcolor,'ForegroundColor',sub_header_5_fgcolor);
             
-            SubHeaderParam(obj, 'sub_header_6',sub_header_6_string,20,20,'TooltipString','Tells the current status of calibration for this rig');
+            SubheaderParam(obj, 'sub_header_6',sub_header_6_string,20,20,'TooltipString','Tells the current status of calibration for this rig');
             mh=get_ghandle(sub_header_6);
             set(mh,'Position', [sub_header_6_pos sub_header_6_size],'FontSize', sub_header_6_font_size,'FontWeight',sub_header_6_font_wieght,...
                 'BackgroundColor', sub_header_6_bgcolor,'ForegroundColor',sub_header_6_fgcolor);
@@ -370,45 +370,45 @@ switch action
             % Buttons and their callbacks: Start
             
             % Settings: Start
-            NumEditParam(obj, 'inter_valve_pause',value(inter_valve_pause_default),10,200,'label',INTER_VALVE_PAUSE_LABEL,'labelfraction',universal_label_fraction);
+            NumeditParam(obj, 'inter_valve_pause',value(inter_valve_pause_default),10,200,'label',INTER_VALVE_PAUSE_LABEL,'labelfraction',universal_label_fraction);
             lh=get_glhandle(inter_valve_pause);
             set(lh(2),'FontSize', universal_label_font_size, 'BackgroundColor', universal_label_color,'Position',[60 200 220 20]);
             set_callback(inter_valve_pause,{mfilename,'verify_inter_valve_pause'});
             
-            NumEditParam(obj, 'num_pulses',value(num_pulses_default),10,180,'label',NUM_PULSES_LABEL,'labelfraction',universal_label_fraction);
+            NumeditParam(obj, 'num_pulses',value(num_pulses_default),10,180,'label',NUM_PULSES_LABEL,'labelfraction',universal_label_fraction);
             lh=get_glhandle(num_pulses);
             set(lh(2),'FontSize', universal_label_font_size, 'BackgroundColor', universal_label_color,'Position',[60 180 220 20]);
             set_callback(num_pulses,{mfilename,'verify_num_pulses'});
             
-            NumEditParam(obj, 'left_pulse_time',value(pulse_time_default),10,160,'label',LEFT_PULSE_TIME_LABEL,'labelfraction',universal_label_fraction);
+            NumeditParam(obj, 'left_pulse_time',value(pulse_time_default),10,160,'label',LEFT_PULSE_TIME_LABEL,'labelfraction',universal_label_fraction);
             lh=get_glhandle(left_pulse_time);
             set(lh(2),'FontSize', universal_label_font_size, 'BackgroundColor', universal_label_color,'Position',[60 160 220 20]);
             set_callback(left_pulse_time,{mfilename,'verify_pulse_times'});
             if ~valves_used(1); disable(left_pulse_time); end;
             
-            NumEditParam(obj, 'center_pulse_time',value(pulse_time_default),10,140,'label',CENTER_PULSE_TIME_LABEL,'labelfraction',universal_label_fraction);
+            NumeditParam(obj, 'center_pulse_time',value(pulse_time_default),10,140,'label',CENTER_PULSE_TIME_LABEL,'labelfraction',universal_label_fraction);
             lh=get_glhandle(center_pulse_time);
             set(lh(2),'FontSize', universal_label_font_size, 'BackgroundColor', universal_label_color,'Position',[60 140 220 20]);
             set_callback(center_pulse_time,{mfilename,'verify_pulse_times'});
             if ~valves_used(2); disable(center_pulse_time); end;
             
-            NumEditParam(obj, 'right_pulse_time',value(pulse_time_default),10,120,'label',RIGHT_PULSE_TIME_LABEL,'labelfraction',universal_label_fraction);
+            NumeditParam(obj, 'right_pulse_time',value(pulse_time_default),10,120,'label',RIGHT_PULSE_TIME_LABEL,'labelfraction',universal_label_fraction);
             lh=get_glhandle(right_pulse_time);
             set(lh(2),'FontSize', universal_label_font_size, 'BackgroundColor', universal_label_color,'Position',[60 120 220 20]);
             set_callback(right_pulse_time,{mfilename,'verify_pulse_times'});
             if ~valves_used(3); disable(right_pulse_time); end;
             
-            NumEditParam(obj, 'low_target_dispense',value(low_target_dispense_default),10,100,'label',LOW_TARGET_LABEL,'labelfraction',universal_label_fraction);
+            NumeditParam(obj, 'low_target_dispense',value(low_target_dispense_default),10,100,'label',LOW_TARGET_LABEL,'labelfraction',universal_label_fraction);
             lh=get_glhandle(low_target_dispense);
             set(lh(2),'FontSize', universal_label_font_size, 'BackgroundColor', universal_label_color,'Position',[60 100 220 20]);
             set_callback(low_target_dispense,{mfilename,'verify_target_dispense'});
             
-            NumEditParam(obj, 'high_target_dispense',value(high_target_dispense_default),10,80,'label',HIGH_TARGET_LABEL,'labelfraction',universal_label_fraction);
+            NumeditParam(obj, 'high_target_dispense',value(high_target_dispense_default),10,80,'label',HIGH_TARGET_LABEL,'labelfraction',universal_label_fraction);
             lh=get_glhandle(high_target_dispense);
             set(lh(2),'FontSize', universal_label_font_size, 'BackgroundColor', universal_label_color,'Position',[60 80 220 20]);
             set_callback(high_target_dispense,{mfilename,'verify_target_dispense'});
             
-            NumEditParam(obj, 'error_tolerance',value(error_tolerance_default),10,60,'label',ERROR_TOLERANCE_LABEL,'labelfraction',universal_label_fraction);
+            NumeditParam(obj, 'error_tolerance',value(error_tolerance_default),10,60,'label',ERROR_TOLERANCE_LABEL,'labelfraction',universal_label_fraction);
             lh=get_glhandle(error_tolerance);
             set(lh(2),'FontSize', universal_label_font_size, 'BackgroundColor', universal_label_color,'Position',[60 60 220 20]);
             set_callback(error_tolerance,{mfilename,'verify_error_tolerance'});

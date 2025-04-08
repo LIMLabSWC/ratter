@@ -2014,7 +2014,7 @@ try
             if ~isequal(SavingSection(obj, 'get_settings_file_load_time'), value(TEMPORARY_SETTINGS_FILE_LOAD_TIME))
                 feval(mfilename, obj, 'init');
             end
-            
+             
             
             if n_done_trials >= 1 && ~isempty(value(CURRENT_TRAINING_STAGES_FILE_NAME))
                 
