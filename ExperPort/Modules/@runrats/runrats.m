@@ -1412,12 +1412,12 @@ switch action
         pause(5);
 
         %Start raspberry pi_camera
-        try
-            disp('trying camera')
-            start_camera(value(RigID),value(RatMenu),value(CurrProtocol),'start')
-        catch
-            disp('failed to start pi camera')
-        end
+        % try
+        %     disp('trying camera')
+        %     start_camera(value(RigID),value(RatMenu),value(CurrProtocol),'start')
+        % catch
+        %     disp('failed to start pi camera')
+        % end
 
         % If using USB Webcam, then try using it
         try
@@ -1474,16 +1474,17 @@ switch action
         set(get_ghandle(Multi),'String','Saving...','Fontsize',32);
         
         %Stop raspberry pi_camera
-        try
-            disp('stopping camera')
-            start_camera(value(RigID),value(RatMenu),value(CurrProtocol),'stop')
-        catch
-            disp('failed to stop pi camera')
-        end
+        % try
+        %     disp('stopping camera')
+        %     start_camera(value(RigID),value(RatMenu),value(CurrProtocol),'stop')
+        % catch
+        %     disp('failed to stop pi camera')
+        % end
 
         % Stop USB Camera
         try
-            closePreview(value(Camera_Obj),value(Camera_Image))
+            closePreview(value(Camera_Obj))
+            clear(value(Camera_Image))
             clear(value(Camera_Obj));
             close(value(Camera_Fig_window));
             disp('USB camera stopped')

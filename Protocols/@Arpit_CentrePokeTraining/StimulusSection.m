@@ -280,12 +280,12 @@ switch action
             stim_max_log = log(value(maxS1));
         end
 
-            dist_type_left  = value(Prob_Dist_Left);
-            dist_mean_left  = value(mean_Left);
-            dist_sigma_left = value(sigma_Left);
-            dist_type_right  = value(Prob_Dist_Right);
-            dist_mean_right  = value(mean_Right);
-            dist_sigma_right = value(sigma_Right);
+            % dist_type_left  = value(Prob_Dist_Left);
+            % dist_mean_left  = value(mean_Left);
+            % dist_sigma_left = value(sigma_Left);
+            % dist_type_right  = value(Prob_Dist_Right);
+            % dist_mean_right  = value(mean_Right);
+            % dist_sigma_right = value(sigma_Right);
             dist_range_multiplier_left = value(sigma_range_Left);
             dist_range_multiplier_right = value(sigma_range_Right);
 
@@ -309,31 +309,34 @@ switch action
 
         
         cla(value(ax))
-        ax_axes = axes(value(ax));
+        x_range = [stim_min_log, value(boundary), stim_max_log];
+        left_range = [edge_min_left edge_max_left];
+        right_range = [edge_min_right edge_max_right];
+        stim_plot_axes = value(ax);
+        
+        StimuliDistribution_plot(obj,stim_plot_axes,x_range,value(Prob_Dist_Left),value(mean_Left),value(sigma_Left),left_range,...
+            value(Prob_Dist_Right),value(mean_Right),value(sigma_Right),right_range);
 
-        plot_stimuliDistribution(ax_axes,[edge_min, value(boundary), edge_max], dist_type_left,dist_mean_left,dist_sigma_left,...
-            [edge_min_left edge_max_left],dist_type_right,dist_mean_right,dist_sigma_right,[edge_min_right edge_max_right]);
+        % plot(xd,stim_min_log,'s','MarkerSize',15,'MarkerEdgeColor',[0 0 0],'LineWidth',2)
+        % hold on
+        % plot(xd,stim_max_log,'s','MarkerSize',15,'MarkerEdgeColor',[0 0 0],'LineWidth',2)
+        % line([0,2], [value(boundary),value(boundary)]);
+        % axis square
+        % set(value(ax),'ytick',([stim_min_log, stim_max_log]),'xtick',xd);
+        % set(value(ax),'yticklabel',([stim_min, stim_max]),'xticklabel','S1');
+        % ylabel('\sigma_1 in log scale','FontSize',16,'FontName','Cambria Math');
+        % set(value(ax),'Fontsize',15)
+        % xlabel('S1','FontSize',16,'FontName','Cambria Math')
 
-        plot(xd,stim_min_log,'s','MarkerSize',15,'MarkerEdgeColor',[0 0 0],'LineWidth',2)
-        hold on
-        plot(xd,stim_max_log,'s','MarkerSize',15,'MarkerEdgeColor',[0 0 0],'LineWidth',2)
-        line([0,2], [value(boundary),value(boundary)]);
-        axis square
-        set(value(ax),'ytick',([stim_min_log, stim_max_log]),'xtick',xd);
-        set(value(ax),'yticklabel',([stim_min, stim_max]),'xticklabel','S1');
-        ylabel('\sigma_1 in log scale','FontSize',16,'FontName','Cambria Math');
-        set(value(ax),'Fontsize',15)
-        xlabel('S1','FontSize',16,'FontName','Cambria Math')
-
-        StimulusSection(obj,'pick_current_stimulus');
-        A1 = value(thisstim);
-
-        %% plot the stimulus;
-        if value(thisstim) > value(boundary)%value(numClass)
-            h1.value=plot(xd,value(A1),'s','color',[0.4 0.8 0.1],'markerfacecolor',[0.4 0.8 0.1],'MarkerSize',15,'LineWidth',3);
-        else
-            h1.value=plot(xd,value(A1),'s','color',[0.8 0.4 0.1],'markerfacecolor',[0.8 0.4 0.1],'MarkerSize',15,'LineWidth',3);
-        end
+        % StimulusSection(obj,'pick_current_stimulus');
+        % A1 = value(thisstim);
+        % 
+        % %% plot the stimulus;
+        % if value(thisstim) > value(boundary)%value(numClass)
+        %     h1.value=plot(xd,value(A1),'s','color',[0.4 0.8 0.1],'markerfacecolor',[0.4 0.8 0.1],'MarkerSize',15,'LineWidth',3);
+        % else
+        %     h1.value=plot(xd,value(A1),'s','color',[0.8 0.4 0.1],'markerfacecolor',[0.8 0.4 0.1],'MarkerSize',15,'LineWidth',3);
+        % end
 
     %% Boundary Calculate
     case 'Cal_Boundary'
