@@ -206,6 +206,33 @@ switch action
     next_row(y);  next_row(y);
     SessionDefinition(obj, 'init', x, y, value(myfig)); next_row(y, 2); %#ok<NASGU>
     
+    %% Before preparing the trial, start with the Bonsai app to control the USB based Camera
+    % Declare the folder location for saving the video files
+    current_dir = cd;
+    ratter_dir = extractBefore(current_dir,'ratter');
+    main_dir_video = [ratter_dir '\ratter_Videos'];
+    date_str = regexprep(char(datetime('today','Format','yyyy-MM-dd')), '[^0-9]', '');
+    video_foldername = sprintf('video_@%s_%s_%s_%s',name,expmtr,ratname,date_str);
+    rat_dir = sprintf('%s\\%s\\%s',main_dir_video,expmtr,ratname);
+    video_save_dir = sprintf('%s\\%s\\%s\\%s',main_dir_video,expmtr,ratname,video_foldername);
+    % We have the general structure of folder save location, now need to
+    % check if there is any other folder for same date. We will add a
+    % alphabet in the end based upon the no. of files present.
+    if exist('rat_dir','folder') == 7
+        folderNames_rat_dir = {listing(find([listing.isdir])).name};
+        folderNames_rat_dir = folderNames_rat_dir(~ismember(folderNames_rat_dir,{'.','..'})); % Remove the '.' and '..' entries (current and parent directories)
+        sessions_today = length(find(contains(folderNames_rat_dir,video_foldername))); % number of folders containing the video foldername
+        video_save_dir = [video_save_dir char(sessions_today + 97)];
+    else
+        video_save_dir = [video_save_dir char(97)];
+    end
+    makedir(video_save_dir);
+    SoloParamHandle(obj, 'Video_Saving_Folder', 'value', video_save_dir);
+
+    Connect_Bonsai_Camera(obj,'init');
+
+    %%
+
     feval(mfilename, obj, 'prepare_next_trial');
          
    %% change_water_modulation_params
@@ -227,7 +254,7 @@ switch action
     % push_helper_vars_tosql(obj,n_done_trials); 
        
        SessionDefinition(obj, 'next_trial');
-       SessionPerformanceSection(obj, 'evaluate');
+       
        StimulusSection(obj,'prepare_next_trial');
        SoundManagerSection(obj, 'send_not_yet_uploaded_sounds');
        [sma, prepare_next_trial_states] = Arpit_CentrePokeTrainingSMA(obj, 'prepare_next_trial');
@@ -252,7 +279,8 @@ switch action
 
    %% trial_completed
    case 'trial_completed'
-       
+    % Update the Metrics Calculated
+    SessionPerformanceSection(obj, 'evaluate');
     % Do any updates in the protocol that need doing:
     feval(mfilename, 'update');
     % And PokesPlot needs completing the trial:
