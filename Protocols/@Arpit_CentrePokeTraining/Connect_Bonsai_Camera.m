@@ -20,8 +20,18 @@ startCommand = "start";       % Use string type. MUST MATCH Bonsai Filter Value
 stopCommand = "stop";         % Use string type. MUST MATCH Bonsai Filter Value
 camera_command_address = "/camera"; % Use string type. MUST MATCH Bonsai Address Value
 recording_command_address = "/record";  % Use string type. MUST MATCH Bonsai Address Value
-bonsai_path = 'C:\Users\Turin\Downloads\Bonsai\Bonsai.exe'; % Path of Bonsai App
-file_path = 'C:\Users\Turin\Desktop\bonsai_script.bonsai';  % Path for .bonsai file 
+
+% bonsai_path = 'C:\Users\Turin\Downloads\Bonsai\Bonsai.exe'; % Path of Bonsai App
+scriptFullPath = mfilename('fullpath'); % Path of running the current script
+scriptDirectory = fileparts(scriptFullPath);
+bonsai_workflow_Path = fullfile(scriptDirectory,'Bonsai','Camera_Control.bonsai');
+foundworkflow = exist("bonsai_workflow_Path",'file');
+% if ~foundworkflow
+%     warning('could not find bonsai executable, please insert it manually');
+%     [fname fpath] = uigetfile( '*.exe', 'Provide the path to Bonsai executable');
+%     pathout = fullfile(fpath, fname);
+% end
+% file_path = 'C:\Users\Turin\Desktop\bonsai_script.bonsai';  % Path for .bonsai file 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -38,9 +48,12 @@ switch action
 
         % Now that we have created the UPD connection, we can send commands
         % over OSC. Before that we need to open the Bonsai App
+        
+        % bonsai_path = bonsaiPath(32);
+        % command = sprintf('"%s" "%s" --start', bonsai_path, bonsai_file_path);
+        % system([command, ' &']);
 
-        command = sprintf('"%s" "%s" --start', bonsai_path, file_path);
-        system([command, ' &']);
+        runBonsaiWorkflow(bonsai_workflow_Path);
 
         % Before starting the streaming of Camera, I need to send the
         % file directory for saving the file otherwise Bonsai can run into
@@ -48,31 +61,37 @@ switch action
         % bonsai and that can conflict with file already present there.
 
         oscMsg_file_directory = createOSCMessage(recording_command_address, [value(Video_Saving_Folder) '\Trial.avi']);
-        write(udpSender, oscMsg_file_directory, "uint8", bonsaiComputerIP,bonsaiUdpPort);
+        % write(udpSender, oscMsg_file_directory, "uint8", bonsaiComputerIP,bonsaiUdpPort);
 
        % OSC message to start the camera
         oscMsg_Camera_start = createOSCMessage(camera_command_address, startCommand);
         % the command to send message to Bonsai
         write(udpSender, oscMsg_Camera_start, "uint8", bonsaiComputerIP,bonsaiUdpPort);
+        pause(2);
+        write(udpSender, oscMsg_Camera_start, "uint8", bonsaiComputerIP,bonsaiUdpPort);
 
+        pause(5);
         % NOTE: Ideally I should start saving the trials once the experimenter presses 
         % Run either on dispatcher or Runrats. But, I dont want to make the changes there
         % so would start recording as soon as the protocol is loaded and camera starts streaming 
+
+        write(udpSender, oscMsg_file_directory, "uint8", bonsaiComputerIP,bonsaiUdpPort);
 
     case 'next_trial'
         
         % in this I send a command to bonsai so that it creates a new file
         % for each trial
 
-        filename = sprintf('%s//%s//%s',work_dir,exp_name,rat_name);
-        oscMsg_filename = createOSCMessage(recording_command_address, filename);
-        write(value(udpSender), oscMsg_filename, "uint8", bonsaiComputerIP,bonsaiUdpPort);
+        oscMsg_file_directory = createOSCMessage(recording_command_address, [value(Video_Saving_Folder) '\Trial.avi']);
+        write(value(UDPSender), oscMsg_file_directory, "uint8", bonsaiComputerIP,bonsaiUdpPort);
 
     case 'close'
             
         % this would stop the workflow
         oscMsg_Camera_stop = createOSCMessage("/camera", stopCommand);
-        write(value(udpSender), oscMsg_Camera_stop, "uint8", bonsaiComputerIP,bonsaiUdpPort);
+        write(value(UDPSender), oscMsg_Camera_stop, "uint8", bonsaiComputerIP,bonsaiUdpPort);
+
+        delete(value(UDPSender)); % delete the UDP Port
 
         % this is to kill the Bonsai app
         system('taskkill /F /IM Bonsai.exe');
@@ -125,12 +144,12 @@ function runBonsaiWorkflow(workflowPath, addOptArray, bonsaiExePath, external)
 %% check the input
 switch nargin
     case 1
-        bonsaiExePath = bonsaiPath(64);
+        bonsaiExePath = bonsaiPath(32);
         addOptArray = '';
         addFlag = 0;
         external = 1;
     case 2
-        bonsaiExePath = bonsaiPath(64);
+        bonsaiExePath = bonsaiPath(32);
         addFlag = 1;
         external = 1;
     case 3
@@ -138,7 +157,7 @@ switch nargin
         external = 1;
     case 4
         if isempty(bonsaiExePath)
-            bonsaiExePath = bonsaiPath(64);
+            bonsaiExePath = bonsaiPath(32);
         end
         addFlag = 1;
         
@@ -199,16 +218,18 @@ switch x64x86
         bonsaiEXE = 'Bonsai.exe';
 end
 
-dirs = {'appdata', 'localappdata', 'programfiles', 'programfiles(x86)',...
-    'C:\Software\Bonsai.Packages\Externals\Bonsai\Bonsai.Editor\bin\x86\Release',...
-    'C:\Software\Bonsai.Packages\Externals\Bonsai\Bonsai.Editor\bin\x64\Release'...
-    };
+dirs = {'appdata', 'localappdata', 'programfiles', 'programfiles(x86)','USERPROFILE'};
 foundBonsai = 0;
 dirIDX = 1;
 while ~foundBonsai && (dirIDX <= length(dirs))
-    pathout = fullfile(getenv(dirs{dirIDX}),'Bonsai', bonsaiEXE);    
+    pathout = fullfile(getenv(dirs{dirIDX}),'Bonsai', bonsaiEXE);  
     foundBonsai = exist(pathout, 'file');
     dirIDX = dirIDX +1;
+end
+
+if ~foundBonsai
+    pathout = fullfile(getenv(dirs{5}),'Desktop',bonsaiEXE);
+    foundBonsai = exist(pathout, 'file');
 end
 
 if ~foundBonsai

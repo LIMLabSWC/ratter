@@ -341,7 +341,7 @@ switch action
         
         cla(value(ax))
         
-        StimuliDistribution_plot(value(ax),[stim_min_log, value(boundary), stim_max_log], ...
+        StimuliDistribution_plot(value(ax),[stim_min_log, value(boundary), stim_max_log], Rule, ...
             value(Prob_Dist_Left),value(mean_Left),value(sigma_Left),[edge_min_left edge_max_left], ...
             value(Prob_Dist_Right),value(mean_Right),value(sigma_Right),[edge_min_right edge_max_right]);
 
@@ -349,7 +349,7 @@ switch action
         xline([stim_min_log value(boundary) stim_max_log],'-',{'Stim Min','Boundary','Stim Max'});
 
         ylabel('log_e A','FontSize',16,'FontName','Cambria Math');
-        set(ax,'Fontsize',15)
+        set(value(ax),'Fontsize',15)
         xlabel('Sound Categorization','FontSize',16,'FontName','Cambria Math')
 
         % plot(xd,stim_min_log,'s','MarkerSize',15,'MarkerEdgeColor',[0 0 0],'LineWidth',2)
