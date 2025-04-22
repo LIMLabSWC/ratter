@@ -59,9 +59,10 @@ switch action
 
 
         %% Setup sounds
-        sone_sound_id     = SoundManagerSection(obj, 'get_sound_id', 'SOneSound');
-        stwo_sound_id     = SoundManagerSection(obj, 'get_sound_id', 'STwoSound');
-        A1_sound_id       = SoundManagerSection(obj, 'get_sound_id', 'StimAUD1');
+
+        sone_sound_id     = SoundManagerSection(obj, 'get_sound_id', 'SOneSound'); % fixed sound for 1 side
+        stwo_sound_id     = SoundManagerSection(obj, 'get_sound_id', 'STwoSound'); % fixed sound for other side
+        A1_sound_id       = SoundManagerSection(obj, 'get_sound_id', 'StimAUD1'); % distribution based sound
         sound_duration    = value(A1_time); % SoundManagerSection(obj, 'get_sound_duration', 'SOneSound');
         go_sound_id       = SoundManagerSection(obj, 'get_sound_id', 'GoSound');
         go_cue_duration   = value(time_go_cue); % SoundManagerSection(obj, 'get_sound_duration', 'GoSound');
@@ -93,7 +94,7 @@ switch action
         sma = StateMachineAssembler('full_trial_structure','use_happenings', 1);
 
         % scheduled wave for stimuli/fixed sound, based upon side
-        if stimuli_on && value(training_stage) > 5
+        if stimuli_on
             sma = add_scheduled_wave(sma, 'name', 'stimplay', 'preamble', PreStim_time, ...
                 'sustain', sound_duration, 'sound_trig', A1_sound_id); % to play a sound before Go Cue
         else

@@ -45,7 +45,7 @@ switch action
         next_row(y);
         % Centre Poke
 		next_row(y);
-        NumeditParam(obj, 'cp_timeout', 5, x,y, 'TooltipString','Time from trial start for rat to centre poke else timeout');
+        NumeditParam(obj, 'cp_timeout', 120, x,y, 'TooltipString','Time from trial start for rat to centre poke else timeout');
         next_row(y);
 		NumeditParam(obj, 'legal_cbreak', 0.1, x,y, 'TooltipString','Time in sec for which it is ok to be outside the center port before a violation occurs.');
         next_row(y);
