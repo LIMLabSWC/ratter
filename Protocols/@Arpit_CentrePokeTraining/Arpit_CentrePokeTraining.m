@@ -210,15 +210,15 @@ switch action
     % Declare the folder location for saving the video files
     current_dir = cd;
     ratter_dir = extractBefore(current_dir,'ratter');
-    main_dir_video = [ratter_dir '\ratter_Videos'];
+    main_dir_video = [ratter_dir 'ratter_Videos'];
     date_str = regexprep(char(datetime('today','Format','yyyy-MM-dd')), '[^0-9]', '');
-    video_foldername = sprintf('video_@%s_%s_%s_%s',name,expmtr,ratname,date_str);
-    rat_dir = sprintf('%s\\%s\\%s',main_dir_video,expmtr,ratname);
-    video_save_dir = sprintf('%s\\%s\\%s\\%s',main_dir_video,expmtr,ratname,video_foldername);
+    video_foldername = sprintf('video_@%s_%s_%s_%s',name,expmtr,rname,date_str);
+    rat_dir = sprintf('%s\\%s\\%s',main_dir_video,expmtr,rname);
+    video_save_dir = sprintf('%s\\%s\\%s\\%s',main_dir_video,expmtr,rname,video_foldername);
     % We have the general structure of folder save location, now need to
     % check if there is any other folder for same date. We will add a
     % alphabet in the end based upon the no. of files present.
-    if exist('rat_dir','folder') == 7
+    if exist('rat_dir','dir') == 7
         folderNames_rat_dir = {listing(find([listing.isdir])).name};
         folderNames_rat_dir = folderNames_rat_dir(~ismember(folderNames_rat_dir,{'.','..'})); % Remove the '.' and '..' entries (current and parent directories)
         sessions_today = length(find(contains(folderNames_rat_dir,video_foldername))); % number of folders containing the video foldername
@@ -226,9 +226,10 @@ switch action
     else
         video_save_dir = [video_save_dir char(97)];
     end
-    makedir(video_save_dir);
+    mkdir(video_save_dir);
     SoloParamHandle(obj, 'Video_Saving_Folder', 'value', video_save_dir);
-
+    SoloFunctionAddVars('Connect_Bonsai_Camera', 'ro_args', ...
+			{'Video_Saving_Folder'});
     Connect_Bonsai_Camera(obj,'init');
 
     %%
@@ -279,6 +280,8 @@ switch action
 
    %% trial_completed
    case 'trial_completed'
+    % Change the video trial  
+    Connect_Bonsai_Camera(obj,'next_trial');
     % Update the Metrics Calculated
     SessionPerformanceSection(obj, 'evaluate');
     % Do any updates in the protocol that need doing:
@@ -296,7 +299,7 @@ switch action
     PokesPlotSection(obj, 'close');
 	ParamsSection(obj, 'close');
     StimulusSection(obj,'close');
-    
+    Connect_Bonsai_Camera(obj,'close');
     if exist('myfig', 'var') && isa(myfig, 'SoloParamHandle') && ishandle(value(myfig)) %#ok<NODEF>
       delete(value(myfig));
     end
