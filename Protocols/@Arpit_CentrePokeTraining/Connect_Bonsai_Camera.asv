@@ -86,7 +86,6 @@ switch action
         write(value(UDPSender), oscMsg_file_directory, "uint8", bonsaiComputerIP,bonsaiUdpPort);
 
     case 'stop'
-       
         % this stops saving and streaming of the camera
         oscMsg_Camera_stop = createOSCMessage("/camera", stopCommand);
         write(value(UDPSender), oscMsg_Camera_stop, "uint8", bonsaiComputerIP,bonsaiUdpPort);
