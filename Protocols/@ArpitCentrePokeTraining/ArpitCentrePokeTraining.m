@@ -1,7 +1,7 @@
-% Arpit_CentrePokeTraining protocol
+% ArpitCentrePokeTraining protocol
 % Arpit, 12 March 2025
 
-function [obj] = Arpit_CentrePokeTraining(varargin)
+function [obj] = ArpitCentrePokeTraining(varargin)
 
 % Default object is of our own class (mfilename);
 % we inherit only from Plugins
@@ -170,7 +170,7 @@ switch action
     
     % For plotting with the pokesplot plugin, we need to tell it what
     % colors to plot with:
-    my_state_colors = Arpit_CentrePokeTrainingSMA(obj, 'get_state_colors');
+    my_state_colors = ArpitCentrePokeTrainingSMA(obj, 'get_state_colors');
     % In pokesplot, the poke colors have a default value, so we don't need
     % to specify them, but here they are so you know how to change them.
     my_poke_colors = struct( ...
@@ -201,7 +201,7 @@ switch action
     
     [x, y] = StimulusSection(obj,'init',x,y);
 
-    Arpit_CentrePokeTrainingSMA(obj, 'init');
+    ArpitCentrePokeTrainingSMA(obj, 'init');
    
     next_row(y);  next_row(y);
     SessionDefinition(obj, 'init', x, y, value(myfig)); next_row(y, 2); %#ok<NASGU>
@@ -259,7 +259,7 @@ switch action
        
        StimulusSection(obj,'prepare_next_trial');
        SoundManagerSection(obj, 'send_not_yet_uploaded_sounds');
-       [sma, prepare_next_trial_states] = Arpit_CentrePokeTrainingSMA(obj, 'prepare_next_trial');
+       [sma, prepare_next_trial_states] = ArpitCentrePokeTrainingSMA(obj, 'prepare_next_trial');
 
     % Default behavior of following call is that every 20 trials, the data
     % gets saved, not interactive, no commit to CVS.

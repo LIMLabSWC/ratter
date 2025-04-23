@@ -156,7 +156,7 @@ switch action
 			'and uses hitfrac to adjust the water times']));
 		
 		next_row(y);
-		SoloFunctionAddVars('Arpit_CentrePokeTrainingSMA', 'ro_args', ...
+		SoloFunctionAddVars('ArpitCentrePokeTrainingSMA', 'ro_args', ...
 			{'CP_duration';'SideLed_duration'; 'stimuli_on';...
 			'RewardCollection_duration';'training_stage'; ...
 			'legal_cbreak' ; 'SettlingIn_time'; 'time_go_cue'; ...
@@ -217,7 +217,7 @@ switch action
         end
 
             [stage_fig_x,stage_fig_y] = Training_ParamsSection(obj, 'reinit', value(stage_fig_x),value(stage_fig_y)); % update the training params as well
-            Arpit_CentrePokeTrainingSMA(obj,'reinit');
+            ArpitCentrePokeTrainingSMA(obj,'reinit');
             SessionPerformanceSection(obj, 'evaluate');
            
             switch value(training_stage)

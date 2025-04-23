@@ -1,4 +1,4 @@
-function  [varargout] =  Arpit_CentrePokeTrainingSMA(obj, action)
+function  [varargout] =  ArpitCentrePokeTrainingSMA(obj, action)
 
 %%%%%%%%%%%%%%%%%%% TRAINING STAGES %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
