@@ -532,10 +532,15 @@ switch action
 
     %% Case close
     case 'close'
+        set(value(myfig), 'Visible', 'off');
+        set(value(stim_dist_fig), 'Visible', 'off');
         % Delete all SoloParamHandles who belong to this object and whose
         % fullname starts with the name of this mfile:
         if exist('myfig', 'var') && isa(myfig, 'SoloParamHandle') && ishandle(value(myfig)) %#ok<NODEF>
             delete(value(myfig));
+        end
+        if exist('stim_dist_fig', 'var') && isa(stim_dist_fig, 'SoloParamHandle') && ishandle(value(stim_dist_fig)) %#ok<NODEF>
+            delete(value(stim_dist_fig));
         end
         delete_sphandle('owner', ['^@' class(obj) '$'], ...
             'fullname', ['^' mfilename]);

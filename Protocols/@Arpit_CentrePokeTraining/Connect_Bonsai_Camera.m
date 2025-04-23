@@ -54,7 +54,7 @@ switch action
         % system([command, ' &']);
 
         runBonsaiWorkflow(bonsai_workflow_Path);
-
+        pause(5);
         % Before starting the streaming of Camera, I need to send the
         % file directory for saving the file otherwise Bonsai can run into
         % error as it will try saving files in the predefined folder in
@@ -67,9 +67,7 @@ switch action
         oscMsg_Camera_start = createOSCMessage(camera_command_address, startCommand);
         % the command to send message to Bonsai
         write(udpSender, oscMsg_Camera_start, "uint8", bonsaiComputerIP,bonsaiUdpPort);
-        pause(2);
-        write(udpSender, oscMsg_Camera_start, "uint8", bonsaiComputerIP,bonsaiUdpPort);
-
+        
         pause(5);
         % NOTE: Ideally I should start saving the trials once the experimenter presses 
         % Run either on dispatcher or Runrats. But, I dont want to make the changes there
@@ -99,8 +97,9 @@ switch action
 
         delete(value(UDPSender)); % delete the UDP Port
 
-        % this is to kill the Bonsai app
+        % this is to kill the Bonsai app and cmd
         system('taskkill /F /IM Bonsai.exe');
+        system('taskkill /F /IM cmd.exe');
 
 
 end

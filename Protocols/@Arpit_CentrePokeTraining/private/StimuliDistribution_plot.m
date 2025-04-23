@@ -164,5 +164,7 @@ else
 end
 
 plot(ax,plot_x,plot_y,'b','LineWidth', 2);
+ylim(ax,[0 max(plot_y)]);
+xlim(ax,[min(plot_x) max(plot_x)])
 
 end
