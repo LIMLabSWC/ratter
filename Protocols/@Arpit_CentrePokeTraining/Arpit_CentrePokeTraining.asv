@@ -219,7 +219,6 @@ switch action
     % check if there is any other folder for same date. We will add a
     % alphabet in the end based upon the no. of files present.
     if exist(rat_dir,'dir') == 7
-        listing = dir(rat_dir);
         folderNames_rat_dir = {listing(find([listing.isdir])).name};
         folderNames_rat_dir = folderNames_rat_dir(~ismember(folderNames_rat_dir,{'.','..'})); % Remove the '.' and '..' entries (current and parent directories)
         sessions_today = length(find(contains(folderNames_rat_dir,video_foldername))); % number of folders containing the video foldername
@@ -310,7 +309,7 @@ switch action
       %% end_session
    case 'end_session'
       prot_title.value = [value(prot_title) ', Ended at ' datestr(now, 'HH:MM')];
-      Connect_Bonsai_Camera(obj,'stop'); % Stopping the cameras
+    
       
       %% pre_saving_settings
    case 'pre_saving_settings'
