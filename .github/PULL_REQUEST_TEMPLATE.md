@@ -17,6 +17,7 @@ Please include a summary of the changes made. Include any relevant context, scre
 - [ ] I have added necessary tests to cover the changes.
 - [ ] I have followed the code style guidelines.
 - [ ] I have verified that the code works in all target environments.
+- [ ] I have made sure the technicians are comfortable using the new feature (if applicable).
 
 ### Related Issues
 
