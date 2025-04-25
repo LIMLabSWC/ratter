@@ -1,25 +1,26 @@
 % REMOVE THE SETTINGS/PRE OPENED GUI
-try
-    flush
-catch
-end
+ flush
 
 % START FRESH & SET THE REQUIRED DIRECTORY
-getenv('USERPROFILE');
-getenv('HOMEDRIVE');
-getenv("SYSTEMROOT");
 
+home_drive = getenv('HOMEDRIVE');
 current_dir = cd;
 ratter_dir = extractBefore(current_dir,'ratter');
-ratter_modules_dir = fullfile(ratter_dir, 'ratter', 'ExperPort');
-cd(ratter_modules_dir);
+ratter_modules_dir1 = fullfile(ratter_dir, 'ratter', 'ExperPort');
+ratter_modules_dir2 = fullfile(home_drive, 'ratter', 'ExperPort');
+if exist("ratter_modules_dir1",'dir') == 7
+    cd(ratter_modules_dir1);
+else
+    cd(ratter_modules_dir2);
+end
 
 % START BPOD
 
 % Identify the bpod port before starting
-bpodPort = getOrSetCOMPort();
-disp(['Using COM Port: ' bpodPort]);
-bpod(bpodPort);
+% bpodPort = getOrSetCOMPort();
+% disp(['Using COM Port: ' bpodPort]);
+Bpod;
+% Bpod(bpodPort);
 newstartup;
 
 % PRESENT THE USER WITH THE CHOICE OF EXPERIMENTER/RAT
@@ -61,7 +62,7 @@ subOptions = map(experimenter);
 clf(figHandle);  % Clear previous buttons
 
 % Create new buttons and assign second-level callback
-newButtons = createButtons(figHandle, subOptions, @(src2, ~) subButtonCallback(src2,experimenter,fig));
+newButtons = createButtons(figHandle, subOptions, @(src2, ~) subButtonCallback(src2,experimenter,figHandle));
 
 % Update resize function
 set(figHandle, 'ResizeFcn', @(src, ~) resizeButtons(src, newButtons));
@@ -72,6 +73,7 @@ function subButtonCallback(src,experimenter_name,figHandle)
 rat_name = src.String;
 close(figHandle);
 runrats('init');
+pause(3);
 runrats('update exp_rat_userclick',experimenter_name,rat_name);
 end
 

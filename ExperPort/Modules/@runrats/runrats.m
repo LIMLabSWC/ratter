@@ -751,15 +751,17 @@ switch action
 % doesn't effect the running of the other cases/functions
     case 'update exp_rat_userclick'
         
-        ExpMenu.value = selected_exp;
-        runrats(obj,'update_ratmenu',selectedrat);
+        ExpMenu.value = varargin{1};
+        runrats(obj,'update_ratmenu',varargin{2});
         %If the rat has changed, let's update it.
-        if ~strcmp(value(RatMenu),selectedrat)
+        if ~strcmp(value(RatMenu),varargin{2})
             runrats(obj,'update_rat',value(InLiveLoop)); %#ok<NODEF>
         else
             %Stay in the loop if we haven't changed anything
             InLiveLoop.value = 1;
         end
+        
+        runrats(obj,'begin_load_protocol');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     case 'update_tech_instructions'
         %% update_tech_instructions
