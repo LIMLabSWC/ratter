@@ -24,7 +24,7 @@ recording_command_address = "/record";  % Use string type. MUST MATCH Bonsai Add
 % bonsai_path = 'C:\Users\Turin\Downloads\Bonsai\Bonsai.exe'; % Path of Bonsai App
 scriptFullPath = mfilename('fullpath'); % Path of running the current script
 scriptDirectory = fileparts(scriptFullPath);
-bonsai_workflow_Path = fullfile(scriptDirectory,'Bonsai','Camera_Control.bonsai');
+bonsai_workflow_Path = fullfile(scriptDirectory,'Bonsai_Camera_Control','Camera_Control.bonsai');
 foundworkflow = exist("bonsai_workflow_Path",'file');
 % if ~foundworkflow
 %     warning('could not find bonsai executable, please insert it manually');
