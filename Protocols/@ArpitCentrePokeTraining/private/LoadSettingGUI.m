@@ -40,7 +40,7 @@ fig = figure('Name', 'Dynamic Button GUI', ...
     'Color', [0.9 0.9 0.9]);
 
 % Create main buttons with resize callback
-buttonHandles = createButtons(fig, mainOptions, @(src, ~) mainButtonCallback(src, Exp_Rat_Map, fig));
+buttonHandles = createButtons(fig, Experimenter_Name, @(src, ~) mainButtonCallback(src, Exp_Rat_Map, fig));
     
     % Setup resize behavior
     set(fig, 'ResizeFcn', @(src, ~) resizeButtons(src, buttonHandles));
@@ -52,17 +52,16 @@ buttonHandles = createButtons(fig, mainOptions, @(src, ~) mainButtonCallback(src
         clf(figHandle);  % Clear previous buttons
 
         % Create new buttons and assign second-level callback
-        newButtons = createButtons(figHandle, subOptions, @(src2, ~) subButtonCallback(src2,experimenter));
+        newButtons = createButtons(figHandle, subOptions, @(src2, ~) subButtonCallback(src2,experimenter,fig));
         
         % Update resize function
         set(figHandle, 'ResizeFcn', @(src, ~) resizeButtons(src, newButtons));
     end
 
     % === Final action when second-level button is clicked ===
-    function subButtonCallback(src,exp_name)
+    function subButtonCallback(src,exp_name,figHandle)
         rat_name = src.String;
-        msgbox(['You selected: ' rat_name], 'Choice');
-        % You can call a custom function here instead of msgbox
+        close(figHandle);
         Run_Runrats(exp_name, rat_name)
     end
 end
@@ -106,9 +105,67 @@ end
 
 
 function Run_Runrats(experimenter_name, rat_name)
-
-bpod('');
+% Identify the bpod port before starting
+bpodPort = getOrSetCOMPort();
+disp(['Using COM Port: ' bpodPort]);
+bpod(bpodPort);
 newstartup;
 runrats('init');
+runrats('update exp_rat_userclick',experimenter_name,rat_name);
 
 end
+
+function comPort = getOrSetCOMPort()
+    configFile = fullfile(fileparts(mfilename('fullpath')), 'com_config.mat');
+    maxAttempts = 3;
+    success = false;
+
+    % Try existing config or prompt
+    if exist(configFile, 'file')
+        data = load(configFile, 'comPort');
+        comPort = data.comPort;
+    else
+        comPort = promptForPort();
+    end
+
+    % Try to validate and possibly retry
+    for attempt = 1:maxAttempts
+        try
+            s = serialport(comPort, 9600);  % test connection
+            clear s;  % close it immediately
+            success = true;
+            break;
+        catch
+            fprintf('[Warning] Failed to open %s. Please select a different COM port.\n', comPort);
+            comPort = promptForPort();
+        end
+    end
+
+    if ~success
+        error('Failed to find a valid COM port after %d attempts.', maxAttempts);
+    end
+
+    % Save the working port
+    save(configFile, 'comPort');
+end
+
+function comPort = promptForPort()
+    availablePorts = serialportlist("available");
+
+    if isempty(availablePorts)
+        warning('No serial ports detected. Enter manually.');
+        comPort = input('Enter COM port manually (e.g., COM3): ', 's');
+    else
+        fprintf('Available COM ports:\n');
+        for i = 1:numel(availablePorts)
+            fprintf('  %d: %s\n', i, availablePorts(i));
+        end
+        idx = input('Select COM port number: ');
+        if isnumeric(idx) && idx >= 1 && idx <= numel(availablePorts)
+            comPort = availablePorts(idx);
+        else
+            comPort = input('Enter COM port manually (e.g., COM3): ', 's');
+        end
+    end
+end
+
