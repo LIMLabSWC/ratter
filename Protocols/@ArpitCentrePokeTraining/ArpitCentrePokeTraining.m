@@ -166,28 +166,14 @@ switch action
 	%AthenaSMA changed to SoundCatSMA (From AthenaDelayComp)
     SoloFunctionAddVars('ParamsSection', 'ro_args', ...
 			{'maxasymp';'slp';'inflp';'minasymp';'assym'});
-    [x, y] = WaterValvesSection(obj,  'init', x, y);
     
-    % For plotting with the pokesplot plugin, we need to tell it what
-    % colors to plot with:
-    my_state_colors = ArpitCentrePokeTrainingSMA(obj, 'get_state_colors');
-    % In pokesplot, the poke colors have a default value, so we don't need
-    % to specify them, but here they are so you know how to change them.
-    my_poke_colors = struct( ...
-    'L',                  0.6*[1 0.66 0],    ...
-    'C',                      [0 0 0],       ...
-    'R',                  0.9*[1 0.66 0]);
-    
-    [x, y] = PokesPlotSection(obj, 'init', x, y, ...
-    struct('states',  my_state_colors, 'pokes', my_poke_colors)); next_row(y);
-
-    [x, y] = CommentsSection(obj, 'init', x, y);
-    % [x, y] = PunishmentSection(obj, 'init', x, y); %#ok<NASGU>
-    
+    [x, y] = WaterValvesSection(obj,  'init', x, y); 
+    [x, y] = PokesPlotSection(obj, 'init', x, y); 
+    next_row(y);
+    [x, y] = CommentsSection(obj, 'init', x, y); 
     next_column(x); y=5; 
 	[x, y] = SessionPerformanceSection(obj, 'init', x, y);
-	[x, y] = ParamsSection(obj,  'init', x, y); %#ok<NASGU>
-    
+	[x, y] = ParamsSection(obj,  'init', x, y); %#ok<NASGU>   
     [x, y] = SoundSection(obj,'init',x,y);   
     [stage_fig_x,stage_fig_y] = Training_ParamsSection(obj, 'init', x, y);
     SoloParamHandle(obj, 'stage_fig_x', 'value', stage_fig_x);

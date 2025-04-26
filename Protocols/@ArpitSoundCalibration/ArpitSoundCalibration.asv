@@ -218,7 +218,7 @@ switch action
         line_names = [];
 
         % Iterate through each line group
-        
+        for i = 1:numel(linegroups)
             % Check if current group exists and has valid parameters
             if ~isempty(linegroups{i}) && ~isempty(linegroups{i}{1,2})
                 % port label position

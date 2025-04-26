@@ -19,8 +19,8 @@ end
 % Identify the bpod port before starting
 % bpodPort = getOrSetCOMPort();
 % disp(['Using COM Port: ' bpodPort]);
-Bpod;
 % Bpod(bpodPort);
+Bpod;
 newstartup;
 
 % PRESENT THE USER WITH THE CHOICE OF EXPERIMENTER/RAT
