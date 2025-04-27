@@ -106,7 +106,9 @@ function [x, y, z] = SavingSection(obj, action, x, y, varargin)
       SoloParamHandle(obj, 'settings_file_load_time', 'value', settings_file_load_time_num);
       
       EditParam(obj, 'experimenter', 'experimenter', x, y); next_row(y, 1.5);
+      set_callback(experimenter, {mfilename, 'set'});
       EditParam(obj, 'ratname', 'ratname', x, y); next_row(y, 1.5);
+      set_callback(ratname, {mfilename, 'set'});
       
       PushbuttonParam(obj, 'loadsets', x, y, 'label', 'Load Settings');
       set_callback(loadsets, {mfilename, 'loadsets'});
