@@ -765,8 +765,7 @@ switch action
 
         % Added to send the details about the experimenter and rat
     case 'exp_rat_names'
-        varargout{1} = value(ExpMenu);
-        varargout{2} = value(RatMenu);
+        x = value(ExpMenu.value)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     case 'update_tech_instructions'
         %% update_tech_instructions
