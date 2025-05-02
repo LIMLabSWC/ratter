@@ -1956,10 +1956,13 @@ try
             
             return_structure = value(GLOBAL_HELPER_VAR_NAME_LIST);
             if ~isempty(return_structure)
-                for ctr = 1:length(return_structure)
-                    assert(logical(exist(return_structure(ctr).var_name, 'var')) && isa(eval(return_structure(ctr).var_name), 'SoloParamHandle'))
-                    return_structure(ctr).current_value = value(eval(return_structure(ctr).var_name));
-                    return_structure(ctr).history = get_history(eval(return_structure(ctr).var_name));
+                try
+                    for ctr = 1:length(return_structure)
+                        assert(logical(exist(return_structure(ctr).var_name, 'var')) && isa(eval(return_structure(ctr).var_name), 'SoloParamHandle'))
+                        return_structure(ctr).current_value = value(eval(return_structure(ctr).var_name));
+                        return_structure(ctr).history = get_history(eval(return_structure(ctr).var_name));
+                    end
+                catch
                 end
             end
             varargout{1} = return_structure;
