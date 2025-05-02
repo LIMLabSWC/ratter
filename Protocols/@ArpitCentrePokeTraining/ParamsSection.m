@@ -92,6 +92,9 @@ switch action
 		DispParam(obj, 'Total_CP_duration', CP_duration+time_go_cue, x, y, 'TooltipString', 'Total expected(rat can poke out anytime after Go cue onset) nose in center port time, in secs. Sum of CP_duration and Go Cue duration'); %#ok<*NODEF>
 		
         next_row(y);
+        ToggleParam(obj, 'Go_Sound', 1, x, y, 'OnString', 'Play Reward Sound', 'OffString', 'No Reward Sound','TooltipString', ...
+			'If 1 (black), sound is played for intial 2 stages of light chasing; if 0 (brown), leave sound off');
+        next_row(y);
         ToggleParam(obj, 'stimuli_on', 0, x,y,...
         'OnString', 'Use Stimuli',...
         'OffString', 'Fixed Sound',...
@@ -162,7 +165,7 @@ switch action
 			'legal_cbreak' ; 'SettlingIn_time'; 'time_go_cue'; ...
             'A1_time';'time_bet_aud1_gocue' ; 'PreStim_time';
 			'drink_time';'reward_delay';'antibias_wtr_mult';...
-			'cp_timeout';'timeout_iti';'violation_iti'});
+			'cp_timeout';'timeout_iti';'violation_iti';'Go_Sound'});
         
         
 		SoloFunctionAddVars('SessionPerformanceSection', 'ro_args', ...
@@ -291,6 +294,13 @@ switch action
             end
 
 	case 'prepare_next_trial'
+
+        % change the reward collection duration once we start with centre
+        % poke
+        if value(training_stage) >=  3
+            RewardCollection_duration.value = 6;
+            Go_Sound.value = 1;
+        end
 		            
         if value(training_stage) ==  8 % user setting
 
