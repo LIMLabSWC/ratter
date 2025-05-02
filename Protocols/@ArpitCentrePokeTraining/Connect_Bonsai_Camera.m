@@ -92,14 +92,14 @@ switch action
        % OSC message to start the camera
         oscMsg_Camera_start = createOSCMessage(camera_command_address, startCommand);
         % the command to send message to Bonsai
-        write(udpSender, oscMsg_Camera_start, "uint8", bonsaiComputerIP,bonsaiUdpPort);
+        write(value(UDPSender), oscMsg_Camera_start, "uint8", bonsaiComputerIP,bonsaiUdpPort);
         
         pause(3);
         % NOTE: Ideally I should start saving the trials once the experimenter presses 
         % Run either on dispatcher or Runrats. But, I dont want to make the changes there
         % so would start recording as soon as the protocol is loaded and camera starts streaming 
 
-        write(udpSender, oscMsg_file_directory, "uint8", bonsaiComputerIP,bonsaiUdpPort);
+        write(value(UDPSender), oscMsg_file_directory, "uint8", bonsaiComputerIP,bonsaiUdpPort);
 
     case 'stop'
        
