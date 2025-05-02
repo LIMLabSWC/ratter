@@ -39,7 +39,7 @@ switch action
 		NumeditParam(obj, 'violation_iti', 1, x,y,'label','Violation Timeout','TooltipString','Center poke violation duration');
         % Reward Collection
         next_row(y);
-		NumeditParam(obj, 'RewardCollection_duration', 6, x,y,'label','RewardCollection_dur','TooltipString','Wait until rat collects the reward else a timeout');
+		NumeditParam(obj, 'RewardCollection_duration', 300, x,y,'label','RewardCollection_dur','TooltipString','Wait until rat collects the reward else a timeout');
 		next_row(y);
 		NumeditParam(obj, 'SideLed_duration', 1, x,y,'label','Side LED duration','TooltipString','Duration of SideLed');
         next_row(y);

@@ -25,8 +25,8 @@ switch action
 
             case 2
              % STAGE RUNNING PARAMETERS
-            NumeditParam(obj, 'max_rColl_dur', 15, x, y,'label','T_Max_RCollect','TooltipString','User given max water collect time(code will optimize for value below this)'); next_row(y);
-            NumeditParam(obj, 'min_rColl_dur', 5, x, y,'label','T_Min_RCollect','TooltipString','User given min water collect time(code will optimize for value above this)'); next_row(y);
+            NumeditParam(obj, 'max_rColl_dur', 300, x, y,'label','T_Max_RCollect','TooltipString','User given max water collect time(code will optimize for value below this)'); next_row(y);
+            NumeditParam(obj, 'min_rColl_dur', 100, x, y,'label','T_Min_RCollect','TooltipString','User given min water collect time(code will optimize for value above this)'); next_row(y);
             SubheaderParam(obj, 'title', 'Stage Params', x, y); next_row(y);
             % COMPLETION TEST PARAMETERS
             NumeditParam(obj, 'total_trials', 1000, x, y,'label','Trials','TooltipString','total trials in this stage for its completion'); next_row(y);
