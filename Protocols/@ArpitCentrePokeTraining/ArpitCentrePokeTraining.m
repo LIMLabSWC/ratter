@@ -171,6 +171,14 @@ switch action
     [x, y] = PokesPlotSection(obj, 'init', x, y); 
     next_row(y);
     [x, y] = CommentsSection(obj, 'init', x, y); 
+    next_row(y);
+    ToggleParam(obj, 'Connect_Camera', 1, x,y,...
+        'OnString', 'Camera On',...
+        'OffString', 'Camera Off',...
+        'TooltipString', sprintf('If on (black) then it enables to start the camera \n',...
+                                 'Only press if camera does not start on its own.'));
+        set_callback(Connect_Camera, {mfilename, 'camera_control'});
+
     next_column(x); y=5; 
 	[x, y] = SessionPerformanceSection(obj, 'init', x, y);
 	[x, y] = ParamsSection(obj,  'init', x, y); %#ok<NASGU>   
@@ -187,13 +195,6 @@ switch action
     
     [x, y] = StimulusSection(obj,'init',x,y);
     
-    ToggleParam(obj, 'Connect_Camera', 1, x,y,...
-        'OnString', 'Camera On',...
-        'OffString', 'Camera Off',...
-        'TooltipString', sprintf('If on (black) then it enables to start the camera \n',...
-                                 'Only press if camera does not start on its own.'));
-        set_callback(Connect_Camera, {mfilename, 'camera_control'});
-
     ArpitCentrePokeTrainingSMA(obj, 'init');
    
     next_row(y);  next_row(y);
