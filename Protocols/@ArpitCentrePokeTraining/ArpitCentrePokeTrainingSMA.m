@@ -109,8 +109,13 @@ switch action
             sma = add_scheduled_wave(sma, 'name', 'CP_Duration_wave', 'preamble', CP_duration - SettlingIn_time); % total length of centre poke minus the inital fidgety time to consider success
         end
 
-        sma = add_scheduled_wave(sma, 'name', 'Go_Cue', 'preamble', 0.001, ...
-            'sustain', go_cue_duration, 'sound_trig', go_sound_id); % to play the Go Cue/Reward Sound
+        if value(Go_Sound) == 1
+            sma = add_scheduled_wave(sma, 'name', 'Go_Cue', 'preamble', 0.001, ...
+                'sustain', go_cue_duration, 'sound_trig', go_sound_id); % to play the Go Cue/Reward Sound
+        else
+            sma = add_scheduled_wave(sma, 'name', 'Go_Cue', 'preamble', 0.001, ...
+                'sustain', go_cue_duration); % to play the Go Cue/Reward Sound
+        end
 
         % scheduled wave for rewarded side either of the side
         sma = add_scheduled_wave(sma, 'name', 'reward_delivery', 'preamble', reward_delay, ...
