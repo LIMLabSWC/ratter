@@ -186,6 +186,13 @@ switch action
     HeaderParam(obj, 'prot_title', [mfilename ': ' expmtr ', ' rname], x, y, 'position', [10 figpos(4)-25, 800 20]);
     
     [x, y] = StimulusSection(obj,'init',x,y);
+    
+    ToggleParam(obj, 'Connect_Camera', 1, x,y,...
+        'OnString', 'Camera On',...
+        'OffString', 'Camera Off',...
+        'TooltipString', sprintf('If on (black) then it enables to start the camera \n',...
+                                 'Only press if camera does not start on its own.'));
+        set_callback(Connect_Camera, {mfilename, 'camera_control'});
 
     ArpitCentrePokeTrainingSMA(obj, 'init');
    
@@ -194,6 +201,7 @@ switch action
     
     %% Before preparing the trial, start with the Bonsai app to control the USB based Camera
     % Declare the folder location for saving the video files
+
     current_dir = cd;
     ratter_dir = extractBefore(current_dir,'ratter');
     main_dir_video = [ratter_dir 'ratter_Videos'];
@@ -224,6 +232,14 @@ switch action
     feval(mfilename, obj, 'prepare_next_trial');
          
    %% change_water_modulation_params
+    case 'camera_control'
+    
+        if value(Connect_Camera) == 1
+            Connect_Bonsai_Camera(obj,'start');
+        else
+            Connect_Bonsai_Camera(obj,'stop');
+        end
+
    case 'change_water_modulation_params'
 	   display_guys = [1 150 300];
        for i=1:numel(display_guys)
