@@ -1,6 +1,6 @@
 % [x, y] = SessionPerformanceSection(obj, action, x,y)
 %
-% Reports overall performance. Uses training_stage from SideSection.
+% Reports overall performance. Uses training_stage from ParamsSection.
 %
 % PARAMETERS:
 % -----------
