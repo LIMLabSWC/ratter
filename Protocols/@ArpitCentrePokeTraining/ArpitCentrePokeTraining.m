@@ -117,10 +117,6 @@ switch action
     % Let's put the figure where we want it and give it a reasonable size:
     set(value(myfig), 'Position', [485   144   850   680]);
 
-    SoloParamHandle(obj, 'nsessions_healthy_number_of_pokes', 'value', 0, 'save_with_settings', 1);
-    SoloParamHandle(obj, 'post_DelComp_protocol', 'value', '', 'save_with_settings', 1);
-    SoloParamHandle(obj, 'post_DelComp_settings_filename', 'value', '', 'save_with_settings', 1);
-    
     SoloParamHandle(obj, 'violation_history', 'value', []);
     DeclareGlobals(obj, 'ro_args', {'violation_history'});
     SoloFunctionAddVars('ParamsSection', 'rw_args', 'violation_history');
@@ -135,7 +131,7 @@ switch action
     
     SoloParamHandle(obj, 'hit_history', 'value', []);
     DeclareGlobals(obj, 'ro_args', {'hit_history'});
-    SoloFunctionAddVars('SideSection', 'rw_args', 'hit_history');
+    SoloFunctionAddVars('ParamsSection', 'rw_args', 'hit_history');
 
     SoundManagerSection(obj, 'init');
     x = 5; y = 5;             % Initial position on main GUI window
@@ -254,9 +250,8 @@ switch action
    case 'prepare_next_trial'
 
        ParamsSection(obj, 'prepare_next_trial');
-	% Run SessionDefinition *after* ParamsSection so we know whether the trial was a violation or not
-	
-    % push_helper_vars_tosql(obj,n_done_trials); 
+
+    % push_helper_vars_tosql(obj,n_completed_trials); 
        
        SessionDefinition(obj, 'next_trial');
        
