@@ -83,13 +83,13 @@ switch action
         next_row(y);
         DispParam(obj, 'init_CP_duration', 0.01, x,y,'label','init_CP duration','TooltipString','Duration of Nose in Central Poke before Go cue starts (see Total_CP_duration)');
     	next_row(y);
-        DispParam(obj, 'CP_duration', PreStim_time+A1_time+time_bet_aud1_gocue, x,y,'label','CP duration','TooltipString','Duration of Nose in Central Poke before Go cue starts (see Total_CP_duration)');
+        NumeditParam(obj, 'CP_duration', PreStim_time+A1_time+time_bet_aud1_gocue, x,y,'label','CP duration', 'TooltipString','Duration of Nose in Central Poke before Go cue starts (see Total_CP_duration)');
 		% set_callback(CP_duration, {mfilename, 'new_CP_duration'});
 		next_row(y);
 		NumeditParam(obj, 'time_go_cue' ,0.2, x,y,'label','Go Cue Duration','TooltipString','duration of go cue (see Total_CP_duration)');
 		set_callback(time_go_cue, {mfilename, 'new_time_go_cue'});
 		next_row(y);
-		DispParam(obj, 'Total_CP_duration', CP_duration+time_go_cue, x, y, 'TooltipString', 'Total expected(rat can poke out anytime after Go cue onset) nose in center port time, in secs. Sum of CP_duration and Go Cue duration'); %#ok<*NODEF>
+		DispParam(obj, 'Total_CP_duration', CP_duration+time_go_cue, x, y,'save_with_settings', 1, 'TooltipString', 'Total expected(rat can poke out anytime after Go cue onset) nose in center port time, in secs. Sum of CP_duration and Go Cue duration'); %#ok<*NODEF>
 		
         next_row(y);
         ToggleParam(obj, 'Go_Sound', 1, x, y, 'OnString', 'Play Reward Sound', 'OffString', 'No Reward Sound','TooltipString', ...

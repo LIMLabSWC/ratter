@@ -16,7 +16,8 @@ switch action
 
             case 1
             % STAGE RUNNING PARAMETERS
-            % SubheaderParam(obj, 'title', 'Stage Params', x, y);
+            DispParam(obj, 'stages_trial_counter_oppSide', 0, x, y,'save_with_settings', 1,'TooltipString','total trials in opposide side this stage'); next_row(y);
+            SubheaderParam(obj, 'title', 'Stage Params', x, y);
             % next_row(y);
             % COMPLETION TEST PARAMETERS
             NumeditParam(obj, 'total_trials', 300, x, y,'label','Trials','TooltipString','total trials in this stage for its completion'); next_row(y);
@@ -25,6 +26,7 @@ switch action
 
             case 2
              % STAGE RUNNING PARAMETERS
+            DispParam(obj, 'stages_trial_counter_oppSide', 0, x, y,'save_with_settings', 1,'TooltipString','total trials in opposide side this stage'); next_row(y);
             NumeditParam(obj, 'max_rColl_dur', 300, x, y,'label','T_Max_RCollect','TooltipString','User given max water collect time(code will optimize for value below this)'); next_row(y);
             NumeditParam(obj, 'min_rColl_dur', 100, x, y,'label','T_Min_RCollect','TooltipString','User given min water collect time(code will optimize for value above this)'); next_row(y);
             SubheaderParam(obj, 'title', 'Stage Params', x, y); next_row(y);
@@ -35,12 +37,14 @@ switch action
            
             case 3  % no completion test required
              % STAGE RUNNING PARAMETERS
+            DispParam(obj, 'last_session_CP', 0, x, y,'save_with_settings', 1,'TooltipString','total cp reached by last session'); next_row(y);
             DispParam(obj, 'max_CP', 0.3, x, y,'label','CP_Dur_Max','TooltipString','max CP duration being trained in this stage'); next_row(y);
             NumeditParam(obj, 'CPfraction_inc', 0.001, x, y,'label','CP_frac_Increase','TooltipString','CP duration is increased by this fraction'); next_row(y);
             SubheaderParam(obj, 'title', 'Stage Params', x, y); next_row(y);
             
             case 4
             % STAGE RUNNING PARAMETERS
+            DispParam(obj, 'last_session_CP', 0, x, y,'save_with_settings', 1,'TooltipString','total cp reached by last session'); next_row(y);
             NumeditParam(obj, 'max_CP', 1.5, x, y,'label','CP_Dur_Max','TooltipString','max CP duration being trained in this stage'); next_row(y);
             NumeditParam(obj, 'CPfraction_inc', 0.001, x, y,'label','CP_frac_Increase','TooltipString','CP duration is increased by this fraction'); next_row(y);
             SubheaderParam(obj, 'title', 'Stage Params', x, y); next_row(y);
@@ -52,6 +56,7 @@ switch action
             
             case 5
              % STAGE RUNNING PARAMETERS
+            DispParam(obj, 'last_session_CP', 0, x, y,'save_with_settings', 1,'TooltipString','total cp reached by last session'); next_row(y);
             NumeditParam(obj, 'max_CP', 5, x, y,'label','CP_Dur_Max','TooltipString','max CP duration being trained in this stage'); next_row(y);
             NumeditParam(obj, 'CPfraction_inc', 0.002, x, y,'label','CP_frac_Increase','TooltipString','CP duration is increased by this fraction'); next_row(y);
             NumeditParam(obj, 'min_CP', 1.5, x, y,'label','CP_Dur_Min','TooltipString','min CP duration being trained in this stage'); next_row(y);
@@ -68,6 +73,7 @@ switch action
 
             case 6
              % STAGE RUNNING PARAMETERS
+            DispParam(obj, 'last_session_CP', 0, x, y,'save_with_settings', 1,'TooltipString','total cp reached by last session'); next_row(y); 
             NumeditParam(obj, 'max_CP', 5, x, y,'label','CP_Dur_Max','TooltipString','max CP duration being trained in this stage'); next_row(y);
             NumeditParam(obj, 'starting_CP', 0.3, x, y,'TooltipString','min CP duration (minus the settling-in time) during warm up'); next_row(y);
             NumeditParam(obj, 'warm_up_trials', 20, x, y,'label','Warmup Trials','TooltipString','N trials for warmup'); next_row(y);
@@ -84,6 +90,7 @@ switch action
 
             case 7
              % STAGE RUNNING PARAMETERS
+            DispParam(obj, 'last_session_CP', 0, x, y,'save_with_settings', 1,'TooltipString','total cp reached by last session'); next_row(y); 
             NumeditParam(obj, 'max_CP', 5, x, y,'label','CP_Dur_Max','TooltipString','max CP duration being trained in this stage'); next_row(y);
             NumeditParam(obj, 'starting_CP', 0.3, x, y,'TooltipString','min CP duration (minus the settling-in time) during warm up'); next_row(y);
             NumeditParam(obj, 'warm_up_trials', 20, x, y,'label','Warmup Trials','TooltipString','N trials for warmup'); next_row(y);

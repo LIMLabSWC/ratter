@@ -129,18 +129,6 @@ switch action
             case 1  % LEARNING THE REWARD SOUND ASSOCIATION -LEFT OR RIGHT LED ON -> POKE -> SOUND+REWARD GIVEN
                 % INFINITE TIME AND CHANCES TO SELF CORRECT
 
-                % sma = add_state(sma, 'name', 'side_led_wait_RewardCollection', 'self_timer', 2, ...
-                %     'output_actions', {'DOut', SideLight}, ...
-                %     'input_to_statechange',{'Tup','hit_state'});
-                % 
-                % sma = add_state(sma,'name','second_hit_state','self_timer',3,...
-                %     'output_actions',{'DOut', SideLight},...
-                %     'input_to_statechange',{'Tup','hit_state'});
-                % 
-                % sma = add_state(sma,'name','hit_state','self_timer',0.01,...
-                %     'output_actions', {'SchedWaveTrig','reward_delivery+Go_Cue'},...
-                %     'input_to_statechange',{'Tup','drink_state'});
-
                 sma = add_state(sma, 'name', 'side_led_wait_RewardCollection', 'self_timer', SideLed_duration + RewardCollection_duration, ...
                     'output_actions', {'DOut', SideLight}, ...
                     'input_to_statechange',{HitEvent,'hit_state';'Tup','side_led_wait_RewardCollection'; ErrorEvent,'second_hit_state'});
@@ -246,6 +234,8 @@ switch action
                     'input_to_statechange',{'Tup','check_next_trial_ready'});
 
               
+                sma = add_state(sma, 'name', 'violation_state');
+                
             case {4,5,6,7,8} % STAGE 4 - LEARN TO NOSE POKE BEYOND SETTLING TIME WITH THE INTRODUCTION OF VIOLATION, THIS IS UNTIL CP = 1 SEC
                 % STAGE 5 ONWARDS - THE STIMULI IS INTRODUCED FROM THE STAGE 5 ONWARDS
 

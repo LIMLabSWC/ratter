@@ -176,6 +176,7 @@ switch action
         set_callback(Connect_Camera, {mfilename, 'camera_control'});
 
     next_column(x); y=5; 
+    [x,y] = Training_Performance_Summary(obj, 'init', x, y);
 	[x, y] = SessionPerformanceSection(obj, 'init', x, y);
 	[x, y] = ParamsSection(obj,  'init', x, y); %#ok<NASGU>   
     [x, y] = SoundSection(obj,'init',x,y);   
@@ -226,7 +227,8 @@ switch action
 
     %%
 
-    feval(mfilename, obj, 'prepare_next_trial');
+    % feval(mfilename, obj, 'prepare_next_trial'); % Commented out because
+    %%% it is being also run by Runrats(while loading the protocol)
          
    %% change_water_modulation_params
     case 'camera_control'
@@ -285,12 +287,10 @@ switch action
     SessionPerformanceSection(obj, 'evaluate');
     % Do any updates in the protocol that need doing:
     feval(mfilename, 'update');
-    % And PokesPlot needs completing the trial:
-    PokesPlotSection(obj, 'trial_completed');
-     
+
    %% update
    case 'update'
-      PokesPlotSection(obj, 'update');
+      % PokesPlotSection(obj, 'update');
       
       
    %% close
@@ -315,7 +315,7 @@ switch action
     
     StimulusSection(obj,'hide');   
     SessionDefinition(obj, 'run_eod_logic_without_saving');
-    perf    = SessionPerformanceSection(obj, 'evaluate');
+    % perf    = SessionPerformanceSection(obj, 'evaluate');
     cp_durs = ParamsSection(obj, 'get_cp_history');
     
     [stim1dur] = ParamsSection(obj,'get_stimdur_history');

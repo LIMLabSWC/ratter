@@ -34,7 +34,12 @@ pairs = {'force_init', false;
     'var_value', []};
 parseargs(varargin, pairs);
 varval = var_value;
-% clear('var_value');
+
+% OLD CODE
+% pairs = {'force_init', false;
+%     'value', []};
+% parseargs(varargin, pairs);
+% varval = value; clear('value');
 
 %%
 
