@@ -12,8 +12,6 @@ switch action
 		
 		SoloParamHandle(obj, 'my_gui_info', 'value', [x y double(gcf)], 'saveable', 0);
 		y0 = y;
- 
-		next_row(y);
 		NumeditParam(obj, 'LeftProb', 0.5, x, y); next_row(y);
 		MenuParam(obj, 'MaxSame', {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, Inf}, Inf, x, y, ...
 			'TooltipString', sprintf(['\nMaximum number of consecutive trials where correct\n' ...
@@ -27,9 +25,9 @@ switch action
 
 
 		SubheaderParam(obj, 'title', 'Params Section', x, y);
-		next_row(y, 1.5);
-		next_column(x); y = 5;
-        next_row(y);
+		% next_row(y, 1.5);
+		% next_column(x); y = 5;
+        % next_row(y);
         NumeditParam(obj, 'reward_delay', 0.01, x,y,'label','Reward Delay','TooltipString','Delay between side poke and reward delivery');
 		next_row(y);
 		NumeditParam(obj, 'drink_time', 1, x,y,'label','Drink Time','TooltipString','waits to finish water delivery');
@@ -298,7 +296,7 @@ switch action
         % change the reward collection duration once we start with centre
         % poke
         if value(training_stage) >=  3
-            RewardCollection_duration.value = 6;
+            RewardCollection_duration.value = 30;
             Go_Sound.value = 1;
         end
 		            

@@ -162,40 +162,47 @@ switch action
 	%AthenaSMA changed to SoundCatSMA (From AthenaDelayComp)
     SoloFunctionAddVars('ParamsSection', 'ro_args', ...
 			{'maxasymp';'slp';'inflp';'minasymp';'assym'});
+     
+    figpos = get(double(gcf), 'Position');
+    [expmtr, rname]=SavingSection(obj, 'get_info');
+    HeaderParam(obj, 'prot_title', [mfilename ': ' expmtr ', ' rname], x, y, 'position', [10 figpos(4)-25, 800 20]);
     
-    [x, y] = WaterValvesSection(obj,  'init', x, y); 
+    [x, y] = WaterValvesSection(obj,  'init', x, y); next_row(y);
     [x, y] = PokesPlotSection(obj, 'init', x, y); 
     next_row(y);
     [x, y] = CommentsSection(obj, 'init', x, y); 
     next_row(y);
-    ToggleParam(obj, 'Connect_Camera', 1, x,y,...
+    oldx=x; oldy=y;
+   
+    next_column(x); y=5; 
+
+	[x, y] = ParamsSection(obj,  'init', x, y); %#ok<NASGU>   
+    [x, y] = SoundSection(obj,'init',x,y);   
+    [x, y] = StimulusSection(obj,'init',x,y);
+    
+    next_row(y);next_row(y);    
+	[x, y] = SessionPerformanceSection(obj, 'init', x, y); 
+    [x, y] = Training_Performance_Summary(obj, 'init', x, y);
+
+     next_row(y);next_row(y);
+     ToggleParam(obj, 'Connect_Camera', 1, x,y,...
         'OnString', 'Camera On',...
         'OffString', 'Camera Off',...
         'TooltipString', sprintf('If on (black) then it enables to start the camera \n',...
                                  'Only press if camera does not start on its own.'));
         set_callback(Connect_Camera, {mfilename, 'camera_control'});
 
-    next_column(x); y=5; 
-    [x,y] = Training_Performance_Summary(obj, 'init', x, y);
-	[x, y] = SessionPerformanceSection(obj, 'init', x, y);
-	[x, y] = ParamsSection(obj,  'init', x, y); %#ok<NASGU>   
-    [x, y] = SoundSection(obj,'init',x,y);   
+    next_column(x); y=5;
     [stage_fig_x,stage_fig_y] = Training_ParamsSection(obj, 'init', x, y);
     SoloParamHandle(obj, 'stage_fig_x', 'value', stage_fig_x);
     SoloFunctionAddVars('ParamsSection', 'rw_args', 'stage_fig_x');
     SoloParamHandle(obj, 'stage_fig_y', 'value', stage_fig_y);
     SoloFunctionAddVars('ParamsSection', 'rw_args', 'stage_fig_y');
   
-    figpos = get(double(gcf), 'Position');
-    [expmtr, rname]=SavingSection(obj, 'get_info');
-    HeaderParam(obj, 'prot_title', [mfilename ': ' expmtr ', ' rname], x, y, 'position', [10 figpos(4)-25, 800 20]);
-    
-    [x, y] = StimulusSection(obj,'init',x,y);
-    
     ArpitCentrePokeTrainingSMA(obj, 'init');
    
-    next_row(y);  next_row(y);
-    SessionDefinition(obj, 'init', x, y, value(myfig)); next_row(y, 2); %#ok<NASGU>
+    x=oldx; y=oldy;
+    SessionDefinition(obj, 'init', x, y, value(myfig)); %#ok<NASGU>
     
     %% Before preparing the trial, start with the Bonsai app to control the USB based Camera
     % Declare the folder location for saving the video files

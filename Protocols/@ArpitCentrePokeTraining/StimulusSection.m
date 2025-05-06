@@ -16,16 +16,18 @@ switch action
         end
         x = varargin{1}; y = varargin{2};
 
-        ToggleParam(obj, 'StimulusShow', 1, x, y, 'OnString', 'Stimuli Show', ...
+        ToggleParam(obj, 'StimulusShow', 0, x, y, 'OnString', 'Stimuli Show', ...
             'OffString', 'Stimuli Hidden', 'TooltipString', 'Show/Hide Stimulus panel');
         set_callback(StimulusShow, {mfilename, 'show_hide'}); %#ok<NODEF> (Defined just above)
         next_row(y);
 
-        SoloParamHandle(obj, 'myfig', 'value', figure('closerequestfcn', [mfilename '(' class(obj) ', ''hide'');'], 'MenuBar', 'none', ...
-            'Name', mfilename), 'saveable', 0);
+        oldx=x; oldy=y;    parentfig=double(gcf);
+
+        SoloParamHandle(obj, 'myfig', 'value', figure('closerequestfcn', [mfilename '(' class(obj) ', ''hide'');'],...
+            'MenuBar', 'none', 'Name', mfilename), 'saveable', 0);
         screen_size = get(0, 'ScreenSize');
         set(value(myfig),'Position',[1 screen_size(4)-740, 400 400]); % put fig at top right
-        % set(gcf, 'Visible', 'off');
+        set(double(gcf), 'Visible', 'off');
 
         SoundManagerSection(obj, 'declare_new_sound', 'StimAUD1')
         SoloParamHandle(obj, 'thisstim', 'value', []);
@@ -130,6 +132,7 @@ switch action
         % next_column(y)
         SoloParamHandle(obj, 'stim_dist_fig', 'value', figure('closerequestfcn', [mfilename '(' class(obj) ', ''hide'');'], 'MenuBar', 'none', ...
             'Name', 'StimulusPlot'), 'saveable', 0);
+        set(double(gcf), 'Visible', 'off');
         ax = axes(value(stim_dist_fig),'Position',[0.1 0.1 0.8 0.8]);
         ylabel('log_e A','FontSize',16,'FontName','Cambria Math');
         set(ax,'Fontsize',15)
@@ -137,6 +140,9 @@ switch action
         SoloParamHandle(obj, 'ax', 'saveable', 0,  'value', ax);
 
         StimulusSection(obj,'plot_stimuli');
+
+        x=oldx; y=oldy;
+        figure(parentfig);
         
     case 'prepare_next_trial'
         if value(training_stage) > 4 && stimuli_on
