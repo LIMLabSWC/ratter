@@ -181,9 +181,9 @@ switch action
     [x, y] = StimulusSection(obj,'init',x,y);
     
     next_row(y);next_row(y);    
-	[x, y] = SessionPerformanceSection(obj, 'init', x, y); 
-    [x, y] = Training_Performance_Summary(obj, 'init', x, y);
-
+	 
+    [x, y] = Training_Performance_Summary(obj, 'init', x, y);next_row(y);
+    [x, y] = SessionPerformanceSection(obj, 'init', x, y);
      next_row(y);next_row(y);
      ToggleParam(obj, 'Connect_Camera', 1, x,y,...
         'OnString', 'Camera On',...
