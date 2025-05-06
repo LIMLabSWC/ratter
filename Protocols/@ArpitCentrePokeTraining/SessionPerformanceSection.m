@@ -15,7 +15,7 @@
 %                        and reinit, at the same position on the same
 %                        figure as the original section GUI was placed.
 %
-%            'evalueta'  Look at history and compute hit fraction, etc.
+%            'evaluate'  Look at history and compute hit fraction, etc.
 %
 % x, y     Only relevant to action = 'init'; they indicate the initial
 %          position to place the GUI at, in the current figure window
@@ -85,8 +85,14 @@ switch action
 	% ------------------------------------------------------------------
 
 	case 'evaluate'
+
+        eval(sprintf('ntrials_stage.value = value(stage_%i_Trials);',value(training_stage)));
+        eval(sprintf('ntrials_stage_today.value = value(stage_%i_TrialsToday);',value(training_stage)));
+        eval(sprintf('ntrials_violation_stage.value = value(stage_%i_ViolationRate);',value(training_stage)));
+        eval(sprintf('ntrials_violation_stage.value = value(stage_%i_TimeoutRate);',value(training_stage)));
 		        
         switch value(training_stage)
+            
             case 1                  %%  center led on -> poke in the center -> go cue -> reward light and sound
                 if n_completed_trials > 1
                     ntrials.value        = n_completed_trials;
@@ -98,7 +104,6 @@ switch action
 
                 violation_stage.value = nan;
                 timeout_stage.value = nan;
-
                 
             case {2,3}                  %%  center led on -> poke in the center -> go cue -> reward light and sound
                 if n_completed_trials > 1
