@@ -25,8 +25,6 @@ switch action
             NumeditParam(obj, 'total_trials_opp', 150, x, y,'label','Trials_Opp','TooltipString','total trials with opposide side option in this stage for its completion'); next_row(y);
             SubheaderParam(obj, 'title', 'Completion Params', x, y); next_row(y);
 
-            SoloFunctionAddVars('Training_Performance_Summary', 'ro_args', {'trial_oppSide'});
-
             case 2
              % STAGE RUNNING PARAMETERS
             DispParam(obj, 'trial_oppSide', 0, x, y,'save_with_settings', 1,'TooltipString','total trials in opposide side this stage'); next_row(y);
@@ -37,8 +35,6 @@ switch action
             NumeditParam(obj, 'total_trials', 1000, x, y,'label','Trials','TooltipString','total trials in this stage for its completion'); next_row(y);
             NumeditParam(obj, 'total_trials_opp', 400, x, y,'label','Trials_Opp','TooltipString','total trials with opposide side option in this stage for its completion'); next_row(y);
             SubheaderParam(obj, 'title', 'Completion Params', x, y);next_row(y);
-
-            SoloFunctionAddVars('Training_Performance_Summary', 'ro_args', {'trial_oppSide'});
            
             case 3  % no completion test required
              % STAGE RUNNING PARAMETERS

@@ -177,9 +177,9 @@ switch action
 			{'training_stage'});
 
         SoloFunctionAddVars('Training_Performance_Summary', 'ro_args', ...
-			{'training_stage';'ThisTrial'});
+			{'training_stage'});
 		
-		SoloParamHandle(obj, 'previous_parameters', 'value', []);
+		% SoloParamHandle(obj, 'previous_parameters', 'value', []);
 		
 
 
