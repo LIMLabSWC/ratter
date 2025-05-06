@@ -75,26 +75,17 @@ switch action
         next_row(y);
 		SubheaderParam(obj, 'title', 'Overall Performance', x, y);
 		next_row(y, 1.5);
-		SoloParamHandle(obj, 'previous_parameters', 'value', []);
+		% SoloParamHandle(obj, 'previous_parameters', 'value', []);
+
+        SoloFunctionAddVars('Training_Performance_Summary', 'ro_args', ...
+			{'ntrials_stage';'ntrials_stage_today';'violation_stage';'timeout_stage'});
 		
 	% ------------------------------------------------------------------
 	%              evaluate
 	% ------------------------------------------------------------------
 
 	case 'evaluate'
-		
-        if n_completed_trials >= 1
-            this_stage_trial_counter_today = value(stages_trial_counter_today);
-            this_stage_trial_counter = value(stages_trial_counter);
-            ntrials_stage.value = this_stage_trial_counter(value(training_stage));
-            ntrials_stage_today.value = this_stage_trial_counter_today(value(training_stage));
-
-            this_stage_timeout_percent = value(stages_timeout_rate);
-            this_stage_violation_percent = value(stages_violation_rate);
-            violation_stage.value = this_stage_violation_percent(value(training_stage));
-            timeout_stage.value = this_stage_timeout_percent(value(training_stage));
-        end
-
+		        
         switch value(training_stage)
             case 1                  %%  center led on -> poke in the center -> go cue -> reward light and sound
                 if n_completed_trials > 1

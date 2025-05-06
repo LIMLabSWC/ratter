@@ -25,11 +25,6 @@ if helper_vars_eval
 GetSoloFunctionArgs(obj);
 ClearHelperVarsNotOwned(obj);
 %<HELPER_VARS>
-CreateHelperVar(obj,'stages_trial_counter','value',zeros(1,8));
-CreateHelperVar(obj,'stages_trial_counter_today','value',zeros(1,8));
-CreateHelperVar(obj,'stages_trial_counter_oppSide','value',zeros(1,8));
-CreateHelperVar(obj,'stages_timeout_rate','value',zeros(1,8));
-CreateHelperVar(obj,'stages_violation_rate','value',zeros(1,8));
 CreateHelperVar(obj,'stage_start_completed_trial','value',n_completed_trials,'force_init',true);
 %</HELPER_VARS>
 end
@@ -48,23 +43,6 @@ if stage_no ~= value(ParamsSection_training_stage)
     ParamsSection_training_stage.value = stage_no;
     callback(ParamsSection_training_stage);
 end
-if n_completed_trials > value(stage_start_completed_trial)
-    this_stage_trial_counter = value(stages_trial_counter);
-    this_stage_trial_counter(stage_no) = this_stage_trial_counter(stage_no) + 1;
-    SessionPerformanceSection_ntrials_stage.value = this_stage_trial_counter(stage_no);
-    callback(SessionPerformanceSection_ntrials_stage);
-    stages_trial_counter.value = this_stage_trial_counter;
-    this_stage_trial_counter_today = value(stages_trial_counter_today);
-    this_stage_trial_counter_today(stage_no) = this_stage_trial_counter_today(stage_no) + 1;
-    SessionPerformanceSection_ntrials_stage_today.value = this_stage_trial_counter_today(stage_no);
-    callback(SessionPerformanceSection_ntrials_stage_today);
-    stages_trial_counter_today.value = this_stage_trial_counter_today;
-    this_stage_trial_counter_oppSide = value(stages_trial_counter_oppSide);
-    if value(previous_sides(end)) ~= value(ParamsSection_ThisTrial)
-        this_stage_trial_counter_oppSide(stage_no) = this_stage_trial_counter_oppSide(stage_no) + 1;
-    end
-    stages_trial_counter_oppSide.value = this_stage_trial_counter_oppSide;
-end
 %</STAGE_ALGORITHM>
 end
 
@@ -76,11 +54,10 @@ clear('ans');
 %<COMPLETION_TEST>
 if ParamsSection_use_auto_train % do completion check if auto training
     stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
-    this_stage_trial_counter_oppSide = value(stages_trial_counter_oppSide);
-    this_stage_trial_counter = value(stages_trial_counter);
     % only run it if its the start of the day, number of trials is small
     if n_completed_trials < 100
-        if this_stage_trial_counter(stage_no) > value(Training_ParamsSection_total_trials) && this_stage_trial_counter_oppSide(stage_no) > value(Training_ParamsSection_total_trials_opp)
+        if value(Training_Performance_Summary_stage_1_TrialsValid) > value(Training_ParamsSection_total_trials) && ...
+                value(Training_ParamsSection_trial_oppSide) > value(Training_ParamsSection_total_trials_opp)
             ParamsSection_training_stage.value = stage_no + 1;
             callback(ParamsSection_training_stage);
             ParamsSection(obj, 'Changed_Training_Stage');
@@ -102,15 +79,29 @@ GetSoloFunctionArgs(obj);
 ClearHelperVarsNotOwned(obj);
 %<END_OF_DAY_LOGIC>
 stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
-this_stage_trial_counter_oppSide = value(stages_trial_counter_oppSide);
-this_stage_trial_counter = value(stages_trial_counter);
-stages_trial_counter_today.value = zeros(1,8);
-if this_stage_trial_counter(stage_no) > value(Training_ParamsSection_total_trials) && this_stage_trial_counter_oppSide(stage_no) > value(Training_ParamsSection_total_trials_opp)
+if value(Training_Performance_Summary_stage_1_TrialsValid) > value(Training_ParamsSection_total_trials) && ...
+        value(Training_ParamsSection_trial_oppSide) > value(Training_ParamsSection_total_trials_opp)
     ParamsSection_training_stage.value = stage_no + 1;
     callback(ParamsSection_training_stage);
     ParamsSection(obj, 'Changed_Training_Stage');
     SessionDefinition(obj, 'jump_to_stage', 'Timeout Rewarded Side Pokes');
 end
+Training_Performance_Summary_stage_1_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_1_TrialsToday);
+Training_Performance_Summary_stage_2_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_2_TrialsToday);
+Training_Performance_Summary_stage_3_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_3_TrialsToday);
+Training_Performance_Summary_stage_4_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_4_TrialsToday);
+Training_Performance_Summary_stage_5_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_5_TrialsToday);
+Training_Performance_Summary_stage_6_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_6_TrialsToday);
+Training_Performance_Summary_stage_7_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_7_TrialsToday);
+Training_Performance_Summary_stage_8_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_8_TrialsToday);
 %</END_OF_DAY_LOGIC>
 end
 
@@ -131,13 +122,7 @@ if helper_vars_eval
 GetSoloFunctionArgs(obj);
 ClearHelperVarsNotOwned(obj);
 %<HELPER_VARS>
-CreateHelperVar(obj,'stages_trial_counter','value',zeros(1,8));
-CreateHelperVar(obj,'stages_trial_counter_today','value',zeros(1,8));
-CreateHelperVar(obj,'stages_trial_counter_oppSide','value',zeros(1,8));
-CreateHelperVar(obj,'stages_timeout_rate','value',zeros(1,8));
-CreateHelperVar(obj,'stages_violation_rate','value',zeros(1,8));
 CreateHelperVar(obj,'this_stage_opp_side_trials', 'value', 0, 'force_init',true);
-CreateHelperVar(obj,'stage_start_completed_trial','value',n_completed_trials,'force_init',true);
 %</HELPER_VARS>
 end
 
@@ -150,36 +135,9 @@ ClearHelperVarsNotOwned(obj);
 ParamsSection_MaxSame.value = 3;
 callback(ParamsSection_MaxSame);
 stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
-this_stage_trial_counter = value(stages_trial_counter);
 if stage_no ~= value(ParamsSection_training_stage)
     ParamsSection_training_stage.value = stage_no;
     callback(ParamsSection_training_stage);
-end
-if n_completed_trials > value(stage_start_completed_trial)
-    % Update the helper vars    
-    this_stage_trial_counter(stage_no) = this_stage_trial_counter(stage_no) + 1;
-    SessionPerformanceSection_ntrials_stage.value = this_stage_trial_counter(stage_no);
-    callback(SessionPerformanceSection_ntrials_stage);
-    stages_trial_counter.value = this_stage_trial_counter;
-
-    this_stage_trial_counter_today = value(stages_trial_counter_today);
-    this_stage_trial_counter_today(stage_no) = this_stage_trial_counter_today(stage_no) + 1;
-    SessionPerformanceSection_ntrials_stage_today.value = this_stage_trial_counter_today(stage_no);
-    callback(SessionPerformanceSection_ntrials_stage_today);
-    stages_trial_counter_today.value = this_stage_trial_counter_today;
-
-    this_stage_trial_counter_oppSide = value(stages_trial_counter_oppSide);
-    if value(previous_sides(end)) ~= value(ParamsSection_ThisTrial)
-        this_stage_trial_counter_oppSide(stage_no) = this_stage_trial_counter_oppSide(stage_no) + 1;
-        this_stage_opp_side_trials.value = value(this_stage_opp_side_trials) + 1;
-    end
-    stages_trial_counter_oppSide.value = this_stage_trial_counter_oppSide;
-
-    this_stage_timeout_percent = value(stages_timeout_rate);
-    this_stage_timeout_percent(stage_no) = ((this_stage_timeout_percent(stage_no) * this_stage_trial_counter(stage_no)) + double(timeout_history(end)))/(this_stage_trial_counter(stage_no) + 1);
-    SessionPerformanceSection_timeout_stage.value = this_stage_timeout_percent(stage_no);
-    callback(SessionPerformanceSection_timeout_stage);
-    stages_timeout_rate.value = this_stage_timeout_percent;
 end
 % Update the reward collection time based upon behav
 if length(timeout_history) > 5
@@ -198,7 +156,7 @@ if length(timeout_history) > 5
 end
 if length(timeout_history) > 20
     if all(value(timeout_history(end-19:end)))
-        ParamsSection_RewardCollection_duration.value = 30;
+        ParamsSection_RewardCollection_duration.value = 120;
         callback(ParamsSection_RewardCollection_duration);
     end
 end
@@ -214,11 +172,10 @@ clear('ans');
 %<COMPLETION_TEST>
 if ParamsSection_use_auto_train % do completion check if auto training
     stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
-    this_stage_trial_counter_oppSide = value(stages_trial_counter_oppSide);
-    this_stage_trial_counter = value(stages_trial_counter);
     % only run it if its the start of the day, number of trials is small
     if n_completed_trials > 50
-        if this_stage_trial_counter(stage_no) > value(Training_ParamsSection_total_trials) && this_stage_trial_counter_oppSide(stage_no) > value(Training_ParamsSection_total_trials_opp)
+        if value(Training_Performance_Summary_stage_2_TrialsValid) > value(Training_ParamsSection_total_trials) && ...
+        value(Training_ParamsSection_trial_oppSide) > value(Training_ParamsSection_total_trials_opp)
             ParamsSection_training_stage.value = stage_no + 1;
             callback(ParamsSection_training_stage);
             ParamsSection(obj, 'Changed_Training_Stage');
@@ -239,7 +196,22 @@ if eod_logic_eval
 GetSoloFunctionArgs(obj);
 ClearHelperVarsNotOwned(obj);
 %<END_OF_DAY_LOGIC>
-stages_trial_counter_today.value = zeros(1,8);
+Training_Performance_Summary_stage_1_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_1_TrialsToday);
+Training_Performance_Summary_stage_2_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_2_TrialsToday);
+Training_Performance_Summary_stage_3_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_3_TrialsToday);
+Training_Performance_Summary_stage_4_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_4_TrialsToday);
+Training_Performance_Summary_stage_5_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_5_TrialsToday);
+Training_Performance_Summary_stage_6_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_6_TrialsToday);
+Training_Performance_Summary_stage_7_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_7_TrialsToday);
+Training_Performance_Summary_stage_8_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_8_TrialsToday);
 %</END_OF_DAY_LOGIC>
 end
 %</TRAINING_STAGE>
@@ -255,13 +227,7 @@ if helper_vars_eval
 GetSoloFunctionArgs(obj);
 ClearHelperVarsNotOwned(obj);
 %<HELPER_VARS>
-CreateHelperVar(obj,'stages_trial_counter','value',zeros(1,8));
-CreateHelperVar(obj,'stages_trial_counter_today','value',zeros(1,8));
-CreateHelperVar(obj,'stages_trial_counter_oppSide','value',zeros(1,8));
-CreateHelperVar(obj,'stages_timeout_rate','value',zeros(1,8));
-CreateHelperVar(obj,'stages_violation_rate','value',zeros(1,8));
-CreateHelperVar(obj,'last_session_CP','value',0);
-CreateHelperVar(obj,'stage_start_completed_trial','value',n_completed_trials,'force_init',true);
+
 %</HELPER_VARS>
 end
 
@@ -279,32 +245,12 @@ ParamsSection_MaxSame.value = Inf;
 callback(ParamsSection_MaxSame);
 
 stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
-this_stage_trial_counter = value(stages_trial_counter);
 if stage_no ~= value(ParamsSection_training_stage)
     ParamsSection_training_stage.value = stage_no;
     callback(ParamsSection_training_stage);
 end
-if n_completed_trials > value(stage_start_completed_trial)
-    % Update the helper vars    
-    this_stage_trial_counter(stage_no) = this_stage_trial_counter(stage_no) + 1;
-    SessionPerformanceSection_ntrials_stage.value = this_stage_trial_counter(stage_no);
-    callback(SessionPerformanceSection_ntrials_stage);
-    stages_trial_counter.value = this_stage_trial_counter;
-
-    this_stage_trial_counter_today = value(stages_trial_counter_today);
-    this_stage_trial_counter_today(stage_no) = this_stage_trial_counter_today(stage_no) + 1;
-    SessionPerformanceSection_ntrials_stage_today.value = this_stage_trial_counter_today(stage_no);
-    callback(SessionPerformanceSection_ntrials_stage_today);
-    stages_trial_counter_today.value = this_stage_trial_counter_today;
-
-    this_stage_timeout_percent = value(stages_timeout_rate);
-    this_stage_timeout_percent(stage_no) = ((this_stage_timeout_percent(stage_no) * this_stage_trial_counter(stage_no)) + double(timeout_history(end)))/(this_stage_trial_counter(stage_no) + 1);
-    SessionPerformanceSection_timeout_stage.value = this_stage_timeout_percent(stage_no);
-    callback(SessionPerformanceSection_timeout_stage);
-    stages_timeout_rate.value = this_stage_timeout_percent;
-end
 % Change the value of CP Duration
-if value(last_session_CP) == 0 && this_stage_trial_counter(stage_no) < 2
+if value(Training_ParamsSection_last_session_CP) == 0 && value(Training_Performance_Summary_stage_3_Trials) < 2
     ParamsSection_CP_duration.value = cp_min; % initialize to min_CP
 end
 
@@ -332,11 +278,12 @@ clear('ans');
 if ParamsSection_use_auto_train % do completion check if auto training
     cp_max = value(ParamsSection_SettlingIn_time) + value(ParamsSection_legal_cbreak);
     if value(ParamsSection_CP_duration) >= cp_max
+        Training_ParamsSection_last_session_CP.value = value(ParamsSection_CP_duration);
+        callback(Training_ParamsSection_last_session_CP);
         ParamsSection_training_stage.value = 4;
         callback(ParamsSection_training_stage);
         ParamsSection(obj, 'Changed_Training_Stage');
         SessionDefinition(obj, 'jump_to_stage', 'Introduce Violation for Centre Poke');
-        last_session_CP.value = value(ParamsSection_CP_duration);
     end
 end
 %</COMPLETION_TEST>
@@ -353,8 +300,26 @@ if eod_logic_eval
 GetSoloFunctionArgs(obj);
 ClearHelperVarsNotOwned(obj);
 %<END_OF_DAY_LOGIC>
-stages_trial_counter_today.value = zeros(1,8);
-last_session_CP.value = value(ParamsSection_CP_duration);
+% Update the CP duration reached in this session
+Training_ParamsSection_last_session_CP.value = value(ParamsSection_CP_duration);
+callback(Training_ParamsSection_last_session_CP);
+% Reset the number of trials done today for this stage
+Training_Performance_Summary_stage_1_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_1_TrialsToday);
+Training_Performance_Summary_stage_2_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_2_TrialsToday);
+Training_Performance_Summary_stage_3_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_3_TrialsToday);
+Training_Performance_Summary_stage_4_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_4_TrialsToday);
+Training_Performance_Summary_stage_5_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_5_TrialsToday);
+Training_Performance_Summary_stage_6_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_6_TrialsToday);
+Training_Performance_Summary_stage_7_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_7_TrialsToday);
+Training_Performance_Summary_stage_8_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_8_TrialsToday);
 %</END_OF_DAY_LOGIC>
 end
 %</TRAINING_STAGE>
@@ -368,13 +333,7 @@ if helper_vars_eval
 GetSoloFunctionArgs(obj);
 ClearHelperVarsNotOwned(obj);
 %<HELPER_VARS>
-CreateHelperVar(obj,'stages_trial_counter','value',zeros(1,8));
-CreateHelperVar(obj,'stages_trial_counter_today','value',zeros(1,8));
-CreateHelperVar(obj,'stages_trial_counter_oppSide','value',zeros(1,8));
-CreateHelperVar(obj,'stages_timeout_rate','value',zeros(1,8));
-CreateHelperVar(obj,'stages_violation_rate','value',zeros(1,8));
-CreateHelperVar(obj,'last_session_CP','value',0);
-CreateHelperVar(obj,'stage_start_completed_trial','value',n_completed_trials,'force_init',true);
+
 %</HELPER_VARS>
 end
 
@@ -394,38 +353,13 @@ cp_fraction = value(Training_ParamsSection_CPfraction_inc);
 cp_minimum_increment = 0.001;
 
 stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
-this_stage_trial_counter = value(stages_trial_counter);
-this_stage_trial_counter_today = value(stages_trial_counter_today);
 if stage_no ~= value(ParamsSection_training_stage)
     ParamsSection_training_stage.value = stage_no;
     callback(ParamsSection_training_stage);
 end
-if n_completed_trials > value(stage_start_completed_trial)
-    % Update the helper vars    
-    this_stage_trial_counter(stage_no) = this_stage_trial_counter(stage_no) + 1;
-    SessionPerformanceSection_ntrials_stage.value = this_stage_trial_counter(stage_no);
-    callback(SessionPerformanceSection_ntrials_stage);
-    stages_trial_counter.value = this_stage_trial_counter;
-  
-    this_stage_trial_counter_today(stage_no) = this_stage_trial_counter_today(stage_no) + 1;
-    SessionPerformanceSection_ntrials_stage_today.value = this_stage_trial_counter_today(stage_no);
-    callback(SessionPerformanceSection_ntrials_stage_today);
-    stages_trial_counter_today.value = this_stage_trial_counter_today;
 
-    this_stage_timeout_percent = value(stages_timeout_rate);
-    this_stage_timeout_percent(stage_no) = ((this_stage_timeout_percent(stage_no) * this_stage_trial_counter(stage_no)) + double(timeout_history(end)))/(this_stage_trial_counter(stage_no) + 1);
-    SessionPerformanceSection_timeout_stage.value = this_stage_timeout_percent(stage_no);
-    callback(SessionPerformanceSection_timeout_stage);
-    stages_timeout_rate.value = this_stage_timeout_percent;
-
-    this_stage_violation_percent = value(stages_violation_rate);
-    this_stage_violation_percent(stage_no) = ((this_stage_violation_percent(stage_no) * this_stage_trial_counter(stage_no)) + double(violation_history(end)))/(this_stage_trial_counter(stage_no) + 1);
-    SessionPerformanceSection_violation_stage.value = this_stage_violation_percent(stage_no);
-    callback(SessionPerformanceSection_violation_stage);
-    stages_violation_rate.value = this_stage_violation_percent;
-end
 % Change the value of CP Duration
-if this_stage_trial_counter(stage_no) < 2
+if value(Training_Performance_Summary_stage_4_Trials) < 2
     ParamsSection_CP_duration.value = cp_min; % initialize to min_CP
 end
 
@@ -456,13 +390,17 @@ clear('ans');
 %<COMPLETION_TEST>
 if ParamsSection_use_auto_train % do completion check if auto training
     cp_max = value(Training_ParamsSection_max_CP);
-    if value(ParamsSection_CP_duration) >= cp_max  && n_completed_trials > 100 && SessionPerformanceSection_violation_recent < value(Training_ParamsSection_recent_violation) && SessionPerformanceSection_timeout_recent < value(Training_ParamsSection_recent_timeout) && ...
-            SessionPerformanceSection_violation_stage < value(Training_ParamsSection_stage_violation)
+    if value(ParamsSection_CP_duration) >= cp_max  && n_completed_trials > 100 && ...
+            value(SessionPerformanceSection_violation_recent) < value(Training_ParamsSection_recent_violation) && ...
+            value(SessionPerformanceSection_timeout_recent) < value(Training_ParamsSection_recent_timeout) && ...
+            value(SessionPerformanceSection_violation_stage) < value(Training_ParamsSection_stage_violation)
+
         ParamsSection_training_stage.value = 5;
         callback(ParamsSection_training_stage);
         ParamsSection(obj, 'Changed_Training_Stage');
         SessionDefinition(obj, 'jump_to_stage', 'Introduce Stimuli Sound during Centre Poke');
-        last_session_CP.value = value(ParamsSection_CP_duration);
+        Training_ParamsSection_last_session_CP.value = value(ParamsSection_CP_duration);
+        callback(Training_ParamsSection_last_session_CP);
     end
 end
 %</COMPLETION_TEST>
@@ -478,9 +416,26 @@ if eod_logic_eval
 GetSoloFunctionArgs(obj);
 ClearHelperVarsNotOwned(obj);
 %<END_OF_DAY_LOGIC>
-% Store the value of the total cp duration reached:
-stages_trial_counter_today.value = zeros(1,8);
-last_session_CP.value = value(ParamsSection_CP_duration);
+% Update the CP duration reached in this session
+Training_ParamsSection_last_session_CP.value = value(ParamsSection_CP_duration);
+callback(Training_ParamsSection_last_session_CP);
+% Reset the number of trials done today for this stage
+Training_Performance_Summary_stage_1_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_1_TrialsToday);
+Training_Performance_Summary_stage_2_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_2_TrialsToday);
+Training_Performance_Summary_stage_3_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_3_TrialsToday);
+Training_Performance_Summary_stage_4_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_4_TrialsToday);
+Training_Performance_Summary_stage_5_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_5_TrialsToday);
+Training_Performance_Summary_stage_6_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_6_TrialsToday);
+Training_Performance_Summary_stage_7_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_7_TrialsToday);
+Training_Performance_Summary_stage_8_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_8_TrialsToday);
 %</END_OF_DAY_LOGIC>
 end
 %</TRAINING_STAGE>
@@ -497,13 +452,7 @@ if helper_vars_eval
 GetSoloFunctionArgs(obj);
 ClearHelperVarsNotOwned(obj);
 %<HELPER_VARS>
-CreateHelperVar(obj,'stages_trial_counter','value',zeros(1,8));
-CreateHelperVar(obj,'stages_trial_counter_today','value',zeros(1,8));
-CreateHelperVar(obj,'stages_trial_counter_oppSide','value',zeros(1,8));
-CreateHelperVar(obj,'stages_timeout_rate','value',zeros(1,8));
-CreateHelperVar(obj,'stages_violation_rate','value',zeros(1,8));
-CreateHelperVar(obj,'last_session_CP','value',0);
-CreateHelperVar(obj,'stage_start_completed_trial','value',n_completed_trials,'force_init',true);
+
 %</HELPER_VARS>
 end
 
@@ -528,34 +477,7 @@ if stage_no ~= value(ParamsSection_training_stage)
     ParamsSection_training_stage.value = stage_no;
     callback(ParamsSection_training_stage);
 end
-if n_completed_trials > value(stage_start_completed_trial)
-    % Update the helper vars
-    this_stage_trial_counter = value(stages_trial_counter);
-    this_stage_trial_counter(stage_no) = this_stage_trial_counter(stage_no) + 1;
-    SessionPerformanceSection_ntrials_stage.value = this_stage_trial_counter(stage_no);
-    callback(SessionPerformanceSection_ntrials_stage);
-    stages_trial_counter.value = this_stage_trial_counter;
-
-    this_stage_trial_counter_today = value(stages_trial_counter_today);
-    this_stage_trial_counter_today(stage_no) = this_stage_trial_counter_today(stage_no) + 1;
-    SessionPerformanceSection_ntrials_stage_today.value = this_stage_trial_counter_today(stage_no);
-    callback(SessionPerformanceSection_ntrials_stage_today);
-    stages_trial_counter_today.value = this_stage_trial_counter_today;
-
-    this_stage_timeout_percent = value(stages_timeout_rate);
-    this_stage_timeout_percent(stage_no) = ((this_stage_timeout_percent(stage_no) * this_stage_trial_counter(stage_no)) + double(timeout_history(end)))/(this_stage_trial_counter(stage_no) + 1);
-    SessionPerformanceSection_timeout_stage.value = this_stage_timeout_percent(stage_no);
-    callback(SessionPerformanceSection_timeout_stage);
-    stages_timeout_rate.value = this_stage_timeout_percent;
-
-    this_stage_violation_percent = value(stages_violation_rate);
-    this_stage_violation_percent(stage_no) = ((this_stage_violation_percent(stage_no) * this_stage_trial_counter(stage_no)) + double(violation_history(end)))/(this_stage_trial_counter(stage_no) + 1);
-    SessionPerformanceSection_violation_stage.value = this_stage_violation_percent(stage_no);
-    callback(SessionPerformanceSection_violation_stage);
-    stages_violation_rate.value = this_stage_violation_percent;
-end
 % Change the value of CP Duration
-
 % Since starting a new session then do a pre warm up to last saved cp
 % duration else continue with learning with increased poke time
 if n_completed_trials == 0
@@ -564,10 +486,10 @@ elseif n_completed_trials == 1
     ParamsSection_CP_duration.value = starting_cp;
 else
     if ~violation_history(end) && ~timeout_history(end)
-        if value(ParamsSection_CP_duration) < max([cp_min,value(last_session_CP)]) % warm up stage
-            increment = (max([cp_min,value(last_session_CP)]) - value(ParamsSection_CP_duration))/ (n_trial_warmup - 1);
+        if value(ParamsSection_CP_duration) < max([cp_min,value(Training_ParamsSection_last_session_CP)]) % warm up stage
+            increment = (max([cp_min,value(Training_ParamsSection_last_session_CP)]) - value(ParamsSection_CP_duration))/ (n_trial_warmup - 1);
         else
-            if value(ParamsSection_CP_duration) >= value(last_session_CP) && value(ParamsSection_CP_duration) <= cp_max % no warm up stage
+            if value(ParamsSection_CP_duration) >= value(Training_ParamsSection_last_session_CP) && value(ParamsSection_CP_duration) <= cp_max % no warm up stage
                 increment = value(ParamsSection_CP_duration)*cp_fraction;
                 if increment < cp_minimum_increment
                     increment = cp_minimum_increment;
@@ -625,15 +547,14 @@ clear('ans');
 %<COMPLETION_TEST>
 if ParamsSection_use_auto_train % do completion check if auto training
     stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
-    this_stage_trial_counter = value(stages_trial_counter);
-    if value(ParamsSection_CP_duration) >= value(Training_ParamsSection_max_CP) && this_stage_trial_counter(stage_no) > value(Training_ParamsSection_total_trials)
-        if SessionPerformanceSection_violation_recent < value(Training_ParamsSection_recent_violation) && SessionPerformanceSection_timeout_recent < value(Training_ParamsSection_recent_timeout) && ...
-                SessionPerformanceSection_violation_stage < value(Training_ParamsSection_stage_violation) && n_completed_trials > 100
+    if value(ParamsSection_CP_duration) >= value(Training_ParamsSection_max_CP) && value(Training_Performance_Summary_stage_5_TrialsValid) > value(Training_ParamsSection_total_trials)
+        if value(SessionPerformanceSection_violation_recent) < value(Training_ParamsSection_recent_violation) && value(SessionPerformanceSection_timeout_recent) < value(Training_ParamsSection_recent_timeout) && ...
+                value(SessionPerformanceSection_violation_stage) < value(Training_ParamsSection_stage_violation) && n_completed_trials > 100
             ParamsSection_training_stage.value = stage_no + 1;
             callback(ParamsSection_training_stage);
             ParamsSection(obj, 'Changed_Training_Stage');
             SessionDefinition(obj, 'jump_to_stage', 'Vary Stimuli location during Centre Poke');
-            last_session_CP.value = value(ParamsSection_CP_duration);
+            Training_ParamsSection_last_session_CP.value = value(ParamsSection_CP_duration);
         end
     end
 end
@@ -651,8 +572,26 @@ if eod_logic_eval
 GetSoloFunctionArgs(obj);
 ClearHelperVarsNotOwned(obj);
 %<END_OF_DAY_LOGIC>
-stages_trial_counter_today.value = zeros(1,8);
-last_session_CP.value = value(ParamsSection_CP_duration);
+% Update the CP duration reached in this session
+Training_ParamsSection_last_session_CP.value = value(ParamsSection_CP_duration);
+callback(Training_ParamsSection_last_session_CP);
+% Reset the number of trials done today for this stage
+Training_Performance_Summary_stage_1_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_1_TrialsToday);
+Training_Performance_Summary_stage_2_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_2_TrialsToday);
+Training_Performance_Summary_stage_3_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_3_TrialsToday);
+Training_Performance_Summary_stage_4_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_4_TrialsToday);
+Training_Performance_Summary_stage_5_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_5_TrialsToday);
+Training_Performance_Summary_stage_6_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_6_TrialsToday);
+Training_Performance_Summary_stage_7_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_7_TrialsToday);
+Training_Performance_Summary_stage_8_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_8_TrialsToday);
 %</END_OF_DAY_LOGIC>
 end
 
@@ -668,13 +607,7 @@ if helper_vars_eval
 GetSoloFunctionArgs(obj);
 ClearHelperVarsNotOwned(obj);
 %<HELPER_VARS>
-CreateHelperVar(obj,'stages_trial_counter','value',zeros(1,8));
-CreateHelperVar(obj,'stages_trial_counter_today','value',zeros(1,8));
-CreateHelperVar(obj,'stages_trial_counter_oppSide','value',zeros(1,8));
-CreateHelperVar(obj,'stages_timeout_rate','value',zeros(1,8));
-CreateHelperVar(obj,'stages_violation_rate','value',zeros(1,8));
-CreateHelperVar(obj,'last_session_CP','value',0);
-CreateHelperVar(obj,'stage_start_completed_trial','value',n_completed_trials,'force_init',true);
+
 %</HELPER_VARS>
 end
 
@@ -698,32 +631,7 @@ if stage_no ~= value(ParamsSection_training_stage)
     ParamsSection_training_stage.value = stage_no;
     callback(ParamsSection_training_stage);
 end
-if n_completed_trials > value(stage_start_completed_trial)
-    % Update the helper vars
-    this_stage_trial_counter = value(stages_trial_counter);
-    this_stage_trial_counter(stage_no) = this_stage_trial_counter(stage_no) + 1;
-    SessionPerformanceSection_ntrials_stage.value = this_stage_trial_counter(stage_no);
-    callback(SessionPerformanceSection_ntrials_stage);
-    stages_trial_counter.value = this_stage_trial_counter;
 
-    this_stage_trial_counter_today = value(stages_trial_counter_today);
-    this_stage_trial_counter_today(stage_no) = this_stage_trial_counter_today(stage_no) + 1;
-    SessionPerformanceSection_ntrials_stage_today.value = this_stage_trial_counter_today(stage_no);
-    callback(SessionPerformanceSection_ntrials_stage_today);
-    stages_trial_counter_today.value = this_stage_trial_counter_today;
-
-    this_stage_timeout_percent = value(stages_timeout_rate);
-    this_stage_timeout_percent(stage_no) = ((this_stage_timeout_percent(stage_no) * this_stage_trial_counter(stage_no)) + double(timeout_history(end)))/(this_stage_trial_counter(stage_no) + 1);
-    SessionPerformanceSection_timeout_stage.value = this_stage_timeout_percent(stage_no);
-    callback(SessionPerformanceSection_timeout_stage);
-    stages_timeout_rate.value = this_stage_timeout_percent;
-
-    this_stage_violation_percent = value(stages_violation_rate);
-    this_stage_violation_percent(stage_no) = ((this_stage_violation_percent(stage_no) * this_stage_trial_counter(stage_no)) + double(violation_history(end)))/(this_stage_trial_counter(stage_no) + 1);
-    SessionPerformanceSection_violation_stage.value = this_stage_violation_percent(stage_no);
-    callback(SessionPerformanceSection_violation_stage);
-    stages_violation_rate.value = this_stage_violation_percent;
-end
 % Warm Up If starting a new session
 if n_completed_trials == 0
     ParamsSection_CP_duration.value = value(ParamsSection_init_CP_duration);
@@ -732,7 +640,7 @@ elseif n_completed_trials == 1
 else
     if value(ParamsSection_CP_duration) < cp_max  % warm up stage
         if ~violation_history(end) && ~timeout_history(end)
-            increment = (cp_max - value(ParamsSection_CP_duration))/ (n_trial_warmup - 1);
+            increment = (cp_max - value(ParamsSection_CP_duration)) / (n_trial_warmup - 1);
             ParamsSection_CP_duration.value = value(ParamsSection_CP_duration) + increment;
             % Check if the values are within the required range
             if value(ParamsSection_CP_duration) < starting_cp
@@ -774,10 +682,9 @@ clear('ans');
 %<COMPLETION_TEST>
 if ParamsSection_use_auto_train % do completion check if auto training
     stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
-    this_stage_trial_counter = value(stages_trial_counter);
-    if this_stage_trial_counter(stage_no) > value(Training_ParamsSection_total_trials)
-        if SessionPerformanceSection_violation_recent < value(Training_ParamsSection_recent_violation) && SessionPerformanceSection_timeout_recent < value(Training_ParamsSection_recent_timeout) && ...
-                SessionPerformanceSection_violation_stage < value(Training_ParamsSection_stage_violation) && n_completed_trials > 100
+    if value(Training_Performance_Summary_stage_6_TrialsValid) > value(Training_ParamsSection_total_trials)
+        if value(SessionPerformanceSection_violation_recent) < value(Training_ParamsSection_recent_violation) && value(SessionPerformanceSection_timeout_recent) < value(Training_ParamsSection_recent_timeout) && ...
+                value(SessionPerformanceSection_violation_stage) < value(Training_ParamsSection_stage_violation) && n_completed_trials > 100
             ParamsSection_training_stage.value = stage_no + 1;
             callback(ParamsSection_training_stage);
             ParamsSection(obj, 'Changed_Training_Stage');
@@ -798,7 +705,23 @@ if eod_logic_eval
 GetSoloFunctionArgs(obj);
 ClearHelperVarsNotOwned(obj);
 %<END_OF_DAY_LOGIC>
-stages_trial_counter_today.value = zeros(1,8);
+% Reset the number of trials done today for this stage
+Training_Performance_Summary_stage_1_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_1_TrialsToday);
+Training_Performance_Summary_stage_2_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_2_TrialsToday);
+Training_Performance_Summary_stage_3_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_3_TrialsToday);
+Training_Performance_Summary_stage_4_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_4_TrialsToday);
+Training_Performance_Summary_stage_5_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_5_TrialsToday);
+Training_Performance_Summary_stage_6_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_6_TrialsToday);
+Training_Performance_Summary_stage_7_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_7_TrialsToday);
+Training_Performance_Summary_stage_8_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_8_TrialsToday);
 %</END_OF_DAY_LOGIC>
 end
 %</TRAINING_STAGE>
@@ -814,13 +737,7 @@ if helper_vars_eval
 GetSoloFunctionArgs(obj);
 ClearHelperVarsNotOwned(obj);
 %<HELPER_VARS>
-CreateHelperVar(obj,'stages_trial_counter','value',zeros(1,8));
-CreateHelperVar(obj,'stages_trial_counter_today','value',zeros(1,8));
-CreateHelperVar(obj,'stages_trial_counter_oppSide','value',zeros(1,8));
-CreateHelperVar(obj,'stages_timeout_rate','value',zeros(1,8));
-CreateHelperVar(obj,'stages_violation_rate','value',zeros(1,8));
-CreateHelperVar(obj,'last_session_CP','value',0);
-CreateHelperVar(obj,'stage_start_completed_trial','value',n_completed_trials,'force_init',true);
+
 %</HELPER_VARS>
 end
 
@@ -855,32 +772,7 @@ if stage_no ~= value(ParamsSection_training_stage)
     ParamsSection_training_stage.value = stage_no;
     callback(ParamsSection_training_stage);
 end
-if n_completed_trials > value(stage_start_completed_trial)
-    % Update the helper vars
-    this_stage_trial_counter = value(stages_trial_counter);
-    this_stage_trial_counter(stage_no) = this_stage_trial_counter(stage_no) + 1;
-    SessionPerformanceSection_ntrials_stage.value = this_stage_trial_counter(stage_no);
-    callback(SessionPerformanceSection_ntrials_stage);
-    stages_trial_counter.value = this_stage_trial_counter;
 
-    this_stage_trial_counter_today = value(stages_trial_counter_today);
-    this_stage_trial_counter_today(stage_no) = this_stage_trial_counter_today(stage_no) + 1;
-    SessionPerformanceSection_ntrials_stage_today.value = this_stage_trial_counter_today(stage_no);
-    callback(SessionPerformanceSection_ntrials_stage_today);
-    stages_trial_counter_today.value = this_stage_trial_counter_today;
-
-    this_stage_timeout_percent = value(stages_timeout_rate);
-    this_stage_timeout_percent(stage_no) = ((this_stage_timeout_percent(stage_no) * this_stage_trial_counter(stage_no)) + double(timeout_history(end)))/(this_stage_trial_counter(stage_no) + 1);
-    SessionPerformanceSection_timeout_stage.value = this_stage_timeout_percent(stage_no);
-    callback(SessionPerformanceSection_timeout_stage);
-    stages_timeout_rate.value = this_stage_timeout_percent;
-
-    this_stage_violation_percent = value(stages_violation_rate);
-    this_stage_violation_percent(stage_no) = ((this_stage_violation_percent(stage_no) * this_stage_trial_counter(stage_no)) + double(violation_history(end)))/(this_stage_trial_counter(stage_no) + 1);
-    SessionPerformanceSection_violation_stage.value = this_stage_violation_percent(stage_no);
-    callback(SessionPerformanceSection_violation_stage);
-    stages_violation_rate.value = this_stage_violation_percent;
-end
 % Warm Up If starting a new session
 if warm_up_on == 1
     if n_completed_trials == 0
@@ -931,10 +823,10 @@ ClearHelperVarsNotOwned(obj);
 clear('ans');
 %<COMPLETION_TEST>
 stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
-this_stage_trial_counter = value(stages_trial_counter);
-if this_stage_trial_counter(stage_no) > value(Training_ParamsSection_total_trials)
-    if SessionPerformanceSection_violation_recent < value(Training_ParamsSection_recent_violation) && SessionPerformanceSection_timeout_recent < value(Training_ParamsSection_recent_timeout) && ...
-        SessionPerformanceSection_violation_stage < value(Training_ParamsSection_stage_violation)
+
+if value(Training_Performance_Summary_stage_7_TrialsValid) > value(Training_ParamsSection_total_trials)
+    if value(SessionPerformanceSection_violation_recent) < value(Training_ParamsSection_recent_violation) && value(SessionPerformanceSection_timeout_recent) < value(Training_ParamsSection_recent_timeout) && ...
+        value(SessionPerformanceSection_violation_stage) < value(Training_ParamsSection_stage_violation)
         ParamsSection_training_stage.value = stage_no + 1;
         callback(ParamsSection_training_stage);
         ParamsSection(obj, 'Changed_Training_Stage');
@@ -955,7 +847,22 @@ if eod_logic_eval
 GetSoloFunctionArgs(obj);
 ClearHelperVarsNotOwned(obj);
 %<END_OF_DAY_LOGIC>
-stages_trial_counter_today.value = zeros(1,8);
+Training_Performance_Summary_stage_1_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_1_TrialsToday);
+Training_Performance_Summary_stage_2_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_2_TrialsToday);
+Training_Performance_Summary_stage_3_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_3_TrialsToday);
+Training_Performance_Summary_stage_4_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_4_TrialsToday);
+Training_Performance_Summary_stage_5_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_5_TrialsToday);
+Training_Performance_Summary_stage_6_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_6_TrialsToday);
+Training_Performance_Summary_stage_7_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_7_TrialsToday);
+Training_Performance_Summary_stage_8_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_8_TrialsToday);
 %</END_OF_DAY_LOGIC>
 end
 %</TRAINING_STAGE>
@@ -970,13 +877,7 @@ if helper_vars_eval
 GetSoloFunctionArgs(obj);
 ClearHelperVarsNotOwned(obj);
 %<HELPER_VARS>
-CreateHelperVar(obj,'stages_trial_counter','value',zeros(1,8));
-CreateHelperVar(obj,'stages_trial_counter_today','value',zeros(1,8));
-CreateHelperVar(obj,'stages_trial_counter_oppSide','value',zeros(1,8));
-CreateHelperVar(obj,'stages_timeout_rate','value',zeros(1,8));
-CreateHelperVar(obj,'stages_violation_rate','value',zeros(1,8));
-CreateHelperVar(obj,'last_session_CP','value',0);
-CreateHelperVar(obj,'stage_start_completed_trial','value',n_completed_trials,'force_init',true);
+
 %</HELPER_VARS>
 end
 
@@ -1011,32 +912,6 @@ if stage_no ~= value(ParamsSection_training_stage)
     callback(ParamsSection_training_stage);
 end
 
-if n_completed_trials > value(stage_start_completed_trial)
-    % Update the helper vars
-    this_stage_trial_counter = value(stages_trial_counter);
-    this_stage_trial_counter(stage_no) = this_stage_trial_counter(stage_no) + 1;
-    SessionPerformanceSection_ntrials_stage.value = this_stage_trial_counter(stage_no);
-    callback(SessionPerformanceSection_ntrials_stage);
-    stages_trial_counter.value = this_stage_trial_counter;
-
-    this_stage_trial_counter_today = value(stages_trial_counter_today);
-    this_stage_trial_counter_today(stage_no) = this_stage_trial_counter_today(stage_no) + 1;
-    SessionPerformanceSection_ntrials_stage_today.value = this_stage_trial_counter_today(stage_no);
-    callback(SessionPerformanceSection_ntrials_stage_today);
-    stages_trial_counter_today.value = this_stage_trial_counter_today;
-
-    this_stage_timeout_percent = value(stages_timeout_rate);
-    this_stage_timeout_percent(stage_no) = ((this_stage_timeout_percent(stage_no) * this_stage_trial_counter(stage_no)) + double(timeout_history(end)))/(this_stage_trial_counter(stage_no) + 1);
-    SessionPerformanceSection_timeout_stage.value = this_stage_timeout_percent(stage_no);
-    callback(SessionPerformanceSection_timeout_stage);
-    stages_timeout_rate.value = this_stage_timeout_percent;
-
-    this_stage_violation_percent = value(stages_violation_rate);
-    this_stage_violation_percent(stage_no) = ((this_stage_violation_percent(stage_no) * this_stage_trial_counter(stage_no)) + double(violation_history(end)))/(this_stage_trial_counter(stage_no) + 1);
-    SessionPerformanceSection_violation_stage.value = this_stage_violation_percent(stage_no);
-    callback(SessionPerformanceSection_violation_stage);
-    stages_violation_rate.value = this_stage_violation_percent;
-end
 % Warm Up If starting a new session
 if warm_up_on == 1
     if n_completed_trials == 0
@@ -1101,7 +976,22 @@ if eod_logic_eval
 GetSoloFunctionArgs(obj);
 ClearHelperVarsNotOwned(obj);
 %<END_OF_DAY_LOGIC>
-stages_trial_counter_today.value = zeros(1,8);
+Training_Performance_Summary_stage_1_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_1_TrialsToday);
+Training_Performance_Summary_stage_2_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_2_TrialsToday);
+Training_Performance_Summary_stage_3_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_3_TrialsToday);
+Training_Performance_Summary_stage_4_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_4_TrialsToday);
+Training_Performance_Summary_stage_5_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_5_TrialsToday);
+Training_Performance_Summary_stage_6_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_6_TrialsToday);
+Training_Performance_Summary_stage_7_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_7_TrialsToday);
+Training_Performance_Summary_stage_8_TrialsToday.value = 0;
+callback(Training_Performance_Summary_stage_8_TrialsToday);
 %</END_OF_DAY_LOGIC>
 end
 %</TRAINING_STAGE>

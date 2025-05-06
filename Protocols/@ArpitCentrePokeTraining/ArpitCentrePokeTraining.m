@@ -291,6 +291,7 @@ switch action
     % Change the video trial  
     Connect_Bonsai_Camera(obj,'next_trial');
     % Update the Metrics Calculated
+    Training_Performance_Summary(obj,'evaluate');
     SessionPerformanceSection(obj, 'evaluate');
     % Do any updates in the protocol that need doing:
     feval(mfilename, 'update');
