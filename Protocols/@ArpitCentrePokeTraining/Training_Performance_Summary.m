@@ -78,7 +78,7 @@ switch action
         figure(parentfig);
 
 %% Evaluate
-    case evaluate
+    case 'evaluate'
 
         switch value(training_stage)
 
@@ -89,19 +89,19 @@ switch action
                     stage_1_Trials.value = value(stage_1_Trials) + 1;
                     stage_1_TrialsToday.value = value(stage_1_TrialsToday) + 1;
                     if value(previous_sides(end)) ~= value(ThisTrial)
-                        trial_oppSide.value = value(trial_oppSide) + 1; % updating value for variable in TrainingParams_Section
+                        trial_oppSide = trial_oppSide + 1; % updating value for variable in TrainingParams_Section
                     end                   
                     stage_1_ViolationRate.value = nan;
                     stage_1_TimeoutRate.value = nan;
                     if value(hit_history(end)) == 1
-                        stage_1_TrialsValid.value = value(stage_1_TrialsToday) + 1;
+                        stage_1_TrialsValid.value = value(stage_1_TrialsValid) + 1;
                     end
                     % Updating Disp Values for SessionPeformance Section as
                     % well
-                    ntrials_stage.value = value(stage_1_Trials);
-                    ntrials_stage_today.value = value(stage_1_TrialsToday);
-                    violation_stage.value = value(stage_1_ViolationRate);
-                    timeout_stage.value = value(stage_1_TimeoutRate);
+                    ntrials_stage = value(stage_1_Trials);
+                    ntrials_stage_today = value(stage_1_TrialsToday);
+                    violation_stage = value(stage_1_ViolationRate);
+                    timeout_stage = value(stage_1_TimeoutRate);
                 end
 
             case 2
@@ -111,19 +111,19 @@ switch action
                     stage_2_Trials.value = value(stage_2_Trials) + 1;
                     stage_2_TrialsToday.value = value(stage_2_TrialsToday) + 1;
                     if value(previous_sides(end)) ~= value(ThisTrial) && all(hit_history(end-1:end)) % last and present trials should also be a valid trial
-                        trial_oppSide.value = value(trial_oppSide) + 1;  % updating value for variable in TrainingParams_Section
+                        trial_oppSide = value(trial_oppSide) + 1;  % updating value for variable in TrainingParams_Section
                     end
                     stage_2_ViolationRate.value = nan;
                     stage_2_TimeoutRate.value = ((value(stage_2_TimeoutRate) * (value(stage_2_Trials) - 1)) + double(timeout_history(end))) / value(stage_2_Trials);
                     if value(hit_history(end)) == 1
-                        stage_2_TrialsValid.value = value(stage_2_TrialsToday) + 1;
+                        stage_2_TrialsValid.value = value(stage_2_TrialsValid) + 1;
                     end
                     % Updating Disp Values for SessionPeformance Section as
                     % well
-                    ntrials_stage.value = value(stage_2_Trials);
-                    ntrials_stage_today.value = value(stage_2_TrialsToday);
-                    violation_stage.value = value(stage_2_ViolationRate);
-                    timeout_stage.value = value(stage_2_TimeoutRate);
+                    ntrials_stage = value(stage_2_Trials);
+                    ntrials_stage_today = value(stage_2_TrialsToday);
+                    violation_stage = value(stage_2_ViolationRate);
+                    timeout_stage = value(stage_2_TimeoutRate);
                 end
 
             case 3
@@ -131,18 +131,22 @@ switch action
                 if n_completed_trials > 0
 
                     stage_3_Trials.value = value(stage_3_Trials) + 1;
-                    stage_1_TrialsToday.value = value(stage_3_TrialsToday) + 1;
+                    stage_3_TrialsToday.value = value(stage_3_TrialsToday) + 1;
                     stage_3_ViolationRate.value = ((value(stage_3_ViolationRate) * (value(stage_3_Trials) - 1)) + double(violation_history(end))) / value(stage_3_Trials);
                     stage_3_TimeoutRate.value = ((value(stage_3_TimeoutRate) * (value(stage_3_Trials) - 1)) + double(timeout_history(end))) / value(stage_3_Trials);
                     if value(hit_history(end)) == 1
-                        stage_3_TrialsValid.value = value(stage_3_TrialsToday) + 1;
+                        stage_3_TrialsValid.value = value(stage_3_TrialsValid) + 1;
                     end
                     % Updating Disp Values for SessionPeformance Section as
                     % well
-                    ntrials_stage.value = value(stage_3_Trials);
-                    ntrials_stage_today.value = value(stage_3_TrialsToday);
-                    violation_stage.value = value(stage_3_ViolationRate);
-                    timeout_stage.value = value(stage_3_TimeoutRate);
+                    ntrials_stage = value(stage_3_Trials);
+                    callback(ntrials_stage);
+                    ntrials_stage_today = value(stage_3_TrialsToday);
+                    callback(ntrials_stage_today);
+                    violation_stage = value(stage_3_ViolationRate);
+                    callback(violation_stage);
+                    timeout_stage = value(stage_3_TimeoutRate);
+                    callback(timeout_stage);
                 end
 
             case 4  
@@ -154,14 +158,14 @@ switch action
                     stage_4_ViolationRate.value = ((value(stage_4_ViolationRate) * (value(stage_4_Trials) - 1)) + double(violation_history(end))) / value(stage_4_Trials);
                     stage_4_TimeoutRate.value = ((value(stage_4_TimeoutRate) * (value(stage_4_Trials) - 1)) + double(timeout_history(end))) / value(stage_4_Trials);
                     if value(hit_history(end)) == 1
-                        stage_4_TrialsValid.value = value(stage_4_TrialsToday) + 1;
+                        stage_4_TrialsValid.value = value(stage_4_TrialsValid) + 1;
                     end
                     % Updating Disp Values for SessionPeformance Section as
                     % well
-                    ntrials_stage.value = value(stage_4_Trials);
-                    ntrials_stage_today.value = value(stage_4_TrialsToday);
-                    violation_stage.value = value(stage_4_ViolationRate);
-                    timeout_stage.value = value(stage_4_TimeoutRate);
+                    ntrials_stage = value(stage_4_Trials);
+                    ntrials_stage_today = value(stage_4_TrialsToday);
+                    violation_stage = value(stage_4_ViolationRate);
+                    timeout_stage = value(stage_4_TimeoutRate);
                 end
 
             case 5
@@ -173,14 +177,14 @@ switch action
                     stage_5_ViolationRate.value = ((value(stage_5_ViolationRate) * (value(stage_5_Trials) - 1)) + double(violation_history(end))) / value(stage_5_Trials);
                     stage_5_TimeoutRate.value = ((value(stage_5_TimeoutRate) * (value(stage_5_Trials) - 1)) + double(timeout_history(end))) / value(stage_5_Trials);
                     if value(hit_history(end)) == 1
-                        stage_5_TrialsValid.value = value(stage_5_TrialsToday) + 1;
+                        stage_5_TrialsValid.value = value(stage_5_TrialsValid) + 1;
                     end
                     % Updating Disp Values for SessionPeformance Section as
                     % well
-                    ntrials_stage.value = value(stage_5_Trials);
-                    ntrials_stage_today.value = value(stage_5_TrialsToday);
-                    violation_stage.value = value(stage_5_ViolationRate);
-                    timeout_stage.value = value(stage_5_TimeoutRate);
+                    ntrials_stage = value(stage_5_Trials);
+                    ntrials_stage_today = value(stage_5_TrialsToday);
+                    violation_stage = value(stage_5_ViolationRate);
+                    timeout_stage = value(stage_5_TimeoutRate);
                 end
 
             case 6
@@ -192,14 +196,14 @@ switch action
                     stage_6_ViolationRate.value = ((value(stage_6_ViolationRate) * (value(stage_6_Trials) - 1)) + double(violation_history(end))) / value(stage_6_Trials);
                     stage_6_TimeoutRate.value = ((value(stage_6_TimeoutRate) * (value(stage_6_Trials) - 1)) + double(timeout_history(end))) / value(stage_6_Trials);
                     if value(hit_history(end)) == 1
-                        stage_6_TrialsValid.value = value(stage_6_TrialsToday) + 1;
+                        stage_6_TrialsValid.value = value(stage_6_TrialsValid) + 1;
                     end
                     % Updating Disp Values for SessionPeformance Section as
                     % well
-                    ntrials_stage.value = value(stage_6_Trials);
-                    ntrials_stage_today.value = value(stage_6_TrialsToday);
-                    violation_stage.value = value(stage_6_ViolationRate);
-                    timeout_stage.value = value(stage_6_TimeoutRate);
+                    ntrials_stage = value(stage_6_Trials);
+                    ntrials_stage_today = value(stage_6_TrialsToday);
+                    violation_stage = value(stage_6_ViolationRate);
+                    timeout_stage = value(stage_6_TimeoutRate);
                 end
 
             case 7
@@ -211,14 +215,14 @@ switch action
                     stage_7_ViolationRate.value = ((value(stage_7_ViolationRate) * (value(stage_7_Trials) - 1)) + double(violation_history(end))) / value(stage_7_Trials);
                     stage_7_TimeoutRate.value = ((value(stage_7_TimeoutRate) * (value(stage_7_Trials) - 1)) + double(timeout_history(end))) / value(stage_7_Trials);
                     if value(hit_history(end)) == 1
-                        stage_7_TrialsValid.value = value(stage_7_TrialsToday) + 1;
+                        stage_7_TrialsValid.value = value(stage_7_TrialsValid) + 1;
                     end
                     % Updating Disp Values for SessionPeformance Section as
                     % well
-                    ntrials_stage.value = value(stage_7_Trials);
-                    ntrials_stage_today.value = value(stage_7_TrialsToday);
-                    violation_stage.value = value(stage_7_ViolationRate);
-                    timeout_stage.value = value(stage_7_TimeoutRate);
+                    ntrials_stage = value(stage_7_Trials);
+                    ntrials_stage_today = value(stage_7_TrialsToday);
+                    violation_stage = value(stage_7_ViolationRate);
+                    timeout_stage = value(stage_7_TimeoutRate);
                 end
 
             case 8 
@@ -230,14 +234,14 @@ switch action
                     stage_8_ViolationRate.value = ((value(stage_8_ViolationRate) * (value(stage_8_Trials) - 1)) + double(violation_history(end))) / value(stage_8_Trials);
                     stage_8_TimeoutRate.value = ((value(stage_8_TimeoutRate) * (value(stage_8_Trials) - 1)) + double(timeout_history(end))) / value(stage_8_Trials);
                     if value(hit_history(end)) == 1
-                        stage_8_TrialsValid.value = value(stage_8_TrialsToday) + 1;
+                        stage_8_TrialsValid.value = value(stage_8_TrialsValid) + 1;
                     end
                     % Updating Disp Values for SessionPeformance Section as
                     % well
-                    ntrials_stage.value = value(stage_8_Trials);
-                    ntrials_stage_today.value = value(stage_8_TrialsToday);
-                    violation_stage.value = value(stage_8_ViolationRate);
-                    timeout_stage.value = value(stage_8_TimeoutRate);
+                    ntrials_stage = value(stage_8_Trials);
+                    ntrials_stage_today = value(stage_8_TrialsToday);
+                    violation_stage = value(stage_8_ViolationRate);
+                    timeout_stage = value(stage_8_TimeoutRate);
                 end
         end
 
@@ -266,7 +270,7 @@ switch action
 
     %% Case Show_hide
     case 'show_hide'
-        if SummaryShow == 1
+        if value(SummaryShow) == 1
             set(value(myfig), 'Visible', 'on');            
         else
             set(value(myfig), 'Visible', 'off');
