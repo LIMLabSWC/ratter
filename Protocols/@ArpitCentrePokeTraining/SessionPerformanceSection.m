@@ -77,74 +77,16 @@ switch action
 		next_row(y, 1.5);
 		% SoloParamHandle(obj, 'previous_parameters', 'value', []);
 
-        SoloFunctionAddVars('Training_Performance_Summary', 'ro_args', ...
-			{'ntrials_stage';'ntrials_stage_today';'violation_stage';'timeout_stage'});
-		
 	% ------------------------------------------------------------------
 	%              evaluate
 	% ------------------------------------------------------------------
 
 	case 'evaluate'
-
-        eval(sprintf('ntrials_stage.value = value(stage_%i_Trials);',value(training_stage)));
-        eval(sprintf('ntrials_stage_today.value = value(stage_%i_TrialsToday);',value(training_stage)));
-        eval(sprintf('ntrials_violation_stage.value = value(stage_%i_ViolationRate);',value(training_stage)));
-        eval(sprintf('ntrials_violation_stage.value = value(stage_%i_TimeoutRate);',value(training_stage)));
-		        
-        switch value(training_stage)
-            
-            case 1                  %%  center led on -> poke in the center -> go cue -> reward light and sound
-                if n_completed_trials > 1
-                    ntrials.value        = n_completed_trials;
-                    violation_rate.value = nan;
-                    timeout_rate.value = nan;
-                end
-                violation_recent.value = nan;
-                timeout_recent.value = nan;
-
-                violation_stage.value = nan;
-                timeout_stage.value = nan;
-                
-            case {2,3}                  %%  center led on -> poke in the center -> go cue -> reward light and sound
-                if n_completed_trials > 1
-                    ntrials.value        = n_completed_trials;
-                    violation_rate.value = nan;
-                    timeout_rate.value = numel(find(timeout_history))/n_completed_trials;
-                end
-
-                violation_recent.value = nan;
-                violation_stage.value = nan;
-
-                if n_completed_trials >= 20
-                    timeout_recent.value = numel(find(timeout_history(end-19:end)))/20;
-                else
-                    timeout_recent.value = nan;
-                end
-
-            
-            case {4,5,6,7,8}        
-
-                if n_completed_trials > 1
-                    ntrials.value        = n_completed_trials;
-                    violation_rate.value = numel(find(violation_history))/n_completed_trials;
-                    timeout_rate.value = numel(find(timeout_history))/n_completed_trials;
-                end
-
-                if n_completed_trials >= 20
-                    timeout_recent.value = numel(find(timeout_history(end-19:end)))/20;
-                    violation_recent.value = numel(find(violation_history(end-19:end)))/20;
-                else
-                    timeout_recent.value = nan;
-                    violation_recent.value = nan;
-                end
-                
-        end
-		
+    		
         if nargout > 0
             x = [n_completed_trials, value(ntrials_stage), value(violation_rate), value(timeout_rate), value(violation_recent), ...
                 value(timeout_recent), value(violation_stage), value(timeout_stage)];
         end
-
 		
 	% ------------------------------------------------------------------
 	%              close

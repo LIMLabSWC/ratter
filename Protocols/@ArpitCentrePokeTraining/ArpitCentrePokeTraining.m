@@ -7,7 +7,7 @@ function [obj] = ArpitCentrePokeTraining(varargin)
 % we inherit only from Plugins
 
 obj = class(struct, mfilename, pokesplot2, saveload, sessionmodel2, soundmanager, soundui, ...
-  water, comments, soundtable, sqlsummary);
+  water, distribui,comments, soundtable, sqlsummary, bonsaicamera);
 
 %---------------------------------------------------------------
 %   BEGIN SECTION COMMON TO ALL PROTOCOLS, DO NOT MODIFY
@@ -19,8 +19,7 @@ if nargin==0 || (nargin==1 && ischar(varargin{1}) && strcmp(varargin{1}, 'empty'
 end
 
 if isa(varargin{1}, mfilename) % If first arg is an object of this class itself, we are
-   % Most likely responding to a callback from
-   % a SoloParamHandle defined in this mfile.
+   % Most likely responding to a callback from a SoloParamHandle defined in this mfile.
    if length(varargin) < 2 || ~ischar(varargin{2})
       error(['If called with a "%s" object as first arg, a second arg, a ' ...
          'string specifying the action, is required\n']);
@@ -200,52 +199,53 @@ switch action
     SoloFunctionAddVars('ParamsSection', 'rw_args', 'stage_fig_y');
   
     ArpitCentrePokeTrainingSMA(obj, 'init');
-   
+    
+
     x=oldx; y=oldy;
     SessionDefinition(obj, 'init', x, y, value(myfig)); %#ok<NASGU>
-    
-    %% Before preparing the trial, start with the Bonsai app to control the USB based Camera
-    % Declare the folder location for saving the video files
+    [x, y] = BonsaiCameraInterface(obj,'init',x,y);
 
-    current_dir = cd;
-    ratter_dir = extractBefore(current_dir,'ratter');
-    main_dir_video = [ratter_dir 'ratter_Videos'];
-    date_str = regexprep(char(datetime('today','Format','yyyy-MM-dd')), '[^0-9]', '');
-    video_foldername = sprintf('video_@%s_%s_%s_%s',name,expmtr,rname,date_str);
-    rat_dir = sprintf('%s\\%s\\%s',main_dir_video,expmtr,rname);
-    video_save_dir = sprintf('%s\\%s\\%s\\%s',main_dir_video,expmtr,rname,video_foldername);
-    % We have the general structure of folder save location, now need to
-    % check if there is any other folder for same date. We will add a
-    % alphabet in the end based upon the no. of files present.
-    if exist(rat_dir,'dir') == 7
-        listing = dir(rat_dir);
-        folderNames_rat_dir = {listing(find([listing.isdir])).name};
-        folderNames_rat_dir = folderNames_rat_dir(~ismember(folderNames_rat_dir,{'.','..'})); % Remove the '.' and '..' entries (current and parent directories)
-        sessions_today = length(find(contains(folderNames_rat_dir,video_foldername))); % number of folders containing the video foldername
-        video_save_dir = [video_save_dir char(sessions_today + 97)];
-    else
-        video_save_dir = [video_save_dir char(97)];
-    end
-    mkdir(video_save_dir);
-    SoloParamHandle(obj, 'Video_Saving_Folder', 'value', video_save_dir);
-    SoloFunctionAddVars('Connect_Bonsai_Camera', 'ro_args', ...
-			{'Video_Saving_Folder'});
-    Connect_Bonsai_Camera(obj,'init');
+    % %% Before preparing the trial, start with the Bonsai app to control the USB based Camera
+    % % Declare the folder location for saving the video files
+    % 
+    % current_dir = cd;
+    % ratter_dir = extractBefore(current_dir,'ratter');
+    % main_dir_video = [ratter_dir 'ratter_Videos'];
+    % date_str = regexprep(char(datetime('today','Format','yyyy-MM-dd')), '[^0-9]', '');
+    % video_foldername = sprintf('video_@%s_%s_%s_%s',name,expmtr,rname,date_str);
+    % rat_dir = sprintf('%s\\%s\\%s',main_dir_video,expmtr,rname);
+    % video_save_dir = sprintf('%s\\%s\\%s\\%s',main_dir_video,expmtr,rname,video_foldername);
+    % % We have the general structure of folder save location, now need to
+    % % check if there is any other folder for same date. We will add a
+    % % alphabet in the end based upon the no. of files present.
+    % if exist(rat_dir,'dir') == 7
+    %     listing = dir(rat_dir);
+    %     folderNames_rat_dir = {listing(find([listing.isdir])).name};
+    %     folderNames_rat_dir = folderNames_rat_dir(~ismember(folderNames_rat_dir,{'.','..'})); % Remove the '.' and '..' entries (current and parent directories)
+    %     sessions_today = length(find(contains(folderNames_rat_dir,video_foldername))); % number of folders containing the video foldername
+    %     video_save_dir = [video_save_dir char(sessions_today + 97)];
+    % else
+    %     video_save_dir = [video_save_dir char(97)];
+    % end
+    % mkdir(video_save_dir);
+    % SoloParamHandle(obj, 'Video_Saving_Folder', 'value', video_save_dir);
+    % SoloFunctionAddVars('Connect_Bonsai_Camera', 'ro_args', ...
+	% 		{'Video_Saving_Folder'});
+    % Connect_Bonsai_Camera(obj,'init');
 
     %%
+    % feval(mfilename, obj, 'prepare_next_trial'); % Commented out because it is also run by Runrats(while loading the protocol)
+          
+    %%% 
+    % case 'camera_control'
+    % 
+    %     if value(Connect_Camera) == 1
+    %         Connect_Bonsai_Camera(obj,'start');
+    %     else
+    %         Connect_Bonsai_Camera(obj,'stop');
+    %     end
 
-    % feval(mfilename, obj, 'prepare_next_trial'); % Commented out because
-    %%% it is being also run by Runrats(while loading the protocol)
-         
    %% change_water_modulation_params
-    case 'camera_control'
-    
-        if value(Connect_Camera) == 1
-            Connect_Bonsai_Camera(obj,'start');
-        else
-            Connect_Bonsai_Camera(obj,'stop');
-        end
-
    case 'change_water_modulation_params'
 	   display_guys = [1 150 300];
        for i=1:numel(display_guys)
@@ -290,9 +290,12 @@ switch action
    case 'trial_completed'
     % Change the video trial  
     Connect_Bonsai_Camera(obj,'next_trial');
-    % Update the Metrics Calculated
-    Training_Performance_Summary(obj,'evaluate');
-    SessionPerformanceSection(obj, 'evaluate');
+    
+    % Update the Metrics Calculated, Instead being Calculated in Session
+    % Definition and commented out
+
+    % Training_Performance_Summary(obj,'evaluate');
+    % SessionPerformanceSection(obj, 'evaluate');
     % Do any updates in the protocol that need doing:
     feval(mfilename, 'update');
 

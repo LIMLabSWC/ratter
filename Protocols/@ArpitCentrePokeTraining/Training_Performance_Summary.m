@@ -77,134 +77,19 @@ switch action
         x=oldx; y=oldy;
         figure(parentfig);
 
-        SoloFunctionAddVars('SessionPerformanceSection', 'ro_args', ...
-			{'stage_1_Trials';'stage_1_TrialsToday';'stage_1_ViolationRate';'stage_1_TimeoutRate'...
-            'stage_2_Trials';'stage_2_TrialsToday';'stage_2_ViolationRate';'stage_2_TimeoutRate' ...
-            'stage_3_Trials';'stage_3_TrialsToday';'stage_3_ViolationRate';'stage_3_TimeoutRate'...
-            'stage_4_Trials';'stage_4_TrialsToday';'stage_4_ViolationRate';'stage_4_TimeoutRate'...
-            'stage_5_Trials';'stage_5_TrialsToday';'stage_5_ViolationRate';'stage_5_TimeoutRate'...
-            'stage_6_Trials';'stage_6_TrialsToday';'stage_6_ViolationRate';'stage_6_TimeoutRate'...
-            'stage_7_Trials';'stage_7_TrialsToday';'stage_7_ViolationRate';'stage_7_TimeoutRate'...
-            'stage_8_Trials';'stage_8_TrialsToday';'stage_8_ViolationRate';'stage_8_TimeoutRate'});
-
 %% Evaluate
     case 'evaluate'
 
-        switch value(training_stage)
-
-            case 1
-
-                if n_completed_trials > 0
-
-                    stage_1_Trials.value = value(stage_1_Trials) + 1;
-                    stage_1_TrialsToday.value = value(stage_1_TrialsToday) + 1;                 
-                    stage_1_ViolationRate.value = nan;
-                    stage_1_TimeoutRate.value = nan;
-                    if value(hit_history(end)) == 1
-                        stage_1_TrialsValid.value = value(stage_1_TrialsValid) + 1;
-                    end
-                    % Updating Disp Values for SessionPeformance Section as
-                    % well
-
-                end
-
-            case 2
-
-                if n_completed_trials > 0
-
-                    stage_2_Trials.value = value(stage_2_Trials) + 1;
-                    stage_2_TrialsToday.value = value(stage_2_TrialsToday) + 1;
-                    if value(previous_sides(end)) ~= value(ThisTrial) && all(hit_history(end-1:end)) % last and present trials should also be a valid trial
-                        trial_oppSide = value(trial_oppSide) + 1;  % updating value for variable in TrainingParams_Section
-                    end
-                    stage_2_ViolationRate.value = nan;
-                    stage_2_TimeoutRate.value = ((value(stage_2_TimeoutRate) * (value(stage_2_Trials) - 1)) + double(timeout_history(end))) / value(stage_2_Trials);
-                    if value(hit_history(end)) == 1
-                        stage_2_TrialsValid.value = value(stage_2_TrialsValid) + 1;
-                    end
-
-                end
-
-            case 3
-
-                if n_completed_trials > 0
-
-                    stage_3_Trials.value = value(stage_3_Trials) + 1;
-                    stage_3_TrialsToday.value = value(stage_3_TrialsToday) + 1;
-                    stage_3_ViolationRate.value = ((value(stage_3_ViolationRate) * (value(stage_3_Trials) - 1)) + double(violation_history(end))) / value(stage_3_Trials);
-                    stage_3_TimeoutRate.value = ((value(stage_3_TimeoutRate) * (value(stage_3_Trials) - 1)) + double(timeout_history(end))) / value(stage_3_Trials);
-                    if value(hit_history(end)) == 1
-                        stage_3_TrialsValid.value = value(stage_3_TrialsValid) + 1;
-                    end
-                end
-
-            case 4  
-
-                if n_completed_trials > 0
-
-                    stage_4_Trials.value = value(stage_4_Trials) + 1;
-                    stage_4_TrialsToday.value = value(stage_4_TrialsToday) + 1;
-                    stage_4_ViolationRate.value = ((value(stage_4_ViolationRate) * (value(stage_4_Trials) - 1)) + double(violation_history(end))) / value(stage_4_Trials);
-                    stage_4_TimeoutRate.value = ((value(stage_4_TimeoutRate) * (value(stage_4_Trials) - 1)) + double(timeout_history(end))) / value(stage_4_Trials);
-                    if value(hit_history(end)) == 1
-                        stage_4_TrialsValid.value = value(stage_4_TrialsValid) + 1;
-                    end
-                end
-
-            case 5
-
-                if n_completed_trials > 0
-
-                    stage_5_Trials.value = value(stage_5_Trials) + 1;
-                    stage_5_TrialsToday.value = value(stage_5_TrialsToday) + 1;
-                    stage_5_ViolationRate.value = ((value(stage_5_ViolationRate) * (value(stage_5_Trials) - 1)) + double(violation_history(end))) / value(stage_5_Trials);
-                    stage_5_TimeoutRate.value = ((value(stage_5_TimeoutRate) * (value(stage_5_Trials) - 1)) + double(timeout_history(end))) / value(stage_5_Trials);
-                    if value(hit_history(end)) == 1
-                        stage_5_TrialsValid.value = value(stage_5_TrialsValid) + 1;
-                    end
-                end
-
-            case 6
-
-                if n_completed_trials > 0
-
-                    stage_6_Trials.value = value(stage_6_Trials) + 1;
-                    stage_6_TrialsToday.value = value(stage_6_TrialsToday) + 1;
-                    stage_6_ViolationRate.value = ((value(stage_6_ViolationRate) * (value(stage_6_Trials) - 1)) + double(violation_history(end))) / value(stage_6_Trials);
-                    stage_6_TimeoutRate.value = ((value(stage_6_TimeoutRate) * (value(stage_6_Trials) - 1)) + double(timeout_history(end))) / value(stage_6_Trials);
-                    if value(hit_history(end)) == 1
-                        stage_6_TrialsValid.value = value(stage_6_TrialsValid) + 1;
-                    end
-                end
-
-            case 7
-
-                if n_completed_trials > 0
-
-                    stage_7_Trials.value = value(stage_7_Trials) + 1;
-                    stage_7_TrialsToday.value = value(stage_7_TrialsToday) + 1;
-                    stage_7_ViolationRate.value = ((value(stage_7_ViolationRate) * (value(stage_7_Trials) - 1)) + double(violation_history(end))) / value(stage_7_Trials);
-                    stage_7_TimeoutRate.value = ((value(stage_7_TimeoutRate) * (value(stage_7_Trials) - 1)) + double(timeout_history(end))) / value(stage_7_Trials);
-                    if value(hit_history(end)) == 1
-                        stage_7_TrialsValid.value = value(stage_7_TrialsValid) + 1;
-                    end
-
-                end
-
-            case 8 
-
-                if n_completed_trials > 0
-
-                    stage_8_Trials.value = value(stage_8_Trials) + 1;
-                    stage_8_TrialsToday.value = value(stage_8_TrialsToday) + 1;
-                    stage_8_ViolationRate.value = ((value(stage_8_ViolationRate) * (value(stage_8_Trials) - 1)) + double(violation_history(end))) / value(stage_8_Trials);
-                    stage_8_TimeoutRate.value = ((value(stage_8_TimeoutRate) * (value(stage_8_Trials) - 1)) + double(timeout_history(end))) / value(stage_8_Trials);
-                    if value(hit_history(end)) == 1
-                        stage_8_TrialsValid.value = value(stage_8_TrialsValid) + 1;
-                    end
-                end
-        end
-
+        % if value(training_stage) == 8 && n_completed_trials > 0
+        %     stage_8_Trials.value = value(stage_8_Trials) + 1;
+        %     stage_8_TrialsToday.value = value(stage_8_TrialsToday) + 1;
+        %     stage_8_ViolationRate.value = ((value(stage_8_ViolationRate) * (value(stage_8_Trials) - 1)) + double(violation_history(end))) / value(stage_8_Trials);
+        %     stage_8_TimeoutRate.value = ((value(stage_8_TimeoutRate) * (value(stage_8_Trials) - 1)) + double(timeout_history(end))) / value(stage_8_Trials);
+        %     if value(hit_history(end)) == 1
+        %         stage_8_TrialsValid.value = value(stage_8_TrialsValid) + 1;
+        %     end
+        % end
+        % 
 
 %% Case close
     case 'close'
