@@ -183,9 +183,10 @@ switch action
 	 
     [x, y] = Training_Performance_Summary(obj, 'init', x, y);next_row(y);
     [x, y] = SessionPerformanceSection(obj, 'init', x, y);
-     next_row(y);next_row(y);
     
-     [x, y] = BonsaiCameraInterface(obj,'init',x,y,name,expmtr,rname);
+    next_row(y);next_row(y);
+    
+    [x, y] = BonsaiCameraInterface(obj,'init',x,y,name,expmtr,rname);
 
     next_column(x); y=5;
     [stage_fig_x,stage_fig_y] = Training_ParamsSection(obj, 'init', x, y);
@@ -200,46 +201,10 @@ switch action
     x=oldx; y=oldy;
     SessionDefinition(obj, 'init', x, y, value(myfig)); %#ok<NASGU>
     
-
-    % %% Before preparing the trial, start with the Bonsai app to control the USB based Camera
-    % % Declare the folder location for saving the video files
-    % 
-    % current_dir = cd;
-    % ratter_dir = extractBefore(current_dir,'ratter');
-    % main_dir_video = [ratter_dir 'ratter_Videos'];
-    % date_str = regexprep(char(datetime('today','Format','yyyy-MM-dd')), '[^0-9]', '');
-    % video_foldername = sprintf('video_@%s_%s_%s_%s',name,expmtr,rname,date_str);
-    % rat_dir = sprintf('%s\\%s\\%s',main_dir_video,expmtr,rname);
-    % video_save_dir = sprintf('%s\\%s\\%s\\%s',main_dir_video,expmtr,rname,video_foldername);
-    % % We have the general structure of folder save location, now need to
-    % % check if there is any other folder for same date. We will add a
-    % % alphabet in the end based upon the no. of files present.
-    % if exist(rat_dir,'dir') == 7
-    %     listing = dir(rat_dir);
-    %     folderNames_rat_dir = {listing(find([listing.isdir])).name};
-    %     folderNames_rat_dir = folderNames_rat_dir(~ismember(folderNames_rat_dir,{'.','..'})); % Remove the '.' and '..' entries (current and parent directories)
-    %     sessions_today = length(find(contains(folderNames_rat_dir,video_foldername))); % number of folders containing the video foldername
-    %     video_save_dir = [video_save_dir char(sessions_today + 97)];
-    % else
-    %     video_save_dir = [video_save_dir char(97)];
-    % end
-    % mkdir(video_save_dir);
-    % SoloParamHandle(obj, 'Video_Saving_Folder', 'value', video_save_dir);
-    % SoloFunctionAddVars('Connect_Bonsai_Camera', 'ro_args', ...
-	% 		{'Video_Saving_Folder'});
-    % Connect_Bonsai_Camera(obj,'init');
-
     %%
     % feval(mfilename, obj, 'prepare_next_trial'); % Commented out because it is also run by Runrats(while loading the protocol)
           
     %%% 
-    % case 'camera_control'
-    % 
-    %     if value(Connect_Camera) == 1
-    %         Connect_Bonsai_Camera(obj,'start');
-    %     else
-    %         Connect_Bonsai_Camera(obj,'stop');
-    %     end
 
    %% change_water_modulation_params
    case 'change_water_modulation_params'

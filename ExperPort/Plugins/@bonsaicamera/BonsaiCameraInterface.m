@@ -1,3 +1,47 @@
+%% BonsaiCameraInterface - MATLAB class interface to control USB camera via Bonsai using OSC messages.
+%
+% This class enables communication between MATLAB and a Bonsai workflow for controlling a USB-based camera.
+% It uses Open Sound Control (OSC) messages transmitted over UDP to start and stop the camera feed, as well
+% as to specify the location where video recordings should be saved.
+%
+% Dependencies:
+% - Camera_Control.bonsai: Bonsai workflow file (must be saved in the same folder as this class file)
+% - private/createOSCMessage.m: Helper function to format OSC messages
+% - private/runBonsaiWorkflow.m: Helper function to launch Bonsai with a specific workflow
+%
+% Initialization ('init' action):
+% Initialization ('init' action):
+% - Requires exactly five input arguments in the following order:
+%   1. x-position of the camera control toggle button (UI element in Solo GUI)
+%   2. y-position of the camera control toggle button
+%   3. Protocol name
+%   4. Experimenter name
+%   5. Rat name
+% - If any of these are missing or fewer than five arguments are provided, the initialization will result in an error.
+
+% - Launches the Bonsai workflow using runBonsaiWorkflow.m This function is used to start a Bonsai workflow (.bonsai file) from within MATLAB.
+% It builds and executes a command to launch the Bonsai executable with the selected workflow,
+% allowing automated and optionally parameterized workflow startup.
+
+% - Sets up a UDP sender object to communicate via OSC.
+
+% - Automatically creates a structured directory for saving video files in the format:
+%   C:\ratter_Videos\<Experimenter>\<Rat>\video_@<Protocol>_<Experimenter>_<Rat>_<Date>[a-z]
+%   A suffix is appended if there are multiple sessions on the same date.
+
+% - Sends initial OSC messages to set the video save path and begin streaming.
+%
+% Switch-case structure:
+%
+% 'init'           : Initializes UI toggle, starts Bonsai workflow, sets up save directory and UDP sender.
+% 'camera_connection' : Sends OSC messages to start or stop the camera feed. Also sends the video path to Bonsai.
+% 'next_trial'     : Sends a new video save path to Bonsai to separate trial recordings.
+% 'close'          : Stops the camera, deletes the UDP sender object, and terminates Bonsai and CMD processes.
+%
+% Notes:
+% - Uses IP 127.0.0.1 and port 9090 for sending OSC messages to Bonsai.
+% - Messages use the OSC addresses "/camera" and "/record" with "start"/"stop" commands.
+
 function [varargout] = BonsaiCameraInterface(obj,action,varargin)
 
 % If creating an empty object, return without further ado:
@@ -7,19 +51,6 @@ end
 
 GetSoloFunctionArgs(obj);
 
-% if isa(varargin{1}, mfilename) % If first arg is an object of this class itself, we are
-%    % Most likely responding to a callback from a SoloParamHandle defined in this mfile.
-%    if length(varargin) < 2 || ~ischar(varargin{2})
-%       error(['If called with a "%s" object as first arg, a second arg, a ' ...
-%          'string specifying the action, is required\n']);
-%    else 
-%        action = varargin{2}; varargin = varargin(3:end); %#ok<NASGU>
-%    end
-% else % Ok, regular call with first param being the action string.
-%    action = varargin{1}; varargin = varargin(2:end); %#ok<NASGU>
-% end
-
-GetSoloFunctionArgs(obj);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%% DO NOT CHANGE THEM UNLESS YOU MAKE THE SAME CHANGES IN BONSAI %%%%%%%%%
@@ -87,18 +118,31 @@ switch action
         runBonsaiWorkflow(bonsai_workflow_Path);        
         pause(5); % wait few seconds for software to open before continuing
 
-
-
         %% STEP 2: DECLARING AND FOLDER LOCATION FOR SAVING THE VIDEOS
 
         % The video files are saved in the folder format declared below
         % C:\RatterVideos\ExpName\RateName\Videos_Protocolname_ExpName_RatName_date
         % (the same format as Data file)
 
-        protocol_name = varargin{3};
-        experimenter_name = varargin{4};
-        rat_name = varargin{5};
-        
+        switch length(varargin)
+            case 2
+                protocol_name = 'protocol_name';
+                experimenter_name = 'experimenter';
+                rat_name = 'ratname';
+            case 3
+                protocol_name = varargin{3};
+                experimenter_name = 'experimenter';
+                rat_name = 'ratname';
+            case 4
+                protocol_name = varargin{3};
+                experimenter_name = varargin{4};
+                rat_name = 'ratname';
+            case 5
+                protocol_name = varargin{3};
+                experimenter_name = varargin{4};
+                rat_name = varargin{5};
+        end
+
         current_dir = cd;
         ratter_dir = extractBefore(current_dir,'ratter');
         main_dir_video = [ratter_dir 'ratter_Videos'];
