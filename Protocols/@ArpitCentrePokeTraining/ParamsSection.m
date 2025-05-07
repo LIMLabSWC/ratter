@@ -32,7 +32,7 @@ switch action
 		next_row(y);
 		NumeditParam(obj, 'drink_time', 1, x,y,'label','Drink Time','TooltipString','waits to finish water delivery');
 		next_row(y);
-		NumeditParam(obj, 'timeout_iti', 5, x,y,'label','No Choice Timeout','TooltipString','ITI on timeout trials');
+		NumeditParam(obj, 'timeout_iti', 1, x,y,'label','No Choice Timeout','TooltipString','ITI on timeout trials');
 		next_row(y);
 		NumeditParam(obj, 'violation_iti', 1, x,y,'label','Violation Timeout','TooltipString','Center poke violation duration');
         % Reward Collection
@@ -299,7 +299,7 @@ switch action
         % change the reward collection duration once we start with centre
         % poke
         if value(training_stage) >=  3
-            RewardCollection_duration.value = 30;
+            RewardCollection_duration.value = 100;
             Go_Sound.value = 1;
         end
 		            

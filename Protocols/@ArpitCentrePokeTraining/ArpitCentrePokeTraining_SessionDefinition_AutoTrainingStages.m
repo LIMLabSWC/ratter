@@ -36,12 +36,58 @@ ClearHelperVarsNotOwned(obj);
 
 
 %<STAGE_ALGORITHM>
+
+% Update ParamsSection
 ParamsSection_MaxSame.value = 4;
 callback(ParamsSection_MaxSame);
 stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
 if stage_no ~= value(ParamsSection_training_stage)
     ParamsSection_training_stage.value = stage_no;
     callback(ParamsSection_training_stage);
+end
+
+% Update Training_ParamsSection
+if value(previous_sides(end)) ~= value(previous_sides(end-1)) && all(hit_history(end-1:end)) % last and present trials should also be a valid trial
+    Training_ParamsSection_trial_oppSide = value(Training_ParamsSection_trial_oppSide) + 1;  % updating value for variable in TrainingParams_Section
+    callback(Training_ParamsSection_trial_oppSide);
+end
+
+% Updating Disp Values for Training_Peformance_Summary
+if n_completed_trials > 0
+    Training_Performance_Summary_stage_1_Trials.value = value(Training_Performance_Summary_stage_1_Trials) + 1;
+    Training_Performance_Summary_stage_1_TrialsToday.value = value(Training_Performance_Summary_stage_1_TrialsToday) + 1;
+    Training_Performance_Summary_stage_1_ViolationRate.value = nan;
+    Training_Performance_Summary_stage_1_TimeoutRate.value = nan;
+    if ~isnan(value(hit_history(end)))
+        Training_Performance_Summary_stage_1_TrialsValid.value = value(Training_Performance_Summary_stage_1_TrialsValid) + 1;
+    end
+  callback(Training_Performance_Summary_stage_1_Trials);
+  callback(Training_Performance_Summary_stage_1_TrialsToday)
+  callback(Training_Performance_Summary_stage_1_ViolationRate);
+  callback(Training_Performance_Summary_stage_1_TimeoutRate);
+  callback(Training_Performance_Summary_stage_1_TrialsValid);
+  
+  %  Updating Disp Values for Training_Peformance_Summary
+  SessionPerformanceSection_ntrials.value = n_completed_trials;
+  SessionPerformanceSection_violation_rate.value = nan;
+  SessionPerformanceSection_timeout_rate.value = nan;
+  SessionPerformanceSection_violation_recent.value = nan;
+  SessionPerformanceSection_timeout_recent.value = nan;
+  SessionPerformanceSection_ntrials_stage.value = value(Training_Performance_Summary_stage_1_Trials);
+  SessionPerformanceSection_ntrials_stage_today.value = value(Training_Performance_Summary_stage_1_TrialsToday);
+  SessionPerformanceSection_timeout_stage.value = nan;
+  SessionPerformanceSection_violation_stage.value = nan;
+  
+  callback(SessionPerformanceSection_ntrials);
+  callback(SessionPerformanceSection_ntrials_stage);
+  callback(SessionPerformanceSection_ntrials_stage_today)
+  callback(SessionPerformanceSection_violation_rate);
+  callback(SessionPerformanceSection_timeout_rate);
+  callback(SessionPerformanceSection_violation_recent);
+  callback(SessionPerformanceSection_timeout_recent);
+  callback(SessionPerformanceSection_violation_stage);
+  callback(SessionPerformanceSection_timeout_stage);
+
 end
 %</STAGE_ALGORITHM>
 end
@@ -132,7 +178,7 @@ GetSoloFunctionArgs(obj);
 ClearHelperVarsNotOwned(obj);
 %<STAGE_ALGORITHM>
 % Change ParamsSection Vars
-ParamsSection_MaxSame.value = 3;
+ParamsSection_MaxSame.value = 4;
 callback(ParamsSection_MaxSame);
 stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
 if stage_no ~= value(ParamsSection_training_stage)
@@ -159,6 +205,55 @@ if length(timeout_history) > 20
         ParamsSection_RewardCollection_duration.value = 120;
         callback(ParamsSection_RewardCollection_duration);
     end
+end
+
+% Update Training_ParamsSection
+if value(previous_sides(end)) ~= value(previous_sides(end-1)) && all(hit_history(end-1:end)) % last and present trials should also be a valid trial
+    Training_ParamsSection_trial_oppSide = value(Training_ParamsSection_trial_oppSide) + 1;  % updating value for variable in TrainingParams_Section
+    callback(Training_ParamsSection_trial_oppSide);
+end
+
+
+% Updating Disp Values for Training_Peformance_Summary
+if n_completed_trials > 0
+    Training_Performance_Summary_stage_2_Trials.value = value(Training_Performance_Summary_stage_2_Trials) + 1;
+    Training_Performance_Summary_stage_2_TrialsToday.value = value(Training_Performance_Summary_stage_2_TrialsToday) + 1;
+    Training_Performance_Summary_stage_2_ViolationRate.value = nan;
+    Training_Performance_Summary_stage_2_TimeoutRate.value = ((value(Training_Performance_Summary_stage_2_TimeoutRate) * (value(Training_Performance_Summary_stage_2_Trials) - 1)) + double(timeout_history(end))) / value(Training_Performance_Summary_stage_2_Trials);
+    if ~isnan(value(hit_history(end)))
+        Training_Performance_Summary_stage_2_TrialsValid.value = value(Training_Performance_Summary_stage_2_TrialsValid) + 1;
+    end
+  
+  callback(Training_Performance_Summary_stage_2_Trials);
+  callback(Training_Performance_Summary_stage_2_TrialsToday)
+  callback(Training_Performance_Summary_stage_2_ViolationRate);
+  callback(Training_Performance_Summary_stage_2_TimeoutRate);
+  callback(Training_Performance_Summary_stage_2_TrialsValid);
+
+  %  Updating Disp Values for Training_Peformance_Summary
+  SessionPerformanceSection_ntrials.value = n_completed_trials;
+  SessionPerformanceSection_violation_rate.value = nan;
+  SessionPerformanceSection_timeout_rate.value = numel(find(timeout_history))/n_completed_trials;
+  SessionPerformanceSection_violation_recent.value = nan;  
+  if n_completed_trials >= 20
+      SessionPerformanceSection_timeout_recent.value = numel(find(timeout_history(end-19:end)))/20;
+  else
+      SessionPerformanceSection_timeout_recent.value = nan;
+  end
+  SessionPerformanceSection_violation_stage.value = nan;
+  SessionPerformanceSection_ntrials_stage.value = value(Training_Performance_Summary_stage_2_Trials);
+  SessionPerformanceSection_ntrials_stage_today.value = value(Training_Performance_Summary_stage_2_TrialsToday);
+  SessionPerformanceSection_timeout_stage.value = value(Training_Performance_Summary_stage_2_TimeoutRate);
+  
+  callback(SessionPerformanceSection_ntrials);
+  callback(SessionPerformanceSection_ntrials_stage);
+  callback(SessionPerformanceSection_ntrials_stage_today)
+  callback(SessionPerformanceSection_violation_rate);
+  callback(SessionPerformanceSection_timeout_rate);
+  callback(SessionPerformanceSection_violation_recent);
+  callback(SessionPerformanceSection_timeout_recent);
+  callback(SessionPerformanceSection_violation_stage);
+  callback(SessionPerformanceSection_timeout_stage);
 end
 
 %</STAGE_ALGORITHM>
@@ -266,6 +361,49 @@ else
     end	
 end
 callback(ParamsSection_CP_duration);
+
+if n_completed_trials > 0
+    % Updating Disp Values for Training_Peformance_Summary
+    Training_Performance_Summary_stage_3_Trials.value = value(Training_Performance_Summary_stage_3_Trials) + 1;
+    Training_Performance_Summary_stage_3_TrialsToday.value = value(Training_Performance_Summary_stage_3_TrialsToday) + 1;
+    Training_Performance_Summary_stage_3_ViolationRate.value = nan;
+    Training_Performance_Summary_stage_3_TimeoutRate.value = ((value(Training_Performance_Summary_stage_3_TimeoutRate) * (value(Training_Performance_Summary_stage_3_Trials) - 1)) + double(timeout_history(end))) / value(Training_Performance_Summary_stage_3_Trials);
+    if ~isnan(value(hit_history(end)))
+        Training_Performance_Summary_stage_3_TrialsValid.value = value(Training_Performance_Summary_stage_3_TrialsValid) + 1;
+    end
+
+    callback(Training_Performance_Summary_stage_3_Trials);
+    callback(Training_Performance_Summary_stage_3_TrialsToday)
+    callback(Training_Performance_Summary_stage_3_ViolationRate);
+    callback(Training_Performance_Summary_stage_3_TimeoutRate);
+    callback(Training_Performance_Summary_stage_3_TrialsValid);
+  
+  % Updating Disp Values for Training_Peformance_Summary
+  SessionPerformanceSection_ntrials.value = n_completed_trials;
+  SessionPerformanceSection_violation_rate.value = nan;
+  SessionPerformanceSection_timeout_rate.value = numel(find(timeout_history))/n_completed_trials;
+  SessionPerformanceSection_violation_recent.value = nan;
+  if n_completed_trials >= 20
+      SessionPerformanceSection_timeout_recent.value = numel(find(timeout_history(end-19:end)))/20;
+  else
+      SessionPerformanceSection_timeout_recent.value = nan;
+  end
+  SessionPerformanceSection_violation_stage.value = nan;
+  SessionPerformanceSection_ntrials_stage.value = value(Training_Performance_Summary_stage_3_Trials);
+  SessionPerformanceSection_ntrials_stage_today.value = value(Training_Performance_Summary_stage_3_TrialsToday);
+  SessionPerformanceSection_timeout_stage.value = value(Training_Performance_Summary_stage_3_TimeoutRate);
+
+  callback(SessionPerformanceSection_ntrials);
+  callback(SessionPerformanceSection_ntrials_stage);
+  callback(SessionPerformanceSection_ntrials_stage_today)
+  callback(SessionPerformanceSection_violation_rate);
+  callback(SessionPerformanceSection_timeout_rate);
+  callback(SessionPerformanceSection_violation_recent);
+  callback(SessionPerformanceSection_timeout_recent);
+  callback(SessionPerformanceSection_violation_stage);
+  callback(SessionPerformanceSection_timeout_stage);
+end
+
 %</STAGE_ALGORITHM>
 end
 
@@ -379,6 +517,49 @@ if value(ParamsSection_CP_duration) > cp_max
 end
 
 callback(ParamsSection_CP_duration);
+
+if n_completed_trials > 0
+    % Updating Disp Values for Training_Peformance_Summary
+    Training_Performance_Summary_stage_4_Trials.value = value(Training_Performance_Summary_stage_4_Trials) + 1;
+    Training_Performance_Summary_stage_4_TrialsToday.value = value(Training_Performance_Summary_stage_4_TrialsToday) + 1;
+    Training_Performance_Summary_stage_4_ViolationRate.value = ((value(Training_Performance_Summary_stage_4_ViolationRate) * (value(Training_Performance_Summary_stage_4_Trials) - 1)) + double(violation_history(end))) / value(Training_Performance_Summary_stage_4_Trials);
+    Training_Performance_Summary_stage_4_TimeoutRate.value = ((value(Training_Performance_Summary_stage_4_TimeoutRate) * (value(Training_Performance_Summary_stage_4_Trials) - 1)) + double(timeout_history(end))) / value(Training_Performance_Summary_stage_4_Trials);
+    if ~isnan(value(hit_history(end)))
+        Training_Performance_Summary_stage_4_TrialsValid.value = value(Training_Performance_Summary_stage_4_TrialsValid) + 1;
+    end
+
+    callback(Training_Performance_Summary_stage_4_Trials);
+    callback(Training_Performance_Summary_stage_4_TrialsToday)
+    callback(Training_Performance_Summary_stage_4_ViolationRate);
+    callback(Training_Performance_Summary_stage_4_TimeoutRate);
+    callback(Training_Performance_Summary_stage_4_TrialsValid);
+  
+  % Updating Disp Values for Training_Peformance_Summary
+  SessionPerformanceSection_ntrials.value = n_completed_trials;
+  SessionPerformanceSection_violation_rate.value = numel(find(violation_history))/n_completed_trials;
+  SessionPerformanceSection_timeout_rate.value = numel(find(timeout_history))/n_completed_trials;
+  if n_completed_trials >= 20
+      SessionPerformanceSection_violation_recent.value = numel(find(violation_history(end-19:end)))/20;
+      SessionPerformanceSection_timeout_recent.value = numel(find(timeout_history(end-19:end)))/20;
+  else
+      SessionPerformanceSection_timeout_recent.value = nan;
+      SessionPerformanceSection_violation_recent.value = nan;
+  end
+  SessionPerformanceSection_violation_stage.value = value(Training_Performance_Summary_stage_4_ViolationRate);
+  SessionPerformanceSection_ntrials_stage.value = value(Training_Performance_Summary_stage_4_Trials);
+  SessionPerformanceSection_ntrials_stage_today.value = value(Training_Performance_Summary_stage_4_TrialsToday);
+  SessionPerformanceSection_timeout_stage.value = value(Training_Performance_Summary_stage_4_TimeoutRate);
+
+  callback(SessionPerformanceSection_ntrials);
+  callback(SessionPerformanceSection_ntrials_stage);
+  callback(SessionPerformanceSection_ntrials_stage_today)
+  callback(SessionPerformanceSection_violation_rate);
+  callback(SessionPerformanceSection_timeout_rate);
+  callback(SessionPerformanceSection_violation_recent);
+  callback(SessionPerformanceSection_timeout_recent);
+  callback(SessionPerformanceSection_violation_stage);
+  callback(SessionPerformanceSection_timeout_stage);
+end
 %</STAGE_ALGORITHM>
 end
 
@@ -535,6 +716,50 @@ if value(ParamsSection_CP_duration) >= starting_cp
     callback(ParamsSection_PreStim_time);
     callback(ParamsSection_A1_time);
 end
+
+if n_completed_trials > 0
+    % Updating Disp Values for Training_Peformance_Summary
+    Training_Performance_Summary_stage_5_Trials.value = value(Training_Performance_Summary_stage_5_Trials) + 1;
+    Training_Performance_Summary_stage_5_TrialsToday.value = value(Training_Performance_Summary_stage_5_TrialsToday) + 1;
+    Training_Performance_Summary_stage_5_ViolationRate.value = ((value(Training_Performance_Summary_stage_5_ViolationRate) * (value(Training_Performance_Summary_stage_5_Trials) - 1)) + double(violation_history(end))) / value(Training_Performance_Summary_stage_5_Trials);
+    Training_Performance_Summary_stage_5_TimeoutRate.value = ((value(Training_Performance_Summary_stage_5_TimeoutRate) * (value(Training_Performance_Summary_stage_5_Trials) - 1)) + double(timeout_history(end))) / value(Training_Performance_Summary_stage_5_Trials);
+    if ~isnan(value(hit_history(end)))
+        Training_Performance_Summary_stage_5_TrialsValid.value = value(Training_Performance_Summary_stage_5_TrialsValid) + 1;
+    end
+
+    callback(Training_Performance_Summary_stage_5_Trials);
+    callback(Training_Performance_Summary_stage_5_TrialsToday)
+    callback(Training_Performance_Summary_stage_5_ViolationRate);
+    callback(Training_Performance_Summary_stage_5_TimeoutRate);
+    callback(Training_Performance_Summary_stage_5_TrialsValid);
+  
+  % Updating Disp Values for Training_Peformance_Summary
+  SessionPerformanceSection_ntrials.value = n_completed_trials;
+  SessionPerformanceSection_violation_rate.value = numel(find(violation_history))/n_completed_trials;
+  SessionPerformanceSection_timeout_rate.value = numel(find(timeout_history))/n_completed_trials;
+  if n_completed_trials >= 20
+      SessionPerformanceSection_violation_recent.value = numel(find(violation_history(end-19:end)))/20;
+      SessionPerformanceSection_timeout_recent.value = numel(find(timeout_history(end-19:end)))/20;
+  else
+      SessionPerformanceSection_timeout_recent.value = nan;
+      SessionPerformanceSection_violation_recent.value = nan;
+  end
+  SessionPerformanceSection_violation_stage.value = value(Training_Performance_Summary_stage_5_ViolationRate);
+  SessionPerformanceSection_ntrials_stage.value = value(Training_Performance_Summary_stage_5_Trials);
+  SessionPerformanceSection_ntrials_stage_today.value = value(Training_Performance_Summary_stage_5_TrialsToday);
+  SessionPerformanceSection_timeout_stage.value = value(Training_Performance_Summary_stage_5_TimeoutRate);
+
+  callback(SessionPerformanceSection_ntrials);
+  callback(SessionPerformanceSection_ntrials_stage);
+  callback(SessionPerformanceSection_ntrials_stage_today)
+  callback(SessionPerformanceSection_violation_rate);
+  callback(SessionPerformanceSection_timeout_rate);
+  callback(SessionPerformanceSection_violation_recent);
+  callback(SessionPerformanceSection_timeout_recent);
+  callback(SessionPerformanceSection_violation_stage);
+  callback(SessionPerformanceSection_timeout_stage);
+end
+
 %</STAGE_ALGORITHM>
 end
 
@@ -671,6 +896,49 @@ if value(ParamsSection_CP_duration) >= starting_cp
     callback(ParamsSection_time_bet_aud1_gocue)
     callback(ParamsSection_PreStim_time);
     callback(ParamsSection_A1_time);
+end
+
+if n_completed_trials > 0
+    % Updating Disp Values for Training_Peformance_Summary
+    Training_Performance_Summary_stage_6_Trials.value = value(Training_Performance_Summary_stage_6_Trials) + 1;
+    Training_Performance_Summary_stage_6_TrialsToday.value = value(Training_Performance_Summary_stage_6_TrialsToday) + 1;
+    Training_Performance_Summary_stage_6_ViolationRate.value = ((value(Training_Performance_Summary_stage_6_ViolationRate) * (value(Training_Performance_Summary_stage_6_Trials) - 1)) + double(violation_history(end))) / value(Training_Performance_Summary_stage_6_Trials);
+    Training_Performance_Summary_stage_6_TimeoutRate.value = ((value(Training_Performance_Summary_stage_6_TimeoutRate) * (value(Training_Performance_Summary_stage_6_Trials) - 1)) + double(timeout_history(end))) / value(Training_Performance_Summary_stage_6_Trials);
+    if ~isnan(value(hit_history(end)))
+        Training_Performance_Summary_stage_6_TrialsValid.value = value(Training_Performance_Summary_stage_6_TrialsValid) + 1;
+    end
+
+    callback(Training_Performance_Summary_stage_6_Trials);
+    callback(Training_Performance_Summary_stage_6_TrialsToday)
+    callback(Training_Performance_Summary_stage_6_ViolationRate);
+    callback(Training_Performance_Summary_stage_6_TimeoutRate);
+    callback(Training_Performance_Summary_stage_6_TrialsValid);
+  
+  % Updating Disp Values for SessionPerformanceSection
+  SessionPerformanceSection_ntrials.value = n_completed_trials;
+  SessionPerformanceSection_violation_rate.value = numel(find(violation_history))/n_completed_trials;
+  SessionPerformanceSection_timeout_rate.value = numel(find(timeout_history))/n_completed_trials;
+  if n_completed_trials >= 20
+      SessionPerformanceSection_violation_recent.value = numel(find(violation_history(end-19:end)))/20;
+      SessionPerformanceSection_timeout_recent.value = numel(find(timeout_history(end-19:end)))/20;
+  else
+      SessionPerformanceSection_timeout_recent.value = nan;
+      SessionPerformanceSection_violation_recent.value = nan;
+  end
+  SessionPerformanceSection_violation_stage.value = value(Training_Performance_Summary_stage_6_ViolationRate);
+  SessionPerformanceSection_ntrials_stage.value = value(Training_Performance_Summary_stage_6_Trials);
+  SessionPerformanceSection_ntrials_stage_today.value = value(Training_Performance_Summary_stage_6_TrialsToday);
+  SessionPerformanceSection_timeout_stage.value = value(Training_Performance_Summary_stage_6_TimeoutRate);
+
+  callback(SessionPerformanceSection_ntrials);
+  callback(SessionPerformanceSection_ntrials_stage);
+  callback(SessionPerformanceSection_ntrials_stage_today)
+  callback(SessionPerformanceSection_violation_rate);
+  callback(SessionPerformanceSection_timeout_rate);
+  callback(SessionPerformanceSection_violation_recent);
+  callback(SessionPerformanceSection_timeout_recent);
+  callback(SessionPerformanceSection_violation_stage);
+  callback(SessionPerformanceSection_timeout_stage);
 end
 
 %</STAGE_ALGORITHM>
@@ -812,6 +1080,50 @@ if n_completed_trials >= 1
     ParamsSection_CP_duration.value = value(ParamsSection_SettlingIn_time) + value(ParamsSection_PreStim_time) + value(ParamsSection_A1_time) + value(ParamsSection_time_bet_aud1_gocue);
 end
 callback(ParamsSection_CP_duration);
+
+if n_completed_trials > 0
+    % Updating Disp Values for Training_Peformance_Summary
+    Training_Performance_Summary_stage_7_Trials.value = value(Training_Performance_Summary_stage_7_Trials) + 1;
+    Training_Performance_Summary_stage_7_TrialsToday.value = value(Training_Performance_Summary_stage_7_TrialsToday) + 1;
+    Training_Performance_Summary_stage_7_ViolationRate.value = ((value(Training_Performance_Summary_stage_7_ViolationRate) * (value(Training_Performance_Summary_stage_7_Trials) - 1)) + double(violation_history(end))) / value(Training_Performance_Summary_stage_7_Trials);
+    Training_Performance_Summary_stage_7_TimeoutRate.value = ((value(Training_Performance_Summary_stage_7_TimeoutRate) * (value(Training_Performance_Summary_stage_7_Trials) - 1)) + double(timeout_history(end))) / value(Training_Performance_Summary_stage_7_Trials);
+    if ~isnan(value(hit_history(end)))
+        Training_Performance_Summary_stage_7_TrialsValid.value = value(Training_Performance_Summary_stage_7_TrialsValid) + 1;
+    end
+
+    callback(Training_Performance_Summary_stage_7_Trials);
+    callback(Training_Performance_Summary_stage_7_TrialsToday)
+    callback(Training_Performance_Summary_stage_7_ViolationRate);
+    callback(Training_Performance_Summary_stage_7_TimeoutRate);
+    callback(Training_Performance_Summary_stage_7_TrialsValid);
+  
+  % Updating Disp Values for SessionPerformanceSection
+  SessionPerformanceSection_ntrials.value = n_completed_trials;
+  SessionPerformanceSection_violation_rate.value = numel(find(violation_history))/n_completed_trials;
+  SessionPerformanceSection_timeout_rate.value = numel(find(timeout_history))/n_completed_trials;
+  if n_completed_trials >= 20
+      SessionPerformanceSection_violation_recent.value = numel(find(violation_history(end-19:end)))/20;
+      SessionPerformanceSection_timeout_recent.value = numel(find(timeout_history(end-19:end)))/20;
+  else
+      SessionPerformanceSection_timeout_recent.value = nan;
+      SessionPerformanceSection_violation_recent.value = nan;
+  end
+  SessionPerformanceSection_violation_stage.value = value(Training_Performance_Summary_stage_7_ViolationRate);
+  SessionPerformanceSection_ntrials_stage.value = value(Training_Performance_Summary_stage_7_Trials);
+  SessionPerformanceSection_ntrials_stage_today.value = value(Training_Performance_Summary_stage_7_TrialsToday);
+  SessionPerformanceSection_timeout_stage.value = value(Training_Performance_Summary_stage_7_TimeoutRate);
+
+  callback(SessionPerformanceSection_ntrials);
+  callback(SessionPerformanceSection_ntrials_stage);
+  callback(SessionPerformanceSection_ntrials_stage_today)
+  callback(SessionPerformanceSection_violation_rate);
+  callback(SessionPerformanceSection_timeout_rate);
+  callback(SessionPerformanceSection_violation_recent);
+  callback(SessionPerformanceSection_timeout_recent);
+  callback(SessionPerformanceSection_violation_stage);
+  callback(SessionPerformanceSection_timeout_stage);
+end
+
 %</STAGE_ALGORITHM>
 end
 
@@ -951,6 +1263,50 @@ if n_completed_trials >= 1
     ParamsSection_CP_duration.value = value(ParamsSection_SettlingIn_time) + value(ParamsSection_PreStim_time) + value(ParamsSection_A1_time) + value(ParamsSection_time_bet_aud1_gocue);
 end
 callback(ParamsSection_CP_duration);
+
+if n_completed_trials > 0
+    % Updating Disp Values for Training_Peformance_Summary
+    Training_Performance_Summary_stage_8_Trials.value = value(Training_Performance_Summary_stage_8_Trials) + 1;
+    Training_Performance_Summary_stage_8_TrialsToday.value = value(Training_Performance_Summary_stage_8_TrialsToday) + 1;
+    Training_Performance_Summary_stage_8_ViolationRate.value = ((value(Training_Performance_Summary_stage_8_ViolationRate) * (value(Training_Performance_Summary_stage_8_Trials) - 1)) + double(violation_history(end))) / value(Training_Performance_Summary_stage_8_Trials);
+    Training_Performance_Summary_stage_8_TimeoutRate.value = ((value(Training_Performance_Summary_stage_8_TimeoutRate) * (value(Training_Performance_Summary_stage_8_Trials) - 1)) + double(timeout_history(end))) / value(Training_Performance_Summary_stage_8_Trials);
+    if ~isnan(value(hit_history(end)))
+        Training_Performance_Summary_stage_8_TrialsValid.value = value(Training_Performance_Summary_stage_8_TrialsValid) + 1;
+    end
+
+    callback(Training_Performance_Summary_stage_8_Trials);
+    callback(Training_Performance_Summary_stage_8_TrialsToday)
+    callback(Training_Performance_Summary_stage_8_ViolationRate);
+    callback(Training_Performance_Summary_stage_8_TimeoutRate);
+    callback(Training_Performance_Summary_stage_8_TrialsValid);
+  
+  % Updating Disp Values for SessionPerformanceSection
+  SessionPerformanceSection_ntrials.value = n_completed_trials;
+  SessionPerformanceSection_violation_rate.value = numel(find(violation_history))/n_completed_trials;
+  SessionPerformanceSection_timeout_rate.value = numel(find(timeout_history))/n_completed_trials;
+  if n_completed_trials >= 20
+      SessionPerformanceSection_violation_recent.value = numel(find(violation_history(end-19:end)))/20;
+      SessionPerformanceSection_timeout_recent.value = numel(find(timeout_history(end-19:end)))/20;
+  else
+      SessionPerformanceSection_timeout_recent.value = nan;
+      SessionPerformanceSection_violation_recent.value = nan;
+  end
+  SessionPerformanceSection_violation_stage.value = value(Training_Performance_Summary_stage_8_ViolationRate);
+  SessionPerformanceSection_ntrials_stage.value = value(Training_Performance_Summary_stage_8_Trials);
+  SessionPerformanceSection_ntrials_stage_today.value = value(Training_Performance_Summary_stage_8_TrialsToday);
+  SessionPerformanceSection_timeout_stage.value = value(Training_Performance_Summary_stage_8_TimeoutRate);
+
+  callback(SessionPerformanceSection_ntrials);
+  callback(SessionPerformanceSection_ntrials_stage);
+  callback(SessionPerformanceSection_ntrials_stage_today)
+  callback(SessionPerformanceSection_violation_rate);
+  callback(SessionPerformanceSection_timeout_rate);
+  callback(SessionPerformanceSection_violation_recent);
+  callback(SessionPerformanceSection_timeout_recent);
+  callback(SessionPerformanceSection_violation_stage);
+  callback(SessionPerformanceSection_timeout_stage);
+end
+
 %</STAGE_ALGORITHM>
 end
 
