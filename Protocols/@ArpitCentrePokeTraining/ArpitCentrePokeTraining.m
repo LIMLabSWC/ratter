@@ -184,12 +184,8 @@ switch action
     [x, y] = Training_Performance_Summary(obj, 'init', x, y);next_row(y);
     [x, y] = SessionPerformanceSection(obj, 'init', x, y);
      next_row(y);next_row(y);
-     ToggleParam(obj, 'Connect_Camera', 1, x,y,...
-        'OnString', 'Camera On',...
-        'OffString', 'Camera Off',...
-        'TooltipString', sprintf('If on (black) then it enables to start the camera \n',...
-                                 'Only press if camera does not start on its own.'));
-        set_callback(Connect_Camera, {mfilename, 'camera_control'});
+    
+     [x, y] = BonsaiCameraInterface(obj,'init',x,y,name,expmtr,rname);
 
     next_column(x); y=5;
     [stage_fig_x,stage_fig_y] = Training_ParamsSection(obj, 'init', x, y);
@@ -203,7 +199,7 @@ switch action
 
     x=oldx; y=oldy;
     SessionDefinition(obj, 'init', x, y, value(myfig)); %#ok<NASGU>
-    [x, y] = BonsaiCameraInterface(obj,'init',x,y);
+    
 
     % %% Before preparing the trial, start with the Bonsai app to control the USB based Camera
     % % Declare the folder location for saving the video files
@@ -309,7 +305,7 @@ switch action
     PokesPlotSection(obj, 'close');
 	ParamsSection(obj, 'close');
     StimulusSection(obj,'close');
-    Connect_Bonsai_Camera(obj,'close');
+    BonsaiCameraInterface(obj,'close');
     if exist('myfig', 'var') && isa(myfig, 'SoloParamHandle') && ishandle(value(myfig)) %#ok<NODEF>
       delete(value(myfig));
     end

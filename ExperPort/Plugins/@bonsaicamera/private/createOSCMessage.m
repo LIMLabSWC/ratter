@@ -27,14 +27,4 @@ argBytes = padNulls(arg);
 % Combine all parts
 oscPacket = [addrBytes, tagBytes, argBytes];
 
-%% parse the addOptArray
-    function out = parseAddOptArray(addOptArray)
-        addOpt = cell(length(addOptArray)/2,2);
-        for ii =  1:length(addOpt)
-            addOpt{ii,1} = addOptArray{2*ii-1}; %gets the propriety
-            addOpt{ii,2} = addOptArray{2*ii}; %gets the value
-        end
-        out = addOpt;
-    end
-
 end

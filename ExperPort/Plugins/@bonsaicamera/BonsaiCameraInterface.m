@@ -7,17 +7,17 @@ end
 
 GetSoloFunctionArgs(obj);
 
-if isa(varargin{1}, mfilename) % If first arg is an object of this class itself, we are
-   % Most likely responding to a callback from a SoloParamHandle defined in this mfile.
-   if length(varargin) < 2 || ~ischar(varargin{2})
-      error(['If called with a "%s" object as first arg, a second arg, a ' ...
-         'string specifying the action, is required\n']);
-   else 
-       action = varargin{2}; varargin = varargin(3:end); %#ok<NASGU>
-   end
-else % Ok, regular call with first param being the action string.
-   action = varargin{1}; varargin = varargin(2:end); %#ok<NASGU>
-end
+% if isa(varargin{1}, mfilename) % If first arg is an object of this class itself, we are
+%    % Most likely responding to a callback from a SoloParamHandle defined in this mfile.
+%    if length(varargin) < 2 || ~ischar(varargin{2})
+%       error(['If called with a "%s" object as first arg, a second arg, a ' ...
+%          'string specifying the action, is required\n']);
+%    else 
+%        action = varargin{2}; varargin = varargin(3:end); %#ok<NASGU>
+%    end
+% else % Ok, regular call with first param being the action string.
+%    action = varargin{1}; varargin = varargin(2:end); %#ok<NASGU>
+% end
 
 GetSoloFunctionArgs(obj);
 
@@ -41,11 +41,11 @@ recording_command_address = "/record";  % Use string type. MUST MATCH Bonsai Add
 % within the ratter > ExpertPort > Plugins > @bonsaicamera folder
 scriptFullPath = mfilename('fullpath'); % Path of running the current script
 scriptDirectory = fileparts(scriptFullPath);
-bonsai_workflow_Path = fullfile(scriptDirectory,'Bonsai_Camera_Control','Camera_Control.bonsai');
-foundworkflow = exist("bonsai_workflow_Path",'file');
+bonsai_workflow_Path = fullfile(scriptDirectory,'Camera_Control.bonsai');
+foundworkflow = isfile(bonsai_workflow_Path);
 if ~foundworkflow
     warning('could not find bonsai executable, please insert it manually');
-    [bonsai_fname bonsai_fpath] = uigetfile( '*.exe', 'Provide the path to Bonsai executable');
+    [bonsai_fname, bonsai_fpath] = uigetfile( '*.bonsai', 'Provide the path to Bonsai executable');
     bonsai_workflow_Path = fullfile(bonsai_fpath, bonsai_fname);
 end
 
@@ -95,13 +95,17 @@ switch action
         % C:\RatterVideos\ExpName\RateName\Videos_Protocolname_ExpName_RatName_date
         % (the same format as Data file)
 
+        protocol_name = varargin{3};
+        experimenter_name = varargin{4};
+        rat_name = varargin{5};
+        
         current_dir = cd;
         ratter_dir = extractBefore(current_dir,'ratter');
         main_dir_video = [ratter_dir 'ratter_Videos'];
         date_str = regexprep(char(datetime('today','Format','yyyy-MM-dd')), '[^0-9]', '');
-        video_foldername = sprintf('video_@%s_%s_%s_%s',name,expmtr,rname,date_str);
-        rat_dir = sprintf('%s\\%s\\%s',main_dir_video,expmtr,rname);
-        video_save_dir = sprintf('%s\\%s\\%s\\%s',main_dir_video,expmtr,rname,video_foldername);
+        video_foldername = sprintf('video_@%s_%s_%s_%s',protocol_name,experimenter_name,rat_name,date_str);
+        rat_dir = sprintf('%s\\%s\\%s',main_dir_video,experimenter_name,rat_name);
+        video_save_dir = sprintf('%s\\%s\\%s\\%s',main_dir_video,experimenter_name,rat_name,video_foldername);
         % We have the general structure of folder save location, now need to
         % check if there is any other folder for same date. We will add a
         % alphabet in the end based upon the no. of files present.
