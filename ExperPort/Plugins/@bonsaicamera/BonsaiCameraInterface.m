@@ -126,17 +126,45 @@ switch action
 
         switch length(varargin)
             case 2
-                protocol_name = 'protocol_name';
-                experimenter_name = 'experimenter';
-                rat_name = 'ratname';
+                protocol_name = lower(class(obj));
+                experimenter_name_handle = get_sphandle('fullname', 'SavingSection_experimenter');
+                if isempty(experimenter_name_handle)
+                    experimenter_name = 'experimenter';
+                else
+                    experimenter_name = value(experimenter_name_handle{1});
+                end 
+                rat_name_handle = get_sphandle('fullname', 'SavingSection_ratname');
+                if isempty(rat_name_handle)
+                    rat_name = 'ratname';
+                else
+                    rat_name = value(rat_name_handle{1});
+                end
+            
             case 3
                 protocol_name = varargin{3};
-                experimenter_name = 'experimenter';
-                rat_name = 'ratname';
+                experimenter_name_handle = get_sphandle('fullname', 'SavingSection_experimenter');
+                if isempty(experimenter_name_handle)
+                    experimenter_name = 'experimenter';
+                else
+                    experimenter_name = value(experimenter_name_handle{1});
+                end 
+                rat_name_handle = get_sphandle('fullname', 'SavingSection_ratname');
+                if isempty(rat_name_handle)
+                    rat_name = 'ratname';
+                else
+                    rat_name = value(rat_name_handle{1});
+                end
+            
             case 4
                 protocol_name = varargin{3};
                 experimenter_name = varargin{4};
-                rat_name = 'ratname';
+                rat_name_handle = get_sphandle('fullname', 'SavingSection_ratname');
+                if isempty(rat_name_handle)
+                    rat_name = 'ratname';
+                else
+                    rat_name = value(rat_name_handle{1});
+                end
+            
             case 5
                 protocol_name = varargin{3};
                 experimenter_name = varargin{4};
