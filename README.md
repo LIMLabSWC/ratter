@@ -1,36 +1,56 @@
-# BControl - Behavioral Experimentation System
+# BControl
 
-BControl is a sophisticated system designed for conducting behavioural experiments with high precision and flexibility. It aims to facilitate rapid interaction with experimental subjects, provide high-time-resolution measurements, and offer ease of programming and modification. For more information, check out the [Brody lab wiki](https://brodylabwiki.princeton.edu/bcontrol/index.php?title=General_overview).
+BControl is a behavioral experimentation system that provides a comprehensive framework for running behavioral experiments. This system is designed to be flexible, extensible, and user-friendly, allowing researchers to implement and run various types of behavioral protocols.
+
+## ⚠️ Recent Changes (May 2025)
+
+We are currently undergoing a major cleanup and modernization effort. Please check the [Recent Refactoring Documentation](docs/recent-refactoring/README.md) for details about:
+
+- Removal of legacy Perl scripts
+- Protocols directory restructuring
+- Documentation modernization
+- Testing status and next steps
+
+These changes are being tracked in the `docs/recent-refactoring/` directory until they are fully tested and verified.
 
 ## Repository Structure
 
-This repository stores the BControl code for our high-throughput behavior training facility. Certain directories and files are intentionally excluded from version control:
+The repository is organized as follows:
 
-- The `/SoloData/` directory contains raw data and configuration files essential for running experiments. It is version-controlled with SVN and stored on our internal server.
-
-- The `/ExperPort/Settings/Settings_Custom.conf` file contains rig-specific configurations. Instead, we provide `/ExperPort/Settings/_Settings_Custom.conf`, which is a template. After downloading, users should rename it to `Settings_Custom.conf` and add their rig-specific settings.
-
-- The `/PASSWORD_CONFIG-DO_NOT_VERSIONCONTROL.mat` file stores hostnames, users, and passwords. It is version-controlled with SVN and stored on our internal server.
+```
+BControl/
+├── ExperPort/           # Core system files
+├── Protocols/           # Main protocols directory
+├── Bpod Protocols/      # Bpod-specific protocols
+├── docs/               # Documentation
+│   ├── guides/        # User guides and tutorials
+│   ├── technical/     # Technical documentation
+│   ├── hardware/      # Hardware-specific documentation
+│   ├── architecture/  # System architecture documentation
+│   ├── recent-refactoring/ # Recent changes documentation
+│   └── old_docs/      # Legacy documentation (archived)
+└── SoloData/          # Data storage (excluded from version control)
+```
 
 ## Documentation
 
-### Table of Contents
+### User Guides
+- [Protocol Writer's Guide](docs/guides/protocol-writers-guide.md)
+- [Solo Core Guide](docs/guides/solo-core-guide.md)
+- [Water Valve Tutorial](docs/guides/water-valve-tutorial.md)
 
-1. [Architecture Overview](docs/architecture/system-overview.md)
-   - System Components
-   - Data Flow
-   - Hardware Integration
+### Technical Documentation
+- [System Architecture Overview](docs/architecture/system-overview.md)
+- [FSM Documentation](docs/technical/fsm-documentation.md)
+- [Staircase Algorithms](docs/technical/staircases.md)
 
-2. [User Guides](docs/guides/)
-   - [Protocol Writer's Guide](docs/guides/protocol-writers-guide.md)
-   - [Solo Core Guide](docs/guides/solo-core-guide.md)
-   - [Water Valve Tutorial](docs/guides/water-valve-tutorial.md)
+### Hardware Documentation
+- [LynxTrig Setup](docs/hardware/lynxtrig-setup.md)
+- [Comedi Setup](docs/hardware/comedi-setup.md)
 
-3. [Hardware Setup](docs/hardware/)
-   - [LynxTrig Setup](docs/hardware/lynxtrig-setup.md)
-   - [Comedi Setup](docs/hardware/comedi-setup.md)
-
-4. [Technical Documentation](docs/technical/)
-   - [Staircase Algorithms](docs/technical/staircases.md)
-   - [FSM Documentation](docs/technical/fsm-documentation.md)
+### Recent Changes
+- [Refactoring Overview](docs/recent-refactoring/README.md)
+- [Perl Scripts Removal](docs/recent-refactoring/perl-scripts-removal.md)
+- [Protocols Restructuring](docs/recent-refactoring/protocols-restructuring.md)
+- [Documentation Modernization](docs/recent-refactoring/documentation-modernization.md)
 
