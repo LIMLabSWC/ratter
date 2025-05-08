@@ -1,4 +1,4 @@
-function [x, y] = Training_ParamsSection(obj, action, x,y)
+function [x, y] = TrainingStageParamsSection(obj, action, x,y)
 
 GetSoloFunctionArgs(obj);
 

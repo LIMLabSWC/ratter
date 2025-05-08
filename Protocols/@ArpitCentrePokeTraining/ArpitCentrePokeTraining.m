@@ -181,7 +181,7 @@ switch action
     
     next_row(y);next_row(y);    
 	 
-    [x, y] = Training_Performance_Summary(obj, 'init', x, y);next_row(y);
+    [x, y] = PerformanceSummarySection(obj, 'init', x, y);next_row(y);
     [x, y] = SessionPerformanceSection(obj, 'init', x, y);
     
     next_row(y);next_row(y);
@@ -189,7 +189,7 @@ switch action
     [x, y] = BonsaiCameraInterface(obj,'init',x,y,name,expmtr,rname);
 
     next_column(x); y=5;
-    [stage_fig_x,stage_fig_y] = Training_ParamsSection(obj, 'init', x, y);
+    [stage_fig_x,stage_fig_y] = TrainingStageParamsSection(obj, 'init', x, y);
     SoloParamHandle(obj, 'stage_fig_x', 'value', stage_fig_x);
     SoloFunctionAddVars('ParamsSection', 'rw_args', 'stage_fig_x');
     SoloParamHandle(obj, 'stage_fig_y', 'value', stage_fig_y);
@@ -249,16 +249,17 @@ switch action
 
    %% trial_completed
    case 'trial_completed'
-    % Change the video trial  
-    Connect_Bonsai_Camera(obj,'next_trial');
+    
+       % Change the video trial  
+        BonsaiCameraInterface(obj,'next_trial');
     
     % Update the Metrics Calculated, Instead being Calculated in Session
     % Definition and commented out
 
-    % Training_Performance_Summary(obj,'evaluate');
+    % PerformanceSummarySection(obj,'evaluate');
     % SessionPerformanceSection(obj, 'evaluate');
     % Do any updates in the protocol that need doing:
-    feval(mfilename, 'update');
+       feval(mfilename, 'update');
 
    %% update
    case 'update'
@@ -280,7 +281,7 @@ switch action
       %% end_session
    case 'end_session'
       prot_title.value = [value(prot_title) ', Ended at ' datestr(now, 'HH:MM')];
-      Connect_Bonsai_Camera(obj,'stop'); % Stopping the cameras
+      BonsaiCameraInterface(obj,'stop') % Stopping the cameras
       
       %% pre_saving_settings
    case 'pre_saving_settings'
