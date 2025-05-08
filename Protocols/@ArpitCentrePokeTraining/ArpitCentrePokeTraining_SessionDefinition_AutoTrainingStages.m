@@ -47,9 +47,11 @@ if stage_no ~= value(ParamsSection_training_stage)
 end
 
 % Update TrainingStageParamsSection
-if previous_sides(end) ~= previous_sides(end-1) && all(hit_history(end-1:end)) % last and present trials should also be a valid trial
-    TrainingStageParamsSection_trial_oppSide.value = value(TrainingStageParamsSection_trial_oppSide) + 1;  % updating value for variable in TrainingParams_Section
-    callback(TrainingStageParamsSection_trial_oppSide);
+if n_completed_trials >= 2
+    if previous_sides(end) ~= previous_sides(end-1) && all(hit_history(end-1:end)) % last and present trials should also be a valid trial
+        TrainingStageParamsSection_trial_oppSide.value = value(TrainingStageParamsSection_trial_oppSide) + 1;  % updating value for variable in TrainingParams_Section
+        callback(TrainingStageParamsSection_trial_oppSide);
+    end
 end
 
 % Updating Disp Values for Training_Peformance_Summary
@@ -208,9 +210,11 @@ if length(timeout_history) > 20
 end
 
 % Update TrainingStageParamsSection
-if previous_sides(end) ~= previous_sides(end-1) && all(hit_history(end-1:end)) % last and present trials should also be a valid trial
-    TrainingStageParamsSection_trial_oppSide.value = value(TrainingStageParamsSection_trial_oppSide) + 1;  % updating value for variable in TrainingParams_Section
-    callback(TrainingStageParamsSection_trial_oppSide);
+if n_completed_trials >= 2
+    if previous_sides(end) ~= previous_sides(end-1) && all(hit_history(end-1:end)) % last and present trials should also be a valid trial
+        TrainingStageParamsSection_trial_oppSide.value = value(TrainingStageParamsSection_trial_oppSide) + 1;  % updating value for variable in TrainingParams_Section
+        callback(TrainingStageParamsSection_trial_oppSide);
+    end
 end
 
 

@@ -289,10 +289,20 @@ switch action
     
     StimulusSection(obj,'hide');   
     SessionDefinition(obj, 'run_eod_logic_without_saving');
-    % perf    = SessionPerformanceSection(obj, 'evaluate');
-    cp_durs = ParamsSection(obj, 'get_cp_history');
+
+    % Sending protocol data as structure is causing error in saving bdata,
+    % instead not sending it asif required can be taken from session data
+    sendsummary(obj);
     
-    [stim1dur] = ParamsSection(obj,'get_stimdur_history');
+    % perf    = SessionPerformanceSection(obj, 'evaluate');
+    % cp_durs = ParamsSection(obj, 'get_cp_history');
+    % [stim1dur] = ParamsSection(obj,'get_stimdur_history');
+    % pd.hits=hit_history(:);
+    % pd.sides=previous_sides(:);
+    % pd.viols=violation_history(:);
+    % pd.timeouts=timeout_history(:);
+    % pd.cp_durs=cp_durs(:);
+    % pd.stim1dur=stim1dur(:);
     
 % 	CommentsSection(obj, 'append_line', ...
 % 		sprintf(['ntrials = %d, violations = %.2f, timeouts=%.2f, hits = %.2f\n', ...
@@ -300,15 +310,7 @@ switch action
 %         'Low = %.2f, High = %.2f'], ...
 % 		perf(1), perf(2), perf(3), perf(6), cp_durs(1), cp_durs(end), cp_durs(end)-cp_durs(1), classperf(1),classperf(2)));
     
-    pd.hits=hit_history(:);
-    pd.sides=previous_sides(:);
-    pd.viols=violation_history(:);
-    pd.timeouts=timeout_history(:);
-    pd.cp_durs=cp_durs(:);
-    pd.stim1dur=stim1dur(:);
-    
-    
-    sendsummary(obj,'protocol_data',pd);    
+    % sendsummary(obj,'protocol_data',pd);    
       
       %% otherwise
     otherwise
