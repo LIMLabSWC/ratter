@@ -220,7 +220,7 @@ switch action
             SessionDefinition(obj, 'jump_to_stage',value(training_stage));
         end
 
-            [stage_fig_x,stage_fig_y] = Training_ParamsSection(obj, 'reinit', value(stage_fig_x),value(stage_fig_y)); % update the training params as well
+            [stage_fig_x,stage_fig_y] = TrainingStageParamsSection(obj, 'reinit', value(stage_fig_x),value(stage_fig_y)); % update the training params as well
             ArpitCentrePokeTrainingSMA(obj,'reinit');
             SessionPerformanceSection(obj, 'evaluate');
            
