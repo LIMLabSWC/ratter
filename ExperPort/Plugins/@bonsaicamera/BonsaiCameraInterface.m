@@ -37,7 +37,7 @@
 % 'camera_connection' : Sends OSC messages to start or stop the camera feed. Also sends the video path to Bonsai.
 % 'next_trial'     : Sends a new video save path to Bonsai to separate trial recordings.
 % 'close'          : Stops the camera, deletes the UDP sender object, and terminates Bonsai and CMD processes.
-%
+% 'stop'           : Sending OSC message to stop streaming and save last trial video
 % Notes:
 % - Uses IP 127.0.0.1 and port 9090 for sending OSC messages to Bonsai.
 % - Messages use the OSC addresses "/camera" and "/record" with "start"/"stop" commands.
@@ -218,6 +218,12 @@ switch action
         end
 
      
+    case 'stop' % Stopping the streaming and saving last trial video
+
+        % this stops saving and streaming of the camera
+        oscMsg_Camera_stop = createOSCMessage("/camera", stopCommand);
+        write(value(UDPSender), oscMsg_Camera_stop, "uint8", bonsaiComputerIP,bonsaiUdpPort);
+
      %% next trial   
      %  SEND STRING TO BONSAI AT THE END OF THE TRIAL TO SAVE NEXT TRIAL IN
      %  NEW VIDEO FILE

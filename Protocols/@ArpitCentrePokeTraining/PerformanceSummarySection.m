@@ -1,4 +1,4 @@
-function [x, y] = Training_Performance_Summary(obj, action, varargin)
+function [x, y] = PerformanceSummarySection(obj, action, varargin)
 
 GetSoloFunctionArgs(obj);
 
