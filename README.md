@@ -34,15 +34,3 @@ This repository stores the BControl code for our high-throughput behavior traini
    - [Staircase Algorithms](docs/technical/staircases.md)
    - [FSM Documentation](docs/technical/fsm-documentation.md)
 
-### Quick Start
-
-1. Install the required hardware components
-2. Set up the LynxTrig system
-3. Configure Comedi for hardware triggering
-4. Start the ExperPort system
-
-For detailed instructions, please refer to the specific sections in the documentation.
-
-## Support
-
-For technical support or questions, please contact the system administrators.
