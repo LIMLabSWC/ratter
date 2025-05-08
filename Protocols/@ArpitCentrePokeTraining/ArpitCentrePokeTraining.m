@@ -243,9 +243,10 @@ switch action
             prot_title.value=[mfilename ' on rig ' get_hostname ' : ' expmtr ', ' rname  '.  Started at ' datestr(now, 'HH:MM')];
        end
       
-       % try 
-       %     send_n_done_trials(obj);
-       % end
+       try 
+           send_n_done_trials(obj,'update');
+       catch
+       end
 
    %% trial_completed
    case 'trial_completed'

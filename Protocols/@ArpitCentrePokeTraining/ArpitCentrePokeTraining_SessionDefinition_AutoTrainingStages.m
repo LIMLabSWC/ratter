@@ -47,8 +47,8 @@ if stage_no ~= value(ParamsSection_training_stage)
 end
 
 % Update TrainingStageParamsSection
-if value(previous_sides(end)) ~= value(previous_sides(end-1)) && all(hit_history(end-1:end)) % last and present trials should also be a valid trial
-    TrainingStageParamsSection_trial_oppSide = value(TrainingStageParamsSection_trial_oppSide) + 1;  % updating value for variable in TrainingParams_Section
+if previous_sides(end) ~= previous_sides(end-1) && all(hit_history(end-1:end)) % last and present trials should also be a valid trial
+    TrainingStageParamsSection_trial_oppSide.value = value(TrainingStageParamsSection_trial_oppSide) + 1;  % updating value for variable in TrainingParams_Section
     callback(TrainingStageParamsSection_trial_oppSide);
 end
 
@@ -58,7 +58,7 @@ if n_completed_trials > 0
     PerformanceSummarySection_stage_1_TrialsToday.value = value(PerformanceSummarySection_stage_1_TrialsToday) + 1;
     PerformanceSummarySection_stage_1_ViolationRate.value = nan;
     PerformanceSummarySection_stage_1_TimeoutRate.value = nan;
-    if ~isnan(value(hit_history(end)))
+    if ~isnan(hit_history(end))
         PerformanceSummarySection_stage_1_TrialsValid.value = value(PerformanceSummarySection_stage_1_TrialsValid) + 1;
     end
   callback(PerformanceSummarySection_stage_1_Trials);
@@ -187,13 +187,13 @@ if stage_no ~= value(ParamsSection_training_stage)
 end
 % Update the reward collection time based upon behav
 if length(timeout_history) > 5
-    if all(value(timeout_history(end-1:end))) && value(this_stage_opp_side_trials) >= 2
+    if all(timeout_history(end-1:end)) && value(this_stage_opp_side_trials) >= 2
         ParamsSection_RewardCollection_duration.value = min([value(ParamsSection_RewardCollection_duration) + 1,...
             value(TrainingStageParamsSection_max_rColl_dur)]);
         callback(ParamsSection_RewardCollection_duration);
         this_stage_opp_side_trials.value = 0;
     end
-    if ~any(value(timeout_history(end-1:end)))  && value(this_stage_opp_side_trials) >= 2
+    if ~any(timeout_history(end-1:end))  && value(this_stage_opp_side_trials) >= 2
         ParamsSection_RewardCollection_duration.value = max([value(ParamsSection_RewardCollection_duration) - 1,...
             value(TrainingStageParamsSection_min_rColl_dur)]);
         callback(ParamsSection_RewardCollection_duration);
@@ -201,15 +201,15 @@ if length(timeout_history) > 5
     end
 end
 if length(timeout_history) > 20
-    if all(value(timeout_history(end-19:end)))
+    if all(timeout_history(end-19:end))
         ParamsSection_RewardCollection_duration.value = 120;
         callback(ParamsSection_RewardCollection_duration);
     end
 end
 
 % Update TrainingStageParamsSection
-if value(previous_sides(end)) ~= value(previous_sides(end-1)) && all(hit_history(end-1:end)) % last and present trials should also be a valid trial
-    TrainingStageParamsSection_trial_oppSide = value(TrainingStageParamsSection_trial_oppSide) + 1;  % updating value for variable in TrainingParams_Section
+if previous_sides(end) ~= previous_sides(end-1) && all(hit_history(end-1:end)) % last and present trials should also be a valid trial
+    TrainingStageParamsSection_trial_oppSide.value = value(TrainingStageParamsSection_trial_oppSide) + 1;  % updating value for variable in TrainingParams_Section
     callback(TrainingStageParamsSection_trial_oppSide);
 end
 
@@ -220,7 +220,7 @@ if n_completed_trials > 0
     PerformanceSummarySection_stage_2_TrialsToday.value = value(PerformanceSummarySection_stage_2_TrialsToday) + 1;
     PerformanceSummarySection_stage_2_ViolationRate.value = nan;
     PerformanceSummarySection_stage_2_TimeoutRate.value = ((value(PerformanceSummarySection_stage_2_TimeoutRate) * (value(PerformanceSummarySection_stage_2_Trials) - 1)) + double(timeout_history(end))) / value(PerformanceSummarySection_stage_2_Trials);
-    if ~isnan(value(hit_history(end)))
+    if ~isnan(hit_history(end))
         PerformanceSummarySection_stage_2_TrialsValid.value = value(PerformanceSummarySection_stage_2_TrialsValid) + 1;
     end
   
@@ -368,7 +368,7 @@ if n_completed_trials > 0
     PerformanceSummarySection_stage_3_TrialsToday.value = value(PerformanceSummarySection_stage_3_TrialsToday) + 1;
     PerformanceSummarySection_stage_3_ViolationRate.value = nan;
     PerformanceSummarySection_stage_3_TimeoutRate.value = ((value(PerformanceSummarySection_stage_3_TimeoutRate) * (value(PerformanceSummarySection_stage_3_Trials) - 1)) + double(timeout_history(end))) / value(PerformanceSummarySection_stage_3_Trials);
-    if ~isnan(value(hit_history(end)))
+    if ~isnan(hit_history(end))
         PerformanceSummarySection_stage_3_TrialsValid.value = value(PerformanceSummarySection_stage_3_TrialsValid) + 1;
     end
 
@@ -524,7 +524,7 @@ if n_completed_trials > 0
     PerformanceSummarySection_stage_4_TrialsToday.value = value(PerformanceSummarySection_stage_4_TrialsToday) + 1;
     PerformanceSummarySection_stage_4_ViolationRate.value = ((value(PerformanceSummarySection_stage_4_ViolationRate) * (value(PerformanceSummarySection_stage_4_Trials) - 1)) + double(violation_history(end))) / value(PerformanceSummarySection_stage_4_Trials);
     PerformanceSummarySection_stage_4_TimeoutRate.value = ((value(PerformanceSummarySection_stage_4_TimeoutRate) * (value(PerformanceSummarySection_stage_4_Trials) - 1)) + double(timeout_history(end))) / value(PerformanceSummarySection_stage_4_Trials);
-    if ~isnan(value(hit_history(end)))
+    if ~isnan(hit_history(end))
         PerformanceSummarySection_stage_4_TrialsValid.value = value(PerformanceSummarySection_stage_4_TrialsValid) + 1;
     end
 
@@ -723,7 +723,7 @@ if n_completed_trials > 0
     PerformanceSummarySection_stage_5_TrialsToday.value = value(PerformanceSummarySection_stage_5_TrialsToday) + 1;
     PerformanceSummarySection_stage_5_ViolationRate.value = ((value(PerformanceSummarySection_stage_5_ViolationRate) * (value(PerformanceSummarySection_stage_5_Trials) - 1)) + double(violation_history(end))) / value(PerformanceSummarySection_stage_5_Trials);
     PerformanceSummarySection_stage_5_TimeoutRate.value = ((value(PerformanceSummarySection_stage_5_TimeoutRate) * (value(PerformanceSummarySection_stage_5_Trials) - 1)) + double(timeout_history(end))) / value(PerformanceSummarySection_stage_5_Trials);
-    if ~isnan(value(hit_history(end)))
+    if ~isnan(hit_history(end))
         PerformanceSummarySection_stage_5_TrialsValid.value = value(PerformanceSummarySection_stage_5_TrialsValid) + 1;
     end
 
@@ -904,7 +904,7 @@ if n_completed_trials > 0
     PerformanceSummarySection_stage_6_TrialsToday.value = value(PerformanceSummarySection_stage_6_TrialsToday) + 1;
     PerformanceSummarySection_stage_6_ViolationRate.value = ((value(PerformanceSummarySection_stage_6_ViolationRate) * (value(PerformanceSummarySection_stage_6_Trials) - 1)) + double(violation_history(end))) / value(PerformanceSummarySection_stage_6_Trials);
     PerformanceSummarySection_stage_6_TimeoutRate.value = ((value(PerformanceSummarySection_stage_6_TimeoutRate) * (value(PerformanceSummarySection_stage_6_Trials) - 1)) + double(timeout_history(end))) / value(PerformanceSummarySection_stage_6_Trials);
-    if ~isnan(value(hit_history(end)))
+    if ~isnan(hit_history(end))
         PerformanceSummarySection_stage_6_TrialsValid.value = value(PerformanceSummarySection_stage_6_TrialsValid) + 1;
     end
 
@@ -1087,7 +1087,7 @@ if n_completed_trials > 0
     PerformanceSummarySection_stage_7_TrialsToday.value = value(PerformanceSummarySection_stage_7_TrialsToday) + 1;
     PerformanceSummarySection_stage_7_ViolationRate.value = ((value(PerformanceSummarySection_stage_7_ViolationRate) * (value(PerformanceSummarySection_stage_7_Trials) - 1)) + double(violation_history(end))) / value(PerformanceSummarySection_stage_7_Trials);
     PerformanceSummarySection_stage_7_TimeoutRate.value = ((value(PerformanceSummarySection_stage_7_TimeoutRate) * (value(PerformanceSummarySection_stage_7_Trials) - 1)) + double(timeout_history(end))) / value(PerformanceSummarySection_stage_7_Trials);
-    if ~isnan(value(hit_history(end)))
+    if ~isnan(hit_history(end))
         PerformanceSummarySection_stage_7_TrialsValid.value = value(PerformanceSummarySection_stage_7_TrialsValid) + 1;
     end
 
@@ -1270,7 +1270,7 @@ if n_completed_trials > 0
     PerformanceSummarySection_stage_8_TrialsToday.value = value(PerformanceSummarySection_stage_8_TrialsToday) + 1;
     PerformanceSummarySection_stage_8_ViolationRate.value = ((value(PerformanceSummarySection_stage_8_ViolationRate) * (value(PerformanceSummarySection_stage_8_Trials) - 1)) + double(violation_history(end))) / value(PerformanceSummarySection_stage_8_Trials);
     PerformanceSummarySection_stage_8_TimeoutRate.value = ((value(PerformanceSummarySection_stage_8_TimeoutRate) * (value(PerformanceSummarySection_stage_8_Trials) - 1)) + double(timeout_history(end))) / value(PerformanceSummarySection_stage_8_Trials);
-    if ~isnan(value(hit_history(end)))
+    if ~isnan(hit_history(end))
         PerformanceSummarySection_stage_8_TrialsValid.value = value(PerformanceSummarySection_stage_8_TrialsValid) + 1;
     end
 
