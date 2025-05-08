@@ -17,7 +17,7 @@ switch action
 
             case 1
             % STAGE RUNNING PARAMETERS
-            DispParam(obj, 'trial_oppSide', 0, x, y,'save_with_settings', 1,'TooltipString','total trials in opposide side this stage'); next_row(y);
+            NumeditParam(obj, 'trial_oppSide', 0, x, y,'TooltipString','total trials in opposide side this stage'); next_row(y);
             SubheaderParam(obj, 'title', 'Stage Params', x, y);
             % next_row(y);
             % COMPLETION TEST PARAMETERS
@@ -27,7 +27,7 @@ switch action
 
             case 2
              % STAGE RUNNING PARAMETERS
-            DispParam(obj, 'trial_oppSide', 0, x, y,'save_with_settings', 1,'TooltipString','total trials in opposide side this stage'); next_row(y);
+            NumeditParam(obj, 'trial_oppSide', 0, x, y,'TooltipString','total trials in opposide side this stage'); next_row(y);
             NumeditParam(obj, 'max_rColl_dur', 300, x, y,'label','T_Max_RCollect','TooltipString','User given max water collect time(code will optimize for value below this)'); next_row(y);
             NumeditParam(obj, 'min_rColl_dur', 100, x, y,'label','T_Min_RCollect','TooltipString','User given min water collect time(code will optimize for value above this)'); next_row(y);
             SubheaderParam(obj, 'title', 'Stage Params', x, y); next_row(y);
