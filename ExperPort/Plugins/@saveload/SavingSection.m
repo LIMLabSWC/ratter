@@ -88,8 +88,11 @@ function [x, y, z] = SavingSection(obj, action, x, y, varargin)
       SoloParamHandle(obj, 'my_gui_info', 'value', [x y double(gcf)]);
       SoloParamHandle(obj, 'data_file', 'value', '');
       
-      %Sundeep Tuteja, 22nd December, 2009: Adding a SoloParamHandle called
-      %settings_file to store the full path to the currently loaded settings file.
+      %Arpit, 09th May, 2025: Getting the experimenter name and rat name
+      %from runrats instead of initializing it. This is required to create
+      %the folder to save video files. If it runss into error or runrat is
+      %not running then as a default it sets values as 'experimenter and
+      %'ratname'
       try
           [~,experimenter_name, rat_name] = runrats('exp_rat_names');
           [~, settings_file_str] = runrats('get_settings_file_path');
