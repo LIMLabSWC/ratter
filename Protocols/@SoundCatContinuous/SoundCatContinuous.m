@@ -249,9 +249,9 @@ switch action,
     pd.stim1dur=stim1dur(:);
 
     %pd.stimul=stim_history(:);
-    
-    sendsummary(obj,'protocol_data',pd);    
-      
+
+    sendsummary(obj,'protocol_data','PLACEHOLDER it was just pd');
+  
       %% otherwise
    otherwise,
       warning('Unknown action! "%s"\n', action);
