@@ -91,22 +91,23 @@ function [x, y, z] = SavingSection(obj, action, x, y, varargin)
       %Sundeep Tuteja, 22nd December, 2009: Adding a SoloParamHandle called
       %settings_file to store the full path to the currently loaded settings file.
       try
-          [dummy, settings_file_str] = runrats('get_settings_file_path');
-          clear('dummy');
+          [~,experimenter_name, rat_name] = runrats('exp_rat_names');
+          [~, settings_file_str] = runrats('get_settings_file_path');
       catch %#ok<CTCH>
           settings_file_str = '';
+          experimenter_name = 'experimenter';
+          rat_name = 'ratname';
       end
       SoloParamHandle(obj, 'settings_file', 'value', settings_file_str);
       try
-          [dummy, settings_file_load_time_num] = runrats('get_settings_file_load_time');
-          clear('dummy');
+          [~, settings_file_load_time_num] = runrats('get_settings_file_load_time');
       catch %#ok<CTCH>
           settings_file_load_time_num = 0;
       end
       SoloParamHandle(obj, 'settings_file_load_time', 'value', settings_file_load_time_num);
       
-      EditParam(obj, 'experimenter', 'experimenter', x, y); next_row(y, 1.5);
-      EditParam(obj, 'ratname', 'ratname', x, y); next_row(y, 1.5);
+      EditParam(obj, 'experimenter', experimenter_name, x, y); next_row(y, 1.5);
+      EditParam(obj, 'ratname', rat_name, x, y); next_row(y, 1.5);
       
       PushbuttonParam(obj, 'loadsets', x, y, 'label', 'Load Settings');
       set_callback(loadsets, {mfilename, 'loadsets'});
@@ -156,7 +157,7 @@ function [x, y, z] = SavingSection(obj, action, x, y, varargin)
       
       return;
 
-      
+    
     case 'set'      
       parname = x; parval = y;
       switch parname
