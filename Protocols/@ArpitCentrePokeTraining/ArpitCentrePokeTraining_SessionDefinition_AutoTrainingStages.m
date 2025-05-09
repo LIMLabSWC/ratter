@@ -355,6 +355,8 @@ end
 
 if n_completed_trials < 1 % intialize to min value at the start of each session/day
     ParamsSection_CP_duration.value = value(ParamsSection_init_CP_duration);
+elseif n_completed_trials == 1
+    ParamsSection_CP_duration.value = value(TrainingStageParamsSection_last_session_CP);
 else
     if ~timeout_history(end) && value(ParamsSection_CP_duration) < cp_max
         increment = value(ParamsSection_CP_duration) * value(TrainingStageParamsSection_CPfraction_inc);
@@ -505,8 +507,10 @@ if value(PerformanceSummarySection_stage_4_Trials) < 2
     ParamsSection_CP_duration.value = cp_min; % initialize to min_CP
 end
 
-if n_completed_trials < 1
+if n_completed_trials == 0
     ParamsSection_CP_duration.value = value(ParamsSection_init_CP_duration);
+elseif n_completed_trials == 1
+    ParamsSection_CP_duration.value = value(TrainingStageParamsSection_last_session_CP);
 else
     if ~violation_history(end) && ~timeout_history(end) && value(ParamsSection_CP_duration) < cp_max
         increment = value(ParamsSection_CP_duration) * cp_fraction;
