@@ -32,9 +32,9 @@ switch action
 		next_row(y);
 		NumeditParam(obj, 'drink_time', 1, x,y,'label','Drink Time','TooltipString','waits to finish water delivery');
 		next_row(y);
-		NumeditParam(obj, 'timeout_iti', 1, x,y,'label','No Choice Timeout','TooltipString','ITI on timeout trials');
+		NumeditParam(obj, 'timeout_iti', 1, x,y,'label','Timeout ITI','TooltipString','ITI on timeout trials');
 		next_row(y);
-		NumeditParam(obj, 'violation_iti', 1, x,y,'label','Violation Timeout','TooltipString','Center poke violation duration');
+		NumeditParam(obj, 'violation_iti', 1, x,y,'label','Violation ITI','TooltipString','Center poke violation duration');
         % Reward Collection
         next_row(y);
 		NumeditParam(obj, 'RewardCollection_duration', 300, x,y,'label','RewardCollection_dur','TooltipString','Wait until rat collects the reward else a timeout');

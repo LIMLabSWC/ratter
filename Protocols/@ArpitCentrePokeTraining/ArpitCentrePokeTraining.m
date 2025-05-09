@@ -201,6 +201,22 @@ switch action
     x=oldx; y=oldy;
     SessionDefinition(obj, 'init', x, y, value(myfig)); %#ok<NASGU>
     
+    %%%
+    
+% Problem: Loading settings in later stages fails because the stage-dependent
+% TrainingStageParamsSection's solohandles are not visible after initial setup.
+% Solution: This section handles a specific scenario for loading setting files during initialization.
+% Although also invoked in Runrats, calling it here is crucial. The
+% TrainingStageParamsSection's parameters are initially set at stage 1 and are visible.
+% However, they become stage-dependent. Subsequent stages lack visible solohandles for
+% these parameters, preventing proper loading. This initialization provides a workaround
+% to avoid significant changes required to load stage-specific solohandles and maintain
+% broader compatibility.
+    try
+        [~, ~]=load_solouiparamvalues(rname,'experimenter',expmtr,...
+            'owner',name,'interactive',0);
+    catch
+    end
     %%
     % feval(mfilename, obj, 'prepare_next_trial'); % Commented out because it is also run by Runrats(while loading the protocol)
           
