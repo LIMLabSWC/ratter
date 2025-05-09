@@ -227,7 +227,7 @@ switch action
        
        StimulusSection(obj,'prepare_next_trial');
        SoundManagerSection(obj, 'send_not_yet_uploaded_sounds');
-       [sma, prepare_next_trial_states] = ArpitCentrePokeTrainingSMA(obj, 'prepare_next_trial');
+       [~, ~] = ArpitCentrePokeTrainingSMA(obj, 'prepare_next_trial');
 
     % Default behavior of following call is that every 20 trials, the data
     % gets saved, not interactive, no commit to CVS.
@@ -238,34 +238,27 @@ switch action
             CommentsSection(obj, 'append_date'); CommentsSection(obj, 'append_line', '');
        end
 
-       if n_done_trials==1
-            [expmtr, rname]=SavingSection(obj, 'get_info');
-            prot_title.value=[mfilename ' on rig ' get_hostname ' : ' expmtr ', ' rname  '.  Started at ' datestr(now, 'HH:MM')];
-       end
-      
-       try 
-           send_n_done_trials(obj,'update');
-       catch
-       end
-
    %% trial_completed
    case 'trial_completed'
     
        % Change the video trial  
         BonsaiCameraInterface(obj,'next_trial');
     
-    % Update the Metrics Calculated, Instead being Calculated in Session
-    % Definition and commented out
+    % Update the Metrics Calculated, Instead being Calculated in SessionDefinition and commented out
 
     % PerformanceSummarySection(obj,'evaluate');
     % SessionPerformanceSection(obj, 'evaluate');
+    
     % Do any updates in the protocol that need doing:
        feval(mfilename, 'update');
 
    %% update
    case 'update'
       % PokesPlotSection(obj, 'update');
-      
+      if n_done_trials==1
+            [expmtr, rname]=SavingSection(obj, 'get_info');
+            prot_title.value=[mfilename ' on rig ' get_hostname ' : ' expmtr ', ' rname  '.  Started at ' datestr(now, 'HH:MM')];
+       end
       
    %% close
    case 'close'
