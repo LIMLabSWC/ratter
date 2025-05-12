@@ -146,9 +146,9 @@ switch action
         SoloParamHandle(obj,'schedDay','value',[]);
 
         % For Live Webcam Feed
-        SoloParamHandle(obj,'Camera_Fig_window','value',[]);
-        SoloParamHandle(obj,'Camera_Obj','value',[]);
-        SoloParamHandle(obj,'Camera_Image','value',[]);
+        % SoloParamHandle(obj,'Camera_Fig_window','value',[]);
+        % SoloParamHandle(obj,'Camera_Obj','value',[]);
+        % SoloParamHandle(obj,'Camera_Image','value',[]);
 
         %Let's make the menus
         try
@@ -1705,7 +1705,7 @@ switch action
 
             %setpref('Internet','SMTP_Server','brodyfs2.princeton.edu');
             %setpref('Internet','E_mail',['RunRats',datestr(now,'yymm'),'@Princeton.EDU']);
-            set_email_sender
+            % set_email_sender
 
             owner = bdata(['select contact from rats where ratname="',value(RatMenu),'"']);
             if ~isempty(owner)
@@ -1716,7 +1716,8 @@ switch action
 
                 for i = 1:length(cms)-1
                     exp = owner(cms(i)+1:cms(i+1)-1);
-                    sendmail([exp,'@princeton.edu'],[value(RatMenu),' Crashed'],message);
+                    % sendmail([exp,'@ucl.ac.uk'],[value(RatMenu),' Crashed'],message);
+                    gmail_SMTP([exp,'@ucl.ac.uk'],[value(RatMenu),' Crashed'],message);
                 end
             end
         end
@@ -1772,7 +1773,7 @@ switch action
         try %#ok<TRYNC>
             %setpref('Internet','SMTP_Server','brodyfs2.princeton.edu');
             %setpref('Internet','E_mail',['RunRats',datestr(now,'yymm'),'@Princeton.EDU']);
-            set_email_sender
+            % set_email_sender
 
             message{1} = ['Load failed for ',value(RatMenu)]; %#ok<NODEF>
             if strcmp(varargin{1},'no settings')
@@ -1800,7 +1801,8 @@ switch action
                 cms = find(contact == ',');
                 for i = 1:length(cms)-1
                     email = contact(cms(i)+1:cms(i+1)-1);
-                    sendmail([email,'@princeton.edu'],subject,message);
+                    % sendmail([email,'@princeton.edu'],subject,message);
+                    gmail_SMTP([email,'@ucl.ac.uk'],subject,message);
                 end
             end
         end
@@ -1808,7 +1810,7 @@ switch action
 
 
 
-    case 'is_running',
+    case 'is_running'
         %% is_running
         %If the Multi button exists, runrats has been loaded
         if exist('Multi','var'), obj = 1; else obj = 0; end
@@ -1834,30 +1836,7 @@ switch action
         else
             varargout{1} = '';
         end
-
-
-    case 'send_empty_state_machine'
-        %% send_empty_state_machine
-        %Sends an empty state matrix. This allows us to toggle DIO lines
-
-        state_machine_server = bSettings('get','RIGS','state_machine_server');
-
-        server_slot = bSettings('get','RIGS','server_slot');
-        if isnan(server_slot); server_slot = 0; end
-
-        card_slot = bSettings('get', 'RIGS', 'card_slot');
-        if isnan(card_slot); card_slot = 0; end
-
-        sm = BPodSM(state_machine_server, 3333,server_slot);
-        sm = Initialize(sm);
-
-        [inL outL] = MachinesSection(dispatcher,'determine_io_maps');
-
-        sma = StateMachineAssembler('full_trial_structure');
-        sma = add_state(sma,'name','vapid_state_in_vapid_matrix');
-
-        send(sma,sm,'run_trial_asap',0,'input_lines',inL,'dout_lines',outL,'sound_card_slot', int2str(card_slot));
-
+     
 
     case  'close'
         %% close
@@ -1889,7 +1868,7 @@ switch action
 
     otherwise
         warning('Unknown action " %s" !', action);%#ok<WNTAG>
-end;
+end
 
 return;
 
@@ -1919,7 +1898,7 @@ try %#ok<TRYNC>
             setdate{xi}=r(1:7); %#ok<AGROW>
         else % not a file we want, give it a really early date, 2000:
             setdate{xi}='000101a'; %#ok<AGROW>
-        end;
+        end
     end
 
     [srtdsets, sdi]=sort(setdate);
@@ -1958,7 +1937,7 @@ try
     if failed1 == 1 || failed2 == 1
         %setpref('Internet','SMTP_Server','brodyfs2.princeton.edu');
         %setpref('Internet','E_mail',['RunRats',datestr(now,'yymm'),'@Princeton.EDU']);
-        set_email_sender
+        % set_email_sender
 
         if pname(1)   ~= filesep; pname = [filesep,pname]; end
         if pname(end) ~= filesep; pname = [pname,filesep]; end
@@ -1993,7 +1972,8 @@ try
             cms = find(ctemp == ',');
             for i = 1:length(cms)-1
                 email = ctemp(cms(i)+1:cms(i+1)-1);
-                sendmail([email,'@princeton.edu'],['SVN Cleanup FAILED on Rig ',rig],message);
+                % sendmail([email,'@princeton.edu'],['SVN Cleanup FAILED on Rig ',rig],message);
+                gmail_SMTP([email,'@ucl.ac.uk'],['SVN Cleanup FAILED on Rig ',rig],message);
             end
         end
 
@@ -2019,7 +1999,8 @@ try
             cms = find(ctemp == ',');
             for i = 1:length(cms)-1
                 email = ctemp(cms(i)+1:cms(i+1)-1);
-                sendmail([email,'@ucl.ac.uk'],subject,message);
+                % sendmail([email,'@ucl.ac.uk'],subject,message); %
+                gmail_SMTP([email,'@ucl.ac.uk'],subject,message); % Using gmail instead of brody smtp
             end
         end
     end
@@ -2029,4 +2010,34 @@ end
 
 
 
+function gmail_SMTP(recipient_email,subject_line,email_body)
+
+smtp_server = 'smtp.gmail.com';
+smtp_port = '587'; % Use TLS
+email_address = 'behav.akramilab@gmail.com';
+email_password = 'fakc mdbw woef lqmq'; % IMPORTANT: this is set in setting of gmail
+
+% recipient_email = 'arpit.agarwal@ucl.ac.uk';
+% subject_line = 'Test Email from MATLAB via Gmail';
+% email_body = 'This email was sent using Gmail SMTP from MATLAB.';
+
+% --- Set MATLAB Email Preferences ---
+setpref('Internet','SMTP_Server',smtp_server);
+setpref('Internet','E_mail',email_address);
+setpref('Internet','SMTP_Username',email_address);
+setpref('Internet','SMTP_Password',email_password);
+
+% Set server properties
+props = java.lang.System.getProperties;
+props.setProperty('mail.smtp.auth','true');
+props.setProperty('mail.smtp.starttls.enable','true');
+props.setProperty('mail.smtp.port',smtp_port);
+
+% --- Send the Email ---
+try
+    sendmail(recipient_email, subject_line, email_body);
+    disp('Email sent successfully via Gmail SMTP.');
+catch ME
+    disp(['Error sending email: ' ME.message]);
+end
 
