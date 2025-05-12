@@ -1,42 +1,50 @@
 #!/bin/bash
 
-# Stop on errors
 set -e
 
 REPO_URL="http://172.24.155.100/svn/akramilab/ratter"
+LOG_FILE="sparse_init.log"
 
 echo ""
-echo "========================================="
-echo "🔧  Initializing sparse SVN checkout"
-echo "📂  Target directory: $(pwd)"
-echo "📡  Repository URL:   $REPO_URL"
-echo "========================================="
-echo ""
+echo "=========================================" | tee -a "$LOG_FILE"
+echo "🔧  Initializing sparse SVN checkout"      | tee -a "$LOG_FILE"
+echo "📂  Target directory: $(pwd)"             | tee -a "$LOG_FILE"
+echo "📡  Repository URL: $REPO_URL"            | tee -a "$LOG_FILE"
+echo "📄  Log file: $LOG_FILE"                 | tee -a "$LOG_FILE"
+echo "=========================================" | tee -a "$LOG_FILE"
+echo "" | tee -a "$LOG_FILE"
+
+# Detect if this folder is already a working copy
+if svn info > /dev/null 2>&1; then
+  echo "⚠️  This directory is already an SVN working copy." | tee -a "$LOG_FILE"
+  echo "❌ Aborting to avoid interfering with existing data." | tee -a "$LOG_FILE"
+  exit 1
+fi
 
 # Sparse checkout of root
-echo "➡️  Checking out repository root (empty)..."
-svn checkout --depth=empty "$REPO_URL" .
+echo "➡️  Checking out repository root (empty)..." | tee -a "$LOG_FILE"
+svn checkout --depth=empty "$REPO_URL" . | tee -a "$LOG_FILE"
 
 # Fetch top-level .mat file
-echo "✅ Fetching: PASSWORD_CONFIG-DO_NOT_VERSIONCONTROL.mat"
-svn update PASSWORD_CONFIG-DO_NOT_VERSIONCONTROL.mat
+echo "✅ Fetching: PASSWORD_CONFIG-DO_NOT_VERSIONCONTROL.mat" | tee -a "$LOG_FILE"
+svn update PASSWORD_CONFIG-DO_NOT_VERSIONCONTROL.mat | tee -a "$LOG_FILE"
 
 # Prepare SoloData structure
-echo ""
-echo "📁 Preparing SoloData structure..."
-svn update --set-depth=empty SoloData
-svn update --set-depth=empty SoloData/Data
-svn update --set-depth=empty SoloData/Settings
+echo "" | tee -a "$LOG_FILE"
+echo "📁 Preparing SoloData structure..." | tee -a "$LOG_FILE"
+svn update --set-depth=empty SoloData | tee -a "$LOG_FILE"
+svn update --set-depth=empty SoloData/Data | tee -a "$LOG_FILE"
+svn update --set-depth=empty SoloData/Settings | tee -a "$LOG_FILE"
 
 # Add training_videos folder
-echo ""
-echo "📁 Adding training_videos folder..."
-svn update --set-depth=empty training_videos
+echo "" | tee -a "$LOG_FILE"
+echo "📁 Adding training_videos folder..." | tee -a "$LOG_FILE"
+svn update --set-depth=empty training_videos | tee -a "$LOG_FILE"
 
 # Done
-echo ""
-echo "✅ DONE: Sparse checkout initialized."
-echo "📌 You can now selectively fetch folders like:"
-echo "   svn update --set-depth=infinity SoloData/Data/arpit"
-echo "   svn update --set-depth=infinity SoloData/Settings/arpit"
-echo ""
+echo "" | tee -a "$LOG_FILE"
+echo "✅ DONE: Sparse checkout initialized." | tee -a "$LOG_FILE"
+echo "📌 You can now selectively fetch folders like:" | tee -a "$LOG_FILE"
+echo "   svn update --set-depth=infinity SoloData/Data/arpit" | tee -a "$LOG_FILE"
+echo "   svn update --set-depth=infinity training_videos/rig1" | tee -a "$LOG_FILE"
+echo "" | tee -a "$LOG_FILE"
