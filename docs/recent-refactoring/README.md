@@ -21,12 +21,18 @@ This directory contains documentation of recent major refactoring efforts in the
    - Reorganized documentation structure
    - Added cross-references
 
+4. [ExperPort Cleanup](experport-cleanup.md)
+   - Removal of unused .m files
+   - Documentation of file dependencies
+   - Implementation of safe removal process
+
 ## Testing Status
 
 - [ ] Perl scripts removal impact assessment
 - [ ] Protocols directory changes verification
 - [ ] Documentation structure validation
 - [ ] System functionality verification
+- [ ] ExperPort cleanup verification
 
 ## Next Steps
 
@@ -34,6 +40,7 @@ This directory contains documentation of recent major refactoring efforts in the
 2. Verify all automated tasks
 3. Test protocol loading and execution
 4. Validate documentation accessibility
+5. Implement ExperPort cleanup plan
 
 ## Contact
 

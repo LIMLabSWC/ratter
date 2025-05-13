@@ -9,6 +9,7 @@ We are currently undergoing a major cleanup and modernization effort. Please che
 - Removal of legacy Perl scripts
 - Protocols directory restructuring
 - Documentation modernization
+- ExperPort cleanup and optimization
 - Testing status and next steps
 
 These changes are being tracked in the `docs/recent-refactoring/` directory until they are fully tested and verified.
@@ -53,5 +54,4 @@ BControl/
 - [Perl Scripts Removal](docs/recent-refactoring/perl-scripts-removal.md)
 - [Protocols Restructuring](docs/recent-refactoring/protocols-restructuring.md)
 - [Documentation Modernization](docs/recent-refactoring/documentation-modernization.md)
-
-test
+- [ExperPort Cleanup](docs/recent-refactoring/experport-cleanup.md)
