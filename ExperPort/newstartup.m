@@ -119,7 +119,14 @@ HandleNewstartupError(errID, errmsg);
 [Protocols_Directory errID errmsg] = bSettings('get','GENERAL','Protocols_Directory');
 fprintf('Protocols_Directory from settings: %s\n', Protocols_Directory);
 fprintf('Current directory: %s\n', pwd);
-fprintf('Full path to Protocols: %s\n', fullfile(pwd, Protocols_Directory));
+% Only construct full path if Protocols_Directory is relative
+if ~isempty(Protocols_Directory) && ~strcmp(Protocols_Directory(1), filesep) && ~strcmp(Protocols_Directory(2), ':')
+    full_protocols_path = fullfile(pwd, Protocols_Directory);
+    fprintf('Full path to Protocols (relative): %s\n', full_protocols_path);
+else
+    fprintf('Using absolute path: %s\n', Protocols_Directory);
+end
+
 if ~errID && ~isempty(Protocols_Directory) && exist(Protocols_Directory, 'dir')
     addpath(Protocols_Directory);
     fprintf('Added to path: %s\n', Protocols_Directory);
