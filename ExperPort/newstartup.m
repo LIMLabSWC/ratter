@@ -1,105 +1,65 @@
-%     .../newstartup.m
-%     Initialization file for Dispatcher-BControl; BControl system;
+% BControl Startup Script
+% ======================
+% This script initializes the BControl system, setting up paths, loading settings,
+% and preparing the environment for behavioral experiments.
 %
-%    ----------------------- INSTRUCTIONS FOR USERS -----------------------
+% Usage:
+%   >> newstartup; dispatcher('init');    % Start Dispatcher-BControl
+%   >> newstartup; runrats('init');       % Start RunRats GUI for techs
 %
-%       To START Dispatcher-BControl, simply type:
+% Requirements:
+% - Must be run from root BControl code directory
+% - Requires critical files and directories to be present
+% - First run creates Settings_Custom.conf from template
 %
-%               >> newstartup; dispatcher('init');
+% Documentation: http://brodylab.princeton.edu/bcontrol
 %
-%                   and pick your protocol from the pull-down list.
-%
-%
-%       To START the simplified RunRats GUI for techs instead, type:
-%
-%               >> newstartup; runrats('init');
-%
-%
-%      These commands must be run from the root BControl code directory!
-%      Newstarup will fail if critical files or directories are not found
-%        in the current directory.
-%
-%      This file is not meant to be modified and should be kept UP TO DATE.
-%      Use the SETTINGS FILE (Settings/Settings_Custom.conf) created on
-%        first run of the system to control settings for BControl.
-%
-%      BControl DOCUMENTATION is available in the wiki at:
-%               http://brodylab.princeton.edu/bcontrol
-%
-%
-%     ------------------------- TECHNICAL DETAILS -------------------------
-%
-%     Outline for newstartup.m:
-%       - CHECK FOR SEVERAL REQUIRED FILES
-%    	- FIRST RUN?
-%    	- ADD PATHS
-%    	- LOAD SETTINGS
-%    	- CHECK A FEW SETTINGS
-%    	- LOAD SOME SETTINGS INTO GLOBALS for backward compatibility
-%
-%
-%
-%      HELPER FUNCTIONS at the end of this file:
-%           HandleNewstartupError
-%           BControl_First_Run
-%           Verify_Settings
-%           Compatibility_Globals
-%
+% Author: Carlos Brody
+% Last modified: 2007.12.20
+
 function [] = newstartup()
 global BpodSystem
 if isempty(BpodSystem)
     clear global BpodSystem
     error('Error: You must run Bpod() at the command line, before you can open B-control');
 end
-%     This startup script will always dbstop on error - but near the end,
-%       we clear this and set dbstop based on Settings files.
-dbstop if error;
-dbstop if caught error 'TIMERERROR:catcherror'; 
-% This allows debugging runtime errors that occur within the dispatcher
-% timer loop
 
-%cd into ExperPort so newstartup doesn't break if you aren't there already
+% ============================================================================
+% Debug Configuration
+% ============================================================================
+% Set initial debug state - will be overridden by settings later
+dbstop if error;
+dbstop if caught error 'TIMERERROR:catcherror';  % For debugging dispatcher timer loop
+
+% Ensure we're in the correct directory
 try cd(bSettings('get','GENERAL','Main_Code_Directory'));
 catch %#ok<CTCH>
 end
 
-
-
-%     -------------------------------------------------------------
-%     -------  DEFINE CONSTANTS (SETTINGS FILENAMES)
-%     -------------------------------------------------------------
-%     It is currently the case that these filenames are separately
-%       specified in Modules/Settings.m and newstartup.m.
-%
-%     THEY MUST BE THE SAME!
-%
-%     Such things should not be separately defined, but I haven't decided
-%       on a clean way to do this without limiting features yet.... ):
-%<~>TODO: consolidation, see above
+% ============================================================================
+% Core Settings File Definitions
+% ============================================================================
+% Note: These filenames must match those in Modules/Settings.m
+% TODO: Consolidate these definitions to avoid duplication
 FILENAME__SETTINGS_DIR              = 'Settings';
-FILENAME__DEFAULT_SETTINGS          = [ FILENAME__SETTINGS_DIR filesep ...
-    'Settings_Default.conf'                                             ];
-FILENAME__CUSTOM_SETTINGS           = [ FILENAME__SETTINGS_DIR filesep ...
-    'Settings_Custom.conf'                                              ];
-FILENAME__SETTINGS_TEMPLATE         = [ FILENAME__SETTINGS_DIR filesep ...
-    'Settings_Template.conf'                                            ];
+FILENAME__DEFAULT_SETTINGS          = [ FILENAME__SETTINGS_DIR filesep 'Settings_Default.conf' ];
+FILENAME__CUSTOM_SETTINGS           = [ FILENAME__SETTINGS_DIR filesep 'Settings_Custom.conf'  ];
+FILENAME__SETTINGS_TEMPLATE         = [ FILENAME__SETTINGS_DIR filesep 'Settings_Template.conf'];
 
-
-
-%     -------------------------------------------------------------
-%     -------  CHECK FOR SEVERAL REQUIRED FILES
-%     -------------------------------------------------------------
-%     Check to see if a default settings file exists in this directory. If
-%       not, treat as if we are not in the proper directory.
+% ============================================================================
+% Directory Structure Validation
+% ============================================================================
+% Verify all required directories and files exist
+% These are essential for BControl operation
 cd(fullfile(BpodSystem.Path.BcontrolRootFolder, 'ExperPort'));
-if		   ~exist([pwd filesep 'bin'],          'dir')				...
-        || ~exist([pwd filesep 'HandleParam'],  'dir')				...
-        || ~exist([pwd filesep 'Modules'],      'dir')				...
-        || ~exist([pwd filesep 'Utility'],		'dir')				...
-        || ~exist([pwd filesep 'Plugins'],		'dir')  			...
-        || ~exist([pwd filesep 'Settings'],		'dir')				...
-        || ~exist([pwd filesep 'SoloUtility'],  'dir')  			...
-        || ~exist([pwd filesep FILENAME__DEFAULT_SETTINGS], 'file')	,
+if ~exist([pwd filesep 'bin'],          'dir') || ...
+   ~exist([pwd filesep 'HandleParam'],  'dir') || ...
+   ~exist([pwd filesep 'Modules'],      'dir') || ...
+   ~exist([pwd filesep 'Utility'],      'dir') || ...
+   ~exist([pwd filesep 'Plugins'],      'dir') || ...
+   ~exist([pwd filesep 'Settings'],     'dir') || ...
+   ~exist([pwd filesep 'SoloUtility'],  'dir') || ...
+   ~exist([pwd filesep FILENAME__DEFAULT_SETTINGS], 'file'),
     errID = 1;
     errmsg = ['BControl must be started from its root directory,' ...
         ' and the following directories and files must exist there:' ...
@@ -108,14 +68,20 @@ if		   ~exist([pwd filesep 'bin'],          'dir')				...
         '.' sprintf('\n') ...
         'If you are missing files, please use cvs to update your code' ...
         ' from our repository.'];
-
     HandleNewstartupError(errID, errmsg);
     return;
 end;
 
-%     -------------------------------------------------------------
-%     -------  ADD BCONTROL CODE PATHS
-%     -------------------------------------------------------------
+% ============================================================================
+% Path Configuration
+% ============================================================================
+% Add all necessary directories to MATLAB's path
+% Organized by functionality:
+% - Core system components
+% - Analysis tools
+% - Protocol support
+% - Hardware interfaces
+% - Utilities and plugins
 addpath([pwd filesep 'bin']   ...
     ,   [pwd filesep 'HandleParam'] ...
     ,   [pwd filesep 'Analysis' filesep 'dual_disc'] ...
@@ -140,13 +106,20 @@ addpath([pwd filesep 'bin']   ...
     ,   pwd ...
     );
 
-%     -------------------------------------------------------------
-%     -------  SETTINGS - LOAD SETTINGS FILES
-%     -------------------------------------------------------------
+% ============================================================================
+% Settings Loading
+% ============================================================================
+% Load system settings in sequence:
+% 1. Default settings (required)
+% 2. Custom settings (created from template if needed)
+% 3. Verify critical settings
 [errID errmsg] = bSettings('load');
 HandleNewstartupError(errID, errmsg);
 
-% Check for Protocols directory specified in settings
+% ============================================================================
+% Protocol Directory Validation
+% ============================================================================
+% Verify the Protocols directory specified in settings exists
 [Protocols_Directory errID errmsg] = bSettings('get','GENERAL','Protocols_Directory');
 if errID || isempty(Protocols_Directory) || ~exist(Protocols_Directory, 'dir'),
     errID = 1;
@@ -155,119 +128,83 @@ if errID || isempty(Protocols_Directory) || ~exist(Protocols_Directory, 'dir'),
     return;
 end;
 
-
-%     -------------------------------------------------------------
-%     -------  FIRST RUN?
-%     -------------------------------------------------------------
-%     If the custom settings file does not exist, assume that this is
-%       BControl's first run and create it from the settings template.
-%     Also display a welcome pop-up with the WIKI address.
+% ============================================================================
+% First Run Handling
+% ============================================================================
+% If custom settings don't exist, this is first run:
+% 1. Create Settings_Custom.conf from template
+% 2. Display welcome message with documentation link
+% 3. Guide user through initial setup
 if ~exist(FILENAME__CUSTOM_SETTINGS,'file'),
     [errID errmsg] = BControl_First_Run(FILENAME__CUSTOM_SETTINGS, FILENAME__SETTINGS_TEMPLATE);
     HandleNewstartupError(errID, errmsg);
 end;
 
-
-
-%     -------------------------------------------------------------
-%     -------  SETTINGS - MINIMAL VERIFICATION
-%     -------------------------------------------------------------
-%     Check for data&code directory settings, issuing warnings and
-%       creating data directory if necessary. (helper fn in this file)
+% ============================================================================
+% Settings Verification
+% ============================================================================
+% Validate critical system settings:
+% - Directory paths
+% - Rig configuration
+% - Server addresses
+% - Hardware settings
 [errID errmsg] = Verify_Settings();
 HandleNewstartupError(errID, errmsg);
 
-
-
-%     -------------------------------------------------------------
-%     -------  SETTINGS - BACKWARD COMPATIBILITY (loaded->globals)
-%     -------------------------------------------------------------
-%     Old code used to use globals to store what is now stored in settings.
-%     For backward compatibility, we load certain settings back into
-%       globals.
-
-%     This compare always returns false unless the setting exists, is
-%       defined, and is logical true or 1 - so we only skip this step if
-%       the skip flag is explicitly set.
+% ============================================================================
+% Backward Compatibility
+% ============================================================================
+% Load settings into global variables for legacy code
+% Note: This is a compatibility layer that should eventually be phased out
 skip_globals = bSettings('compare','COMPATIBILITY', ...
     'Skip_Loading_Old_Settings_Into_Globals', true);
-if ~skip_globals,   % Otherwise, do fill the globals.
+if ~skip_globals,
     [errID errmsg] = Compatibility_Globals();
     HandleNewstartupError(errID, errmsg);
 end;
 
-
-%     -------------------------------------------------------------
-%     -------  DETERMINE RTLSM VERSION AND ADD NETCLIENT PATH
-%     -------  2008.June.25
-%     -------------------------------------------------------------
-% <~> Determine which NetClient directory to add to the path.
-%     The old RTLSM  requires Modules/NetClient.
-%     The new RTLSM2 requires Modules/newrt_mods/NetClient.
-%     Autodetection will be added later, but for now we'll use the
-%       fake_rp_box setting set to 20 instead of 2 to denote RTLSM2
-%       instead of old RTLSM. (New is version 100+ of Calin's RTFSM
-%       project.)
+% ============================================================================
+% RTLSM Version Handling
+% ============================================================================
+% Configure path based on RTLSM version:
+% - Old RTLSM: Modules/NetClient
+% - New RTLSM2: Modules/newrt_mods/NetClient
+% Version determined by fake_rp_box setting (20 = RTLSM2)
 if bSettings('compare','RIGS','fake_rp_box',20),
     addpath([pwd filesep 'Modules' filesep 'newrt_mods' filesep 'NetClient']);
 else
     addpath([pwd filesep 'Modules' filesep 'NetClient']);
 end;
 
-    
-    
-%     -------------------------------------------------------------
-%     -------  INTERPRET EXECUTION SETTINGS
-%     -------------------------------------------------------------
-%     Above we temporarily set dbstop if error. Here we clear that ...
+% ============================================================================
+% Debug Configuration
+% ============================================================================
+% Configure MATLAB's debugger based on settings:
+% - Clear temporary error breakpoint
+% - Set new breakpoint based on settings
+% - Options: 'never', 'error', or custom condition
 dbclear if error;
-%     ... and then set dbstop based on the settings files.
 [dbstop_setting errID] = bSettings('get','GENERAL','dbstop_if');
 if errID,
-    %     If the setting didn't exist, default to dbstop if error.
-    dbstop if error;
-elseif strcmpi(dbstop_setting,'never')  ...
-        || strcmpi(dbstop_setting,'NULL')   ...
-        || isempty(dbstop_setting),
-    %     If empty, 'never', or 'null', leave 'dbstop if' clear.
+    dbstop if error;  % Default to breaking on errors
+elseif strcmpi(dbstop_setting,'never') || strcmpi(dbstop_setting,'NULL') || isempty(dbstop_setting),
+    % No breakpoints if explicitly disabled
 else
-    %     Set dbstop to whatever the setting says.
-    eval(['dbstop if ' dbstop_setting]);
-    %     ... there's a minor problem here, actually.
-    %     Suppose dbstop_setting is some inappropriate value. Because we've
-    %       just cleared dbstop if error, we won't dbstop on this
-    %       inappropriate command. This isn't a big deal, but it's worth
-    %       noting.
+    eval(['dbstop if ' dbstop_setting]);  % Set custom breakpoint
 end;
 
-
-%     -------------------------------------------------------------
-%     -------  Select a renderer for compatibility
-%     -------------------------------------------------------------
-% Different renderers have different behaviors-- but OpenGL appears to be
-% buggy, at least as of the Matlab release used on 18-Jul-07. So, we use
-% painters, which seems to work:
+% ============================================================================
+% Graphics Configuration
+% ============================================================================
+% Set default figure renderer for compatibility
+% OpenGL can be buggy, so we use painters
 set(0, 'DefaultFigureRenderer', 'painters');
 
+end  % end function newstartup
 
-end  %     end function newstartup
-
-
-
-
-
-
-
-%     ---------------------------------------------------------------------
-%     ---------------------------------------------------------------------
-%     ---------------------------------------------------------------------
-%     ---------------------------------------------------------------------
-%     ------------------ HERE BEGIN THE HELPER FUNCTIONS ------------------
-%     ---------------------------------------------------------------------
-%     ---------------------------------------------------------------------
-%     ---------------------------------------------------------------------
-%     ---------------------------------------------------------------------
-
+% ============================================================================
+% Helper Functions
+% ============================================================================
 
 %     -------------------------------------------------------------
 %     -------------------------------------------------------------
@@ -290,35 +227,26 @@ end  %     end helper function HandleNewstartupError
 %     -------  BControl_First_Run (helper function for newstartup)
 %     -------------------------------------------------------------
 %     -------------------------------------------------------------
-%     on-first-run-of-system tasks; BControl system;
+%     Handles first-time system initialization
+%     
+%     Responsibilities:
+%     1. Creates custom settings file from template
+%     2. Displays welcome message with documentation link
+%     3. Guides user through initial setup
 %
+%     Future Improvements:
+%     - Add settings selection dialogs for:
+%       * Rig type configuration
+%       * CVS settings
+%       * Protocol defaults
 %
-%     This was only intended to be run by newstartup.
+%     Inputs:
+%       FILENAME__CUSTOM_SETTINGS - Target path for custom settings
+%       FILENAME__SETTINGS_TEMPLATE - Source template file
 %
-%
-%     Performs tasks on the first run of the system.
-%     Currently:
-%       - creates custom settings file from template (simple copy)
-%       - presents simple welcome dialog
-%
-%
-%     Suggestions for the future:
-%        ? settings selection dialogs for rig type and cvs settings?
-%
-%
-%     ARGUMENTS:
-%       - FILENAME__CUSTOM_SETTINGS
-%           string - filename of custom settings file to create
-%       - FILENAME__SETTINGS_TEMPLATE
-%           string - filename of settings template to copy from
-%
-%     RETURNS:	[errID errmsg]
-%         errmsg:   '' if OK, else an informative error message
-%         errID:
-%           0:      no problem
-%           1:      error creating custom settings file
-%           -1:     LOGICAL ERROR IN THIS CODE (e.g. errID never set)
-%
+%     Returns:
+%       errID - 0 if successful, 1 for file errors, -1 for logical errors
+%       errmsg - Empty if successful, error description otherwise
 function [errID, errmsg] = BControl_First_Run(FILENAME__CUSTOM_SETTINGS, FILENAME__SETTINGS_TEMPLATE)
 errID = -1; errmsg = ''; %#ok<NASGU> (errID=-1 OK despite unused)
 errorlocation = 'ERROR in BControl_First_Run.m';
@@ -380,36 +308,20 @@ end             % end helper function BControl_First_Run
 %     -------  Verify_Settings (helper function for newstartup)
 %     -------------------------------------------------------------
 %     -------------------------------------------------------------
-%     Verifies a small number of critical settings; BControl system;
+%     Validates critical system settings and directories
+%     Checks:
+%     1. Main code directory matches current directory
+%     2. Main data directory exists (creates if missing)
+%     3. Valid fake_rp_box setting (0-4, 20, or 30)
+%     4. Valid state/sound machine server addresses
+%     5. Required DIO line configurations
 %
+%     Future Improvements Needed:
+%     - Validate all DIOLines are properly specified
+%     - Ensure fake_rp_box values are reasonable for the setup
+%     - Verify DIOLINES are numeric and unique powers of two (except 0/NaN)
 %
-%     This was only intended to be run by newstartup.
-%
-%
-%     Currently:
-%       - Checks that Main_Data_Directory is defined and exists (It is
-%           created if it does not exist but is defined.).
-%       - Checks that Main_Code_Directory is defined, exists, and is the
-%           current directory (issuing warnings otherwise).
-%       - Checks that value of fake_rp_box is 0-4 or 20, 30. (Consult dispatcher
-%           assumptions.)
-%       - If fake_rp_box is 1,2, or 20, then checks for defined state_machine_server
-%           string setting.
-%
-%     Suggestions for the future:
-%       ? Affirm that all DIOLines that are assumed to be specified are
-%           actually specified?
-%       ? Check that fake_rp_box is a reasonable value?
-%       ? Make sure that the DIOLINES settings are all numeric and unique
-%           powers of two (unless 0 or NaN)?
-%
-%
-%     ARGUMENTS:    NONE
-%
-%     RETURNS:      [errID errmsg]
-%         errID:    0 if OK, else 1; see errmsg
-%         errmsg:   '' if OK, else an informative error message
-%
+%     Returns error if any critical setting is invalid
 function [errID errmsg] = Verify_Settings()
 errID = -1; errmsg = ''; %#ok<NASGU> (errID=-1 OK despite unused)
 errorlocation = 'ERROR in Verify_Settings';
@@ -528,16 +440,30 @@ end  %     end helper function Verify_Settings
 %     -------  Compatibility_Globals (helper function for newstartup)
 %     -------------------------------------------------------------
 %     -------------------------------------------------------------
-%     loads old settings into globals; BControl system;
+%     Maintains backward compatibility with older code
+%     Loads settings into global variables for legacy code that expects them
 %
-%     This was only intended to be run by newstartup.
+%     Global Variables Created:
+%     - Rig Configuration:
+%       * fake_rp_box - Rig type identifier
+%       * state_machine_server - RTLSM server address
+%       * sound_machine_server - Sound server address
 %
-%     Because old code depends on certain settings being defined as
-%       globals, after loading settings via the new settings system, we
-%       load certain settings into globals.
+%     - Hardware Settings:
+%       * DIO line configurations
+%       * Sound settings (sample rate, etc.)
+%       * Pump timing (on/off times)
 %
+%     - System Paths:
+%       * Solo_rootdir - Main code directory
+%       * Solo_datadir - Data storage directory
 %
-%     Notes on each setting can be found in the default settings file.
+%     - Protocol Settings:
+%       * Super_Protocols - List of protocol objects
+%
+%     Note: This is a compatibility layer and should be phased out
+%     in favor of using the settings system directly. However, many
+%     existing protocols still depend on these globals.
 %
 %     ARGUMENTS:    NONE
 %
