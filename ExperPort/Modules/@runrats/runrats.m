@@ -677,7 +677,7 @@ switch action
         end;
         cd(dirRat);
 
-        update_folder(pwd,'svn');
+        % update_folder(pwd,'svn');
 
         cd(dirCurrent);
         runrats(obj,'enable_all');
@@ -1316,19 +1316,26 @@ switch action
         StatusBar.value='Loading protocol and settings.  Please be patient!';
         pause(0.1);
 
-        %Let's also make sure we have the most up-to-date code
-        CurrDir = pwd;
-        pname = bSettings('get','GENERAL','Main_Code_Directory');
-        if ~isempty(pname) && ischar(pname)
-            update_folder(pname,'svn');
-        end
+        %%%%%%%%%%%% ARPIT %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-        %And finally we make sure the protocols are up-to-date
-        pname = bSettings('get','GENERAL','Protocols_Directory');
-        if ~isempty(pname) && ischar(pname)
-            update_folder(pname,'svn');
-        end
-        cd(CurrDir);
+        % NOT REQUIRED AS INSTEAD OF SVN WE ARE USING GITHUB 
+
+        %Let's also make sure we have the most up-to-date code
+        
+        % CurrDir = pwd;
+        % pname = bSettings('get','GENERAL','Main_Code_Directory');
+        % if ~isempty(pname) && ischar(pname)
+        %     update_folder(pname,'svn');
+        % end
+        % 
+        % %And finally we make sure the protocols are up-to-date
+        % pname = bSettings('get','GENERAL','Protocols_Directory');
+        % if ~isempty(pname) && ischar(pname)
+        %     update_folder(pname,'svn');
+        % end
+        % cd(CurrDir);
+
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         %Let's get the protocol for the rat and load it
         CurrProtocol.value = getProtocol(value(ExpMenu),value(RatMenu)); %#ok<NODEF>
