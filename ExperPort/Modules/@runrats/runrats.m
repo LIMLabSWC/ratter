@@ -767,6 +767,8 @@ switch action
     case 'exp_rat_names'
         varargout{1} = value(ExpMenu);
         varargout{2} = value(RatMenu);
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     case 'update_tech_instructions'
         %% update_tech_instructions
@@ -1055,11 +1057,18 @@ switch action
 
     case 'update_schedule'
         %% update_schedule
+        
         %Here we grab the current schedule for this rig
 
-        if ~isnan(value(RigID));
-            [rats slots] = bdata(['select ratname, timeslot from scheduler where date="',...
-                datestr(now,'yyyy-mm-dd'),'" and rig=',num2str(value(RigID))]);
+        % if ~isnan(value(RigID));
+        %     [rats slots] = bdata(['select ratname, timeslot from scheduler where date="',...
+        %         datestr(now,'yyyy-mm-dd'),'" and rig=',num2str(value(RigID))]);
+        % end
+
+        % Updated by Arpit - instead of taking the date, we will look for
+        % if the rats which are in training in scheduler table.
+        if ~isnan(value(RigID))
+            [rats,slots] = bdata(['select ratname, timeslot from scheduler where in_training="1" and rig=',num2str(value(RigID))]);
         end
 
         %Let's populate the 5 training sessions (changed by sharbat, with
@@ -1593,6 +1602,15 @@ switch action
             end
             set(get_ghandle(UpdateMode),'String','Live Update On','BackgroundColor',[0.6 1 0.6],'ForegroundColor',[0 0 0]);
 
+            %%%%%%%%%%%%%%Removing the part of full restart %%%%%%%%%%%%%%
+                    %%%%%%%%%%%%% ARPIT %%%%%%%%%%%%%%%%%%%%%
+
+            do_full_restart.value = 0;
+            p = bSettings('get','GENERAL','Main_Code_Directory');
+            cd(p);
+
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+           
             %Another option is to now kill MatLab completely and restart
             %runrats.  This ensures windows don't pile up, and code can get
             %updated before each session
