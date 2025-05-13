@@ -224,61 +224,50 @@ end  % end function newstartup
 % Helper Functions
 % ============================================================================
 
-%     -------------------------------------------------------------
-%     -------------------------------------------------------------
-%     -------  HandleNewstartupError (helper function for newstartup)
-%     -------------------------------------------------------------
-%     -------------------------------------------------------------
+% HandleNewstartupError (helper function for newstartup)
+% -------------------------------------------------------------
 function [] = HandleNewstartupError(errID, errmsg)
 if errID,
     errordlg(errmsg);
     error(errmsg);
 end;
 return;
+end
 
-end  %     end helper function HandleNewstartupError
-
-
-
-%     -------------------------------------------------------------
-%     -------------------------------------------------------------
-%     -------  BControl_First_Run (helper function for newstartup)
-%     -------------------------------------------------------------
-%     -------------------------------------------------------------
-%     Handles first-time system initialization
+% BControl_First_Run (helper function for newstartup)
+% -------------------------------------------------------------
+% Handles first-time system initialization
 %     
-%     Responsibilities:
-%     1. Creates custom settings file from template
-%     2. Displays welcome message with documentation link
-%     3. Guides user through initial setup
+% Responsibilities:
+% 1. Creates custom settings file from template
+% 2. Displays welcome message with documentation link
+% 3. Guides user through initial setup
 %
-%     Future Improvements:
-%     - Add settings selection dialogs for:
-%       * Rig type configuration
-%       * CVS settings
-%       * Protocol defaults
+% Future Improvements:
+% - Add settings selection dialogs for:
+%   * Rig type configuration
+%   * CVS settings
+%   * Protocol defaults
 %
-%     Inputs:
-%       FILENAME__CUSTOM_SETTINGS - Target path for custom settings
-%       FILENAME__SETTINGS_TEMPLATE - Source template file
+% Inputs:
+%   FILENAME__CUSTOM_SETTINGS - Target path for custom settings
+%   FILENAME__SETTINGS_TEMPLATE - Source template file
 %
-%     Returns:
-%       errID - 0 if successful, 1 for file errors, -1 for logical errors
-%       errmsg - Empty if successful, error description otherwise
+% Returns:
+%   errID - 0 if successful, 1 for file errors, -1 for logical errors
+%   errmsg - Empty if successful, error description otherwise
 function [errID, errmsg] = BControl_First_Run(FILENAME__CUSTOM_SETTINGS, FILENAME__SETTINGS_TEMPLATE)
 errID = -1; errmsg = ''; %#ok<NASGU> (errID=-1 OK despite unused)
 errorlocation = 'ERROR in BControl_First_Run.m';
 
-%     Generate an error iff* we have n args where n~=2.
+% Generate an error iff* we have n args where n~=2.
 error(nargchk(2, 2, nargin, 'struct'));
 
-%     Newline character for convenience.
-nl     = sprintf('\n');            %     :P
+% Newline character for convenience.
+nl = sprintf('\n');
 
-Welcome_String  = [ 'Welcome to BControl!' nl ...
+Welcome_String = ['Welcome to BControl!' nl ...
     'Help can be found at "http://brodylab.princeton.edu/bcontrol"'];
-
-
 
 if ~exist(FILENAME__CUSTOM_SETTINGS,'file'),
     if ~exist(FILENAME__SETTINGS_TEMPLATE,'file'),
@@ -286,8 +275,7 @@ if ~exist(FILENAME__CUSTOM_SETTINGS,'file'),
         errmsg = [errorlocation ': Could not find settings template file at "' FILENAME__SETTINGS_TEMPLATE '".'];
         return;
     else
-        [copysuccess,copymessage] = ...
-            copyfile(FILENAME__SETTINGS_TEMPLATE,FILENAME__CUSTOM_SETTINGS,'f');
+        [copysuccess,copymessage] = copyfile(FILENAME__SETTINGS_TEMPLATE,FILENAME__CUSTOM_SETTINGS,'f');
         if ~copysuccess,
             errID = 1;
             errmsg = [errorlocation ': Copying template settings file to custom settings file failed. Copy error message:  ' copymessage];
@@ -297,63 +285,42 @@ if ~exist(FILENAME__CUSTOM_SETTINGS,'file'),
                 'A custom settings file has been created for you at "' ...
                 FILENAME__CUSTOM_SETTINGS '".' nl ...
                 'See instructions there and edit as desired.'];
-        end;        %end if/else copy successful
-    end;            %end if/else sample exists, copying
-end;                %end if/else custom doesn't exist, copying
-
-
-%     Other first-time tasks?
-
+        end;
+    end;
+end;
 
 errID = 0;
 msgbox(Welcome_String, 'First Run? - WELCOME TO BCONTROL!', 'help');
-
-
-
 return;
+end
 
-end             % end helper function BControl_First_Run
-
-
-
-
-
-
-
-
-%     -------------------------------------------------------------
-%     -------------------------------------------------------------
-%     -------  Verify_Settings (helper function for newstartup)
-%     -------------------------------------------------------------
-%     -------------------------------------------------------------
-%     Validates critical system settings and directories
-%     Checks:
-%     1. Main code directory matches current directory
-%     2. Main data directory exists (creates if missing)
-%     3. Valid fake_rp_box setting (0-4, 20, or 30)
-%     4. Valid state/sound machine server addresses
-%     5. Required DIO line configurations
+% Verify_Settings (helper function for newstartup)
+% -------------------------------------------------------------
+% Validates critical system settings and directories
+% Checks:
+% 1. Main code directory matches current directory
+% 2. Main data directory exists (creates if missing)
+% 3. Valid fake_rp_box setting (0-4, 20, or 30)
+% 4. Valid state/sound machine server addresses
+% 5. Required DIO line configurations
 %
-%     Future Improvements Needed:
-%     - Validate all DIOLines are properly specified
-%     - Ensure fake_rp_box values are reasonable for the setup
-%     - Verify DIOLINES are numeric and unique powers of two (except 0/NaN)
+% Future Improvements Needed:
+% - Validate all DIOLines are properly specified
+% - Ensure fake_rp_box values are reasonable for the setup
+% - Verify DIOLINES are numeric and unique powers of two (except 0/NaN)
 %
-%     Returns error if any critical setting is invalid
+% Returns error if any critical setting is invalid
 function [errID errmsg] = Verify_Settings()
 errID = -1; errmsg = ''; %#ok<NASGU> (errID=-1 OK despite unused)
 errorlocation = 'ERROR in Verify_Settings';
 
-%     Newline character for convenience.
+% Newline character for convenience.
 nl = sprintf('\n');
 
-%     Be sure that we're running from the indicated code directory.
-%     The warning below will trigger until hand-editing of the custom
-%       settings file.
-[Main_Code_Directory errID errmsg] = ...
-    bSettings('get','GENERAL','Main_Code_Directory');
+% Be sure that we're running from the indicated code directory.
+[Main_Code_Directory errID errmsg] = bSettings('get','GENERAL','Main_Code_Directory');
 if errID, return; end;
-if	isempty(Main_Code_Directory) || strcmpi(Main_Code_Directory,'NULL'),
+if isempty(Main_Code_Directory) || strcmpi(Main_Code_Directory,'NULL'),
     warning(['\nWARNING in Verify_Settings: Main_Code_Directory' ...
         ' setting was left blank.\n' ...
         'Though BControl may not break, it is best to set this value\n' ...
@@ -372,10 +339,8 @@ elseif ispc &&  ~strcmpi(Main_Code_Directory, pwd) ...
         Main_Code_Directory, pwd);
 end
 
-
-%     See if the main data directory is specified.
-[Main_Data_Directory errID errmsg] = ...
-    bSettings('get','GENERAL','Main_Data_Directory');
+% See if the main data directory is specified.
+[Main_Data_Directory errID errmsg] = bSettings('get','GENERAL','Main_Data_Directory');
 if errID, return; end;
 if isempty(Main_Data_Directory) || strcmpi(Main_Data_Directory, 'NULL'),
     warning(['\n\nWARNING in Verify_Settings: Main_Data_Directory not \n'...
@@ -387,8 +352,7 @@ if isempty(Main_Data_Directory) || strcmpi(Main_Data_Directory, 'NULL'),
         [pwd filesep '..' filesep 'SoloData']);
 end;
 
-
-%     Create data directory at specified location if necessary.
+% Create data directory at specified location if necessary.
 if ~isempty(Main_Data_Directory) && ~strcmp(Main_Data_Directory,'NULL'),
     if ~exist(Main_Data_Directory, 'dir'),
         [success message] = mkdir(Main_Data_Directory);
@@ -401,31 +365,25 @@ if ~isempty(Main_Data_Directory) && ~strcmp(Main_Data_Directory,'NULL'),
                 nl 'Directory: "' Main_Data_Directory '".' ...
                 nl 'mkdir error message: ' nl '"' message '"'];
             return;
-        end;    %  end if unsuccessful mkdir
-    end;        %  end if data dir does not already exist
-end;            %  end if Main_Data_Directory variable is not meaningless
+        end;
+    end;
+end;
 
-
-%     Check for meaningful fake_rp_box (0-4 or 20, 30).
-[fake_rp_box errID errmsg] = ...
-    bSettings('get','RIGS','fake_rp_box');
+% Check for meaningful fake_rp_box (0-4 or 20, 30).
+[fake_rp_box errID errmsg] = bSettings('get','RIGS','fake_rp_box');
 if errID, return; end;
-if ~ismember(fake_rp_box, [0 1 2 3 4 20 30]), % <~> added 20 2008.July.04
-    % added 30 06/08/2024
+if ~ismember(fake_rp_box, [0 1 2 3 4 20 30]),
     warn = [nl nl 'WARNING in Verify_Settings:' nl 'The setting' ...
         ' RIGS;fake_rp_box is not an integer in the set [0 1 2 3 4].' nl...
         'It is expected to be. See documentation in settings files.' nl];
-    warning(warn); %#ok<WNTAG> (Ignore the meaningless MATLAB warning that marks this line.)
+    warning(warn);
 end;
 
-%     Check selected addresses of state and sound machine servers.
-[steMS errID errmsg] = ...
-    bSettings('get','RIGS','state_machine_server');
+% Check selected addresses of state and sound machine servers.
+[steMS errID errmsg] = bSettings('get','RIGS','state_machine_server');
 if errID, return; end;
-[sndMS errID errmsg] = ...
-    bSettings('get','RIGS','sound_machine_server');
+[sndMS errID errmsg] = bSettings('get','RIGS','sound_machine_server');
 if errID, return; end;
-% <~> 2008.July.4: added 20 in the fake_rp_box check below
 if ~ischar(steMS) || ~ischar(sndMS) ...
         || (ismember(fake_rp_box,[0 1 2 20]) && (isempty(steMS) || isempty(sndMS))),
     warn = [nl nl 'WARNING in Verify_Settings:' nl ...
@@ -436,59 +394,45 @@ if ~ischar(steMS) || ~ischar(sndMS) ...
         'virtual behavior box is in use, they may be blank;' nl...
         'otherwise, they should be IP or DNS addresses - e.g.' nl...
         'rtlsm43.princeton.edu and 192.1.1.1 are fine.' nl nl];
-    warning(warn); %#ok<WNTAG> (Ignore the meaningless MATLAB warning that marks this line.)
+    warning(warn);
     return;
 end;
 
-
-%     If we've reached this point, everything should be okay.
+% If we've reached this point, everything should be okay.
 errID = 0;
 return;
+end
 
-end  %     end helper function Verify_Settings
-
-
-
-
-
-
-
-%     -------------------------------------------------------------
-%     -------------------------------------------------------------
-%     -------  Compatibility_Globals (helper function for newstartup)
-%     -------------------------------------------------------------
-%     -------------------------------------------------------------
-%     Maintains backward compatibility with older code
-%     Loads settings into global variables for legacy code that expects them
+% Compatibility_Globals (helper function for newstartup)
+% -------------------------------------------------------------
+% Maintains backward compatibility with older code
+% Loads settings into global variables for legacy code that expects them
 %
-%     Global Variables Created:
-%     - Rig Configuration:
-%       * fake_rp_box - Rig type identifier
-%       * state_machine_server - RTLSM server address
-%       * sound_machine_server - Sound server address
+% Global Variables Created:
+% - Rig Configuration:
+%   * fake_rp_box - Rig type identifier
+%   * state_machine_server - RTLSM server address
+%   * sound_machine_server - Sound server address
 %
-%     - Hardware Settings:
-%       * DIO line configurations
-%       * Sound settings (sample rate, etc.)
-%       * Pump timing (on/off times)
+% - Hardware Settings:
+%   * DIO line configurations
+%   * Sound settings (sample rate, etc.)
+%   * Pump timing (on/off times)
 %
-%     - System Paths:
-%       * Solo_rootdir - Main code directory
-%       * Solo_datadir - Data storage directory
+% - System Paths:
+%   * Solo_rootdir - Main code directory
+%   * Solo_datadir - Data storage directory
 %
-%     - Protocol Settings:
-%       * Super_Protocols - List of protocol objects
+% - Protocol Settings:
+%   * Super_Protocols - List of protocol objects
 %
-%     Note: This is a compatibility layer and should be phased out
-%     in favor of using the settings system directly. However, many
-%     existing protocols still depend on these globals.
+% Note: This is a compatibility layer and should be phased out
+% in favor of using the settings system directly. However, many
+% existing protocols still depend on these globals.
 %
-%     ARGUMENTS:    NONE
-%
-%     RETURNS:      [errID errmsg]
-%         errID:    0 if OK, else see errmsg
-%         errmsg:   '' if OK, else an informative error message
-%
+% Returns: [errID errmsg]
+%   errID: 0 if OK, else see errmsg
+%   errmsg: '' if OK, else an informative error message
 function [errID errmsg] = Compatibility_Globals()
 errID = -1; errmsg = ''; %#ok<NASGU> (errID=-1 OK despite unused)
 errorlocation = 'ERROR in Compatibility_Globals (newstartup helper function)';
@@ -498,52 +442,42 @@ global fake_rp_box;
 if errID, return; end;
 
 global state_machine_server;
-[state_machine_server errID errmsg] = ...
-    bSettings('get','RIGS','state_machine_server'); if errID, return; end;
+[state_machine_server errID errmsg] = bSettings('get','RIGS','state_machine_server');
+if errID, return; end;
 
 global sound_machine_server;
-[sound_machine_server errID errmsg] = ...
-    bSettings('get','RIGS','sound_machine_server'); if errID, return; end;
+[sound_machine_server errID errmsg] = bSettings('get','RIGS','sound_machine_server');
+if errID, return; end;
 
 global cvsroot_string;
 [cvsroot_string errID errmsg] = bSettings('get','CVS','CVSROOT_STRING');
 if errID, return; end;
 
-
-%     Grab the DIO line names and values from Settings and create globals
-%       from them.
-
+% Grab the DIO line names and values from Settings and create globals
 [outputs errID_i errmsg_i] = bSettings('get','DIOLINES','all');
 if errID_i,
     errID = 1;
     errmsg = [errorlocation ': Attempt to retrieve DIOLINES settings group failed. bSettings(''get'',''DIOLINES'',''all'') returned the following error (ID: ' int2str(errID_i) '): ' errmsg_i ];
     return;
 end;
-%     The Settings call above returns a cell matrix of the form:
-%       {nameofoutput1  channelvalueofoutput1    DIOLINES;
-%        nameofoutput2  channelvalueofoutput2    DIOLINES;
-%        etc...}
 
-%     Iterate over the DIOLINES settings and create globals with names
-%       equal to the setting names, and values equal to the setting values.
-%       This results in each channel name declared as a global, and the
-%       channel's value in the outputs bitfield assigned to the global.
+% Iterate over the DIOLINES settings and create globals
 for i = 1:size(outputs,1),
-    chan_name =     outputs{i,1};
-    chan_val  =     outputs{i,2};
-    eval(['global ' chan_name ';']);        % e.g.      global center1led;
-    eval([chan_name ' = ' num2str(chan_val) ';']);   % e.g.      center1led = 3;
+    chan_name = outputs{i,1};
+    chan_val  = outputs{i,2};
+    eval(['global ' chan_name ';']);
+    eval([chan_name ' = ' num2str(chan_val) ';']);
 end;
 
 global softsound_play_sounds;
 softsound_play_sounds = bSettings('get','EMULATOR','softsound_play_sounds');
 
 global pump_ontime;
-[pump_ontime errID errmsg]      = bSettings('get','PUMPS','pump_ontime');
+[pump_ontime errID errmsg] = bSettings('get','PUMPS','pump_ontime');
 if errID, return; end;
 
 global pump_offtime;
-[pump_offtime errID errmsg]     = bSettings('get','PUMPS','pump_offtime');
+[pump_offtime errID errmsg] = bSettings('get','PUMPS','pump_offtime');
 if errID, return; end;
 
 global sound_sample_rate;
@@ -557,34 +491,21 @@ if errID || ~isnumeric(Solo_Try_Catch_Flag) || ...
     Solo_Try_Catch_Flag = 1;
 end;
 
-
 global Solo_rootdir;
-Solo_rootdir = pwd;     %     NOTE THIS LINE!
-
+Solo_rootdir = pwd;
 
 global Solo_datadir;
 [Solo_datadir errID errmsg] = bSettings('get','GENERAL','Main_Data_Directory');
 if errID, return; end;
 if isempty(Solo_datadir) || strcmpi(Solo_datadir, 'NULL'),
-    %     If the setting is blank, old code still gets what it expects.
-    Solo_datadir = [Solo_rootdir filesep '..' filesep 'SoloData']; %     NOTE THIS LINE!
+    Solo_datadir = [Solo_rootdir filesep '..' filesep 'SoloData'];
 end;
 
-
-%     I don't know what to do with this yet, so I'm leaving it entirely as
-%       is. Shraddha's protocols will need this, I expect, and cell arrays
-%       are not recognized as such in the settings system (only as
-%       strings), so we have to do some negotiating.
 % Names of protocols built using protocolobj
 global Super_Protocols;
 Super_Protocols = {'duration_discobj','dual_discobj'};
 
-
-
-%     If we've reached this point, everything should be okay.
+% If we've reached this point, everything should be okay.
 errID = 0;
 return;
-
-
-
-end %     end helper function Compatibility_Globals
+end
