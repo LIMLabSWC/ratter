@@ -115,6 +115,18 @@ addpath([pwd filesep 'bin']   ...
 [errID errmsg] = bSettings('load');
 HandleNewstartupError(errID, errmsg);
 
+% Add Protocols directory to path
+[Protocols_Directory errID errmsg] = bSettings('get','GENERAL','Protocols_Directory');
+fprintf('Protocols_Directory from settings: %s\n', Protocols_Directory);
+fprintf('Current directory: %s\n', pwd);
+fprintf('Full path to Protocols: %s\n', fullfile(pwd, Protocols_Directory));
+if ~errID && ~isempty(Protocols_Directory) && exist(Protocols_Directory, 'dir')
+    addpath(Protocols_Directory);
+    fprintf('Added to path: %s\n', Protocols_Directory);
+else
+    fprintf('Could not add to path. Error: %s\n', errmsg);
+end
+
 % ============================================================================
 % Protocol Directory Validation
 % ============================================================================
