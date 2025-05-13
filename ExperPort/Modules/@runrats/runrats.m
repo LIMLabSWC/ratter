@@ -138,6 +138,7 @@ switch action
         SoloParamHandle(obj,'do_full_restart', 'value',1); %1 if we want to restart matlab between each session
         SoloParamHandle(obj,'SafetyMode',      'value',''); %empty for no safety, B for before, A for after
         SoloParamHandle(obj,'OptoPlugColor',   'value',[]); %figure handle for opto plug color panel
+        SoloParamHandle(obj,'Rerun_AfterCrash',   'value',1); % should load the previous protocol if runrats/dispatcher crashed
 
         if ~exist('phys','var'); SoloParamHandle(obj,'phys','value',0); end
 
@@ -1746,11 +1747,52 @@ switch action
         if ~isempty(id)
             id = id(end);
             bdata('call mark_crashed("{S}")',id);
+       
+        end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %% Added by Arpit
+        %% Lets try and rerun the protocol and only do it if the animal is training
+        is_rat_training = bdata(['select is_training from rats where experimenter="',value(ExpMenu),'" and ratname="', value(RatMenu),'"']);
+        
+        if value(Rerun_AfterCrash) == 1 && is_rat_training == 1
+                runrats(obj,'rerun');
         end
 
 
+    case 'rerun' % called in 'crash' and made by combining 'begin_load_protocol' , 'load_protocol' and 'run' 
 
+        InLiveLoop.value = 0;
+        runrats(obj,'disable_all');
 
+        set(get_ghandle(Multi),'string','Unloading...','fontsize',28);
+
+        x = '';
+        try x = dispatcher('get_protocol_object'); end %#ok<TRYNC>
+        if ~isempty(x)
+            %There was a protocol previously open. Let's not trust that
+            %their close section is working properly.
+            try  %#ok<TRYNC>
+                %rigscripts does not exist currently, try Protocols (ask
+                %Athena) -sharbat
+                p = bSettings('get','GENERAL','Main_Code_Directory');
+                p(strfind(p,'ExperPort'):end) = '';
+                p = [p,'Rigscripts'];
+                cd(p);
+                if ispc == 1
+                    system('restart_runrats.bat');
+                end
+            end
+        end
+
+        dispatcher('set_protocol','');
+
+        % Loading the protocol and setting file
+        runrats(obj,'load_protocol')
+
+        % Running the protocol
+        runrats(obj,'run')
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     case 'crash_cleanup'
         %% crash_cleanup
         %The tech has acknowledged the crash. Let's jump back in the loop
