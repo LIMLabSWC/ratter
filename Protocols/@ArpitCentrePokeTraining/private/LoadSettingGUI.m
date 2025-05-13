@@ -1,5 +1,9 @@
 % REMOVE THE SETTINGS/PRE OPENED GUI
- flush
+ if exist('BpodSystem','var') == 1
+     if ~isempty(BpodSystem)
+         flush
+     end
+ end
 
 % START FRESH & SET THE REQUIRED DIRECTORY
 
@@ -15,12 +19,17 @@ else
 end
 
 % START BPOD
+try
+    Bpod('COM5')
+catch
 
-% Identify the bpod port before starting
-% bpodPort = getOrSetCOMPort();
-% disp(['Using COM Port: ' bpodPort]);
-% Bpod(bpodPort);
-Bpod;
+    % Identify the bpod port before starting
+    bpodPort = getOrSetCOMPort();
+    disp(['Using COM Port: ' bpodPort]);
+    % Bpod();
+    Bpod(bpodPort);
+end
+
 newstartup;
 
 % PRESENT THE USER WITH THE CHOICE OF EXPERIMENTER/RAT
@@ -33,14 +42,25 @@ catch %#ok<CTCH>
     Experimenter_Name = '';
 end
 
+rig_id = bSettings('get','RIGS','Rig_ID'); % the ID of this rig
+
 if ~isempty(Experimenter_Name)
     for n_exp = 1:numel(Experimenter_Name)
-        ratnames = bdata(['select ratname from rats where experimenter="',Experimenter_Name{n_exp},'" and extant=1']);
-        Rat_Name{n_exp} = sortrows(strtrim(ratnames));
+        % Finding all training rat for this experimenter
+        % ratnames = bdata(['select ratname from rats where experimenter="',Experimenter_Name{n_exp},'" and extant=1']);
+        ratnames = bdata(['select ratname from rats where experimenter="',Experimenter_Name{n_exp},'" and in_training=1']);
+        Rat_Name_all{n_exp} = sortrows(strtrim(ratnames));
+        
+        % Additionaally finding rats for this experimenter with its schedule on this rig
+        [rats,slots] = bdata(['select ratname, timeslot from scheduler where experimenter="',...
+            Experimenter_Name{n_exp},'" and rig="',num2str(rig_id),'"']);
+
+
     end
 end
 
-Exp_Rat_Map = containers.Map(Experimenter_Name, Rat_Name);
+Exp_Rat_Map = containers.Map(Experimenter_Name, Rat_Name_all);
+
 
 % Create figure
 fig = figure('Name', 'Dynamic Button GUI', ...
@@ -76,6 +96,13 @@ runrats('init');
 pause(3);
 runrats('update exp_rat_userclick',experimenter_name,rat_name);
 end
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% HELPER FUNCTIONS
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % === Create buttons dynamically and return handles ===
 function btns = createButtons(figHandle, optionList, callbackFcn)
@@ -167,4 +194,3 @@ else
     end
 end
 end
-
