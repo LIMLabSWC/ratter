@@ -11,3 +11,15 @@ This repository stores the BControl code for our high-throughput behavior traini
 - The `/ExperPort/Settings/Settings_Custom.conf` file contains rig-specific configurations. Instead, we provide `/ExperPort/Settings/_Settings_Custom.conf`, which is a template. After downloading, users should rename it to `Settings_Custom.conf` and add their rig-specific settings.
 
 - The `/PASSWORD_CONFIG-DO_NOT_VERSIONCONTROL.mat` file stores hostnames, users, and passwords. It is version-controlled with SVN and stored on our internal server.
+
+## Quick Start
+
+Clone the repository and run the `svn_sparse_init.sh` sript from git bash:
+
+```
+bash svn_sparse_init.sh
+```
+
+This will initiate the SVN repository in `ratter`.
+
+For more detailed instructions, follow our [giude](https://github.com/LIMLabSWC/limlab_documentation/blob/main/docs/how_to_set_up_a_rig_-_software.md) on setting up a rig.
