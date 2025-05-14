@@ -33,6 +33,18 @@ BControl/
 └── SoloData/          # Data storage (excluded from version control)
 ```
 
+## Quick Start
+
+Clone the repository and run the `svn_sparse_init.sh` sript from git bash:
+
+```
+bash svn_sparse_init.sh
+```
+
+This will initiate the SVN repository in `ratter`.
+
+For more detailed instructions, follow our [giude](https://github.com/LIMLabSWC/limlab_documentation/blob/main/docs/how_to_set_up_a_rig_-_software.md) on setting up a rig.
+
 ## Documentation
 
 ### User Guides
