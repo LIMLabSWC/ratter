@@ -3,6 +3,28 @@
 ## Overview
 This document outlines the plan to remove unused .m files from the ExperPort directory. The goal is to reduce code clutter and maintenance burden by removing files that are no longer actively used in the codebase.
 
+## Actively Used Files
+
+The following files are actively used in the codebase and should be retained:
+
+1. `flush.m`
+   - Referenced in multiple protocol files, indicating active usage for flushing operations.
+
+2. `olfip.mat`
+   - Referenced in several protocol files, indicating active usage for olfactory IP configurations.
+
+3. `rows.m`
+   - Referenced in multiple protocol files, indicating active usage for row operations.
+
+4. `bgnames.mat`
+   - Referenced in `@odorsegm2obj/OdorSection.m`, indicating usage for background names.
+
+5. `OdorNames.mat`
+   - Referenced in `@adil2afcobj/OdorSection.m`, indicating usage for odor names.
+
+6. `OdorSet.mat`
+   - Referenced in `@odorsegm2obj/OdorSection.m`, indicating usage for odor set configurations.
+
 ## Files to Remove
 
 ### Confirmed Unused Files
