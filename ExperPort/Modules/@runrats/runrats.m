@@ -296,7 +296,7 @@ switch action
         %prepare to load, let's do it.
         runrats(obj,'update_exprat');
         runrats(obj,'check_rig_flushed');
-        runrats(obj,'live_loop');
+        % runrats(obj,'live_loop');
 
 
     case 'send_empty_state_machine'
@@ -1600,7 +1600,7 @@ switch action
             %Let's reset the Multi button and hop back in the live loop
             set(get_ghandle(Multi),'ForegroundColor',[0,0,0],'BackgroundColor',...
                 [1,1,0.4],'string','Load Protocol','FontSize',24);
-            InLiveLoop.value = 1;
+            InLiveLoop.value = 0; % Changed by Arpit as the timer function is preventing 'flush' to run
             runrats(obj,'enable_all');
 
             %We need to turn RunRats back to live mode
@@ -1654,7 +1654,7 @@ switch action
             end
 
             %And now we hop back in the loop
-            runrats(obj,'live_loop');
+            % runrats(obj,'live_loop');
         end
 
 
@@ -1809,7 +1809,7 @@ switch action
             [1,1,0.4],'string','Load Protocol','FontSize',24);
 
         InLiveLoop.value = 1;
-        runrats(obj,'live_loop');
+        % runrats(obj,'live_loop');
 
     case 'updatelog'
 
