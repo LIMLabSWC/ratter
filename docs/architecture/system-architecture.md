@@ -4,130 +4,134 @@ This document outlines the permanent architecture of the system, including core 
 
 ## Core System Components
 
-The following diagram shows the high-level architecture of active system components and their relationships:
-
 ```mermaid
-graph LR
-    %% Core System Components
+graph TB
+    %% Core Components
     subgraph Core ["Core System"]
-        direction LR
         NS["newstartup.m"]
-        F["flush.m"]
-        R["rows.m"]
-    end
-
-    subgraph Settings ["Settings Module"]
-        direction LR
-        SM["Settings.m"]
-        BS["bSettings.m"]
-        SC["SettingsObject"]
+        Settings["Settings Module"]
     end
 
     subgraph Protocols ["Protocol System"]
-        direction LR
-        subgraph Base ["Base Classes"]
-            PO["@protocolobj"]
-            NP["@nprotocol"]
-        end
+        Base["@protocolobj"]
         
         subgraph Active ["Active Protocols"]
-            direction LR
-            CL["@Classical"]
-            PS["@Psychometric"]
+            AD["@AthenaDelayComp"]
+            SC["@SoundCatContinuous"]
             AC["@ArpitCentrePokeTraining"]
-        end
-        
-        subgraph Plugins ["Protocol Plugins"]
-            direction LR
-            PP["pokesplot"]
-            SL["saveload"]
-            SM2["sessionmodel"]
-            SW["soundmanager"]
-            SU["soundui"]
-            WA["water"]
         end
     end
 
-    %% Relationships
-    NS --> SM
-    NS --> BS
-    BS --> SC
+    %% Essential Plugin Groups
+    subgraph Essential ["Essential Plugins"]
+        UI["UI Plugins"]
+        Data["Data Handling"]
+        Sound["Sound Management"]
+        Control["Control Plugins"]
+    end
+
+    %% Key Relationships
+    NS --> Settings
+    NS --> Protocols
+    Active --> Base
+    Active --> Essential
     
-    %% Protocol relationships
-    Active --> PO
-    Active --> NP
-    Active --> Plugins
-    Active --> F
-    Active --> R
-
-    %% Module relationships
-    NS --> |"Loads"| Protocols
-    SM --> |"Configures"| Protocols
-
     %% Style
-    classDef default fill:#f9f9f9,stroke:#333,stroke-width:1px;
-    classDef core fill:#e6ffe6,stroke:#060,stroke-width:2px;
-    classDef settings fill:#e6e6ff,stroke:#006,stroke-width:2px;
-    classDef protocols fill:#ffe6e6,stroke:#600,stroke-width:2px;
+    classDef default fill:#f9f9f9,stroke:#333,stroke-width:1px
+    classDef core fill:#e6ffe6,stroke:#060,stroke-width:2px
+    classDef active fill:#ffe6e6,stroke:#600,stroke-width:1px
     
-    class Core core;
-    class Settings settings;
-    class Protocols protocols;
+    class Core,Settings core
+    class Active active
 ```
 
-### Component Descriptions
+## Protocol Plugin Details
 
-1. **Core System**
-   - `newstartup.m`: Core system initialization script that sets up paths, loads settings, and prepares the environment
-   - `flush.m`: Handles flushing operations, used extensively in protocol files
-   - `rows.m`: Provides matrix operation functionality used throughout the codebase
+```mermaid
+graph LR
+    %% Plugin Categories
+    subgraph UI ["UI Plugins"]
+        direction TB
+        pokesplot2
+        soundui
+        distribui
+        punishui
+    end
 
-2. **Settings Module**
-   - `Settings.m`: Main settings management module
-   - `bSettings.m`: Base settings configuration
-   - These components work together to maintain system configuration
+    subgraph Data ["Data Handling"]
+        direction TB
+        saveload
+        sessionmodel
+        sqlsummary
+        comments
+    end
 
-## System Startup Sequence
+    subgraph Sound ["Sound Management"]
+        direction TB
+        soundmanager
+        soundtable
+    end
 
-The following sequence diagram illustrates the system initialization process:
+    subgraph Control ["Control Plugins"]
+        direction TB
+        water
+        antibias
+        reinforcement
+    end
+
+    %% Protocol Usage
+    AD["@AthenaDelayComp"] --> UI & Data & Sound & Control
+    SC["@SoundCatContinuous"] --> UI & Data & Sound & Control
+    AC["@ArpitCentrePokeTraining"] --> UI & Data & Sound
+    
+    %% Style
+    classDef group fill:#f9f9f9,stroke:#333,stroke-width:1px
+    classDef proto fill:#ffe6e6,stroke:#600,stroke-width:1px
+    
+    class UI,Data,Sound,Control group
+    class AD,SC,AC proto
+```
+
+## System Startup Flow
 
 ```mermaid
 sequenceDiagram
-    participant U as User
-    participant NS as newstartup.m
-    participant S as Settings.m
-    participant BS as bSettings.m
-    participant P as Protocols
-    participant D as Dispatcher
+    participant User
+    participant System as newstartup.m
+    participant Settings
+    participant Protocols
 
-    U->>NS: Start System
-    NS->>BS: Load Settings Files
-    BS->>S: Initialize Settings
-    S->>BS: Load Base Settings
-    NS->>P: Configure Protocol Paths
-    P->>D: Register Available Protocols
-    D->>NS: Ready State
-    NS->>U: System Ready
+    User->>System: Start
+    System->>Settings: Load Configuration
+    System->>Protocols: Initialize
+    Protocols-->>System: Ready
+    System-->>User: System Ready
 ```
 
-### Startup Process Details
+## Key Components
 
-1. **System Initialization**
-   - User triggers system start
-   - `newstartup.m` begins initialization sequence
+1. **Core System**
+   - `newstartup.m`: System initialization
+   - Settings Module: Configuration management
 
-2. **Settings Configuration**
-   - Settings module is initialized
-   - Base settings are loaded and configured
-   - System paths are established
+2. **Active Protocols**
+   - `@AthenaDelayComp`: Full plugin suite
+   - `@SoundCatContinuous`: Full plugin suite
+   - `@ArpitCentrePokeTraining`: Basic plugin set
 
-3. **Protocol Loading**
-   - Protocol paths are configured
-   - Active protocols are made available
+3. **Plugin Categories**
+   - UI: Visual interfaces and plotting
+   - Data: Storage and session management
+   - Sound: Audio control and management
+   - Control: Hardware and behavior control
 
-4. **System Ready State**
-   - All components initialized
-   - System ready for operation
+## Plugin Usage
+
+| Protocol | UI | Data | Sound | Control |
+|----------|-------|--------|--------|----------|
+| AthenaDelayComp | ✓ | ✓ | ✓ | ✓ |
+| SoundCatContinuous | ✓ | ✓ | ✓ | ✓ |
+| ArpitCentrePokeTraining | ✓ | ✓ | ✓ | - |
 
 ## Dependencies and Requirements
 
@@ -168,46 +172,54 @@ sequenceDiagram
 ## Protocol Class Hierarchy
 
 ```mermaid
-graph TD
-    subgraph Base ["Base Protocol Classes"]
-        PO["@protocolobj"]
-        NP["@nprotocol"]
-    end
+graph LR
+    %% Base Protocol
+    Base["@protocolobj"]
+    
+    %% Active Protocols
+    AD["@AthenaDelayComp"]
+    SC["@SoundCatContinuous"]
+    AC["@ArpitCentrePokeTraining"]
 
-    subgraph Plugins ["Protocol Plugins"]
-        PP["pokesplot"]
+    %% Plugin Groups
+    subgraph Core ["Core Plugins"]
+        direction TB
+        PP["pokesplot2"]
         SL["saveload"]
         SM["sessionmodel"]
         SW["soundmanager"]
         SU["soundui"]
         WA["water"]
+    end
+
+    subgraph Extended ["Extended Plugins"]
+        direction TB
         DU["distribui"]
+        PU["punishui"]
         CO["comments"]
         ST["soundtable"]
         SQ["sqlsummary"]
+        RF["reinforcement"]
+        AB["antibias"]
     end
 
-    subgraph Active ["Active Protocol Classes"]
-        CL["@Classical"]
-        PS["@Psychometric"]
-        AC["@ArpitCentrePokeTraining"]
-    end
+    %% Inheritance
+    AD --> Base
+    SC --> Base
+    AC --> Base
 
-    %% Inheritance/Usage
-    CL --> PO
-    PS --> PO
-    AC --> PO
-    
-    CL --> PP & SL & SM & SW & SU & WA & DU & CO & ST & SQ
-    PS --> PP & SL & SM & SW & SU & WA
-    AC --> PP & SL & SM & SW & SU & WA & DU & CO & ST & SQ
+    %% Plugin Usage
+    AD --> Core & Extended
+    SC --> Core & Extended
+    AC --> Core
+    AC --> CO & ST & SQ & AB
 
     %% Style
-    classDef base fill:#e6ffe6,stroke:#060,stroke-width:2px;
-    classDef plugin fill:#e6e6ff,stroke:#006,stroke-width:2px;
-    classDef active fill:#ffe6e6,stroke:#600,stroke-width:2px;
+    classDef base fill:#e6ffe6,stroke:#060,stroke-width:2px
+    classDef active fill:#ffe6e6,stroke:#600,stroke-width:1px
+    classDef plugin fill:#e6e6ff,stroke:#006,stroke-width:1px
     
-    class Base base;
-    class Plugins plugin;
-    class Active active;
+    class Base base
+    class AD,SC,AC active
+    class Core,Extended plugin
 ``` 
