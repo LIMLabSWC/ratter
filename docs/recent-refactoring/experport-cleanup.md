@@ -97,8 +97,8 @@ These files have limited or indirect usage and should be investigated before rem
 ### Phase 1: Backup and Documentation
 Changes are version controlled on `integration-junk-removal` branch
 
-### Phase 2: Gradual Removal
-- Remove files in "confirmed unused" category
+### Phase 2: Gradual Archiving
+- Archive files in "confirmed unused" category 
 - Run protocols
 - If issues arise, restore the files
 
