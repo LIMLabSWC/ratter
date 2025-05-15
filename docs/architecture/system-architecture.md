@@ -19,13 +19,6 @@ graph TD
         BS[bSettings.m]
     end
 
-    subgraph Data ["Data Files"]
-        OF[olfip.mat]
-        BG[bgnames.mat]
-        ON[OdorNames.mat]
-        OS[OdorSet.mat]
-    end
-
     NS --> SM
     NS --> BS
     SM --> BS
@@ -46,11 +39,6 @@ graph TD
    - `Settings.m`: Main settings management module
    - `bSettings.m`: Base settings configuration
    - These components work together to maintain system configuration
-
-3. **Data Files**
-   - Several .mat files are maintained for system operation
-   - These files contain critical data used by various protocols
-   - While some protocols using these files have been moved to legacy, the data files remain active
 
 ## System Startup Sequence
 
