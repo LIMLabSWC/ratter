@@ -4,6 +4,8 @@ This document outlines the permanent architecture of the system, including core 
 
 ## Core System Components
 
+The diagram below provides an overview of the main system components and their relationships. It shows how the core system, protocol system, and essential plugins interact:
+
 ```mermaid
 graph TB
     %% Core Components
@@ -45,7 +47,15 @@ graph TB
     class Active active
 ```
 
+**Core Components Overview:**
+- The **Core System** consists of `newstartup.m` (the initialization script) and the Settings Module (configuration management)
+- The **Protocol System** includes the base `@protocolobj` class and actively used protocol implementations
+- **Essential Plugins** provide functionality grouped by purpose: UI, Data Handling, Sound Management, and Control
+- All active protocols inherit from the base protocol class and utilize various essential plugins
+
 ## Protocol Plugin Details
+
+This diagram shows the specific plugins used by each protocol and their categorization. It provides a detailed view of how different protocols utilize the plugin system:
 
 ```mermaid
 graph LR
@@ -92,21 +102,57 @@ graph LR
     class AD,SC,AC proto
 ```
 
+**Plugin System Details:**
+- **UI Plugins**: Handle visual elements like plots and user interfaces
+- **Data Handling Plugins**: Manage data storage, session information, and database interactions
+- **Sound Management Plugins**: Control audio stimuli generation and playback
+- **Control Plugins**: Manage behavioral control elements like water delivery and reinforcement
+- Different protocols have different plugin requirements:
+  - `@AthenaDelayComp` and `@SoundCatContinuous` use all plugin categories
+  - `@ArpitCentrePokeTraining` uses UI, Data, and Sound plugins but not Control plugins
+
 ## System Startup Flow
+
+The diagram below details the full system initialization process, showing how the core components interact during startup and the two possible user interface paths:
 
 ```mermaid
 sequenceDiagram
     participant User
-    participant System as newstartup.m
+    participant NS as newstartup.m
     participant Settings
-    participant Protocols
+    participant Dispatcher
+    participant RunRats
+    participant Protocol
 
-    User->>System: Start
-    System->>Settings: Load Configuration
-    System->>Protocols: Initialize
-    Protocols-->>System: Ready
-    System-->>User: System Ready
+    User->>NS: Start System
+    NS->>Settings: Load Configuration
+    Settings-->>NS: Configuration Loaded
+    NS->>NS: Configure Paths & Environment
+    NS-->>User: System Ready
+    
+    alt Dispatcher Interface
+        User->>Dispatcher: Initialize (init)
+        Dispatcher->>Dispatcher: Create UI
+        Dispatcher->>Protocol: Load Selected Protocol
+        Protocol-->>Dispatcher: Protocol Ready
+        Dispatcher-->>User: Ready for Experiments
+    else RunRats Interface
+        User->>RunRats: Initialize (init)
+        RunRats->>Dispatcher: Initialize (hidden)
+        RunRats->>RunRats: Create Technician UI
+        RunRats->>Protocol: Load Selected Protocol
+        Protocol-->>RunRats: Protocol Ready
+        RunRats-->>User: Ready for Experiments
+    end
 ```
+
+**Initialization Process Notes:**
+- The initialization begins with `newstartup.m` loading system settings and configuring paths
+- After system initialization, users can choose between two interfaces:
+  - **Dispatcher**: Used directly by researchers for protocol development and complex experiments
+  - **RunRats**: Used by technicians for routine experiment sessions
+- The RunRats interface actually initializes Dispatcher behind the scenes as a hidden component
+- Both interfaces load protocols from the configured Protocols directory
 
 ## Key Components
 
@@ -171,6 +217,8 @@ sequenceDiagram
 
 ## Protocol Class Hierarchy
 
+The diagram below illustrates the inheritance structure of protocols and their detailed plugin usage patterns. This provides a more detailed view of how protocols are organized and which specific plugins they utilize:
+
 ```mermaid
 graph LR
     %% Base Protocol
@@ -222,4 +270,12 @@ graph LR
     class Base base
     class AD,SC,AC active
     class Core,Extended plugin
-``` 
+```
+
+**Protocol Hierarchy Details:**
+- All protocols inherit from the base `@protocolobj` class which provides common functionality
+- Plugins are divided into **Core Plugins** (essential for all protocols) and **Extended Plugins** (additional functionality)
+- Complex protocols like `@AthenaDelayComp` and `@SoundCatContinuous` use both core and extended plugin sets
+- Simpler protocols like `@ArpitCentrePokeTraining` use primarily core plugins with only selective extended plugins
+- The specific combination of plugins determines the protocol's capabilities and behavior
+- This modular architecture allows for flexible protocol development and reuse of common components 

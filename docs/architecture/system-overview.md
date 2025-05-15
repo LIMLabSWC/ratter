@@ -25,14 +25,83 @@ ExperPort is a comprehensive behavioral control system designed for rodent exper
 
 ### Data Flow
 
+The diagram below illustrates how data flows through the system during experiment execution. This sequence shows the interactions between system components during a typical behavioral experiment:
+
 ```mermaid
-graph TD
-    A[Protocol] --> B[State Machine]
-    B --> C[Hardware Interface]
-    C --> D[Data Acquisition]
-    D --> E[Data Storage]
-    E --> F[Analysis]
+sequenceDiagram
+    participant P as Protocol
+    participant SM as State Machine
+    participant HW as Hardware Interface
+    participant DA as Data Acquisition
+    participant DS as Data Storage
+    participant A as Analysis
+
+    P->>SM: Define State Matrix
+    SM->>HW: Control Hardware
+    HW->>DA: Generate Events
+    DA->>P: Real-time Events
+    P->>DA: Process Events
+    DA->>DS: Store Data
+    DS->>A: Analyze Results
+    A-->>P: Inform Protocol Design
+    
+    loop Trial Execution
+        P->>SM: Update State Matrix
+        SM->>HW: Execute State Changes
+        HW->>DA: Generate New Events
+        DA->>P: Update Trial Data
+    end
 ```
+
+**Key Data Flow Processes:**
+- Protocols define state matrices that control experiment logic
+- State matrices execute on hardware to produce stimulus and record responses
+- Events are processed in real-time and fed back to the protocol
+- The trial execution loop repeats for each trial in an experiment
+- Data is stored for later analysis, which informs protocol refinement
+
+### System Initialization Flow
+
+The following diagram shows how the system initializes and the two possible user interface paths - either through Dispatcher (for researchers) or RunRats (for technicians):
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant NS as newstartup.m
+    participant Settings
+    participant Dispatcher
+    participant RunRats
+    participant Protocol
+
+    User->>NS: Start System
+    NS->>Settings: Load Configuration
+    Settings-->>NS: Configuration Loaded
+    NS->>NS: Configure Paths & Environment
+    NS-->>User: System Ready
+    
+    alt Dispatcher Interface
+        User->>Dispatcher: Initialize (init)
+        Dispatcher->>Dispatcher: Create UI
+        Dispatcher->>Protocol: Load Selected Protocol
+        Protocol-->>Dispatcher: Protocol Ready
+        Dispatcher-->>User: Ready for Experiments
+    else RunRats Interface
+        User->>RunRats: Initialize (init)
+        RunRats->>Dispatcher: Initialize (hidden)
+        RunRats->>RunRats: Create Technician UI
+        RunRats->>Protocol: Load Selected Protocol
+        Protocol-->>RunRats: Protocol Ready
+        RunRats-->>User: Ready for Experiments
+    end
+```
+
+**System Initialization Highlights:**
+- The system begins with `newstartup.m`, which configures paths and loads settings
+- Users can choose between two interfaces:
+  - **Dispatcher**: Direct interface for researchers with full control
+  - **RunRats**: Simplified interface for technicians that uses Dispatcher behind the scenes
+- Both interfaces ultimately load and control protocols, but with different user experiences
+- The initialization process ensures proper environment setup before any experiments can run
 
 ## Hardware Integration
 
@@ -131,4 +200,4 @@ graph TD
 For additional information:
 - See [Hardware Setup](../hardware/)
 - Refer to [Technical Documentation](../technical/)
-- Contact system administrators 
+- Contact system administrators
