@@ -24,40 +24,52 @@ The following files are actively used in the codebase and should be retained:
 ## Files to Remove
 
 ### Confirmed Unused Files
-The following files have no direct references in the codebase and can be safely removed:
+The following files have been moved to ExperPort/legacy (commit: 67d64ada04815d3e676f8d651ee90ac35883c4f9):
 
 1. `start_script.m`
    - No references found in the codebase outside of this cleanup document.
+   - Moved to ExperPort/legacy
 
 2. `beginit.m`
    - No references found in the codebase outside of this cleanup document.
+   - Moved to ExperPort/legacy
 
 3. `remove_protocol_preferences.m`
    - No references found in the codebase outside of this cleanup document.
+   - Moved to ExperPort/legacy
 
 4. `reporter.m`
    - No references found in the codebase outside of this cleanup document.
+   - Moved to ExperPort/legacy
 
 5. `RPbox_realbox.m`
    - No references found in the codebase outside of this cleanup document.
+   - Moved to ExperPort/legacy
 
 6. `ExperRPBox.m`
    - No references found in the codebase outside of this cleanup document.
+   - Moved to ExperPort/legacy
 
 7. `ExperStart.m`
    - No references found in the codebase outside of this cleanup document.
+   - Moved to ExperPort/legacy
 
 8. `ExperValveCheck.m`
    - No references found in the codebase outside of this cleanup document.
+   - Moved to ExperPort/legacy
 
 ### Files Requiring Further Investigation
-These files have limited or indirect usage and should be investigated before removal:
+These files have been moved to ExperPort/legacy (commit: 67d64ada04815d3e676f8d651ee90ac35883c4f9) but require further investigation before potential removal:
 
-1. `end_script.m` - Referenced in configuration files but not directly called
-   - No active references found in the codebase outside of this cleanup document.
+1. `end_script.m`
+   - Referenced in configuration files but not directly called
+   - No active references found in the codebase outside of this cleanup document
+   - Moved to ExperPort/legacy for further investigation
 
-2. `RExper.m` - Only referenced in Control.m
-   - No active references found in the codebase outside of this cleanup document.
+2. `RExper.m`
+   - Only referenced in Control.m
+   - No active references found in the codebase outside of this cleanup document
+   - Moved to ExperPort/legacy for further investigation
 
 3. `olfip.mat`
    - All related protocols have been moved to Protocols/legacy folder (commit: 1c8b5d799155912251a1b6ac44881e3b8e00983d)
@@ -138,9 +150,40 @@ These files have limited or indirect usage and should be investigated before rem
 - Codebase is cleaner and more maintainable
 
 ## Rollback Plan
-If issues arise:
-1. Restore files from backup
-2. Document the discovered dependencies
+The following changes are listed from newest to oldest. When rolling back, start from the bottom (6) and work your way up to (1):
+
+Most Recent:
+1. ExperPort unused and investigation files (67d64ada04815d3e676f8d651ee90ac35883c4f9):
+   - Restore from ExperPort/legacy to ExperPort root
+   - Includes start_script.m, beginit.m, etc.
+   - Also includes end_script.m and RExper.m for investigation
+
+2. Analysis and Protocol files for .mat files (b714b1848ac6d1bf70e666daa3f85338b403169f):
+   - Restore Analysis/legacy/Odor_* folders to original locations
+   - Restore @gf2afcobj from Protocols/legacy
+   - Related to bgnames.mat, OdorNames.mat, and OdorSet.mat
+
+3. Olfip.mat related protocols (1c8b5d799155912251a1b6ac44881e3b8e00983d):
+   - Restore all protocol folders from Protocols/legacy
+   - Includes 15 protocol folders like @onebank_2afcobj, @adil2afcobj, etc.
+
+4. Newstartup refactoring (60932b71d39853a25725e5c52ff2788942cbf243):
+   - Restore original structure of newstartup.m if needed
+   - Check path handling and startup sequence
+
+5. Unused code removal (5da710d356f8385dcfebd856b9ad3c57f2fc50b1):
+   - Restore removed code sections if dependencies are discovered
+   - Check impact on startup sequence
+
+6. Documentation and path changes (ce835f7a3a290c03fdd847480887898ce7cac6b6):
+   - Restore ExperPort/Protocols path if needed
+   - Review documentation for any missing critical information
+
+Rollback Order: Start with #6 and work backwards to #1. This ensures proper restoration of dependencies.
+
+For each rollback:
+1. Use git checkout to the specific commit
+2. Document any discovered dependencies
 3. Update this plan with new findings
 
 ## Notes
