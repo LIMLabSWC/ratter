@@ -7,44 +7,20 @@ This document outlines the permanent architecture of the system, including core 
 The diagram below provides an overview of the main system components and their relationships. It shows how the core system, protocol system, and essential plugins interact:
 
 ```mermaid
-graph TB
-    %% Core Components
-    subgraph Core ["Core System"]
-        NS["newstartup.m"]
-        Settings["Settings Module"]
-    end
-
-    subgraph Protocols ["Protocol System"]
-        Base["@protocolobj"]
-        
-        subgraph Active ["Active Protocols"]
-            AD["@AthenaDelayComp"]
-            SC["@SoundCatContinuous"]
-            AC["@ArpitCentrePokeTraining"]
-        end
-    end
-
-    %% Essential Plugin Groups
-    subgraph Essential ["Essential Plugins"]
-        UI["UI Plugins"]
-        Data["Data Handling"]
-        Sound["Sound Management"]
-        Control["Control Plugins"]
-    end
-
-    %% Key Relationships
-    NS --> Settings
-    NS --> Protocols
-    Active --> Base
-    Active --> Essential
+sequenceDiagram
+    participant NS as newstartup.m
+    participant Settings as Settings Module
+    participant Base as @protocolobj
+    participant Protocols as Active Protocols
+    participant Plugins as Essential Plugins
     
-    %% Style
-    classDef default fill:#f9f9f9,stroke:#333,stroke-width:1px
-    classDef core fill:#e6ffe6,stroke:#060,stroke-width:2px
-    classDef active fill:#ffe6e6,stroke:#600,stroke-width:1px
+    Note over Protocols: @AthenaDelayComp<br>@SoundCatContinuous<br>@ArpitCentrePokeTraining
+    Note over Plugins: UI Plugins<br>Data Handling<br>Sound Management<br>Control Plugins
     
-    class Core,Settings core
-    class Active active
+    NS->>Settings: Configure
+    NS->>Base: Initialize
+    Base->>Protocols: Inherit from
+    Protocols->>Plugins: Utilize
 ```
 
 **Core Components Overview:**
@@ -58,48 +34,33 @@ graph TB
 This diagram shows the specific plugins used by each protocol and their categorization. It provides a detailed view of how different protocols utilize the plugin system:
 
 ```mermaid
-graph LR
-    %% Plugin Categories
-    subgraph UI ["UI Plugins"]
-        direction TB
-        pokesplot2
-        soundui
-        distribui
-        punishui
-    end
-
-    subgraph Data ["Data Handling"]
-        direction TB
-        saveload
-        sessionmodel
-        sqlsummary
-        comments
-    end
-
-    subgraph Sound ["Sound Management"]
-        direction TB
-        soundmanager
-        soundtable
-    end
-
-    subgraph Control ["Control Plugins"]
-        direction TB
-        water
-        antibias
-        reinforcement
-    end
-
-    %% Protocol Usage
-    AD["@AthenaDelayComp"] --> UI & Data & Sound & Control
-    SC["@SoundCatContinuous"] --> UI & Data & Sound & Control
-    AC["@ArpitCentrePokeTraining"] --> UI & Data & Sound
+sequenceDiagram
+    participant AD as @AthenaDelayComp
+    participant SC as @SoundCatContinuous
+    participant AC as @ArpitCentrePokeTraining
+    participant UI as UI Plugins
+    participant Data as Data Handling
+    participant Sound as Sound Management
+    participant Control as Control Plugins
     
-    %% Style
-    classDef group fill:#f9f9f9,stroke:#333,stroke-width:1px
-    classDef proto fill:#ffe6e6,stroke:#600,stroke-width:1px
+    Note over UI: pokesplot2<br>soundui<br>distribui<br>punishui
+    Note over Data: saveload<br>sessionmodel<br>sqlsummary<br>comments
+    Note over Sound: soundmanager<br>soundtable
+    Note over Control: water<br>antibias<br>reinforcement
+
+    AD->>UI: Uses
+    AD->>Data: Uses
+    AD->>Sound: Uses
+    AD->>Control: Uses
     
-    class UI,Data,Sound,Control group
-    class AD,SC,AC proto
+    SC->>UI: Uses
+    SC->>Data: Uses
+    SC->>Sound: Uses
+    SC->>Control: Uses
+    
+    AC->>UI: Uses
+    AC->>Data: Uses
+    AC->>Sound: Uses
 ```
 
 **Plugin System Details:**
@@ -220,56 +181,30 @@ sequenceDiagram
 The diagram below illustrates the inheritance structure of protocols and their detailed plugin usage patterns. This provides a more detailed view of how protocols are organized and which specific plugins they utilize:
 
 ```mermaid
-graph LR
-    %% Base Protocol
-    Base["@protocolobj"]
+sequenceDiagram
+    participant Base as @protocolobj
+    participant AD as @AthenaDelayComp
+    participant SC as @SoundCatContinuous 
+    participant AC as @ArpitCentrePokeTraining
+    participant Core as Core Plugins
+    participant Extended as Extended Plugins
     
-    %% Active Protocols
-    AD["@AthenaDelayComp"]
-    SC["@SoundCatContinuous"]
-    AC["@ArpitCentrePokeTraining"]
+    Note over Core: pokesplot2<br>saveload<br>sessionmodel<br>soundmanager<br>soundui<br>water
+    Note over Extended: distribui<br>punishui<br>comments<br>soundtable<br>sqlsummary<br>reinforcement<br>antibias
 
-    %% Plugin Groups
-    subgraph Core ["Core Plugins"]
-        direction TB
-        PP["pokesplot2"]
-        SL["saveload"]
-        SM["sessionmodel"]
-        SW["soundmanager"]
-        SU["soundui"]
-        WA["water"]
-    end
-
-    subgraph Extended ["Extended Plugins"]
-        direction TB
-        DU["distribui"]
-        PU["punishui"]
-        CO["comments"]
-        ST["soundtable"]
-        SQ["sqlsummary"]
-        RF["reinforcement"]
-        AB["antibias"]
-    end
-
-    %% Inheritance
-    AD --> Base
-    SC --> Base
-    AC --> Base
-
-    %% Plugin Usage
-    AD --> Core & Extended
-    SC --> Core & Extended
-    AC --> Core
-    AC --> CO & ST & SQ & AB
-
-    %% Style
-    classDef base fill:#e6ffe6,stroke:#060,stroke-width:2px
-    classDef active fill:#ffe6e6,stroke:#600,stroke-width:1px
-    classDef plugin fill:#e6e6ff,stroke:#006,stroke-width:1px
+    Base->>AD: Inherits
+    Base->>SC: Inherits
+    Base->>AC: Inherits
     
-    class Base base
-    class AD,SC,AC active
-    class Core,Extended plugin
+    AD->>Core: Uses All
+    AD->>Extended: Uses All
+    
+    SC->>Core: Uses All
+    SC->>Extended: Uses All
+    
+    AC->>Core: Uses All
+    AC->>Extended: Uses Selective
+    Note right of AC: Only uses:<br>comments<br>soundtable<br>sqlsummary<br>antibias
 ```
 
 **Protocol Hierarchy Details:**
