@@ -81,20 +81,27 @@ These files have limited or indirect usage and should be investigated before rem
    - The olfip.mat file itself remains in place as it may be needed by other components
 
 4. `bgnames.mat`
-   - Referenced in `@odorsegm2obj/OdorSection.m`, indicating usage for background names.
-   - Used in multiple protocol files including:
-     - odorsegm2obj/OdorSection.m
-     - odorsegm3obj/OdorSection.m
-     - odorsegmobj/OdorSection.m
-     - Also referenced in analysis scripts in ExperPort/Analysis/Odor_Segm/
+   - All related protocols and analysis code moved to legacy folders (commit: b714b1848ac6d1bf70e666daa3f85338b403169f)
+   - Analysis code moved to Analysis/legacy/Odor_Segm/
+   - Protocol folders already in Protocols/legacy from previous olfip.mat move:
+     - @odorsegm2obj
+     - @odorsegm3obj
+     - @odorsegmobj
+   - The bgnames.mat file itself remains in place as it may be needed by other components
 
 5. `OdorNames.mat`
-   - Referenced in `@adil2afcobj/OdorSection.m` and `@gf2afcobj/OdorSection.m`, indicating usage for odor names.
-   - Used in odor-related protocol files.
+   - All related protocols moved to legacy folder (commit: b714b1848ac6d1bf70e666daa3f85338b403169f)
+   - Protocols in legacy:
+     - @adil2afcobj (moved with olfip.mat)
+     - @gf2afcobj
+   - The OdorNames.mat file itself remains in place as it may be needed by other components
 
 6. `OdorSet.mat`
-   - Referenced in `@odorsegm2obj/OdorSection.m` and `@odorsegm3obj/OdorSection.m`, indicating usage for odor set configurations.
-   - Used in several odor-related protocol implementations.
+   - All related protocols already in legacy folder (commit: b714b1848ac6d1bf70e666daa3f85338b403169f)
+   - Used by protocols that were moved with olfip.mat:
+     - @odorsegm2obj
+     - @odorsegm3obj
+   - The OdorSet.mat file itself remains in place as it may be needed by other components
 
 ## Implementation Plan
 
