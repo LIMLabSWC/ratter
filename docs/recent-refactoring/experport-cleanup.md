@@ -24,7 +24,7 @@ The following files are actively used in the codebase and should be retained:
 ## Files to Remove
 
 ### Confirmed Unused Files
-The following files have been moved to ExperPort/legacy (commit: 67d64ada04815d3e676f8d651ee90ac35883c4f9):
+The following files have been moved to ExperPort/legacy (commit: 67d64ad):
 
 1. `start_script.m`
    - No references found in the codebase outside of this cleanup document.
@@ -59,7 +59,7 @@ The following files have been moved to ExperPort/legacy (commit: 67d64ada04815d3
    - Moved to ExperPort/legacy
 
 ### Files Requiring Further Investigation
-These files have been moved to ExperPort/legacy (commit: 67d64ada04815d3e676f8d651ee90ac35883c4f9) but require further investigation before potential removal:
+These files have been moved to ExperPort/legacy (commit: 67d64ad) but require further investigation before potential removal:
 
 1. `end_script.m`
    - Referenced in configuration files but not directly called
@@ -72,7 +72,7 @@ These files have been moved to ExperPort/legacy (commit: 67d64ada04815d3e676f8d6
    - Moved to ExperPort/legacy for further investigation
 
 3. `olfip.mat`
-   - All related protocols have been moved to Protocols/legacy folder (commit: 1c8b5d799155912251a1b6ac44881e3b8e00983d)
+   - All related protocols have been moved to Protocols/legacy folder (commit: 1c8b5d7)
    - This includes 15 protocol folders and their associated .m files:
      - @onebank_2afcobj
      - @adil2afcobj
@@ -90,30 +90,30 @@ These files have been moved to ExperPort/legacy (commit: 67d64ada04815d3e676f8d6
      - @odorsegmobj
      - @nl_odorsamp2obj
    - These protocols are no longer actively used and depend on legacy olfactometer configurations
-   - The olfip.mat file itself remains in place as it may be needed by other components
+   - Initially remained in place, now moved to ExperPort/legacy
 
 4. `bgnames.mat`
-   - All related protocols and analysis code moved to legacy folders (commit: b714b1848ac6d1bf70e666daa3f85338b403169f)
+   - All related protocols and analysis code moved to legacy folders (commit: b714b18)
    - Analysis code moved to Analysis/legacy/Odor_Segm/
    - Protocol folders already in Protocols/legacy from previous olfip.mat move:
      - @odorsegm2obj
      - @odorsegm3obj
      - @odorsegmobj
-   - The bgnames.mat file itself remains in place as it may be needed by other components
+   - Initially remained in place, now moved to ExperPort/legacy
 
 5. `OdorNames.mat`
-   - All related protocols moved to legacy folder (commit: b714b1848ac6d1bf70e666daa3f85338b403169f)
+   - All related protocols moved to legacy folder (commit: b714b18)
    - Protocols in legacy:
      - @adil2afcobj (moved with olfip.mat)
      - @gf2afcobj
-   - The OdorNames.mat file itself remains in place as it may be needed by other components
+   - Initially remained in place, now moved to ExperPort/legacy
 
 6. `OdorSet.mat`
-   - All related protocols already in legacy folder (commit: b714b1848ac6d1bf70e666daa3f85338b403169f)
+   - All related protocols already in legacy folder (commit: b714b18)
    - Used by protocols that were moved with olfip.mat:
      - @odorsegm2obj
      - @odorsegm3obj
-   - The OdorSet.mat file itself remains in place as it may be needed by other components
+   - Initially remained in place, now moved to ExperPort/legacy
 
 ## Implementation Plan
 
@@ -137,6 +137,8 @@ These files have been moved to ExperPort/legacy (commit: 67d64ada04815d3e676f8d6
    - Document any discovered dependencies
 2. Make a decision based on findings
 
+**Update (May 15, 2025, commit: fe550df):** Investigation completed for olfactory-related .mat files. After verification that no active code depends on these files, all four files (olfip.mat, bgnames.mat, OdorNames.mat, and OdorSet.mat) have been moved to ExperPort/legacy for consistency with the previous protocol and analysis code moves.
+
 ### Phase 4: Cleanup
 1. Remove backup copies
 2. Update documentation
@@ -150,36 +152,40 @@ These files have been moved to ExperPort/legacy (commit: 67d64ada04815d3e676f8d6
 - Codebase is cleaner and more maintainable
 
 ## Rollback Plan
-The following changes are listed from newest to oldest. When rolling back, start from the bottom (6) and work your way up to (1):
+The following changes are listed from newest to oldest. When rolling back, start from the bottom (7) and work your way up to (1):
 
 Most Recent:
-1. ExperPort unused and investigation files (67d64ada04815d3e676f8d651ee90ac35883c4f9):
+1. Olfactory .mat files to legacy (commit: fe550df, May 15, 2025):
+   - Restore olfip.mat, bgnames.mat, OdorNames.mat, and OdorSet.mat from ExperPort/legacy to ExperPort root
+   - This completes the previous refactoring effort by moving all olfactory-related components to legacy folders
+
+2. ExperPort unused and investigation files (67d64ad):
    - Restore from ExperPort/legacy to ExperPort root
    - Includes start_script.m, beginit.m, etc.
    - Also includes end_script.m and RExper.m for investigation
 
-2. Analysis and Protocol files for .mat files (b714b1848ac6d1bf70e666daa3f85338b403169f):
+3. Analysis and Protocol files for .mat files (b714b18):
    - Restore Analysis/legacy/Odor_* folders to original locations
    - Restore @gf2afcobj from Protocols/legacy
    - Related to bgnames.mat, OdorNames.mat, and OdorSet.mat
 
-3. Olfip.mat related protocols (1c8b5d799155912251a1b6ac44881e3b8e00983d):
+4. Olfip.mat related protocols (1c8b5d7):
    - Restore all protocol folders from Protocols/legacy
    - Includes 15 protocol folders like @onebank_2afcobj, @adil2afcobj, etc.
 
-4. Newstartup refactoring (60932b71d39853a25725e5c52ff2788942cbf243):
+5. Newstartup refactoring (60932b7):
    - Restore original structure of newstartup.m if needed
    - Check path handling and startup sequence
 
-5. Unused code removal (5da710d356f8385dcfebd856b9ad3c57f2fc50b1):
+6. Unused code removal (5da710d):
    - Restore removed code sections if dependencies are discovered
    - Check impact on startup sequence
 
-6. Documentation and path changes (ce835f7a3a290c03fdd847480887898ce7cac6b6):
+7. Documentation and path changes (ce835f7):
    - Restore ExperPort/Protocols path if needed
    - Review documentation for any missing critical information
 
-Rollback Order: Start with #6 and work backwards to #1. This ensures proper restoration of dependencies.
+Rollback Order: Start with #7 and work backwards to #1. This ensures proper restoration of dependencies.
 
 For each rollback:
 1. Use git checkout to the specific commit
