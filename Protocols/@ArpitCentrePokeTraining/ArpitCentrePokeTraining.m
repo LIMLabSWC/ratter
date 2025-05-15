@@ -232,6 +232,11 @@ switch action
            myvar.value = maxasymp + (minasymp/(1+(t/inflp)^slp).^assym);
        end
 	
+   %% when user presses run on runrats then then is called
+    case 'start_recording'
+
+        BonsaiCameraInterface(obj,'record_start');
+
    %% prepare next trial
    case 'prepare_next_trial'
 

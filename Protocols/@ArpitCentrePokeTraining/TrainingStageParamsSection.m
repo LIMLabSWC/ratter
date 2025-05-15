@@ -21,8 +21,8 @@ switch action
             SubheaderParam(obj, 'title', 'Stage Params', x, y);
             % next_row(y);
             % COMPLETION TEST PARAMETERS
-            NumeditParam(obj, 'total_trials', 300, x, y,'label','Trials','TooltipString','total trials in this stage for its completion'); next_row(y);
-            NumeditParam(obj, 'total_trials_opp', 150, x, y,'label','Trials_Opp','TooltipString','total trials with opposide side option in this stage for its completion'); next_row(y);
+            NumeditParam(obj, 'total_trials', 1000, x, y,'label','Trials','TooltipString','total trials in this stage for its completion'); next_row(y);
+            NumeditParam(obj, 'total_trials_opp', 300, x, y,'label','Trials_Opp','TooltipString','total trials with opposide side option in this stage for its completion'); next_row(y);
             SubheaderParam(obj, 'title', 'Completion Params', x, y); next_row(y);
 
             case 2
@@ -32,8 +32,8 @@ switch action
             NumeditParam(obj, 'min_rColl_dur', 100, x, y,'label','T_Min_RCollect','TooltipString','User given min water collect time(code will optimize for value above this)'); next_row(y);
             SubheaderParam(obj, 'title', 'Stage Params', x, y); next_row(y);
             % COMPLETION TEST PARAMETERS
-            NumeditParam(obj, 'total_trials', 1000, x, y,'label','Trials','TooltipString','total trials in this stage for its completion'); next_row(y);
-            NumeditParam(obj, 'total_trials_opp', 400, x, y,'label','Trials_Opp','TooltipString','total trials with opposide side option in this stage for its completion'); next_row(y);
+            NumeditParam(obj, 'total_trials', 700, x, y,'label','Trials','TooltipString','total trials in this stage for its completion'); next_row(y);
+            NumeditParam(obj, 'total_trials_opp', 200, x, y,'label','Trials_Opp','TooltipString','total trials with opposide side option in this stage for its completion'); next_row(y);
             SubheaderParam(obj, 'title', 'Completion Params', x, y);next_row(y);
            
             case 3  % no completion test required
