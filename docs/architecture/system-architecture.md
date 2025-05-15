@@ -7,25 +7,72 @@ This document outlines the permanent architecture of the system, including core 
 The following diagram shows the high-level architecture of active system components and their relationships:
 
 ```mermaid
-graph TD
+graph LR
+    %% Core System Components
     subgraph Core ["Core System"]
-        NS[newstartup.m]
-        F[flush.m]
-        R[rows.m]
+        direction LR
+        NS["newstartup.m"]
+        F["flush.m"]
+        R["rows.m"]
     end
 
     subgraph Settings ["Settings Module"]
-        SM[Settings.m]
-        BS[bSettings.m]
+        direction LR
+        SM["Settings.m"]
+        BS["bSettings.m"]
+        SC["SettingsObject"]
     end
 
+    subgraph Protocols ["Protocol System"]
+        direction LR
+        subgraph Base ["Base Classes"]
+            PO["@protocolobj"]
+            NP["@nprotocol"]
+        end
+        
+        subgraph Active ["Active Protocols"]
+            direction LR
+            CL["@Classical"]
+            PS["@Psychometric"]
+            AC["@ArpitCentrePokeTraining"]
+        end
+        
+        subgraph Plugins ["Protocol Plugins"]
+            direction LR
+            PP["pokesplot"]
+            SL["saveload"]
+            SM2["sessionmodel"]
+            SW["soundmanager"]
+            SU["soundui"]
+            WA["water"]
+        end
+    end
+
+    %% Relationships
     NS --> SM
     NS --> BS
-    SM --> BS
-
+    BS --> SC
+    
     %% Protocol relationships
-    P[Active Protocols] --> F
-    P --> R
+    Active --> PO
+    Active --> NP
+    Active --> Plugins
+    Active --> F
+    Active --> R
+
+    %% Module relationships
+    NS --> |"Loads"| Protocols
+    SM --> |"Configures"| Protocols
+
+    %% Style
+    classDef default fill:#f9f9f9,stroke:#333,stroke-width:1px;
+    classDef core fill:#e6ffe6,stroke:#060,stroke-width:2px;
+    classDef settings fill:#e6e6ff,stroke:#006,stroke-width:2px;
+    classDef protocols fill:#ffe6e6,stroke:#600,stroke-width:2px;
+    
+    class Core core;
+    class Settings settings;
+    class Protocols protocols;
 ```
 
 ### Component Descriptions
@@ -51,12 +98,15 @@ sequenceDiagram
     participant S as Settings.m
     participant BS as bSettings.m
     participant P as Protocols
+    participant D as Dispatcher
 
     U->>NS: Start System
-    NS->>S: Initialize Settings
+    NS->>BS: Load Settings Files
+    BS->>S: Initialize Settings
     S->>BS: Load Base Settings
-    NS->>P: Load Protocol Paths
-    P->>NS: Ready State
+    NS->>P: Configure Protocol Paths
+    P->>D: Register Available Protocols
+    D->>NS: Ready State
     NS->>U: System Ready
 ```
 
@@ -113,4 +163,51 @@ sequenceDiagram
 2. **Documentation**
    - Keep this architecture document updated
    - Document any new dependencies
-   - Maintain clear protocol documentation 
+   - Maintain clear protocol documentation
+
+## Protocol Class Hierarchy
+
+```mermaid
+graph TD
+    subgraph Base ["Base Protocol Classes"]
+        PO["@protocolobj"]
+        NP["@nprotocol"]
+    end
+
+    subgraph Plugins ["Protocol Plugins"]
+        PP["pokesplot"]
+        SL["saveload"]
+        SM["sessionmodel"]
+        SW["soundmanager"]
+        SU["soundui"]
+        WA["water"]
+        DU["distribui"]
+        CO["comments"]
+        ST["soundtable"]
+        SQ["sqlsummary"]
+    end
+
+    subgraph Active ["Active Protocol Classes"]
+        CL["@Classical"]
+        PS["@Psychometric"]
+        AC["@ArpitCentrePokeTraining"]
+    end
+
+    %% Inheritance/Usage
+    CL --> PO
+    PS --> PO
+    AC --> PO
+    
+    CL --> PP & SL & SM & SW & SU & WA & DU & CO & ST & SQ
+    PS --> PP & SL & SM & SW & SU & WA
+    AC --> PP & SL & SM & SW & SU & WA & DU & CO & ST & SQ
+
+    %% Style
+    classDef base fill:#e6ffe6,stroke:#060,stroke-width:2px;
+    classDef plugin fill:#e6e6ff,stroke:#006,stroke-width:2px;
+    classDef active fill:#ffe6e6,stroke:#600,stroke-width:2px;
+    
+    class Base base;
+    class Plugins plugin;
+    class Active active;
+``` 

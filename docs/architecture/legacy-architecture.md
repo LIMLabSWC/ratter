@@ -7,75 +7,122 @@ This document tracks legacy components, their current status, and relationships.
 The following diagram shows the current organization of legacy components and their relationships:
 
 ```mermaid
-graph TD
+graph LR
+    %% Define main containers
     subgraph Legacy_Protocols ["Protocols/legacy/"]
-        OB["@onebank_2afcobj"]
-        AD["@adil2afcobj"]
-        OS2["@odorsegm2obj"]
-        MIX["@mix2afcobj"]
-        OT["@odor_testobj"]
-        NL["@nl2afc_mix2obj"]
-        style Legacy_Protocols fill:#f9f,stroke:#333
+        direction LR
+        subgraph Olfactory ["Olfactory Protocols"]
+            OB["@onebank_2afcobj"]
+            AD["@adil2afcobj"]
+            OS2["@odorsegm2obj"]
+            MIX["@mix2afcobj"]
+            OT["@odor_testobj"]
+            NL["@nl2afc_mix2obj"]
+        end
     end
 
     subgraph Legacy_Analysis ["Analysis/legacy/"]
-        ODR["Odor_Segm/"]
-        O2A["Odor2AFC/"]
-        NL2["NL2AFC_MIX/"]
+        direction LR
+        subgraph OdorAnalysis ["Odor Analysis"]
+            ODR["Odor_Segm/"]
+            O2A["Odor2AFC/"]
+            NL2["NL2AFC_MIX/"]
+        end
         SC["state_colors_olf.m"]
-        style Legacy_Analysis fill:#bbf,stroke:#333
     end
 
     subgraph Legacy_ExperPort ["ExperPort/legacy/"]
-        SS["start_script.m"]
-        BI["beginit.m"]
-        ES["end_script.m"]
-        RE["RExper.m"]
-        style Legacy_ExperPort fill:#bfb,stroke:#333
+        direction LR
+        subgraph Confirmed ["Confirmed Unused"]
+            SS["start_script.m"]
+            BI["beginit.m"]
+        end
+        subgraph Investigation ["Under Investigation"]
+            ES["end_script.m"]
+            RE["RExper.m"]
+        end
     end
 
-    %% Data file dependencies
-    OF[olfip.mat] --> Legacy_Protocols
-    BG[bgnames.mat] --> ODR
-    ON[OdorNames.mat] --> AD
-    OS[OdorSet.mat] --> OS2
+    %% Data file relationships
+    subgraph Data_Files ["Critical Data Files"]
+        direction LR
+        OF["olfip.mat"]
+        BG["bgnames.mat"]
+        ON["OdorNames.mat"]
+        OS["OdorSet.mat"]
+    end
+
+    %% Define relationships
+    OF --> Olfactory
+    BG --> OdorAnalysis
+    ON --> AD
+    OS --> OS2
+
+    %% Define investigation relationships
+    ES --> |"Referenced in"| Config["Config Files"]
+    RE --> |"Referenced in"| Control["Control.m"]
+
+    %% Style
+    classDef default fill:#f9f9f9,stroke:#333,stroke-width:1px;
+    classDef investigation fill:#fff0f0,stroke:#c00,stroke-width:2px;
+    classDef confirmed fill:#f0f0f0,stroke:#666,stroke-width:1px;
+    classDef data fill:#e6ffe6,stroke:#060,stroke-width:2px;
+    
+    class Investigation investigation;
+    class Confirmed confirmed;
+    class Data_Files data;
 ```
 
 ## Investigation Status
 
-The following diagram shows the current investigation status of legacy components:
+The following diagram shows the current status of components under investigation:
 
 ```mermaid
-graph TD
-    subgraph Confirmed_Unused ["Confirmed Unused"]
-        SS[start_script.m]
-        BI[beginit.m]
-        RP[remove_protocol_preferences.m]
-        RE[reporter.m]
-        RB[RPbox_realbox.m]
-        ER[ExperRPBox.m]
-        ES1[ExperStart.m]
-        EV[ExperValveCheck.m]
-        style Confirmed_Unused fill:#ddd,stroke:#333
+graph LR
+    subgraph Current_Status ["Component Status"]
+        direction LR
+        subgraph Ready_Remove ["Ready for Removal"]
+            SS[start_script.m]
+            BI[beginit.m]
+            RP[remove_protocol_preferences.m]
+            RE1[reporter.m]
+            RB[RPbox_realbox.m]
+            ER[ExperRPBox.m]
+            ES1[ExperStart.m]
+            EV[ExperValveCheck.m]
+        end
+
+        subgraph Need_Review ["Needs Investigation"]
+            ES2[end_script.m]
+            RX[RExper.m]
+        end
+
+        subgraph Keep_Active ["Preserved Data Files"]
+            OF[olfip.mat]
+            BG[bgnames.mat]
+            ON[OdorNames.mat]
+            OS[OdorSet.mat]
+        end
     end
 
-    subgraph Under_Investigation ["Needs Investigation"]
-        ES2[end_script.m]
-        RX[RExper.m]
-        style Under_Investigation fill:#fdd,stroke:#333
-    end
+    %% Dependencies
+    ES2 --> |"Config Dependencies"| CF[Configuration Files]
+    RX --> |"Active Reference"| CT[Control.m]
+    
+    %% Data File Dependencies
+    OF --> |"Used by Legacy"| LP[Legacy Protocols]
+    BG --> |"Used by Legacy"| LA[Legacy Analysis]
+    ON --> |"Used by Legacy"| LP
+    OS --> |"Used by Legacy"| LP
 
-    subgraph Preserved_Data ["Preserved .mat Files"]
-        OF[olfip.mat]
-        BG[bgnames.mat]
-        ON[OdorNames.mat]
-        OS[OdorSet.mat]
-        style Preserved_Data fill:#dfd,stroke:#333
-    end
-
-    %% Show investigation relationships
-    ES2 -->|Referenced in| C[Config Files]
-    RX -->|Referenced in| CT[Control.m]
+    %% Style
+    classDef ready fill:#e6ffe6,stroke:#060,stroke-width:1px;
+    classDef review fill:#ffe6e6,stroke:#600,stroke-width:1px;
+    classDef keep fill:#e6e6ff,stroke:#006,stroke-width:1px;
+    
+    class Ready_Remove ready;
+    class Need_Review review;
+    class Keep_Active keep;
 ```
 
 ## Component Status Details
