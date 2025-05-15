@@ -1442,7 +1442,7 @@ switch action
             sendstarttime(eval(value(CurrProtocol))); %#ok<NODEF>
         catch %#ok<CTCH>
             disp('ERROR: Failed to add the start time to the MySQL table.');
-        end;
+        end
 
         %Let's make everything unresponsive for 5 more seconds to prevent
         %double clicks from stopping the session
@@ -1491,7 +1491,13 @@ switch action
             set(get_ghandle(Multi),'enable','on');
             set(get_ghandle(Safety),'visible','off','string','');
         end
+        
+        % Let start recording the videos by sending the command to protocol
+        % itself
+        protobj=eval(value(CurrProtocol));
+        feval(value(CurrProtocol), protobj, 'start_recording');
 
+        % Now ready to run with dispatcher
         dispatcher(value(dispobj),'Run'); %#ok<NODEF>
 
 
@@ -1759,7 +1765,7 @@ switch action
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %% Added by Arpit
         %% Lets try and rerun the protocol and only do it if the animal is training
-        is_rat_training = bdata(['select is_training from rats where experimenter="',value(ExpMenu),'" and ratname="', value(RatMenu),'"']);
+        is_rat_training = bdata(['select in_training from rats where experimenter="',value(ExpMenu),'" and ratname="', value(RatMenu),'"']);
         
         if value(Rerun_AfterCrash) == 1 && is_rat_training == 1
                 runrats(obj,'rerun');
