@@ -60,21 +60,25 @@ These files have limited or indirect usage and should be investigated before rem
    - No active references found in the codebase outside of this cleanup document.
 
 3. `olfip.mat`
-   - Referenced in several protocol files, indicating active usage for olfactory IP configurations.
-   - Used in multiple protocol objects including:
-     - onebank_2afcobj
-     - adil2afcobj
-     - odorsegm2obj
-     - mix2afcobj
-     - odor_testobj
-     - nl2afc_mix2obj
-     - odorsampobj
-     - odor_test2obj
-     - odorsegm3obj
-     - nl2afc_airmixobj
-     - nl2afc_mixobj
-     - chemotaxobj
-     - flow_controller_calibobj
+   - All related protocols have been moved to Protocols/legacy folder (commit: 1c8b5d799155912251a1b6ac44881e3b8e00983d)
+   - This includes 15 protocol folders and their associated .m files:
+     - @onebank_2afcobj
+     - @adil2afcobj
+     - @odorsegm2obj
+     - @mix2afcobj
+     - @odor_testobj
+     - @nl2afc_mix2obj
+     - @odorsampobj
+     - @odor_test2obj
+     - @odorsegm3obj
+     - @nl2afc_airmixobj
+     - @nl2afc_mixobj
+     - @chemotaxobj
+     - @flow_controller_calibobj
+     - @odorsegmobj
+     - @nl_odorsamp2obj
+   - These protocols are no longer actively used and depend on legacy olfactometer configurations
+   - The olfip.mat file itself remains in place as it may be needed by other components
 
 4. `bgnames.mat`
    - Referenced in `@odorsegm2obj/OdorSection.m`, indicating usage for background names.
@@ -95,20 +99,29 @@ These files have limited or indirect usage and should be investigated before rem
 ## Implementation Plan
 
 ### Phase 1: Backup and Documentation
-Changes are version controlled on `integration-junk-removal` branch
+1. Create a backup branch before making any changes
+2. Document the current state of each file to be removed
+3. Create a backup copy of each file in a separate directory
 
-### Phase 2: Gradual Archiving
-- Archive files in "confirmed unused" category 
-- Run protocols
-- If issues arise, restore the files
+### Phase 2: Gradual Removal
+1. Remove one file at a time, starting with the confirmed unused files
+2. After each removal:
+   - Run the test suite
+   - Verify that all protocols still work
+   - Check for any runtime errors
+3. If issues arise, restore the file and document the dependency
 
 ### Phase 3: Investigation
-For files requiring further investigation:
-- remove files and archive related protocols in 'Protocols/legacy'
-  
+1. For files requiring further investigation:
+   - Add logging to track usage
+   - Monitor for a period of time
+   - Document any discovered dependencies
+2. Make a decision based on findings
+
 ### Phase 4: Cleanup
-- Update documentation
-- Update any related configuration files
+1. Remove backup copies
+2. Update documentation
+3. Update any related configuration files
 
 ## Success Criteria
 - All removed files are properly backed up
@@ -116,3 +129,14 @@ For files requiring further investigation:
 - All tests pass
 - Documentation is updated
 - Codebase is cleaner and more maintainable
+
+## Rollback Plan
+If issues arise:
+1. Restore files from backup
+2. Document the discovered dependencies
+3. Update this plan with new findings
+
+## Notes
+- Some files might be used indirectly through MATLAB's path system
+- Consider adding a deprecation notice before removal
+- Keep track of any files that are restored due to discovered dependencies
