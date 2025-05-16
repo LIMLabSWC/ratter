@@ -1,0 +1,91 @@
+function create_ArpitCentrePokeTraining_SettingFile()
+
+templateDir = 'C:/ratter/';
+templateDir = '/Users/AkramiLab_Arpit/Documents/AkramiLabScripts/ratter';
+
+templatePath = [templateDir '/Protocols/@ArpitCentrePokeTraining/private/pipeline_ArpitCentrePokeTraining_arpit_AR05_250516.m'];
+outputRootDir = [templateDir '/SoloData/Settings/'];
+
+experimenter = input('Enter experimenter name: ', 's');
+ratname     = input('Enter rat name: ', 's');
+
+% Get today's date
+newDate = datestr(now, 'yymmdd');
+
+% Read the template file
+if ~isfile(templatePath)
+    error('Template file not found: %s', templatePath);
+end
+code = fileread(templatePath);
+lines = splitlines(code);
+
+% Find and update the function definition line
+newFuncName = '';
+for i = 1:length(lines)
+    line = strtrim(lines{i});
+    if startsWith(line, 'function') && contains(line, 'pipeline_')
+        % Extract argument list
+        pattern = 'function\s+varargout\s*=\s*pipeline_.*?\((.*?)\)';
+        tokens = regexp(line, pattern, 'tokens');
+        if ~isempty(tokens)
+            args = tokens{1}{1};
+            newFuncName = sprintf('pipeline_ArpitCentrePokeTraining_%s_%s_%s', ...
+                experimenter, ratname, newDate);
+            lines{i} = sprintf('function varargout = %s(%s)', newFuncName, args);
+            break;
+        end
+    end
+end
+
+if isempty(newFuncName)
+    error('Could not find valid function definition line in template.');
+end
+
+% Create output directory if needed
+outputDir = fullfile(outputRootDir, experimenter, ratname);
+if ~exist(outputDir, 'dir')
+    mkdir(outputDir);
+end
+
+% Build full new script path
+newScriptPath = fullfile(outputDir, [newFuncName, '.m']);
+
+% Save modified content
+newCode = strjoin(lines, newline);
+fid = fopen(newScriptPath, 'w');
+if fid == -1
+    error('Failed to open new file for writing: %s', newScriptPath);
+end
+fwrite(fid, newCode);
+fclose(fid);
+
+fprintf('New Session Definition file saved to: %s\n', newScriptPath);
+
+% Load and modify .mat file
+[templateFolder, ~, ~] = fileparts(templatePath);
+matTemplatePath = fullfile(templateFolder, 'settings_@ArpitCentrePokeTraining_arpit_AR05_250516a.mat');
+
+if ~isfile(matTemplatePath)
+    warning('No setting_file found in template directory: %s', matTemplatePath);
+    newMatPath = '';
+    return;
+end
+
+load(matTemplatePath,'saved','saved_autoset','fig_position');  % Load struct
+
+saved.SavingSection_experimenter = experimenter;
+saved.SavingSection_ratname = ratname;
+saved.SessionDefinition_textTrainingStageFile = newScriptPath;
+saved.ArpitCentrePokeTraining_prot_title = sprintf('ArpitCentrePokeTraining: %s, %s',experimenter,ratname);
+saved.PokesPlotSection_textHeader = sprintf('PokesPlotSection(%s, %s',experimenter,ratname);
+saved.SessionDefinition_textHeader = sprintf('SESSION AUTOMATOR WINDOW: %s, %s',experimenter,ratname);
+
+new_MATfile = sprintf('settings_@ArpitCentrePokeTraining__%s_%s_%sa.mat', ...
+    experimenter, ratname, newDate);
+
+newMatPath = fullfile(outputDir, new_MATfile);
+
+save(newMatPath,'saved','saved_autoset','fig_position');
+fprintf('New setting file saved to: %s\n', newMatPath);
+
+end
