@@ -35,7 +35,15 @@ BControl/
 
 ## Quick Start
 
-Clone the repository and run the `svn_sparse_init.sh` sript from git bash:
+### 1. Clone the repository 
+Run this command in git bash:
+
+```
+git clone git@github.com:LIMLabSWC/ratter.git
+```
+
+### 2. Initiate the SVN repository
+Run the `svn_sparse_init.sh` sript from git bash:
 
 ```
 bash svn_sparse_init.sh
@@ -43,7 +51,16 @@ bash svn_sparse_init.sh
 
 This will initiate the SVN repository in `ratter`.
 
+### 3. Adjust the configuration file 
+
+Make a **copy** of the configuration file template in 
+`ratter/ExperPort/Settings/_Settings_Custom.conf` and **rename** it to `Settings_Custom.conf` and
+modify the rig specific settings.
+
+> ℹ️ **Info:**  
 For more detailed instructions, follow our [giude](https://github.com/LIMLabSWC/limlab_documentation/blob/main/docs/how_to_set_up_a_rig_-_software.md) on setting up a rig.
+
+
 
 ## Documentation
 
