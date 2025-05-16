@@ -1105,10 +1105,10 @@ switch action
 
         CS = value(CurrSession);
 
-        [ratSCH slots] = bdata(['select ratname, timeslot from scheduler where date="',...
+        [ratSCH, slots] = bdata(['select ratname, timeslot from scheduler where date="',...
             datestr(now,'yyyy-mm-dd'),'"']);
         ratSES = bdata(['select ratname from sessions where sessiondate="',datestr(now,'yyyy-mm-dd'),'"']);
-        [ratSS ST]  = bdata(['select ratname, starttime from sess_started where sessiondate="',...
+        [ratSS, ST]  = bdata(['select ratname, starttime from sess_started where sessiondate="',...
             datestr(now,'yyyy-mm-dd'),'"']);
 
         %Let's cycle through each of the 6 training sessions and see if the
@@ -1456,7 +1456,7 @@ switch action
         %     disp('failed to start pi camera')
         % end
 
-        % If using USB Webcam, then try using it
+        % If using USB Webcam, then try using it instead using Bonsai
         % try
         %     disp('Connecting to USB HD Camera')
         %     webcam_connected = webcamlist;
@@ -1493,7 +1493,7 @@ switch action
         end
         
         % Let start recording the videos by sending the command to protocol
-        % itself
+        % itself instead of the plugin bonsaicamera
         protobj=eval(value(CurrProtocol));
         feval(value(CurrProtocol), protobj, 'start_recording');
 
@@ -1716,16 +1716,24 @@ switch action
         RunningSection(value(dispobj),'RunStop'); %#ok<NODEF>
         dispatcher('set_protocol','');
 
-        %Now we can email the rat's owner a crash report
+        %Now we can email the rat's owner a detailed crash report
         try %#ok<TRYNC>
+            error_message = lsterr.message;
+            error_message = strrep(error_message, '\', '\\');
+            error_message = strrep(error_message, '"', '\"');
             message = cell(0);
             message{end+1} = ['Rig ',num2str(value(RigID)),' crashed while running ',value(RatMenu),' at ',datestr(now,13)]; %#ok<NODEF>
             message{end+1} = '';
-            message{end+1} = lsterr.message;
+            message{end+1} = lsterr.identifier;            
+            message{end+1} = error_message;
+            file_path = lsterr.stack(1).file;
+            message{end+1} = strrep(file_path, '\', '\\');
+            message{end+1} = lsterr.stack(1).name;
+            message{end+1} = num2str(lsterr.stack(1).line);
             message{end+1} = '';
-
+            
             for i = 1:length(lsterr.stack)
-                message{end+1} = [lsterr.stack(i).name,' at ',num2str(lsterr.stack(i).line)]; %#ok<AGROW>
+                message{end+1} = ['Line ' num2str(lsterr.stack(i).line) ', File ' lsterr.stack(i).file ', Function ' lsterr.stack(i).name]; %#ok<AGROW>
             end
 
             IP = get_network_info;
@@ -1754,19 +1762,28 @@ switch action
             end
         end
 
-        %Let's update the MySQL table to indicate a crash has happened
-        id = bdata(['select sessid from sess_started where ratname="',value(RatMenu),...
-            '" and was_ended=0 and sessiondate="',datestr(now,'yyyy-mm-dd'),'"']);
-        if ~isempty(id)
-            id = id(end);
-            bdata('call mark_crashed("{S}")',id);
-       
-        end
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        %% Added by Arpit
-        %% Lets try and rerun the protocol and only do it if the animal is training
-        is_rat_training = bdata(['select in_training from rats where experimenter="',value(ExpMenu),'" and ratname="', value(RatMenu),'"']);
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
+        %% Modified/Added by Arpit
+
+        %Let's update the MySQL table to indicate a crash has happened
+        %Since this sql table is missing, the same information can be 
+        % obtained from sess_started table where was_ended will stay 0. 
+        
+        % id = bdata(['select sessid from sess_started where ratname="',value(RatMenu),...
+        %     '" and was_ended=0 and sessiondate="',datestr(now,'yyyy-mm-dd'),'"']);
+        % if ~isempty(id)
+        %     id = id(end);
+        %     bdata('call mark_crashed("{S}")',id);       
+        % end
+
+        %% Lets try and rerun the protocol and only do it if the animal is training
+        try
+            is_rat_training = bdata(['select in_training from rats where experimenter="',value(ExpMenu),'" and ratname="', value(RatMenu),'"']);
+        catch
+            is_rat_training = 1; % if couldn't find then try rerun of the protocol
+        end
+
         if value(Rerun_AfterCrash) == 1 && is_rat_training == 1
                 runrats(obj,'rerun');
         end
