@@ -34,7 +34,9 @@
 % Switch-case structure:
 %
 % 'init'           : Initializes UI toggle, starts Bonsai workflow, sets up save directory and UDP sender.
-% 'camera_connection' : Sends OSC messages to start or stop the camera feed. Also sends the video path to Bonsai.
+% 'camera_connection' : Sends OSC messages to start or stop the camera feed.
+% 'record_start'   : creates the directory to save videos initially declared
+%                    in 'init' and then send the message to Bonsai to start recording.
 % 'next_trial'     : Sends a new video save path to Bonsai to separate trial recordings.
 % 'close'          : Stops the camera, deletes the UDP sender object, and terminates Bonsai and CMD processes.
 % 'stop'           : Sending OSC message to stop streaming and save last trial video
@@ -251,7 +253,7 @@ switch action
         write(value(UDPSender), oscMsg_Camera_start, "uint8", bonsaiComputerIP,bonsaiUdpPort);
         pause(2);
         % Send the message to start recording
-        oscMsg_file_directory = createOSCMessage(recording_command_address, [value(Video_Saving_Folder) '\Trial.avi']);
+        oscMsg_file_directory = createOSCMessage(recording_command_address,sprintf('%s\BControlTrial%i_bonsaiTrial.avi',value(Video_Saving_Folder),n_completed_trial));
         write(value(UDPSender), oscMsg_file_directory, "uint8", bonsaiComputerIP,bonsaiUdpPort);
 
 
@@ -269,7 +271,7 @@ switch action
         % in this I send a command to bonsai so that it creates a new file
         % for each trial
 
-        oscMsg_file_directory = createOSCMessage(recording_command_address, [value(Video_Saving_Folder) '\Trial.avi']);
+        oscMsg_file_directory = createOSCMessage(recording_command_address,sprintf('%s\BControlTrial%i_bonsaiTrial.avi',value(Video_Saving_Folder),n_completed_trial));
         write(value(UDPSender), oscMsg_file_directory, "uint8", bonsaiComputerIP,bonsaiUdpPort);
     
     %% close bonsai and command window

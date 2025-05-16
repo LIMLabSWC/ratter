@@ -14,25 +14,26 @@ obj = class(struct, mfilename, pokesplot2, saveload, sessionmodel, soundmanager,
 %---------------------------------------------------------------
 
 % If creating an empty object, return without further ado:
-if nargin==0 || (nargin==1 && ischar(varargin{1}) && strcmp(varargin{1}, 'empty')),
+if nargin==0 || (nargin==1 && ischar(varargin{1}) && strcmp(varargin{1}, 'empty'))
    return;
-end;
+end
 
-if isa(varargin{1}, mfilename), % If first arg is an object of this class itself, we are
+if isa(varargin{1}, mfilename) % If first arg is an object of this class itself, we are
    % Most likely responding to a callback from
    % a SoloParamHandle defined in this mfile.
-   if length(varargin) < 2 || ~ischar(varargin{2}),
+   if length(varargin) < 2 || ~ischar(varargin{2})
       error(['If called with a "%s" object as first arg, a second arg, a ' ...
          'string specifying the action, is required\n']);
-   else action = varargin{2}; varargin = varargin(3:end); %#ok<NASGU>
-   end;
+   else 
+       action = varargin{2}; varargin = varargin(3:end); %#ok<NASGU>
+   end
 else % Ok, regular call with first param being the action string.
    action = varargin{1}; varargin = varargin(2:end); %#ok<NASGU>
-end;
+end
 
 GetSoloFunctionArgs(obj);
 
-switch action,
+switch action
    
    %% init
    case 'init'
@@ -138,14 +139,14 @@ switch action,
     feval(mfilename, obj, 'prepare_next_trial');
          
       %% change_water_modulation_params
-   case 'change_water_modulation_params',
+   case 'change_water_modulation_params'
 	   display_guys = [1 150 300];
-	   for i=1:numel(display_guys),
+	   for i=1:numel(display_guys)
 		   t = display_guys(i);
 	   
 		   myvar = eval(sprintf('trial_%d', t));
 		   myvar.value = maxasymp + (minasymp/(1+(t/inflp)^slp).^assym);
-	   end;
+       end
 	
       %% prepare next trial
    case 'prepare_next_trial'
@@ -169,16 +170,16 @@ switch action,
        SavingSection(obj, 'autosave_data');
     
        CommentsSection(obj, 'clear_history'); % Make sure we're not storing unnecessary history
-       if n_done_trials==1,  % Auto-append date for convenience.
+       if n_done_trials==1  % Auto-append date for convenience.
             CommentsSection(obj, 'append_date'); CommentsSection(obj, 'append_line', '');
-       end;
+       end
 
        if n_done_trials==1
             [expmtr, rname]=SavingSection(obj, 'get_info');
             prot_title.value=[mfilename ' on rig ' get_hostname ' : ' expmtr ', ' rname  '.  Started at ' datestr(now, 'HH:MM')];
        end
       
-       try send_n_done_trials(obj); end
+       % try send_n_done_trials(obj); end
 
       %% trial_completed
    case 'trial_completed'
@@ -199,9 +200,9 @@ switch action,
 	SideSection(obj, 'close');
     StimulusSection(obj,'close');
     
-    if exist('myfig', 'var') && isa(myfig, 'SoloParamHandle') && ishandle(value(myfig)), %#ok<NODEF>
+    if exist('myfig', 'var') && isa(myfig, 'SoloParamHandle') && ishandle(value(myfig)) %#ok<NODEF>
       delete(value(myfig));
-    end;
+    end
     delete_sphandle('owner', ['^@' class(obj) '$']);
 
       
@@ -253,9 +254,9 @@ switch action,
     sendsummary(obj,'protocol_data','PLACEHOLDER it was just pd');
   
       %% otherwise
-   otherwise,
+    otherwise
       warning('Unknown action! "%s"\n', action);
-end;
+end
 
 return;
 
