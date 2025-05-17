@@ -253,7 +253,7 @@ switch action
         write(value(UDPSender), oscMsg_Camera_start, "uint8", bonsaiComputerIP,bonsaiUdpPort);
         pause(2);
         % Send the message to start recording
-        oscMsg_file_directory = createOSCMessage(recording_command_address,sprintf('%s\BControlTrial%i_bonsaiTrial.avi',value(Video_Saving_Folder),n_completed_trial));
+        oscMsg_file_directory = createOSCMessage(recording_command_address,sprintf('%s\BControlTrial%i_bonsaiTrial.avi',value(Video_Saving_Folder),n_completed_trials));
         write(value(UDPSender), oscMsg_file_directory, "uint8", bonsaiComputerIP,bonsaiUdpPort);
 
 
@@ -271,7 +271,7 @@ switch action
         % in this I send a command to bonsai so that it creates a new file
         % for each trial
 
-        oscMsg_file_directory = createOSCMessage(recording_command_address,sprintf('%s\BControlTrial%i_bonsaiTrial.avi',value(Video_Saving_Folder),n_completed_trial));
+        oscMsg_file_directory = createOSCMessage(recording_command_address,sprintf('%s\BControlTrial%i_bonsaiTrial.avi',value(Video_Saving_Folder),n_completed_trials));
         write(value(UDPSender), oscMsg_file_directory, "uint8", bonsaiComputerIP,bonsaiUdpPort);
     
     %% close bonsai and command window
