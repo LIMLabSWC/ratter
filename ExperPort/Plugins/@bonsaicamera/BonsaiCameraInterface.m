@@ -274,6 +274,11 @@ switch action
         oscMsg_file_directory = createOSCMessage(recording_command_address,sprintf('%s\\BControlTrial%i_bonsaiTrial.avi',value(Video_Saving_Folder),n_done_trials+1));
         write(value(UDPSender), oscMsg_file_directory, "uint8", bonsaiComputerIP,bonsaiUdpPort);
     
+
+    case 'video_filepath'
+
+        varargout{1} = value(Video_Saving_Folder);
+
     %% close bonsai and command window
     case 'close'
             

@@ -327,20 +327,16 @@ switch action
     % sendsummary(obj);
     perf = struct([]);
     perf = PerformanceSummarySection(obj, 'evaluate');
-    [violation_rate,timeout_rate] = SessionPerformanceSection(obj, 'evaluate');
-    perf.violation_rate = violation_rate;
-    perf.timeout_rate = timeout_rate;
+    [perf.violation_rate,perf.timeout_rate] = SessionPerformanceSection(obj, 'evaluate');
 
-    stage  = ParamsSection(obj,'get_stage');
-    perf.stage_no = stage;
-
+    [perf.stage_no,perf.CP_Duration]  = ParamsSection(obj,'get_stage');
     stage_name_list = {'Familiarize with Reward Side Pokes','Timeout Rewarded Side Pokes'...
         'Introduce Centre Poke','Introduce Violation for Centre Poke',...
         'Introduce Stimuli Sound during Centre Poke','Vary Stimuli location during Centre Poke'...
         'Variable Stimuli Go Cue location during Centre Poke','User Setting'};
-
-    perf.stage_name = stage_name_list{stage};
-    perf.video_filepath = value(Video_Saving_Folder);
+    perf.stage_name = stage_name_list{perf.stage_no};
+    
+    perf.video_filepath = BonsaiCameraInterface(obj,'video_filepath');
     
     CentrePoketrainingsummary(obj,'protocol_data',perf);
     

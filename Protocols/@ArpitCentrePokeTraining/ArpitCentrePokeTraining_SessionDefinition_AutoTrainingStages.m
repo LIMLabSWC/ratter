@@ -92,8 +92,8 @@ if n_done_trials > 0
   
   %  Updating Disp Values for Training_Peformance_Summary
   SessionPerformanceSection_ntrials.value = n_done_trials;
-  SessionPerformanceSection_violation_rate.value = nan;
-  SessionPerformanceSection_timeout_rate.value = nan;
+  SessionPerformanceSection_violation_percent.value = nan;
+  SessionPerformanceSection_timeout_percent.value = nan;
   SessionPerformanceSection_violation_recent.value = nan;
   SessionPerformanceSection_timeout_recent.value = nan;
   SessionPerformanceSection_ntrials_stage.value = value(PerformanceSummarySection_stage_1_Trials);
@@ -104,8 +104,8 @@ if n_done_trials > 0
   callback(SessionPerformanceSection_ntrials);
   callback(SessionPerformanceSection_ntrials_stage);
   callback(SessionPerformanceSection_ntrials_stage_today)
-  callback(SessionPerformanceSection_violation_rate);
-  callback(SessionPerformanceSection_timeout_rate);
+  callback(SessionPerformanceSection_violation_percent);
+  callback(SessionPerformanceSection_timeout_percent);
   callback(SessionPerformanceSection_violation_recent);
   callback(SessionPerformanceSection_timeout_recent);
   callback(SessionPerformanceSection_violation_stage);
@@ -262,8 +262,8 @@ if n_done_trials > 0
 
   %  Updating Disp Values for Training_Peformance_Summary
   SessionPerformanceSection_ntrials.value = n_done_trials;
-  SessionPerformanceSection_violation_rate.value = nan;
-  SessionPerformanceSection_timeout_rate.value = numel(find(timeout_history))/n_done_trials;
+  SessionPerformanceSection_violation_percent.value = nan;
+  SessionPerformanceSection_timeout_percent.value = numel(find(timeout_history))/n_done_trials;
   SessionPerformanceSection_violation_recent.value = nan;  
   if n_done_trials >= 20
       SessionPerformanceSection_timeout_recent.value = numel(find(timeout_history(end-19:end)))/20;
@@ -278,8 +278,8 @@ if n_done_trials > 0
   callback(SessionPerformanceSection_ntrials);
   callback(SessionPerformanceSection_ntrials_stage);
   callback(SessionPerformanceSection_ntrials_stage_today)
-  callback(SessionPerformanceSection_violation_rate);
-  callback(SessionPerformanceSection_timeout_rate);
+  callback(SessionPerformanceSection_violation_percent);
+  callback(SessionPerformanceSection_timeout_percent);
   callback(SessionPerformanceSection_violation_recent);
   callback(SessionPerformanceSection_timeout_recent);
   callback(SessionPerformanceSection_violation_stage);
@@ -417,8 +417,8 @@ if n_done_trials > 0
   
   % Updating Disp Values for Training_Peformance_Summary
   SessionPerformanceSection_ntrials.value = n_done_trials;
-  SessionPerformanceSection_violation_rate.value = nan;
-  SessionPerformanceSection_timeout_rate.value = numel(find(timeout_history))/n_done_trials;
+  SessionPerformanceSection_violation_percent.value = nan;
+  SessionPerformanceSection_timeout_percent.value = numel(find(timeout_history))/n_done_trials;
   SessionPerformanceSection_violation_recent.value = nan;
   if n_done_trials >= 20
       SessionPerformanceSection_timeout_recent.value = numel(find(timeout_history(end-19:end)))/20;
@@ -433,8 +433,8 @@ if n_done_trials > 0
   callback(SessionPerformanceSection_ntrials);
   callback(SessionPerformanceSection_ntrials_stage);
   callback(SessionPerformanceSection_ntrials_stage_today)
-  callback(SessionPerformanceSection_violation_rate);
-  callback(SessionPerformanceSection_timeout_rate);
+  callback(SessionPerformanceSection_violation_percent);
+  callback(SessionPerformanceSection_timeout_percent);
   callback(SessionPerformanceSection_violation_recent);
   callback(SessionPerformanceSection_timeout_recent);
   callback(SessionPerformanceSection_violation_stage);
@@ -578,8 +578,8 @@ if n_done_trials > 0
   
   % Updating Disp Values for Training_Peformance_Summary
   SessionPerformanceSection_ntrials.value = n_done_trials;
-  SessionPerformanceSection_violation_rate.value = numel(find(violation_history))/n_done_trials;
-  SessionPerformanceSection_timeout_rate.value = numel(find(timeout_history))/n_done_trials;
+  SessionPerformanceSection_violation_percent.value = numel(find(violation_history))/n_done_trials;
+  SessionPerformanceSection_timeout_percent.value = numel(find(timeout_history))/n_done_trials;
   if n_done_trials >= 20
       SessionPerformanceSection_violation_recent.value = numel(find(violation_history(end-19:end)))/20;
       SessionPerformanceSection_timeout_recent.value = numel(find(timeout_history(end-19:end)))/20;
@@ -595,8 +595,8 @@ if n_done_trials > 0
   callback(SessionPerformanceSection_ntrials);
   callback(SessionPerformanceSection_ntrials_stage);
   callback(SessionPerformanceSection_ntrials_stage_today)
-  callback(SessionPerformanceSection_violation_rate);
-  callback(SessionPerformanceSection_timeout_rate);
+  callback(SessionPerformanceSection_violation_percent);
+  callback(SessionPerformanceSection_timeout_percent);
   callback(SessionPerformanceSection_violation_recent);
   callback(SessionPerformanceSection_timeout_recent);
   callback(SessionPerformanceSection_violation_stage);
@@ -780,8 +780,8 @@ if n_done_trials > 0
   
   % Updating Disp Values for Training_Peformance_Summary
   SessionPerformanceSection_ntrials.value = n_done_trials;
-  SessionPerformanceSection_violation_rate.value = numel(find(violation_history))/n_done_trials;
-  SessionPerformanceSection_timeout_rate.value = numel(find(timeout_history))/n_done_trials;
+  SessionPerformanceSection_violation_percent.value = numel(find(violation_history))/n_done_trials;
+  SessionPerformanceSection_timeout_percent.value = numel(find(timeout_history))/n_done_trials;
   if n_done_trials >= 20
       SessionPerformanceSection_violation_recent.value = numel(find(violation_history(end-19:end)))/20;
       SessionPerformanceSection_timeout_recent.value = numel(find(timeout_history(end-19:end)))/20;
@@ -797,8 +797,8 @@ if n_done_trials > 0
   callback(SessionPerformanceSection_ntrials);
   callback(SessionPerformanceSection_ntrials_stage);
   callback(SessionPerformanceSection_ntrials_stage_today)
-  callback(SessionPerformanceSection_violation_rate);
-  callback(SessionPerformanceSection_timeout_rate);
+  callback(SessionPerformanceSection_violation_percent);
+  callback(SessionPerformanceSection_timeout_percent);
   callback(SessionPerformanceSection_violation_recent);
   callback(SessionPerformanceSection_timeout_recent);
   callback(SessionPerformanceSection_violation_stage);
@@ -964,8 +964,8 @@ if n_done_trials > 0
   
   % Updating Disp Values for SessionPerformanceSection
   SessionPerformanceSection_ntrials.value = n_done_trials;
-  SessionPerformanceSection_violation_rate.value = numel(find(violation_history))/n_done_trials;
-  SessionPerformanceSection_timeout_rate.value = numel(find(timeout_history))/n_done_trials;
+  SessionPerformanceSection_violation_percent.value = numel(find(violation_history))/n_done_trials;
+  SessionPerformanceSection_timeout_percent.value = numel(find(timeout_history))/n_done_trials;
   if n_done_trials >= 20
       SessionPerformanceSection_violation_recent.value = numel(find(violation_history(end-19:end)))/20;
       SessionPerformanceSection_timeout_recent.value = numel(find(timeout_history(end-19:end)))/20;
@@ -981,8 +981,8 @@ if n_done_trials > 0
   callback(SessionPerformanceSection_ntrials);
   callback(SessionPerformanceSection_ntrials_stage);
   callback(SessionPerformanceSection_ntrials_stage_today)
-  callback(SessionPerformanceSection_violation_rate);
-  callback(SessionPerformanceSection_timeout_rate);
+  callback(SessionPerformanceSection_violation_percent);
+  callback(SessionPerformanceSection_timeout_percent);
   callback(SessionPerformanceSection_violation_recent);
   callback(SessionPerformanceSection_timeout_recent);
   callback(SessionPerformanceSection_violation_stage);
@@ -1151,8 +1151,8 @@ if n_done_trials > 0
   
   % Updating Disp Values for SessionPerformanceSection
   SessionPerformanceSection_ntrials.value = n_done_trials;
-  SessionPerformanceSection_violation_rate.value = numel(find(violation_history))/n_done_trials;
-  SessionPerformanceSection_timeout_rate.value = numel(find(timeout_history))/n_done_trials;
+  SessionPerformanceSection_violation_percent.value = numel(find(violation_history))/n_done_trials;
+  SessionPerformanceSection_timeout_percent.value = numel(find(timeout_history))/n_done_trials;
   if n_done_trials >= 20
       SessionPerformanceSection_violation_recent.value = numel(find(violation_history(end-19:end)))/20;
       SessionPerformanceSection_timeout_recent.value = numel(find(timeout_history(end-19:end)))/20;
@@ -1168,8 +1168,8 @@ if n_done_trials > 0
   callback(SessionPerformanceSection_ntrials);
   callback(SessionPerformanceSection_ntrials_stage);
   callback(SessionPerformanceSection_ntrials_stage_today)
-  callback(SessionPerformanceSection_violation_rate);
-  callback(SessionPerformanceSection_timeout_rate);
+  callback(SessionPerformanceSection_violation_percent);
+  callback(SessionPerformanceSection_timeout_percent);
   callback(SessionPerformanceSection_violation_recent);
   callback(SessionPerformanceSection_timeout_recent);
   callback(SessionPerformanceSection_violation_stage);
@@ -1339,8 +1339,8 @@ if n_done_trials > 0
   
   % Updating Disp Values for SessionPerformanceSection
   SessionPerformanceSection_ntrials.value = n_done_trials;
-  SessionPerformanceSection_violation_rate.value = numel(find(violation_history))/n_done_trials;
-  SessionPerformanceSection_timeout_rate.value = numel(find(timeout_history))/n_done_trials;
+  SessionPerformanceSection_violation_percent.value = numel(find(violation_history))/n_done_trials;
+  SessionPerformanceSection_timeout_percent.value = numel(find(timeout_history))/n_done_trials;
   if n_done_trials >= 20
       SessionPerformanceSection_violation_recent.value = numel(find(violation_history(end-19:end)))/20;
       SessionPerformanceSection_timeout_recent.value = numel(find(timeout_history(end-19:end)))/20;
@@ -1356,8 +1356,8 @@ if n_done_trials > 0
   callback(SessionPerformanceSection_ntrials);
   callback(SessionPerformanceSection_ntrials_stage);
   callback(SessionPerformanceSection_ntrials_stage_today)
-  callback(SessionPerformanceSection_violation_rate);
-  callback(SessionPerformanceSection_timeout_rate);
+  callback(SessionPerformanceSection_violation_percent);
+  callback(SessionPerformanceSection_timeout_percent);
   callback(SessionPerformanceSection_violation_recent);
   callback(SessionPerformanceSection_timeout_recent);
   callback(SessionPerformanceSection_violation_stage);
