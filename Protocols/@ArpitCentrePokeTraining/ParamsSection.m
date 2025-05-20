@@ -442,7 +442,11 @@ switch action
 %         right_wtr_mult.value=maxasymp + (minasymp./(1+(n_done_trials/inflp).^slp).^assym);
 		x=left_wtr_mult+0;
 		y=right_wtr_mult+0;
-		
+	
+    case 'get_stage'
+
+        x = value(training_stage);
+
 	case 'get_previous_sides'
 		x = value(previous_sides); %#ok<NODEF>
 		
