@@ -20,19 +20,19 @@ As part of the May 2025 cleanup effort, we have removed several legacy Perl scri
 
 ### Automated Task Scripts
 
-3. **nightly_runner.pl**
+1. **nightly_runner.pl**
    - **Previous Location**: `ExperPort/nightly_runner.pl`
    - **Function**: Executed contents of runme_tonight.pl and then emptied its contents
    - **Dependencies**: Perl, CVS
    - **Note**: Part of an automated nightly task system
 
-4. **runme_tonight.pl**
+2. **runme_tonight.pl**
    - **Previous Location**: `ExperPort/runme_tonight.pl`
    - **Function**: Contained tasks to be executed nightly
    - **Dependencies**: Perl, CVS
    - **Note**: Part of an automated nightly task system
 
-5. **nightly_followup.pl**
+3. **nightly_followup.pl**
    - **Previous Location**: `ExperPort/nightly_followup.pl`
    - **Function**: Emptied contents of runme_tonight.pl and updated CVS
    - **Dependencies**: Perl, CVS
@@ -40,14 +40,14 @@ As part of the May 2025 cleanup effort, we have removed several legacy Perl scri
 
 ### Version Control Scripts
 
-6. **CVSAutoUpdater.pl**
+1. **CVSAutoUpdater.pl**
    - **Previous Location**: `ExperPort/CVSAutoUpdater.pl`
    - **Function**: Automated CVS updates
    - **Dependencies**: Perl, CVS
 
 ### Utility Scripts
 
-7. **remove_comments.pl**
+1. **remove_comments.pl**
    - **Previous Location**: `ExperPort/Utility/remove_comments.pl`
    - **Function**: Utility script for removing comments from code
    - **Dependencies**: Perl
@@ -82,12 +82,14 @@ As part of the May 2025 cleanup effort, we have removed several legacy Perl scri
 ## Replacement Solutions
 
 1. **Process Management**
+
    ```matlab
    % Example MATLAB alternative for process management
    system('taskkill /F /IM process_name.exe');
    ```
 
 2. **Automated Tasks**
+
    ```matlab
    % Example MATLAB timer for automated tasks
    t = timer('TimerFcn', @myTask, 'Period', 86400, 'ExecutionMode', 'fixedRate');
@@ -95,6 +97,7 @@ As part of the May 2025 cleanup effort, we have removed several legacy Perl scri
    ```
 
 3. **Version Control**
+
    ```matlab
    % Example MATLAB Git commands
    system('git pull');
@@ -102,6 +105,7 @@ As part of the May 2025 cleanup effort, we have removed several legacy Perl scri
    ```
 
 4. **Code Maintenance**
+
    ```matlab
    % Example MATLAB comment removal
    str = fileread('file.m');
@@ -110,4 +114,4 @@ As part of the May 2025 cleanup effort, we have removed several legacy Perl scri
 
 ## Archive Location
 
-These scripts have been archived in a separate repository for historical reference. Contact the system administrator for access if needed. 
+These scripts have been archived in a separate repository for historical reference. Contact the system administrator for access if needed.

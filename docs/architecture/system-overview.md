@@ -54,6 +54,7 @@ sequenceDiagram
 ```
 
 **Key Data Flow Processes:**
+
 - Protocols define state matrices that control experiment logic
 - State matrices execute on hardware to produce stimulus and record responses
 - Events are processed in real-time and fed back to the protocol
@@ -96,6 +97,7 @@ sequenceDiagram
 ```
 
 **System Initialization Highlights:**
+
 - The system begins with `newstartup.m`, which configures paths and loads settings
 - Users can choose between two interfaces:
   - **Dispatcher**: Direct interface for researchers with full control
@@ -106,16 +108,19 @@ sequenceDiagram
 ## Hardware Integration
 
 ### Sound System
+
 - LynxTWO sound card
 - Real-time sound triggering
 - Sample rates up to 210KHz
 
 ### Digital I/O
+
 - Comedi interface
 - Parallel port support
 - National Instruments cards
 
 ### Real-time Control
+
 - RTLinux server
 - Hardware interrupts
 - Microsecond timing
@@ -123,6 +128,7 @@ sequenceDiagram
 ## Software Components
 
 ### Core Modules
+
 1. **State Machine Assembler**
    - Protocol compilation
    - State matrix generation
@@ -139,6 +145,7 @@ sequenceDiagram
    - Experiment control
 
 ### Utility Modules
+
 1. **Water Control**
    - Valve control
    - Calibration
@@ -157,16 +164,19 @@ sequenceDiagram
 ## System Requirements
 
 ### Hardware
+
 - LynxTWO sound card
 - Compatible I/O hardware
 - Sufficient processing power
 
 ### Software
+
 - RTLinux 3.1/3.2
 - MATLAB
 - Required kernel modules
 
 ### Network
+
 - Local network connection
 - Client-server architecture
 - Real-time communication
@@ -174,11 +184,13 @@ sequenceDiagram
 ## Configuration
 
 ### Basic Setup
+
 1. Install hardware components
 2. Configure kernel modules
 3. Set up network connections
 
 ### Advanced Configuration
+
 1. Optimize interrupt handling
 2. Configure real-time parameters
 3. Set up data storage
@@ -186,11 +198,13 @@ sequenceDiagram
 ## Maintenance
 
 ### Regular Tasks
+
 1. Hardware calibration
 2. Software updates
 3. Data backup
 
 ### Troubleshooting
+
 1. Hardware diagnostics
 2. Software debugging
 3. Performance monitoring
@@ -198,6 +212,7 @@ sequenceDiagram
 ## Support
 
 For additional information:
+
 - See [Hardware Setup](../hardware/)
 - Refer to [Technical Documentation](../technical/)
 - Contact system administrators

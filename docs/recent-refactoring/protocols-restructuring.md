@@ -95,4 +95,4 @@ As part of the May 2025 cleanup effort, we have improved the Protocols directory
 
 ## Contact
 
-For questions about these changes, contact the system administrator. 
+For questions about these changes, contact the system administrator.

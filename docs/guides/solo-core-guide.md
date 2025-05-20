@@ -9,6 +9,7 @@ Solo Core is the foundation of the ExperPort system, providing essential functio
 ### State Machine
 
 1. **State Matrix**
+
    ```matlab
    % Basic state matrix structure
    sm = StateMachineAssembler();
@@ -17,6 +18,7 @@ Solo Core is the foundation of the ExperPort system, providing essential functio
    ```
 
 2. **Event Handling**
+
    ```matlab
    % Event processing
    function process_event(obj, event)
@@ -33,6 +35,7 @@ Solo Core is the foundation of the ExperPort system, providing essential functio
 ### Protocol System
 
 1. **Protocol Definition**
+
    ```matlab
    % Protocol structure
    classdef MyProtocol < handle
@@ -47,6 +50,7 @@ Solo Core is the foundation of the ExperPort system, providing essential functio
    ```
 
 2. **Parameter Management**
+
    ```matlab
    % Parameter handling
    function set_parameter(obj, name, value)
@@ -61,6 +65,7 @@ Solo Core is the foundation of the ExperPort system, providing essential functio
 ### Data Acquisition
 
 1. **Event Logging**
+
    ```matlab
    % Log events
    function log_event(obj, event)
@@ -70,6 +75,7 @@ Solo Core is the foundation of the ExperPort system, providing essential functio
    ```
 
 2. **Performance Tracking**
+
    ```matlab
    % Track performance
    function update_performance(obj, trial)
@@ -81,6 +87,7 @@ Solo Core is the foundation of the ExperPort system, providing essential functio
 ### Data Storage
 
 1. **File Management**
+
    ```matlab
    % Save data
    function save_data(obj, filename)
@@ -90,6 +97,7 @@ Solo Core is the foundation of the ExperPort system, providing essential functio
    ```
 
 2. **Data Analysis**
+
    ```matlab
    % Analyze data
    function analyze_data(obj)
@@ -103,6 +111,7 @@ Solo Core is the foundation of the ExperPort system, providing essential functio
 ### GUI Components
 
 1. **Parameter Display**
+
    ```matlab
    % Display parameters
    function update_display(obj)
@@ -112,6 +121,7 @@ Solo Core is the foundation of the ExperPort system, providing essential functio
    ```
 
 2. **Control Panel**
+
    ```matlab
    % Control interface
    function create_controls(obj)
@@ -238,6 +248,7 @@ end
 ## Support
 
 For additional information:
+
 - See [Protocol Guide](protocol-writers-guide.md)
 - Refer to [System Overview](../architecture/system-overview.md)
-- Contact system administrators 
+- Contact system administrators

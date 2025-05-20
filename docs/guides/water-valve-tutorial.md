@@ -28,6 +28,7 @@ This tutorial explains how to set up and use water valves in the ExperPort syste
 ### Valve Control
 
 1. **Digital Output Setup**
+
    ```matlab
    % Configure DIO for valve control
    dio = DigitalIO('ni');
@@ -35,6 +36,7 @@ This tutorial explains how to set up and use water valves in the ExperPort syste
    ```
 
 2. **Valve Timing**
+
    ```matlab
    % Control valve timing
    function deliver_reward(obj, duration)
@@ -47,6 +49,7 @@ This tutorial explains how to set up and use water valves in the ExperPort syste
 ### Calibration
 
 1. **Volume Calibration**
+
    ```matlab
    % Calibrate valve delivery
    function calibrate_valve(obj)
@@ -59,6 +62,7 @@ This tutorial explains how to set up and use water valves in the ExperPort syste
    ```
 
 2. **Timing Verification**
+
    ```matlab
    % Verify valve timing
    function verify_timing(obj)
@@ -190,6 +194,7 @@ end
 ## Support
 
 For additional information:
+
 - See [Hardware Setup](../hardware/)
 - Refer to [Protocol Guide](protocol-writers-guide.md)
-- Contact system administrators 
+- Contact system administrators

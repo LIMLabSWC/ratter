@@ -59,6 +59,7 @@ state_matrix = [
 ## Hardware Integration
 
 ### Sound Control
+
 ```matlab
 % Example sound trigger
 sound_trigger = [
@@ -69,6 +70,7 @@ sound_trigger = [
 ```
 
 ### Digital I/O
+
 ```matlab
 % Example DIO control
 dio_control = [
@@ -83,6 +85,7 @@ dio_control = [
 ### State Machine Assembly
 
 1. **Protocol Definition**
+
    ```matlab
    % Example protocol structure
    protocol = struct(...
@@ -183,6 +186,7 @@ dio_control = [
 ## Support
 
 For additional information:
+
 - See [Hardware Setup](../hardware/)
 - Refer to [System Overview](../architecture/system-overview.md)
-- Contact system administrators 
+- Contact system administrators

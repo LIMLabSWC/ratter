@@ -24,6 +24,7 @@ sequenceDiagram
 ```
 
 **Core Components Overview:**
+
 - The **Core System** consists of `newstartup.m` (the initialization script) and the Settings Module (configuration management)
 - The **Protocol System** includes the base `@protocolobj` class and actively used protocol implementations
 - **Essential Plugins** provide functionality grouped by purpose: UI, Data Handling, Sound Management, and Control
@@ -64,6 +65,7 @@ sequenceDiagram
 ```
 
 **Plugin System Details:**
+
 - **UI Plugins**: Handle visual elements like plots and user interfaces
 - **Data Handling Plugins**: Manage data storage, session information, and database interactions
 - **Sound Management Plugins**: Control audio stimuli generation and playback
@@ -108,6 +110,7 @@ sequenceDiagram
 ```
 
 **Initialization Process Notes:**
+
 - The initialization begins with `newstartup.m` loading system settings and configuring paths
 - After system initialization, users can choose between two interfaces:
   - **Dispatcher**: Used directly by researchers for protocol development and complex experiments
@@ -208,9 +211,10 @@ sequenceDiagram
 ```
 
 **Protocol Hierarchy Details:**
+
 - All protocols inherit from the base `@protocolobj` class which provides common functionality
 - Plugins are divided into **Core Plugins** (essential for all protocols) and **Extended Plugins** (additional functionality)
 - Complex protocols like `@AthenaDelayComp` and `@SoundCatContinuous` use both core and extended plugin sets
 - Simpler protocols like `@ArpitCentrePokeTraining` use primarily core plugins with only selective extended plugins
 - The specific combination of plugins determines the protocol's capabilities and behavior
-- This modular architecture allows for flexible protocol development and reuse of common components 
+- This modular architecture allows for flexible protocol development and reuse of common components

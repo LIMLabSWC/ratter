@@ -1,6 +1,7 @@
 # ExperPort Cleanup Plan
 
 ## Overview
+
 This document outlines the plan to remove unused .m files from the ExperPort directory. The goal is to reduce code clutter and maintenance burden by removing files that are no longer actively used in the codebase.
 
 ## Actively Used Files
@@ -24,6 +25,7 @@ The following files are actively used in the codebase and should be retained:
 ## Files to Remove
 
 ### Confirmed Unused Files
+
 The following files have been moved to ExperPort/legacy (commit: 67d64ad):
 
 1. `start_script.m`
@@ -59,6 +61,7 @@ The following files have been moved to ExperPort/legacy (commit: 67d64ad):
    - Moved to ExperPort/legacy
 
 ### Files Requiring Further Investigation
+
 These files have been moved to ExperPort/legacy (commit: 67d64ad) but require further investigation before potential removal:
 
 1. `end_script.m`
@@ -118,11 +121,13 @@ These files have been moved to ExperPort/legacy (commit: 67d64ad) but require fu
 ## Implementation Plan
 
 ### Phase 1: Backup and Documentation
+
 1. Create a backup branch before making any changes
 2. Document the current state of each file to be removed
 3. Create a backup copy of each file in a separate directory
 
 ### Phase 2: Gradual Removal
+
 1. Remove one file at a time, starting with the confirmed unused files
 2. After each removal:
    - Run the test suite
@@ -131,6 +136,7 @@ These files have been moved to ExperPort/legacy (commit: 67d64ad) but require fu
 3. If issues arise, restore the file and document the dependency
 
 ### Phase 3: Investigation
+
 1. For files requiring further investigation:
    - Add logging to track usage
    - Monitor for a period of time
@@ -140,11 +146,13 @@ These files have been moved to ExperPort/legacy (commit: 67d64ad) but require fu
 **Update (May 15, 2025, commit: fe550df):** Investigation completed for olfactory-related .mat files. After verification that no active code depends on these files, all four files (olfip.mat, bgnames.mat, OdorNames.mat, and OdorSet.mat) have been moved to ExperPort/legacy for consistency with the previous protocol and analysis code moves.
 
 ### Phase 4: Cleanup
+
 1. Remove backup copies
 2. Update documentation
 3. Update any related configuration files
 
 ## Success Criteria
+
 - All removed files are properly backed up
 - No functionality is broken
 - All tests pass
@@ -152,9 +160,11 @@ These files have been moved to ExperPort/legacy (commit: 67d64ad) but require fu
 - Codebase is cleaner and more maintainable
 
 ## Rollback Plan
+
 The following changes are listed from newest to oldest. When rolling back, start from the bottom (7) and work your way up to (1):
 
 Most Recent:
+
 1. Olfactory .mat files to legacy (commit: fe550df, May 15, 2025):
    - Restore olfip.mat, bgnames.mat, OdorNames.mat, and OdorSet.mat from ExperPort/legacy to ExperPort root
    - This completes the previous refactoring effort by moving all olfactory-related components to legacy folders
@@ -188,11 +198,13 @@ Most Recent:
 Rollback Order: Start with #7 and work backwards to #1. This ensures proper restoration of dependencies.
 
 For each rollback:
+
 1. Use git checkout to the specific commit
 2. Document any discovered dependencies
 3. Update this plan with new findings
 
 ## Notes
+
 - Some files might be used indirectly through MATLAB's path system
 - Consider adding a deprecation notice before removal
 - Keep track of any files that are restored due to discovered dependencies

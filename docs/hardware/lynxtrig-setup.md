@@ -13,23 +13,31 @@ This guide explains how to set up and use the LynxTrig system for real-time soun
 ## Hardware Requirements
 
 ### Sound Card
+
 - LynxTWO (L22) soundcard
 - PCI ID: 1621:0023
 - Verify with `lspci` command:
+
   ```
   00:0b.0 Multimedia audio controller: Unknown device 1621:0023
   ```
 
 ### Interrupt Configuration
+
 For optimal performance, the LynxTWO card should have a dedicated interrupt:
+
 1. Check current IRQ assignment:
+
    ```bash
    cat /proc/pci
    ```
+
 2. View interrupt usage:
+
    ```bash
    cat /proc/interrupts
    ```
+
 3. Adjust hardware configuration if needed:
    - Move card to different PCI slots
    - Disable unused devices
@@ -38,6 +46,7 @@ For optimal performance, the LynxTWO card should have a dedicated interrupt:
 ## Installation
 
 1. Obtain required software:
+
    ```bash
    # LynxTWO-RT driver
    cvs -d :pserver:anonymous@rtlab.org:/cvs co LynxTWO-RT
@@ -47,12 +56,14 @@ For optimal performance, the LynxTWO card should have a dedicated interrupt:
    ```
 
 2. Load kernel modules:
+
    ```bash
    insmod ../LynxTWO/LynxTWO-RT.o
    insmod LynxTrig-RT.o
    ```
 
 3. Start the server:
+
    ```bash
    ./LynxTrigServer
    ```
@@ -82,6 +93,7 @@ insmod LynxTrig-RT.o comedi_triggers=1 num_trig_chans=8 first_trig_chan=0
 ```
 
 This configuration:
+
 - Uses COMEDI device on /dev/comedi0
 - Configures 8 DIO lines starting at channel 0
 - Requires proper COMEDI setup (see [Comedi Setup Guide](comedi-setup.md))
@@ -106,6 +118,7 @@ This configuration:
 ## Support
 
 For additional support:
+
 - Check the [Comedi documentation](http://www.comedi.org)
 - Contact system administrators
-- Refer to the [FSM Documentation](../technical/fsm-documentation.md) 
+- Refer to the [FSM Documentation](../technical/fsm-documentation.md)

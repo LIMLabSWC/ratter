@@ -128,6 +128,7 @@ graph LR
 ## Component Status Details
 
 ### Confirmed Unused Components
+
 These components have been confirmed as unused and moved to legacy folders:
 
 1. **ExperPort Legacy** (Commit: 67d64ada04815d3e676f8d651ee90ac35883c4f9)
@@ -141,13 +142,15 @@ These components have been confirmed as unused and moved to legacy folders:
    - `ExperValveCheck.m`
 
 ### Under Investigation
+
 Components requiring further analysis before final disposition:
 
 1. **ExperPort Components**
    - `end_script.m`: Referenced in configuration files
    - `RExper.m`: Referenced in Control.m
-   
+
 ### Preserved Data Files
+
 Critical data files maintained despite legacy status of dependent components:
 
 1. **olfip.mat Related** (Commit: 1c8b5d799155912251a1b6ac44881e3b8e00983d)
@@ -163,6 +166,7 @@ Critical data files maintained despite legacy status of dependent components:
 ## Monitoring Plan
 
 ### Components Under Investigation
+
 1. **end_script.m**
    - Monitor configuration file dependencies
    - Track any runtime references
@@ -174,6 +178,7 @@ Critical data files maintained despite legacy status of dependent components:
    - Document any system impacts
 
 ### Investigation Timeline
+
 - Investigation Period: [Define specific timeframe]
 - Review Points: [Define review schedule]
 - Final Disposition Date: [Define target date]
@@ -204,4 +209,4 @@ For any needed rollbacks, follow this sequence (from newest to oldest):
 3. **Final Disposition**
    - Plan for permanent removal of confirmed unused components
    - Document any components that need to be retained
-   - Update system documentation accordingly 
+   - Update system documentation accordingly

@@ -9,6 +9,7 @@ This guide explains how to create and implement protocols for the ExperPort syst
 ### Basic Components
 
 1. **Protocol Class**
+
    ```matlab
    classdef MyProtocol < handle
        properties
@@ -24,6 +25,7 @@ This guide explains how to create and implement protocols for the ExperPort syst
    ```
 
 2. **State Machine Definition**
+
    ```matlab
    function sm = make_state_matrix(obj)
        % Define states
@@ -40,6 +42,7 @@ This guide explains how to create and implement protocols for the ExperPort syst
 ### Parameter Management
 
 1. **Parameter Definition**
+
    ```matlab
    properties
        % Protocol parameters
@@ -49,6 +52,7 @@ This guide explains how to create and implement protocols for the ExperPort syst
    ```
 
 2. **Parameter Validation**
+
    ```matlab
    function set.param1(obj, value)
        % Validate parameter
@@ -60,6 +64,7 @@ This guide explains how to create and implement protocols for the ExperPort syst
 ### State Machine Implementation
 
 1. **State Definition**
+
    ```matlab
    % Define states
    sm = add_state(sm, 'name', 'wait_for_lick', ...
@@ -70,6 +75,7 @@ This guide explains how to create and implement protocols for the ExperPort syst
    ```
 
 2. **Output Control**
+
    ```matlab
    % Control outputs
    sm = add_state(sm, 'name', 'reward', ...
@@ -212,6 +218,7 @@ end
 ## Support
 
 For additional information:
+
 - See [FSM Documentation](../technical/fsm-documentation.md)
 - Refer to [System Overview](../architecture/system-overview.md)
-- Contact system administrators 
+- Contact system administrators

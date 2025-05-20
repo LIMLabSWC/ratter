@@ -5,6 +5,7 @@ This guide explains how to set up and configure Comedi for hardware control in t
 ## Overview
 
 Comedi (Control and Measurement Device Interface) provides a unified interface for data acquisition hardware. In ExperPort, it's used for:
+
 - Digital I/O control
 - Hardware triggering
 - Device synchronization
@@ -12,6 +13,7 @@ Comedi (Control and Measurement Device Interface) provides a unified interface f
 ## Installation
 
 1. Install Comedi:
+
    ```bash
    # Install dependencies
    apt-get install build-essential linux-headers-$(uname -r)
@@ -25,6 +27,7 @@ Comedi (Control and Measurement Device Interface) provides a unified interface f
    ```
 
 2. Load required kernel modules:
+
    ```bash
    modprobe kcomedilib
    ```
@@ -34,6 +37,7 @@ Comedi (Control and Measurement Device Interface) provides a unified interface f
 ### Parallel Port Setup
 
 1. Configure parallel port driver:
+
    ```bash
    modprobe comedi_parport
    comedi_config /dev/comedi0 comedi_parport 0x378
@@ -46,6 +50,7 @@ Comedi (Control and Measurement Device Interface) provides a unified interface f
 ### National Instruments Cards
 
 For NI cards:
+
 ```bash
 modprobe ni_pcimio
 comedi_config /dev/comedi0 ni_pcimio
@@ -56,6 +61,7 @@ comedi_config /dev/comedi0 ni_pcimio
 Use the ComediClientServer utility:
 
 1. Obtain the utility:
+
    ```bash
    cvs -d :pserver:anonymous@rtlab.org:/cvs co ComediClientServer
    cd ComediClientServer
@@ -64,6 +70,7 @@ Use the ComediClientServer utility:
    ```
 
 2. Run the server:
+
    ```bash
    # First, unload LynxTrig-RT if running
    rmmod LynxTrig-RT
@@ -73,9 +80,11 @@ Use the ComediClientServer utility:
    ```
 
 3. Run the client:
+
    ```bash
    Client/ComediClient
    ```
+
    - Enter 'localhost' in server name
    - Click "Connect"
 
@@ -84,6 +93,7 @@ Use the ComediClientServer utility:
 ### Parallel Port Pinout
 
 Data pins (D0-D7) are used for DIO lines:
+
 - D0: Data bit 0
 - D1: Data bit 1
 - ...
@@ -98,6 +108,7 @@ Data pins (D0-D7) are used for DIO lines:
 ## Integration with LynxTrig
 
 1. Load LynxTrig with Comedi support:
+
    ```bash
    insmod LynxTrig-RT.o comedi_triggers=1 num_trig_chans=8 first_trig_chan=0
    ```
@@ -128,4 +139,4 @@ Data pins (D0-D7) are used for DIO lines:
 
 - [Comedi Documentation](http://www.comedi.org)
 - [Linux Kernel Documentation](https://www.kernel.org/doc/html/latest/)
-- System Administrator Support 
+- System Administrator Support

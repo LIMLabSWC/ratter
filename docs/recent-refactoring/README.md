@@ -44,4 +44,4 @@ This directory contains documentation of recent major refactoring efforts in the
 
 ## Contact
 
-For questions about these changes, contact the system administrator. 
+For questions about these changes, contact the system administrator.

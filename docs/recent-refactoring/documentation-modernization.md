@@ -68,4 +68,4 @@ As part of the May 2025 cleanup effort, we have modernized the documentation str
 
 ## Contact
 
-For questions about these changes, contact the system administrator. 
+For questions about these changes, contact the system administrator.
