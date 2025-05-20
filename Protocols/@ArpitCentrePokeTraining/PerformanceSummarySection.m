@@ -77,19 +77,65 @@ switch action
         x=oldx; y=oldy;
         figure(parentfig);
 
-%% Evaluate
-    case 'evaluate'
+       % ------------------------------------------------------------------
+	%              evaluate
+	% ------------------------------------------------------------------
 
-        % if value(training_stage) == 8 && n_done_trials > 0
-        %     stage_8_Trials.value = value(stage_8_Trials) + 1;
-        %     stage_8_TrialsToday.value = value(stage_8_TrialsToday) + 1;
-        %     stage_8_ViolationRate.value = ((value(stage_8_ViolationRate) * (value(stage_8_Trials) - 1)) + double(violation_history(end))) / value(stage_8_Trials);
-        %     stage_8_TimeoutRate.value = ((value(stage_8_TimeoutRate) * (value(stage_8_Trials) - 1)) + double(timeout_history(end))) / value(stage_8_Trials);
-        %     if value(hit_history(end)) == 1
-        %         stage_8_TrialsValid.value = value(stage_8_TrialsValid) + 1;
-        %     end
-        % end
-        % 
+	case 'evaluate'
+    	
+    	pd.stage1_trials_total = value(stage_1_Trials);
+        pd.stage1_trials_today = value(stage_1_TrialsToday);
+        pd.stage1_trials_valid = value(stage_1_TrialsValid); 
+        pd.stage1_violationrate = value(stage_1_ViolationRate);
+        pd.stage1_timeoutrate = value(stage_1_TimeoutRate);
+
+        pd.stage2_trials_total = value(stage_2_Trials);
+        pd.stage2_trials_today = value(stage_2_TrialsToday);
+        pd.stage2_trials_valid = value(stage_2_TrialsValid); 
+        pd.stage2_violationrate = value(stage_2_ViolationRate);
+        pd.stage2_timeoutrate = value(stage_2_TimeoutRate);
+
+        pd.stage3_trials_total = value(stage_3_Trials);
+        pd.stage3_trials_today = value(stage_3_TrialsToday);
+        pd.stage3_trials_valid = value(stage_3_TrialsValid); 
+        pd.stage3_violationrate = value(stage_3_ViolationRate);
+        pd.stage3_timeoutrate = value(stage_3_TimeoutRate);
+
+        pd.stage4_trials_total = value(stage_4_Trials);
+        pd.stage4_trials_today = value(stage_4_TrialsToday);
+        pd.stage4_trials_valid = value(stage_4_TrialsValid); 
+        pd.stage4_violationrate = value(stage_4_ViolationRate);
+        pd.stage4_timeoutrate = value(stage_4_TimeoutRate);
+
+        pd.stage5_trials_total = value(stage_5_Trials);
+        pd.stage5_trials_today = value(stage_5_TrialsToday);
+        pd.stage5_trials_valid = value(stage_5_TrialsValid); 
+        pd.stage5_violationrate = value(stage_5_ViolationRate);
+        pd.stage5_timeoutrate = value(stage_5_TimeoutRate);
+
+        pd.stage6_trials_total = value(stage_6_Trials);
+        pd.stage6_trials_today = value(stage_6_TrialsToday);
+        pd.stage6_trials_valid = value(stage_6_TrialsValid); 
+        pd.stage6_violationrate = value(stage_6_ViolationRate);
+        pd.stage6_timeoutrate = value(stage_6_TimeoutRate);
+
+        pd.stage7_trials_total = value(stage_7_Trials);
+        pd.stage7_trials_today = value(stage_7_TrialsToday);
+        pd.stage7_trials_valid = value(stage_7_TrialsValid); 
+        pd.stage7_violationrate = value(stage_7_ViolationRate);
+        pd.stage7_timeoutrate = value(stage_7_TimeoutRate);
+
+        pd.stage8_trials_total = value(stage_8_Trials);
+        pd.stage8_trials_today = value(stage_8_TrialsToday);
+        pd.stage8_trials_valid = value(stage_8_TrialsValid); 
+        pd.stage8_violationrate = value(stage_8_ViolationRate);
+        pd.stage8_timeoutrate = value(stage_8_TimeoutRate);
+        
+                
+        if nargout > 0
+            x = pd;
+        end
+		
 
 %% Case close
     case 'close'
