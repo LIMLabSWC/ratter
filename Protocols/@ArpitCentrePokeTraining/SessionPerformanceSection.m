@@ -32,7 +32,7 @@
 
 % CDB, 23-March-2013
 
-function [x, y] = SessionPerformanceSection(obj, action, x,y)
+function [x, y] = SessionPerformanceSection(obj, action, varargin)
 
 GetSoloFunctionArgs(obj);
 
@@ -44,6 +44,8 @@ switch action
 	
 	case 'init'
 		
+        x = varargin{1}; y = varargin{2};
+
 		SoloParamHandle(obj, 'my_gui_info', 'value', [x y double(gcf)], 'saveable', 0);
 
 		DispParam(obj, 'ntrials', 0, x, y,'label','Session Trials', 'TooltipString', ...
@@ -55,10 +57,10 @@ switch action
         DispParam(obj, 'ntrials_stage_today', 0, x, y,'label','Stage Trials Today', 'TooltipString', ...
 			'trials completed in this training stage'); 
         next_row(y);
-		DispParam(obj, 'violation_rate', 0, x, y,'label','Session Violation', 'TooltipString', ...
+		DispParam(obj, 'violation_percent', 0, x, y,'label','Session Violation', 'TooltipString', ...
 			'Fraction of trials with a center poke violation in this session'); 
         next_row(y);
-        DispParam(obj, 'timeout_rate', 0, x, y,'label','Session Timeout', 'TooltipString', ...
+        DispParam(obj, 'timeout_percent', 0, x, y,'label','Session Timeout', 'TooltipString', ...
 			'Fraction of trials with timeout in this session'); 
         next_row(y);
 		DispParam(obj, 'violation_recent', 0, x, y,'label','Recent Violation', 'TooltipString', ...
@@ -84,7 +86,8 @@ switch action
 	case 'evaluate'
     		
         if nargout > 0
-            x = [value(violation_rate), value(timeout_rate)];
+            x = value(violation_percent);
+            y = value(timeout_percent);
         end
 		
 	% ------------------------------------------------------------------
