@@ -80,7 +80,7 @@ switch action
 %% Evaluate
     case 'evaluate'
 
-        % if value(training_stage) == 8 && n_completed_trials > 0
+        % if value(training_stage) == 8 && n_done_trials > 0
         %     stage_8_Trials.value = value(stage_8_Trials) + 1;
         %     stage_8_TrialsToday.value = value(stage_8_TrialsToday) + 1;
         %     stage_8_ViolationRate.value = ((value(stage_8_ViolationRate) * (value(stage_8_Trials) - 1)) + double(violation_history(end))) / value(stage_8_Trials);

@@ -23,7 +23,7 @@ if helper_vars_eval
 GetSoloFunctionArgs(obj);
 ClearHelperVarsNotOwned(obj);
 %<HELPER_VARS>
-CreateHelperVar(obj,'stage_start_completed_trial','value',n_completed_trials,'force_init',true);
+CreateHelperVar(obj,'stage_start_completed_trial','value',n_done_trials,'force_init',true);
 %</HELPER_VARS>
 end
 if stage_algorithm_eval
@@ -41,7 +41,7 @@ if stage_no ~= value(ParamsSection_training_stage)
 end
 
 % Update TrainingStageParamsSection
-if n_completed_trials >= 2
+if n_done_trials >= 2
     if previous_sides(end) ~= previous_sides(end-1) && all(hit_history(end-1:end)) % last and present trials should also be a valid trial
         TrainingStageParamsSection_trial_oppSide.value = value(TrainingStageParamsSection_trial_oppSide) + 1;  % updating value for variable in TrainingParams_Section
         callback(TrainingStageParamsSection_trial_oppSide);
@@ -49,7 +49,7 @@ if n_completed_trials >= 2
 end
 
 % Updating Disp Values for Training_Peformance_Summary
-if n_completed_trials > 0
+if n_done_trials > 0
     PerformanceSummarySection_stage_1_Trials.value = value(PerformanceSummarySection_stage_1_Trials) + 1;
     PerformanceSummarySection_stage_1_TrialsToday.value = value(PerformanceSummarySection_stage_1_TrialsToday) + 1;
     PerformanceSummarySection_stage_1_ViolationRate.value = nan;
@@ -64,7 +64,7 @@ if n_completed_trials > 0
   callback(PerformanceSummarySection_stage_1_TrialsValid);
 
   %  Updating Disp Values for Training_Peformance_Summary
-  SessionPerformanceSection_ntrials.value = n_completed_trials;
+  SessionPerformanceSection_ntrials.value = n_done_trials;
   SessionPerformanceSection_violation_rate.value = nan;
   SessionPerformanceSection_timeout_rate.value = nan;
   SessionPerformanceSection_violation_recent.value = nan;
@@ -95,7 +95,7 @@ clear('ans');
 if ParamsSection_use_auto_train % do completion check if auto training
     stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
     % only run it if its the start of the day, number of trials is small
-    if n_completed_trials < 100
+    if n_done_trials < 100
         if value(PerformanceSummarySection_stage_1_TrialsValid) > value(TrainingStageParamsSection_total_trials) && ...
                 value(TrainingStageParamsSection_trial_oppSide) > value(TrainingStageParamsSection_total_trials_opp)
             ParamsSection_training_stage.value = stage_no + 1;
@@ -190,7 +190,7 @@ if length(timeout_history) > 20
 end
 
 % Update TrainingStageParamsSection
-if n_completed_trials >= 2
+if n_done_trials >= 2
     if previous_sides(end) ~= previous_sides(end-1) && all(hit_history(end-1:end)) % last and present trials should also be a valid trial
         TrainingStageParamsSection_trial_oppSide.value = value(TrainingStageParamsSection_trial_oppSide) + 1;  % updating value for variable in TrainingParams_Section
         callback(TrainingStageParamsSection_trial_oppSide);
@@ -199,7 +199,7 @@ end
 
 
 % Updating Disp Values for Training_Peformance_Summary
-if n_completed_trials > 0
+if n_done_trials > 0
     PerformanceSummarySection_stage_2_Trials.value = value(PerformanceSummarySection_stage_2_Trials) + 1;
     PerformanceSummarySection_stage_2_TrialsToday.value = value(PerformanceSummarySection_stage_2_TrialsToday) + 1;
     PerformanceSummarySection_stage_2_ViolationRate.value = nan;
@@ -215,11 +215,11 @@ if n_completed_trials > 0
   callback(PerformanceSummarySection_stage_2_TrialsValid);
 
   %  Updating Disp Values for Training_Peformance_Summary
-  SessionPerformanceSection_ntrials.value = n_completed_trials;
+  SessionPerformanceSection_ntrials.value = n_done_trials;
   SessionPerformanceSection_violation_rate.value = nan;
-  SessionPerformanceSection_timeout_rate.value = numel(find(timeout_history))/n_completed_trials;
+  SessionPerformanceSection_timeout_rate.value = numel(find(timeout_history))/n_done_trials;
   SessionPerformanceSection_violation_recent.value = nan;
-  if n_completed_trials >= 20
+  if n_done_trials >= 20
       SessionPerformanceSection_timeout_recent.value = numel(find(timeout_history(end-19:end)))/20;
   else
       SessionPerformanceSection_timeout_recent.value = nan;
@@ -250,7 +250,7 @@ clear('ans');
 if ParamsSection_use_auto_train % do completion check if auto training
     stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
     % only run it if its the start of the day, number of trials is small
-    if n_completed_trials > 50
+    if n_done_trials > 50
         if value(PerformanceSummarySection_stage_2_TrialsValid) > value(TrainingStageParamsSection_total_trials) && ...
         value(TrainingStageParamsSection_trial_oppSide) > value(TrainingStageParamsSection_total_trials_opp)
             ParamsSection_training_stage.value = stage_no + 1;
@@ -324,9 +324,9 @@ if value(TrainingStageParamsSection_last_session_CP) == 0 && value(PerformanceSu
     ParamsSection_CP_duration.value = cp_min; % initialize to min_CP
 end
 
-if n_completed_trials < 1 % intialize to min value at the start of each session/day
+if n_done_trials < 1 % intialize to min value at the start of each session/day
     ParamsSection_CP_duration.value = value(ParamsSection_init_CP_duration);
-elseif n_completed_trials == 1
+elseif n_done_trials == 1
     ParamsSection_CP_duration.value = value(TrainingStageParamsSection_last_session_CP);
 else
     if ~timeout_history(end) && value(ParamsSection_CP_duration) < cp_max
@@ -339,7 +339,7 @@ else
 end
 callback(ParamsSection_CP_duration);
 
-if n_completed_trials > 0
+if n_done_trials > 0
     % Updating Disp Values for Training_Peformance_Summary
     PerformanceSummarySection_stage_3_Trials.value = value(PerformanceSummarySection_stage_3_Trials) + 1;
     PerformanceSummarySection_stage_3_TrialsToday.value = value(PerformanceSummarySection_stage_3_TrialsToday) + 1;
@@ -356,11 +356,11 @@ if n_completed_trials > 0
     callback(PerformanceSummarySection_stage_3_TrialsValid);
 
   % Updating Disp Values for Training_Peformance_Summary
-  SessionPerformanceSection_ntrials.value = n_completed_trials;
+  SessionPerformanceSection_ntrials.value = n_done_trials;
   SessionPerformanceSection_violation_rate.value = nan;
-  SessionPerformanceSection_timeout_rate.value = numel(find(timeout_history))/n_completed_trials;
+  SessionPerformanceSection_timeout_rate.value = numel(find(timeout_history))/n_done_trials;
   SessionPerformanceSection_violation_recent.value = nan;
-  if n_completed_trials >= 20
+  if n_done_trials >= 20
       SessionPerformanceSection_timeout_recent.value = numel(find(timeout_history(end-19:end)))/20;
   else
       SessionPerformanceSection_timeout_recent.value = nan;
@@ -469,9 +469,9 @@ if value(PerformanceSummarySection_stage_4_Trials) < 2
     ParamsSection_CP_duration.value = cp_min; % initialize to min_CP
 end
 
-if n_completed_trials == 0
+if n_done_trials == 0
     ParamsSection_CP_duration.value = value(ParamsSection_init_CP_duration);
-elseif n_completed_trials == 1
+elseif n_done_trials == 1
     ParamsSection_CP_duration.value = value(TrainingStageParamsSection_last_session_CP);
 else
     if ~violation_history(end) && ~timeout_history(end) && value(ParamsSection_CP_duration) < cp_max
@@ -488,7 +488,7 @@ end
 
 callback(ParamsSection_CP_duration);
 
-if n_completed_trials > 0
+if n_done_trials > 0
     % Updating Disp Values for Training_Peformance_Summary
     PerformanceSummarySection_stage_4_Trials.value = value(PerformanceSummarySection_stage_4_Trials) + 1;
     PerformanceSummarySection_stage_4_TrialsToday.value = value(PerformanceSummarySection_stage_4_TrialsToday) + 1;
@@ -505,10 +505,10 @@ if n_completed_trials > 0
     callback(PerformanceSummarySection_stage_4_TrialsValid);
 
   % Updating Disp Values for Training_Peformance_Summary
-  SessionPerformanceSection_ntrials.value = n_completed_trials;
-  SessionPerformanceSection_violation_rate.value = numel(find(violation_history))/n_completed_trials;
-  SessionPerformanceSection_timeout_rate.value = numel(find(timeout_history))/n_completed_trials;
-  if n_completed_trials >= 20
+  SessionPerformanceSection_ntrials.value = n_done_trials;
+  SessionPerformanceSection_violation_rate.value = numel(find(violation_history))/n_done_trials;
+  SessionPerformanceSection_timeout_rate.value = numel(find(timeout_history))/n_done_trials;
+  if n_done_trials >= 20
       SessionPerformanceSection_violation_recent.value = numel(find(violation_history(end-19:end)))/20;
       SessionPerformanceSection_timeout_recent.value = numel(find(timeout_history(end-19:end)))/20;
   else
@@ -539,7 +539,7 @@ clear('ans');
 %<COMPLETION_TEST>
 if ParamsSection_use_auto_train % do completion check if auto training
     cp_max = value(TrainingStageParamsSection_max_CP);
-    if value(ParamsSection_CP_duration) >= cp_max  && n_completed_trials > 100 && ...
+    if value(ParamsSection_CP_duration) >= cp_max  && n_done_trials > 100 && ...
             value(SessionPerformanceSection_violation_recent) < value(TrainingStageParamsSection_recent_violation) && ...
             value(SessionPerformanceSection_timeout_recent) < value(TrainingStageParamsSection_recent_timeout) && ...
             value(SessionPerformanceSection_violation_stage) < value(TrainingStageParamsSection_stage_violation)
@@ -621,9 +621,9 @@ end
 % Change the value of CP Duration
 % Since starting a new session then do a pre warm up to last saved cp
 % duration else continue with learning with increased poke time
-if n_completed_trials == 0
+if n_done_trials == 0
     ParamsSection_CP_duration.value = value(ParamsSection_init_CP_duration);
-elseif n_completed_trials == 1
+elseif n_done_trials == 1
     ParamsSection_CP_duration.value = starting_cp;
 else
     if ~violation_history(end) && ~timeout_history(end)
@@ -677,7 +677,7 @@ if value(ParamsSection_CP_duration) >= starting_cp
     callback(ParamsSection_A1_time);
 end
 
-if n_completed_trials > 0
+if n_done_trials > 0
     % Updating Disp Values for Training_Peformance_Summary
     PerformanceSummarySection_stage_5_Trials.value = value(PerformanceSummarySection_stage_5_Trials) + 1;
     PerformanceSummarySection_stage_5_TrialsToday.value = value(PerformanceSummarySection_stage_5_TrialsToday) + 1;
@@ -694,10 +694,10 @@ if n_completed_trials > 0
     callback(PerformanceSummarySection_stage_5_TrialsValid);
 
   % Updating Disp Values for Training_Peformance_Summary
-  SessionPerformanceSection_ntrials.value = n_completed_trials;
-  SessionPerformanceSection_violation_rate.value = numel(find(violation_history))/n_completed_trials;
-  SessionPerformanceSection_timeout_rate.value = numel(find(timeout_history))/n_completed_trials;
-  if n_completed_trials >= 20
+  SessionPerformanceSection_ntrials.value = n_done_trials;
+  SessionPerformanceSection_violation_rate.value = numel(find(violation_history))/n_done_trials;
+  SessionPerformanceSection_timeout_rate.value = numel(find(timeout_history))/n_done_trials;
+  if n_done_trials >= 20
       SessionPerformanceSection_violation_recent.value = numel(find(violation_history(end-19:end)))/20;
       SessionPerformanceSection_timeout_recent.value = numel(find(timeout_history(end-19:end)))/20;
   else
@@ -731,7 +731,7 @@ if ParamsSection_use_auto_train % do completion check if auto training
     stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
     if value(ParamsSection_CP_duration) >= value(TrainingStageParamsSection_max_CP) && value(PerformanceSummarySection_stage_5_TrialsValid) > value(TrainingStageParamsSection_total_trials)
         if value(SessionPerformanceSection_violation_recent) < value(TrainingStageParamsSection_recent_violation) && value(SessionPerformanceSection_timeout_recent) < value(TrainingStageParamsSection_recent_timeout) && ...
-                value(SessionPerformanceSection_violation_stage) < value(TrainingStageParamsSection_stage_violation) && n_completed_trials > 100
+                value(SessionPerformanceSection_violation_stage) < value(TrainingStageParamsSection_stage_violation) && n_done_trials > 100
             ParamsSection_training_stage.value = stage_no + 1;
             callback(ParamsSection_training_stage);
             ParamsSection(obj, 'Changed_Training_Stage');
@@ -806,9 +806,9 @@ if stage_no ~= value(ParamsSection_training_stage)
 end
 
 % Warm Up If starting a new session
-if n_completed_trials == 0
+if n_done_trials == 0
     ParamsSection_CP_duration.value = value(ParamsSection_init_CP_duration);
-elseif n_completed_trials == 1
+elseif n_done_trials == 1
     ParamsSection_CP_duration.value = starting_cp;
 else
     if value(ParamsSection_CP_duration) < cp_max  % warm up stage
@@ -846,7 +846,7 @@ if value(ParamsSection_CP_duration) >= starting_cp
     callback(ParamsSection_A1_time);
 end
 
-if n_completed_trials > 0
+if n_done_trials > 0
     % Updating Disp Values for Training_Peformance_Summary
     PerformanceSummarySection_stage_6_Trials.value = value(PerformanceSummarySection_stage_6_Trials) + 1;
     PerformanceSummarySection_stage_6_TrialsToday.value = value(PerformanceSummarySection_stage_6_TrialsToday) + 1;
@@ -863,10 +863,10 @@ if n_completed_trials > 0
     callback(PerformanceSummarySection_stage_6_TrialsValid);
 
   % Updating Disp Values for SessionPerformanceSection
-  SessionPerformanceSection_ntrials.value = n_completed_trials;
-  SessionPerformanceSection_violation_rate.value = numel(find(violation_history))/n_completed_trials;
-  SessionPerformanceSection_timeout_rate.value = numel(find(timeout_history))/n_completed_trials;
-  if n_completed_trials >= 20
+  SessionPerformanceSection_ntrials.value = n_done_trials;
+  SessionPerformanceSection_violation_rate.value = numel(find(violation_history))/n_done_trials;
+  SessionPerformanceSection_timeout_rate.value = numel(find(timeout_history))/n_done_trials;
+  if n_done_trials >= 20
       SessionPerformanceSection_violation_recent.value = numel(find(violation_history(end-19:end)))/20;
       SessionPerformanceSection_timeout_recent.value = numel(find(timeout_history(end-19:end)))/20;
   else
@@ -900,7 +900,7 @@ if ParamsSection_use_auto_train % do completion check if auto training
     stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
     if value(PerformanceSummarySection_stage_6_TrialsValid) > value(TrainingStageParamsSection_total_trials)
         if value(SessionPerformanceSection_violation_recent) < value(TrainingStageParamsSection_recent_violation) && value(SessionPerformanceSection_timeout_recent) < value(TrainingStageParamsSection_recent_timeout) && ...
-                value(SessionPerformanceSection_violation_stage) < value(TrainingStageParamsSection_stage_violation) && n_completed_trials > 100
+                value(SessionPerformanceSection_violation_stage) < value(TrainingStageParamsSection_stage_violation) && n_done_trials > 100
             ParamsSection_training_stage.value = stage_no + 1;
             callback(ParamsSection_training_stage);
             ParamsSection(obj, 'Changed_Training_Stage');
@@ -984,10 +984,10 @@ end
 
 % Warm Up If starting a new session
 if warm_up_on == 1
-    if n_completed_trials == 0
+    if n_done_trials == 0
         ParamsSection_CP_duration.value = value(ParamsSection_init_CP_duration);
         warmup_completed = 0;
-    elseif n_completed_trials == 1
+    elseif n_done_trials == 1
         ParamsSection_CP_duration.value = starting_cp;
     else
         if value(ParamsSection_CP_duration) <= cp_max  % warm up stage
@@ -1009,7 +1009,7 @@ else
     warmup_completed = 1;
 end
 
-if n_completed_trials >= 1
+if n_done_trials >= 1
     cp_length = value(ParamsSection_CP_duration) - value(ParamsSection_SettlingIn_time);
     [ParamsSection_PreStim_time.value ,ParamsSection_A1_time.value,ParamsSection_time_bet_aud1_gocue.value] = param_time_within_range(warmup_completed,...
         cp_length,prestim_min,prestim_max, random_prestim, prestim_time,...
@@ -1022,7 +1022,7 @@ if n_completed_trials >= 1
 end
 callback(ParamsSection_CP_duration);
 
-if n_completed_trials > 0
+if n_done_trials > 0
     % Updating Disp Values for Training_Peformance_Summary
     PerformanceSummarySection_stage_7_Trials.value = value(PerformanceSummarySection_stage_7_Trials) + 1;
     PerformanceSummarySection_stage_7_TrialsToday.value = value(PerformanceSummarySection_stage_7_TrialsToday) + 1;
@@ -1039,10 +1039,10 @@ if n_completed_trials > 0
     callback(PerformanceSummarySection_stage_7_TrialsValid);
 
   % Updating Disp Values for SessionPerformanceSection
-  SessionPerformanceSection_ntrials.value = n_completed_trials;
-  SessionPerformanceSection_violation_rate.value = numel(find(violation_history))/n_completed_trials;
-  SessionPerformanceSection_timeout_rate.value = numel(find(timeout_history))/n_completed_trials;
-  if n_completed_trials >= 20
+  SessionPerformanceSection_ntrials.value = n_done_trials;
+  SessionPerformanceSection_violation_rate.value = numel(find(violation_history))/n_done_trials;
+  SessionPerformanceSection_timeout_rate.value = numel(find(timeout_history))/n_done_trials;
+  if n_done_trials >= 20
       SessionPerformanceSection_violation_recent.value = numel(find(violation_history(end-19:end)))/20;
       SessionPerformanceSection_timeout_recent.value = numel(find(timeout_history(end-19:end)))/20;
   else
@@ -1156,10 +1156,10 @@ end
 
 % Warm Up If starting a new session
 if warm_up_on == 1
-    if n_completed_trials == 0
+    if n_done_trials == 0
         ParamsSection_CP_duration.value = value(ParamsSection_init_CP_duration);
         warmup_completed = 0;
-    elseif n_completed_trials == 1
+    elseif n_done_trials == 1
         ParamsSection_CP_duration.value = starting_cp;
     else
         if value(ParamsSection_CP_duration) <= cp_max  % warm up stage
@@ -1181,7 +1181,7 @@ else
     warmup_completed = 1;
 end
 
-if n_completed_trials >= 1
+if n_done_trials >= 1
     cp_length = value(ParamsSection_CP_duration) - value(ParamsSection_SettlingIn_time);
     [ParamsSection_PreStim_time.value ,ParamsSection_A1_time.value,ParamsSection_time_bet_aud1_gocue.value] = param_time_within_range(warmup_completed,...
         cp_length,prestim_min,prestim_max, random_prestim, prestim_time,...
@@ -1194,7 +1194,7 @@ if n_completed_trials >= 1
 end
 callback(ParamsSection_CP_duration);
 
-if n_completed_trials > 0
+if n_done_trials > 0
     % Updating Disp Values for Training_Peformance_Summary
     PerformanceSummarySection_stage_8_Trials.value = value(PerformanceSummarySection_stage_8_Trials) + 1;
     PerformanceSummarySection_stage_8_TrialsToday.value = value(PerformanceSummarySection_stage_8_TrialsToday) + 1;
@@ -1211,10 +1211,10 @@ if n_completed_trials > 0
     callback(PerformanceSummarySection_stage_8_TrialsValid);
 
   % Updating Disp Values for SessionPerformanceSection
-  SessionPerformanceSection_ntrials.value = n_completed_trials;
-  SessionPerformanceSection_violation_rate.value = numel(find(violation_history))/n_completed_trials;
-  SessionPerformanceSection_timeout_rate.value = numel(find(timeout_history))/n_completed_trials;
-  if n_completed_trials >= 20
+  SessionPerformanceSection_ntrials.value = n_done_trials;
+  SessionPerformanceSection_violation_rate.value = numel(find(violation_history))/n_done_trials;
+  SessionPerformanceSection_timeout_rate.value = numel(find(timeout_history))/n_done_trials;
+  if n_done_trials >= 20
       SessionPerformanceSection_violation_recent.value = numel(find(violation_history(end-19:end)))/20;
       SessionPerformanceSection_timeout_recent.value = numel(find(timeout_history(end-19:end)))/20;
   else

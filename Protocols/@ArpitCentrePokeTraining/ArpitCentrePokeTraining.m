@@ -188,6 +188,20 @@ switch action
     
     [x, y] = BonsaiCameraInterface(obj,'init',x,y,name,expmtr,rname);
 
+    % Before Loading the TrainingStageParamsSection, let me first check if
+    % the setting file exist for this rat and only load the training stage
+    % Problem: Loading settings in later stages fails because the stage-dependent
+    % TrainingStageParamsSection's solohandles are not visible after initial setup.
+    % Solution: This section handles a specific scenario for loading setting files during initialization.
+    % Although also invoked in Runrats, calling it here is crucial. The
+    % TrainingStageParamsSection's parameters are initially set at stage 1 and are visible.
+    % However, they become stage-dependent. Subsequent stages lack visible solohandles for
+    % these parameters, preventing proper loading. This initialization provides a workaround
+    % to avoid significant changes required to load stage-specific solohandles and maintain
+    % broader compatibility.
+
+    set_training_stage_last_setting_file(name,expmtr,rname)
+
     next_column(x); y=5;
     [stage_fig_x,stage_fig_y] = TrainingStageParamsSection(obj, 'init', x, y);
     SoloParamHandle(obj, 'stage_fig_x', 'value', stage_fig_x);
@@ -212,16 +226,18 @@ switch action
 % these parameters, preventing proper loading. This initialization provides a workaround
 % to avoid significant changes required to load stage-specific solohandles and maintain
 % broader compatibility.
-    try
-        [~, ~]=load_solouiparamvalues(rname,'experimenter',expmtr,...
-            'owner',name,'interactive',0);
-    catch
-    end
-    %%
+    
+%     try
+%         [~, ~]=load_solouiparamvalues(rname,'experimenter',expmtr,...
+%             'owner',name,'interactive',0);
+%     catch
+%     end
+     %%
     % feval(mfilename, obj, 'prepare_next_trial'); % Commented out because it is also run by Runrats(while loading the protocol)
           
     %%% 
 
+   
    %% change_water_modulation_params
    case 'change_water_modulation_params'
 	   display_guys = [1 150 300];
@@ -242,7 +258,7 @@ switch action
 
        ParamsSection(obj, 'prepare_next_trial');
 
-    % push_helper_vars_tosql(obj,n_completed_trials); 
+    % push_helper_vars_tosql(obj,n_done_trials); 
        
        SessionDefinition(obj, 'next_trial');
        
