@@ -136,7 +136,7 @@ function [err] = CentrePoketrainingsummary(obj, varargin)
             'left_poke'...				VARCHAR
             'right_poke'...				VARCHAR
             'comments'...				VARCHAR
-            'tech_notes']; % total 63 columns
+            'tech_notes'];
 
             
 
@@ -163,53 +163,12 @@ function [err] = CentrePoketrainingsummary(obj, varargin)
             '"{S}",', ...     % right_pokes
             '"{S}",', ...     % technotes
             '"{S}"'           % IP_addr
-            '"{S}",', ...     % ratname
-            '"{S}",', ...     % hostname
-            '"{S}",', ...     % experimenter
-            '"{S}",', ...     % endtime
-            '"{S}",', ...     % starttime
-            '"{S}",', ...     % sessiondate
-            '"{S}",', ...     % protocol
-            '"{S}",', ...     % n_done_trials
-            '"{S}",', ...     % total_correct
-            '"{S}",', ...     % right_correct
-            '"{S}",', ...     % left_correct
-            '"{S}",', ...     % percent_violations
-            '"{S}",', ...     % protocol_data
-            '"{S}",', ...     % comments
-            '"{S}",', ...     % data_file
-            '"{S}",', ...     % data_path
-            '"{S}",', ...     % left_pokes
-            '"{S}",', ...     % center_pokes
-            '"{S}",', ...     % right_pokes
-            '"{S}",', ...     % technotes
-            '"{S}"'           % IP_addr
-            '"{S}",', ...     % ratname
-            '"{S}",', ...     % hostname
-            '"{S}",', ...     % experimenter
-            '"{S}",', ...     % endtime
-            '"{S}",', ...     % starttime
-            '"{S}",', ...     % sessiondate
-            '"{S}",', ...     % protocol
-            '"{S}",', ...     % n_done_trials
-            '"{S}",', ...     % total_correct
-            '"{S}",', ...     % right_correct
-            '"{S}",', ...     % left_correct
-            '"{S}",', ...     % percent_violations
-            '"{S}",', ...     % protocol_data
-            '"{S}",', ...     % comments
-            '"{S}",', ...     % data_file
-            '"{S}",', ...     % data_path
-            '"{S}",', ...     % left_pokes
-            '"{S}",', ...     % center_pokes
-            '"{S}",', ...     % right_pokes
-            '"{S}",', ...     % technotes
         ];
 
 
 
         %% Construct SQL string
-        sqlstr = ['insert into CentrePokeTraining (' strtrim(colstr) ') values (' strtrim(valstr) ')'];
+        sqlstr = ['insert into sessions (' strtrim(colstr) ') values (' strtrim(valstr) ')'];
 
         
         %% Execute SQL Query

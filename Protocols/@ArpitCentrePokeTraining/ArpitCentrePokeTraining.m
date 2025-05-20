@@ -327,25 +327,28 @@ switch action
     % sendsummary(obj);
     perf = struct([]);
     perf = PerformanceSummarySection(obj, 'evaluate');
-    [perf.violation_rate,perf.timeout_rate] = SessionPerformanceSection(obj, 'evaluate');
-     
-    CentrePoketrainingsummary(obj,perf);
-    % cp_durs = ParamsSection(obj, 'get_cp_history');
-    % [stim1dur] = ParamsSection(obj,'get_stimdur_history');
-    % pd.hits=hit_history(:);
-    % pd.sides=previous_sides(:);
-    % pd.viols=violation_history(:);
-    % pd.timeouts=timeout_history(:);
-    % pd.cp_durs=cp_durs(:);
-    % pd.stim1dur=stim1dur(:);
+    [violation_rate,timeout_rate] = SessionPerformanceSection(obj, 'evaluate');
+    perf.violation_rate = violation_rate;
+    perf.timeout_rate = timeout_rate;
+
+    stage  = ParamsSection(obj,'get_stage');
+    perf.stage_no = stage;
+
+    stage_name_list = {'Familiarize with Reward Side Pokes','Timeout Rewarded Side Pokes'...
+        'Introduce Centre Poke','Introduce Violation for Centre Poke',...
+        'Introduce Stimuli Sound during Centre Poke','Vary Stimuli location during Centre Poke'...
+        'Variable Stimuli Go Cue location during Centre Poke','User Setting'};
+
+    perf.stage_name = stage_name_list{stage};
+    perf.video_filepath = value(Video_Saving_Folder);
+    
+    CentrePoketrainingsummary(obj,'protocol_data',perf);
     
 % 	CommentsSection(obj, 'append_line', ...
 % 		sprintf(['ntrials = %d, violations = %.2f, timeouts=%.2f, hits = %.2f\n', ...
 % 		'pre-Go cue went from %.3f to %.3f  (delta=%.3f)\n', ...
 %         'Low = %.2f, High = %.2f'], ...
 % 		perf(1), perf(2), perf(3), perf(6), cp_durs(1), cp_durs(end), cp_durs(end)-cp_durs(1), classperf(1),classperf(2)));
-    
-    % sendsummary(obj,'protocol_data',pd);    
       
       %% otherwise
     otherwise
