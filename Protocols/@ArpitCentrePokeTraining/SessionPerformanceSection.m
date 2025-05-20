@@ -84,7 +84,7 @@ switch action
 	case 'evaluate'
     		
         if nargout > 0
-            x = [n_completed_trials, value(ntrials_stage), value(violation_rate), value(timeout_rate), value(violation_recent), ...
+            x = [n_done_trials, value(ntrials_stage), value(violation_rate), value(timeout_rate), value(violation_recent), ...
                 value(timeout_recent), value(violation_stage), value(timeout_stage)];
         end
 		

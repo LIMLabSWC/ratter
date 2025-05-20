@@ -197,14 +197,14 @@ switch action
         % Calculate individual group width based on screen dimensions and number of groups
         groupwidth = floor((MP(3)/2)/numel(linegroups));
 
-        padding = 10 % padding around GUI elements
+        padding = 10; % padding around GUI elements
 
         % Calculate total width needed for all groups combined
         total_width = floor(numel(linegroups) * groupwidth+padding);
-        total_height = 400 % total height of GUI
+        total_height = 400; % total height of GUI
         
-        label_height = 140 % height of port label
-        button_height = 25
+        label_height = 140; % height of port label
+        button_height = 25;
 
         % Center the GUI horizontally on screen
         left_pos = floor((MP(3) - total_width) / 2);
