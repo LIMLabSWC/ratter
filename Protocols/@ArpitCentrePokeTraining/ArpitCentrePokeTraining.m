@@ -323,9 +323,13 @@ switch action
 
     % Sending protocol data as structure is causing error in saving bdata,
     % instead not sending it asif required can be taken from session data
-    sendsummary(obj);
     
-    % perf    = SessionPerformanceSection(obj, 'evaluate');
+    % sendsummary(obj);
+    perf = struct([]);
+    perf = PerformanceSummarySection(obj, 'evaluate');
+    [perf.violation_rate,perf.timeout_rate] = SessionPerformanceSection(obj, 'evaluate');
+     
+    CentrePoketrainingsummary(obj,perf);
     % cp_durs = ParamsSection(obj, 'get_cp_history');
     % [stim1dur] = ParamsSection(obj,'get_stimdur_history');
     % pd.hits=hit_history(:);
