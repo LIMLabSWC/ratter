@@ -188,8 +188,9 @@ switch action
     
     [x, y] = BonsaiCameraInterface(obj,'init',x,y,name,expmtr,rname);
 
-    % Before Loading the TrainingStageParamsSection, let me first check if
+    % Before the TrainingStageParamsSection, let's first check if
     % the setting file exist for this rat and only load the training stage
+    % from there.
     % Problem: Loading settings in later stages fails because the stage-dependent
     % TrainingStageParamsSection's solohandles are not visible after initial setup.
     % Solution: This section handles a specific scenario for loading setting files during initialization.
