@@ -1,6 +1,7 @@
 function create_ArpitCentrePokeTraining_SettingFile()
 
 templateDir = 'C:/ratter/';
+templateDir = '/Users/AkramiLab_Arpit/Documents/AkramiLabScripts/ratter';
 
 templatePath = [templateDir '/Protocols/@ArpitCentrePokeTraining/private/pipeline_ArpitCentrePokeTraining_arpit_AR05_250516.m'];
 setting_filename = 'settings_@ArpitCentrePokeTraining_arpit_AR05_250516a.mat';
