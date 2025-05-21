@@ -446,7 +446,7 @@ switch action
     case 'get_stage'
 
         x = value(training_stage);
-        y = value(CP_Duration);
+        y = value(CP_duration);
 
 	case 'get_previous_sides'
 		x = value(previous_sides); %#ok<NODEF>

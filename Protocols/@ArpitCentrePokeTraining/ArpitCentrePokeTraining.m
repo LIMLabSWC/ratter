@@ -327,7 +327,7 @@ switch action
     % sendsummary(obj);
     perf = struct([]);
     perf = PerformanceSummarySection(obj, 'evaluate');
-    [perf.violation_rate,perf.timeout_rate] = SessionPerformanceSection(obj, 'evaluate');
+    [perf.violation_percent,perf.timeout_percent] = SessionPerformanceSection(obj, 'evaluate');
 
     [perf.stage_no,perf.CP_Duration]  = ParamsSection(obj,'get_stage');
     stage_name_list = {'Familiarize with Reward Side Pokes','Timeout Rewarded Side Pokes'...
