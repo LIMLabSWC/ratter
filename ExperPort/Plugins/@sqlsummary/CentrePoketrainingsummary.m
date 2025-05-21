@@ -44,12 +44,12 @@ function [err] = CentrePoketrainingsummary(obj, varargin)
         [pth, fl] = extract_path(data_file);
         
         %% Calculate Violation Percentage
-        if isfield(protocol_data, 'violation_rate')
-            percent_violations = perf.violation_rate;
-        else
-            percent_violations = [];
-        end
-        
+        % if isfield(protocol_data, 'violation_rate')
+        %     percent_violations = perf.violation_rate;
+        % else
+        %     percent_violations = [];
+        % end
+        % 
         %% Calculate Poke Counts
         left_pokes = 0;
         center_pokes = 0;
@@ -74,138 +74,136 @@ function [err] = CentrePoketrainingsummary(obj, varargin)
         
         %% Define SQL columns and placeholders
         colstr = [
-            'sessid',...
-            'sessiondate'...				DATE
-            'starttime'...				TIME
-            'endtime'...				TIME
-            'ratname'...					VARCHAR
-            'experimenter'...			VARCHAR
-            'protocol'...					VARCHAR
-            'hostname'...				VARCHAR
-            'IP_address'...				VARCHAR
-            'training_stage_no'...		 	INT
-            'training_stage_name'...		VARCHAR
-            'n_done_trials'...				INT
-            'percent_violations'...		VARCHAR
-            'percent_timeout'...			VARCHAR
-            'stage1_trials_total'...		INT
-            'stage1_trials_today'...		INT
-            'stage1_trials_valid'...		INT
-            'stage1_percent_violation'... 	VARCHAR
-            'stage1_percent_timeout'...	VARCHAR
-            'stage2_trials_total'...		INT
-            'stage2_trials_today'...		INT
-            'stage2_trials_valid'...		INT
-            'stage2_percent_violation'... 	VARCHAR
-            'stage2_percent_timeout'...	VARCHAR
-            'stage3_trials_total'...		INT
-            'stage3_trials_today'...		INT
-            'stage3_trials_valid'...		INT
-            'stage3_percent_violation'... 	VARCHAR
-            'stage3_percent_timeout'...	VARCHAR
-            'stage4_trials_total'...		INT
-            'stage4_trials_today'...		INT
-            'stage4_trials_valid'...		INT
-            'stage4_percent_violation'... 	VARCHAR
-            'stage4_percent_timeout'...	VARCHAR
-            'stage5_trials_total'...		INT
-            'stage5_trials_today'...		INT
-            'stage5_trials_valid'...		INT
-            'stage5_percent_violation'... 	VARCHAR
-            'stage5_percent_timeout'...	VARCHAR
-            'stage6_trials_total'...		INT
-            'stage6_trials_today'...		INT
-            'stage6_trials_valid'...		INT
-            'stage6_percent_violation'... 	VARCHAR
-            'stage6_percent_timeout'...	VARCHAR
-            'stage7_trials_total'...		INT
-            'stage7_trials_today'...		INT
-            'stage7_trials_valid'...		INT
-            'stage7_percent_violation'... 	VARCHAR
-            'stage7_percent_timeout'...	VARCHAR
-            'stage8_trials_total'...		INT
-            'stage8_trials_today'...		INT
-            'stage8_trials_valid'...		INT
-            'stage8_percent_violation'... 	VARCHAR
-            'stage8_percent_timeout'...	VARCHAR
-            'datafile'...					VARCHAR
-            'datapath'...				VARCHAR
-            'videofile'...					VARCHAR
-            'videopath'...				VARCHAR
-            'centre_poke'...			VARCHAR
-            'left_poke'...				VARCHAR
-            'right_poke'...				VARCHAR
-            'comments'...				VARCHAR
+            'sessid, ',...
+            'sessiondate, '...				DATE
+            'starttime, '...				TIME
+            'endtime, '...				TIME
+            'ratname, '...					VARCHAR
+            'experimenter, '...			VARCHAR
+            'protocol, '...					VARCHAR
+            'hostname, '...				VARCHAR
+            'IP_address, '...				VARCHAR
+            'training_stage_no, '...		 	INT
+            'training_stage_name, '...		VARCHAR
+            'n_done_trials, '...				INT
+            'percent_violations, '...		VARCHAR
+            'percent_timeout, '...			VARCHAR
+            'stage1_trials_total, '...		INT
+            'stage1_trials_today, '...		INT
+            'stage1_trials_valid, '...		INT
+            'stage1_percent_violation, '... 	VARCHAR
+            'stage1_percent_timeout, '...	VARCHAR
+            'stage2_trials_total, '...		INT
+            'stage2_trials_today, '...		INT
+            'stage2_trials_valid, '...		INT
+            'stage2_percent_violation, '... 	VARCHAR
+            'stage2_percent_timeout, '...	VARCHAR
+            'stage3_trials_total, '...		INT
+            'stage3_trials_today, '...		INT
+            'stage3_trials_valid, '...		INT
+            'stage3_percent_violation, '... 	VARCHAR
+            'stage3_percent_timeout, '...	VARCHAR
+            'stage4_trials_total, '...		INT
+            'stage4_trials_today, '...		INT
+            'stage4_trials_valid, '...		INT
+            'stage4_percent_violation, '... 	VARCHAR
+            'stage4_percent_timeout, '...	VARCHAR
+            'stage5_trials_total, '...		INT
+            'stage5_trials_today, '...		INT
+            'stage5_trials_valid, '...		INT
+            'stage5_percent_violation, '... 	VARCHAR
+            'stage5_percent_timeout, '...	VARCHAR
+            'stage6_trials_total, '...		INT
+            'stage6_trials_today, '...		INT
+            'stage6_trials_valid, '...		INT
+            'stage6_percent_violation, '... 	VARCHAR
+            'stage6_percent_timeout, '...	VARCHAR
+            'stage7_trials_total, '...		INT
+            'stage7_trials_today, '...		INT
+            'stage7_trials_valid, '...		INT
+            'stage7_percent_violation, '... 	VARCHAR
+            'stage7_percent_timeout, '...	VARCHAR
+            'stage8_trials_total, '...		INT
+            'stage8_trials_today, '...		INT
+            'stage8_trials_valid, '...		INT
+            'stage8_percent_violation, '... 	VARCHAR
+            'stage8_percent_timeout, '...	VARCHAR
+            'datafile, '...					VARCHAR
+            'datapath, '...				VARCHAR
+            'videofile, '...					VARCHAR
+            'videopath, '...				VARCHAR
+            'centre_poke, '...			VARCHAR
+            'left_poke, '...				VARCHAR
+            'right_poke, '...				VARCHAR
+            'comments, '...				VARCHAR
             'tech_notes']; % total 63 columns
 
             
-
-        valstr = [
+valstr = [
             '"{Si}",', ...    % sessid
-            '"{S}",', ...     % ratname
-            '"{S}",', ...     % hostname
-            '"{S}",', ...     % experimenter
-            '"{S}",', ...     % endtime
-            '"{S}",', ...     % starttime
             '"{S}",', ...     % sessiondate
+            '"{S}",', ...     % starttime
+            '"{S}",', ...     % endtime
+            '"{S}",', ...     % ratname
+            '"{S}",', ...     % experimenter
             '"{S}",', ...     % protocol
+            '"{S}",', ...     % hostname
+            '"{S}",', ...     % IP_address
+            '"{S}",', ...     % training_stage_no
+            '"{S}",', ...     % training_stage_name
             '"{S}",', ...     % n_done_trials
-            '"{S}",', ...     % total_correct
-            '"{S}",', ...     % right_correct
-            '"{S}",', ...     % left_correct
             '"{S}",', ...     % percent_violations
-            '"{S}",', ...     % protocol_data
-            '"{S}",', ...     % comments
-            '"{S}",', ...     % data_file
-            '"{S}",', ...     % data_path
+            '"{S}",', ...     % percent_timeout
+            '"{S}",', ...     % stage1_trials_total
+            '"{S}",', ...     % stage1_trials_today
+            '"{S}",', ...     % stage1_trials_valid
+            '"{S}",', ...     % stage1_percent_violation
+            '"{S}",', ...     % stage1_percent_timeout
+            '"{S}",', ...     % stage2_trials_total
+            '"{S}",', ...     % stage2_trials_today
+            '"{S}",', ...     % stage2_trials_valid
+            '"{S}",', ...     % stage2_percent_violation
+            '"{S}",', ...     % stage2_percent_timeout
+            '"{S}",', ...     % stage3_trials_total
+            '"{S}",', ...     % stage3_trials_today
+            '"{S}",', ...     % stage3_trials_valid
+            '"{S}",', ...     % stage3_percent_violation
+            '"{S}",', ...     % stage3_percent_timeout
+            '"{S}",', ...     % stage4_trials_total
+            '"{S}",', ...     % stage4_trials_today
+            '"{S}",', ...     % stage4_trials_valid
+            '"{S}",', ...     % stage4_percent_violation
+            '"{S}",', ...     % stage4_percent_timeout
+            '"{S}",', ...     % stage5_trials_total
+            '"{S}",', ...     % stage5_trials_today
+            '"{S}",', ...     % stage5_trials_valid
+            '"{S}",', ...     % stage5_percent_violation
+            '"{S}",', ...     % stage5_percent_timeout
+            '"{S}",', ...     % stage6_trials_total
+            '"{S}",', ...     % stage6_trials_today
+            '"{S}",', ...     % stage6_trials_valid
+            '"{S}",', ...     % stage6_percent_violation
+            '"{S}",', ...     % stage6_percent_timeout
+            '"{S}",', ...     % stage7_trials_total
+            '"{S}",', ...     % stage7_trials_today
+            '"{S}",', ...     % stage7_trials_valid
+            '"{S}",', ...     % stage7_percent_violation
+            '"{S}",', ...     % stage7_percent_timeout
+            '"{S}",', ...     % stage8_trials_total
+            '"{S}",', ...     % stage8_trials_today
+            '"{S}",', ...     % stage8_trials_valid
+            '"{S}",', ...     % stage8_percent_violation
+            '"{S}",', ...     % stage8_percent_timeout
+            '"{S}",', ...     % datafile
+            '"{S}",', ...     % datapath
+            '"{S}",', ...     % video_path
+            '"{S}",', ...     % videofile
             '"{S}",', ...     % left_pokes
             '"{S}",', ...     % center_pokes
             '"{S}",', ...     % right_pokes
-            '"{S}",', ...     % technotes
-            '"{S}"'           % IP_addr
-            '"{S}",', ...     % ratname
-            '"{S}",', ...     % hostname
-            '"{S}",', ...     % experimenter
-            '"{S}",', ...     % endtime
-            '"{S}",', ...     % starttime
-            '"{S}",', ...     % sessiondate
-            '"{S}",', ...     % protocol
-            '"{S}",', ...     % n_done_trials
-            '"{S}",', ...     % total_correct
-            '"{S}",', ...     % right_correct
-            '"{S}",', ...     % left_correct
-            '"{S}",', ...     % percent_violations
-            '"{S}",', ...     % protocol_data
             '"{S}",', ...     % comments
-            '"{S}",', ...     % data_file
-            '"{S}",', ...     % data_path
-            '"{S}",', ...     % left_pokes
-            '"{S}",', ...     % center_pokes
-            '"{S}",', ...     % right_pokes
-            '"{S}",', ...     % technotes
-            '"{S}"'           % IP_addr
-            '"{S}",', ...     % ratname
-            '"{S}",', ...     % hostname
-            '"{S}",', ...     % experimenter
-            '"{S}",', ...     % endtime
-            '"{S}",', ...     % starttime
-            '"{S}",', ...     % sessiondate
-            '"{S}",', ...     % protocol
-            '"{S}",', ...     % n_done_trials
-            '"{S}",', ...     % total_correct
-            '"{S}",', ...     % right_correct
-            '"{S}",', ...     % left_correct
-            '"{S}",', ...     % percent_violations
-            '"{S}",', ...     % protocol_data
-            '"{S}",', ...     % comments
-            '"{S}",', ...     % data_file
-            '"{S}",', ...     % data_path
-            '"{S}",', ...     % left_pokes
-            '"{S}",', ...     % center_pokes
-            '"{S}",', ...     % right_pokes
             '"{S}",', ...     % technotes
         ];
-
 
 
         %% Construct SQL string
@@ -215,28 +213,69 @@ function [err] = CentrePoketrainingsummary(obj, varargin)
         %% Execute SQL Query
         bdata(sqlstr, ... 
             sessid, ... 
-            ratname, ...
-            hostname, ...
-            experimenter, ... 
-            endtime, ...
-            starttime, ...
             sessiondate, ...
+            starttime, ...
+            endtime, ...
+            ratname, ...
+            experimenter, ... 
             protocol, ...
+            hostname, ...
+            IP_addr, ...
+            protocol_data.stage_no, ...
+            protocol_data.stage_name, ...
             n_done_trials, ...
-            total_correct, ...
-            right_correct, ...
-            left_correct, ...
-            percent_violations, ...
-            protocol_data, ...
-            last_comment, ...
-            fl, ...
+            protocol_data.violation_percent, ...
+            protocol_data.timeout_percent, ...
+            protocol_data.stage1_trials_total, ...
+            protocol_data.stage1_trials_today, ...
+            protocol_data.stage1_trials_valid, ...
+            protocol_data.stage1_violationrate, ...
+            protocol_data.stage1_timeoutrate, ...
+            protocol_data.stage2_trials_total, ...
+            protocol_data.stage2_trials_today, ...
+            protocol_data.stage2_trials_valid, ...
+            protocol_data.stage2_violationrate, ...
+            protocol_data.stage2_timeoutrate, ...
+            protocol_data.stage3_trials_total, ...
+            protocol_data.stage3_trials_today, ...
+            protocol_data.stage3_trials_valid, ...
+            protocol_data.stage3_violationrate, ...
+            protocol_data.stage3_timeoutrate, ...
+            protocol_data.stage4_trials_total, ...
+            protocol_data.stage4_trials_today, ...
+            protocol_data.stage4_trials_valid, ...
+            protocol_data.stage4_violationrate, ...
+            protocol_data.stage4_timeoutrate, ...
+            protocol_data.stage5_trials_total, ...
+            protocol_data.stage5_trials_today, ...
+            protocol_data.stage5_trials_valid, ...
+            protocol_data.stage5_violationrate, ...
+            protocol_data.stage5_timeoutrate, ...
+            protocol_data.stage6_trials_total, ...
+            protocol_data.stage6_trials_today, ...
+            protocol_data.stage6_trials_valid, ...
+            protocol_data.stage6_violationrate, ...
+            protocol_data.stage6_timeoutrate, ...
+            protocol_data.stage7_trials_total, ...
+            protocol_data.stage7_trials_today, ...
+            protocol_data.stage7_trials_valid, ...
+            protocol_data.stage7_violationrate, ...
+            protocol_data.stage7_timeoutrate, ...
+            protocol_data.stage8_trials_total, ...
+            protocol_data.stage8_trials_today, ...
+            protocol_data.stage8_trials_valid, ...
+            protocol_data.stage8_violationrate, ...
+            protocol_data.stage8_timeoutrate, ...
             pth, ...
+            fl, ...
+            perf.video_filepath, ...
+            perf.CP_Duration, ....
             left_pokes, ...
             center_pokes, ...
             right_pokes, ...
-            technotes, ...
-            IP_addr ...
-        );
+            last_comment, ...
+            technotes...
+            );
 
         % Log successful execution
         fprintf('No errors encountered during sendsummary execution.\n');
