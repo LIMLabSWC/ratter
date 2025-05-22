@@ -661,7 +661,6 @@ cp_minimum_increment = 0.001;
 starting_cp = value(TrainingStageParamsSection_starting_CP) + value(ParamsSection_SettlingIn_time);
 n_trial_warmup = value(TrainingStageParamsSection_warm_up_trials);
 cp_range = cp_max - cp_min;
-
 a1_min = 0.1;
 a1_max = 0.4;
 
@@ -679,7 +678,7 @@ curr_CP = value(ParamsSection_CP_duration);
 if n_done_trials == 0
     new_CP = init_CP_duration;
 
-elseif n_done_trials <= n_trial_warmup && n_done_trials > 0
+elseif n_done_trials <= n_trial_warmup
     cp_delta = (last_CP - init_CP_duration) / n_trial_warmup;
     new_CP = init_CP_duration + cp_delta * n_done_trials;
     if new_CP < starting_cp
@@ -692,6 +691,8 @@ else
             increment = cp_minimum_increment;
         end
         new_CP = curr_CP + increment;
+    else
+        new_CP = curr_CP;
     end
 end
 ParamsSection_CP_duration.value = min(new_CP, cp_max);

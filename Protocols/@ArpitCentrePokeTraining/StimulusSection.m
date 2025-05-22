@@ -112,7 +112,9 @@ switch action
         next_row(y);
     	NumeditParam(obj,'maxF1',10,x,y,'label','maxF1','TooltipString','max frequency value for AUD1');
         set_callback(maxF1, {mfilename, 'Cal_Boundary'});
-        next_row(y);   
+        next_row(y); 
+        NumeditParam(obj,'volumeF1',0.007,x,y,'label','VolumeF1','TooltipString','volume of tone for AUD1');
+        next_row(y);
         DispParam(obj, 'A1_freq', 0.01, x,y,'label','A1_freq','TooltipString','Sigma value for the first stimulus');
     	next_row(y);
     	DispParam(obj,'boundary',-3.9,x,y,'label','boundary(log)','TooltipString','decision boundary for categorisation (log)');
@@ -158,7 +160,7 @@ switch action
                 dur1 = A1_time*1000;
                 bal=0;
                 freq1=A1_freq*1000;
-                vol=0.001;
+                vol=value(volumeF1);
                 RVol=vol*min(1,(1+bal));
                 LVol=vol*min(1,(1-bal));
                 t=0:(1/srate):(dur1/1000);
@@ -515,19 +517,17 @@ switch action
     %% Case frequency ON
     case 'FrequencyCategorization'
         if frequency_categorization == 1
-            make_visible(maxF1);make_visible(minF1);make_visible(A1_freq);
+            make_visible(maxF1);make_visible(minF1);make_visible(A1_freq);make_visible(volumeF1);
             make_invisible(maxS1);make_invisible(minS1);make_invisible(A1_sigma);
-            make_invisible(fcut);make_invisible(lfreq);make_invisible(hfreq); make_invisible(filter_type);
-            StimulusSection(obj,'plot_stimuli');
+            make_invisible(fcut);make_invisible(lfreq);make_invisible(hfreq); make_invisible(filter_type);           
         else
             make_visible(maxS1);make_visible(minS1);make_visible(A1_sigma);
             make_visible(fcut);make_visible(lfreq);make_visible(hfreq); make_visible(filter_type);
-            make_invisible(maxF1);make_invisible(minF1);make_invisible(A1_freq);
-            StimulusSection(obj,'plot_stimuli');
+            make_invisible(maxF1);make_invisible(minF1);make_invisible(A1_freq); make_visible(volumeF1);          
         end
 
         StimulusSection(obj,'Cal_Boundary'); % update the boundary
-
+        StimulusSection(obj,'plot_stimuli');
 
     %% Case get_stimuli
     % case 'get_stimuli'
