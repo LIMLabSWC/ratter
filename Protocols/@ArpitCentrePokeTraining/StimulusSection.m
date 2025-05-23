@@ -128,7 +128,7 @@ switch action
             'OffString', 'Amplitude(Noise)',...
             'TooltipString', sprintf('If on (black) then it enables the presentation of pure tones'));
         set_callback(frequency_categorization, {mfilename, 'FrequencyCategorization'});
-        make_invisible(maxF1);make_invisible(minF1);make_invisible(A1_freq);
+        make_invisible(maxF1);make_invisible(minF1);make_invisible(A1_freq);make_invisible(volumeF1);
         next_row(y);
         
         % next_column(y)
@@ -156,7 +156,7 @@ switch action
             if frequency_categorization
                 % produce the tone
                 A1_freq.value = value(thisstim);
-                A1 = value(thisstimlog(n_completed_trials+1));
+                A1 = value(thisstimlog(n_done_trials+1));
                 dur1 = A1_time*1000;
                 bal=0;
                 freq1=A1_freq*1000;
@@ -172,7 +172,7 @@ switch action
             else
                 % produce noise pattern
                 A1_sigma.value = value(thisstim);
-                A1 = value(thisstimlog(n_completed_trials+1));
+                A1 = value(thisstimlog(n_done_trials+1));
                 [rawA1, rawA2, normA1, normA2]=noisestim(1,1,T,value(fcut),Fs,value(filter_type));
                 modulator=singlenoise(1,T,[value(lfreq) value(hfreq)],Fs,'BUTTER');
                 AUD1=normA1(1:A1_time*srate).*modulator(1:A1_time*srate).*A1_sigma;
@@ -186,14 +186,14 @@ switch action
 
             % Plot current stimulus and move to saving stimulus history
 
-            % if value(thisstimlog(n_completed_trials+1)) > value(boundary)%value(numClass)
+            % if value(thisstimlog(n_done_trials+1)) > value(boundary)%value(numClass)
             %     set(value(h1), 'YData', value(A1), 'color',[0.4 0.8 0.1],'markerfacecolor',[0.4 0.8 0.1]);
             % else
             %     set(value(h1), 'YData', value(A1), 'color',[0.8 0.4 0.1],'markerfacecolor',[0.8 0.4 0.1]);
             % end
 
-            if n_completed_trials > 0
-                if ~violation_history(n_completed_trials) && ~timeout_history(n_completed_trials)
+            if n_done_trials > 0
+                if ~violation_history(n_done_trials) && ~timeout_history(n_done_trials)
                     StimulusSection(obj,'update_stimulus_history');
                 else
                     StimulusSection(obj,'update_stimulus_history_nan');
@@ -312,7 +312,7 @@ switch action
         end
 
         thisstim.value=exp(stim_i_log);
-        thisstimlog(n_completed_trials+1) = stim_i_log;
+        thisstimlog(n_done_trials+1) = stim_i_log;
 
         %% Case plot stimuli distribution
     case 'plot_stimuli'
@@ -553,12 +553,12 @@ switch action
 
     case 'update_stimulus_history'
         ps=value(stimulus_history);
-        ps(n_completed_trials)=value(thisstimlog(n_completed_trials));
+        ps(n_done_trials)=value(thisstimlog(n_done_trials));
         stimulus_history.value=ps;
 
     case 'update_stimulus_history_nan'
         ps=value(stimulus_history);
-        ps(n_completed_trials)=value(thisstimlog(n_completed_trials));%nan;
+        ps(n_done_trials)=value(thisstimlog(n_done_trials));%nan;
         stimulus_history.value=ps;
 
     %% Case hide
