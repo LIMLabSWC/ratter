@@ -18,7 +18,7 @@ We are undergoing a major modernization effort. Please see the [Recent Refactori
 BControl/
 ├── ExperPort/             # Core system files
 ├── Protocols/             # Main protocols directory
-├── Bpod Protocols/        # Bpod-specific protocols
+├── BpodProtocols/         # Bpod-specific protocols
 ├── docs/                  # Documentation
 │   ├── guides/            # User guides and tutorials
 │   ├── technical/         # Technical documentation

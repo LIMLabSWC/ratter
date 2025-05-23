@@ -15,9 +15,9 @@ As part of the May 2025 cleanup effort, we have improved the Protocols directory
    - No symbolic links or hard-coded paths
    - Single Protocols directory at root level
 
-2. **Bpod Protocols**
-   - Dedicated `Bpod Protocols/` directory for Bpod-specific protocols
-   - Separates Bpod protocols from standard BControl protocols
+2. **BpodProtocols**
+   - Dedicated `BpodProtocols/` directory for Bpod-specific protocols
+   - Separates Bpodprotocols from standard BControl protocols
    - Improves clarity and maintainability
 
 ### Protocol Structure Requirements
