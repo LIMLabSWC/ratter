@@ -31,6 +31,24 @@ BControl/
 
 ```
 
+## Repository Usage Notes
+
+This repository hosts the **BControl** codebase for our high-throughput behavior training facility. Some components are excluded from Git version control by design:
+
+- `/SoloData/`
+  Contains raw data and rig-specific configuration files.
+  ➤ Version-controlled with **SVN** and stored on our internal server.
+
+- `/ExperPort/Settings/Settings_Custom.conf`
+  Contains per-rig configuration settings.
+  ➤ Instead, we provide a template:
+  `/ExperPort/Settings/_Settings_Custom.conf`
+  ➤ After cloning, users should rename this file and customize it for their rig.
+
+- `/PASSWORD_CONFIG-DO_NOT_VERSIONCONTROL.mat`
+  Stores hostnames, users, and passwords.
+  ➤ This file is **version-controlled with SVN** and stored internally.
+
 ## Quick Start
 
 ### 1. Clone the Repository
