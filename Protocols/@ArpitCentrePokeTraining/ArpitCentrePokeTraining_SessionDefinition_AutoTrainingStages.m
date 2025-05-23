@@ -699,7 +699,7 @@ ParamsSection_CP_duration.value = min(new_CP, cp_max);
 callback(ParamsSection_CP_duration);
 
 % Timing parameter adjustments based on CP_duration
-if new_CP >= starting_cp
+if new_CP >= starting_cp && new_CP ~= curr_CP
     if new_CP >= cp_min
         % Scale A1_time linearly between 0.1 to 0.4
         scale = (new_CP - cp_min) / cp_range;
