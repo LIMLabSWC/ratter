@@ -97,7 +97,7 @@ switch action
     SessionDefinition(obj, 'init', x, y, value(myfig)); next_row(y, 2); %#ok<NASGU>
     
     next_column(x); y=5;
-	[x, y] = OverallPerformanceSection(obj, 'init', x, y);
+	[x, y] = PerformanceSection(obj, 'init', x, y);
     [x, y] = StimulatorSection(obj, 'init', x, y); next_row(y, 1.3);
 	[x, y] = SideSection(obj,  'init', x, y); %#ok<NASGU>
     [x, y] = SoundSection(obj,'init',x,y);
@@ -119,13 +119,12 @@ switch action
 	% trial was a violation or not
        SessionDefinition(obj, 'next_trial');
        StimulatorSection(obj, 'update_values');
-       OverallPerformanceSection(obj, 'evaluate');
+       PerformanceSection(obj, 'evaluate');
        StimulusSection(obj,'prepare_next_trial');
        SoundManagerSection(obj, 'send_not_yet_uploaded_sounds');
     
-       nTrials.value = n_done_trials;
-
        [sma, prepare_next_trial_states] = SoundCatSMA(obj, 'prepare_next_trial');
+       sma = add_trialnum_indicator(sma, n_done_trials);
 
     % Default behavior of following call is that every 20 trials, the data
     % gets saved, not interactive, no commit to CVS.
@@ -141,8 +140,6 @@ switch action
             prot_title.value=[mfilename ' on rig ' get_hostname ' : ' expmtr ', ' rname  '.  Started at ' datestr(now, 'HH:MM')];
        end
       
-       try send_n_done_trials(obj); end
-
       %% trial_completed
    case 'trial_completed'
        
@@ -178,7 +175,7 @@ switch action
        
     StimulusSection(obj,'hide');
     SessionDefinition(obj, 'run_eod_logic_without_saving');
-    perf    = OverallPerformanceSection(obj, 'evaluate');
+    perf    = PerformanceSection(obj, 'evaluate');
     cp_durs = SideSection(obj, 'get_cp_history');
     
     [stim1dur] = SideSection(obj,'get_stimdur_history');
