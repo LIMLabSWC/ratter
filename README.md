@@ -1,86 +1,115 @@
 # BControl
 
-BControl is a behavioral experimentation system that provides a comprehensive framework for running behavioral experiments. This system is designed to be flexible, extensible, and user-friendly, allowing researchers to implement and run various types of behavioral protocols.
+**BControl** is a behavioral experimentation system that provides a flexible and extensible framework for running behavioral protocols. It is designed to support a variety of experiments with user-friendly configuration and robust MATLAB-based components.
 
 ## ⚠️ Recent Changes (May 2025)
 
-We are currently undergoing a major cleanup and modernization effort. Please check the [Recent Refactoring Documentation](docs/recent-refactoring/README.md) for details about:
+We are undergoing a major modernization effort. Please see the [Recent Refactoring Overview](docs/recent-refactoring/README.md) for details, including:
 
 - Removal of legacy Perl scripts
-- Protocols directory restructuring
+- Protocol directory restructuring
 - Documentation modernization
 - ExperPort cleanup and optimization
-- Testing status and next steps
-
-These changes are being tracked in the `docs/recent-refactoring/` directory until they are fully tested and verified.
+- Current testing status and next steps
 
 ## Repository Structure
 
-The repository is organized as follows:
-
 ```
 BControl/
-├── ExperPort/           # Core system files
-├── Protocols/           # Main protocols directory
-├── Bpod Protocols/      # Bpod-specific protocols
-├── docs/               # Documentation
-│   ├── guides/        # User guides and tutorials
-│   ├── technical/     # Technical documentation
-│   ├── hardware/      # Hardware-specific documentation
-│   ├── architecture/  # System architecture documentation
-│   ├── recent-refactoring/ # Recent changes documentation
-│   └── old_docs/      # Legacy documentation (archived)
-└── SoloData/          # Data storage (excluded from version control)
+├── ExperPort/             # Core system files
+├── Protocols/             # Main protocols directory
+├── Bpod Protocols/        # Bpod-specific protocols
+├── docs/                  # Documentation
+│   ├── guides/            # User guides and tutorials
+│   ├── technical/         # Technical documentation
+│   ├── hardware/          # Hardware-related setup
+│   ├── architecture/      # System design and history
+│   ├── recent-refactoring/# Refactoring logs and plans
+│   ├── future_development/# Ideas and roadmap
+│   └── old_docs/          # Archived legacy documentation
+└── SoloData/              # Local data storage (excluded from version control)
+
 ```
 
 ## Quick Start
 
-### 1. Clone the repository 
-Run this command in git bash:
+### 1. Clone the Repository
 
-```
+```bash
 git clone git@github.com:LIMLabSWC/ratter.git
 ```
 
-### 2. Initiate the SVN repository
-Run the `svn_sparse_init.sh` sript from git bash:
+### 2. Initialize the SVN Repository
 
-```
+```bash
 bash svn_sparse_init.sh
 ```
 
-This will initiate the SVN repository in `ratter`.
+This sets up the sparse SVN checkout within the `ratter` directory.
 
-### 3. Adjust the configuration file 
+### 3. Configure Your Rig
 
-Make a **copy** of the configuration file template in 
-`ratter/ExperPort/Settings/_Settings_Custom.conf` and **rename** it to `Settings_Custom.conf` and
-modify the rig specific settings.
+Copy and rename the default config file:
+
+```bash
+cp ExperPort/Settings/_Settings_Custom.conf ExperPort/Settings/Settings_Custom.conf
+```
+
+Then edit it with your rig-specific settings.
 
 > ℹ️ **Info:**  
-For more detailed instructions, follow our [giude](https://github.com/LIMLabSWC/limlab_documentation/blob/main/docs/how_to_set_up_a_rig_-_software.md) on setting up a rig.
+See our [rig setup guide](https://github.com/LIMLabSWC/limlab_documentation/blob/main/docs/how_to_set_up_a_rig_-_software.md) for detailed instructions.
 
+## Development and Contribution
 
+**BControl** is built on legacy MATLAB code and maintained through incremental
+patches and continuous development. Some updates are cosmetic, while others
+introduce core functionality.
+
+We welcome contributions to help modernize and improve the system. You can:
+
+- Fix small issues
+- Implement proposed improvements
+- Join ongoing discussions
+
+See [future development plans](docs/future_development/README.md) for active proposals.
+
+### Contribution Guidelines
+
+- The `main` branch is protected—create a feature branch for your work.
+- Coordinate major changes with the team.
+- Document any changes and update relevant planning documents.
+- Submit a pull request when ready for review.
 
 ## Documentation
 
-### User Guides
+### Guides
+
 - [Protocol Writer's Guide](docs/guides/protocol-writers-guide.md)
 - [Solo Core Guide](docs/guides/solo-core-guide.md)
 - [Water Valve Tutorial](docs/guides/water-valve-tutorial.md)
 
-### Technical Documentation
-- [System Architecture Overview](docs/architecture/system-overview.md)
-- [FSM Documentation](docs/technical/fsm-documentation.md)
-- [Staircase Algorithms](docs/technical/staircases.md)
+### Technical References
 
-### Hardware Documentation
+- [Finite State Machine (FSM) Documentation](docs/technical/fsm-documentation.md)
+- [Staircase Algorithms](docs/technical/staircases.md)
+- [SVN Update Process](docs/technical/svn_update_process.md)
+
+### Hardware Setup
+
 - [LynxTrig Setup](docs/hardware/lynxtrig-setup.md)
 - [Comedi Setup](docs/hardware/comedi-setup.md)
 
-### Recent Changes
-- [Refactoring Overview](docs/recent-refactoring/README.md)
+### System Architecture
+
+- [System Overview](docs/architecture/system-overview.md)
+- [System Architecture](docs/architecture/system-architecture.md)
+- [Legacy Architecture Notes](docs/architecture/legacy-architecture.md)
+
+### Refactoring
+
+- [Overview](docs/recent-refactoring/README.md)
+- [ExperPort Cleanup](docs/recent-refactoring/experport-cleanup.md)
 - [Perl Scripts Removal](docs/recent-refactoring/perl-scripts-removal.md)
 - [Protocols Restructuring](docs/recent-refactoring/protocols-restructuring.md)
 - [Documentation Modernization](docs/recent-refactoring/documentation-modernization.md)
-- [ExperPort Cleanup](docs/recent-refactoring/experport-cleanup.md)
