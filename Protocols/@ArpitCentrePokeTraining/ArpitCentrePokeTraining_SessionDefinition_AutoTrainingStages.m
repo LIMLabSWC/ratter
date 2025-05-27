@@ -46,6 +46,20 @@ if stage_no ~= value(ParamsSection_training_stage)
     callback(ParamsSection_training_stage);
 end
 
+% Introduce Go/Reward Sound intensity after the rat did some trials and also increase
+% it gradually until the max sound played at around 0.05. We will start
+% with 0.001
+if value(PerformanceSummarySection_stage_1_TrialsValid) < value(TrainingStageParamsSection_Go_Sound_Start)
+    ParamsSection_Go_Sound.Value = 0;
+elseif  value(PerformanceSummarySection_stage_1_TrialsValid) == value(TrainingStageParamsSection_Go_Sound_Start)% start gradual increase
+    ParamsSection_Go_Sound.Value = 1;
+    SoundInterface_GoSoundVol.value = 0.001;
+else
+    ParamsSection_Go_Sound.Value = 1;
+    SoundInterface_GoSoundVol.value = value(SoundInterface_GoSoundVol) + ((0.05 - 0.001) / (value(TrainingStageParamsSection_total_trials) - value(TrainingStageParamsSection_Go_Sound_Start)));
+end
+callback(SoundInterface_GoSoundVol);
+callback(ParamsSection_Go_Sound);
 
 % Update TrainingStageParamsSection
 if n_done_trials >= 2
@@ -219,6 +233,7 @@ end
 if n_done_trials >= 2
     if previous_sides(end) ~= previous_sides(end-1) && all(~isnan(hit_history(end-1:end)))% last and present trials should also be a valid trial
         TrainingStageParamsSection_trial_oppSide.value = value(TrainingStageParamsSection_trial_oppSide) + 1;  % updating value for variable in TrainingParams_Section
+        this_stage_opp_side_trials.value = value(this_stage_opp_side_trials) + 1; % updating value to change the reward_Collection_Dur
         callback(TrainingStageParamsSection_trial_oppSide);
     end
 end
@@ -297,6 +312,8 @@ if ParamsSection_use_auto_train % do completion check if auto training
     if n_done_trials > 50
         if value(PerformanceSummarySection_stage_2_TrialsValid) > value(TrainingStageParamsSection_total_trials) && ...
         value(TrainingStageParamsSection_trial_oppSide) > value(TrainingStageParamsSection_total_trials_opp)
+            ParamsSection_RewardCollection_duration.value = 40;
+            callback(ParamsSection_RewardCollection_duration);
             ParamsSection_training_stage.value = stage_no + 1;
             callback(ParamsSection_training_stage);
             ParamsSection(obj, 'Changed_Training_Stage');
@@ -445,6 +462,8 @@ if ParamsSection_use_auto_train % do completion check if auto training
     cp_max = value(ParamsSection_SettlingIn_time) + value(ParamsSection_legal_cbreak);
     if value(ParamsSection_CP_duration) >= cp_max
         TrainingStageParamsSection_last_session_CP.value = value(ParamsSection_CP_duration);
+        ParamsSection_RewardCollection_duration.value = 8;
+        callback(ParamsSection_RewardCollection_duration);
         callback(TrainingStageParamsSection_last_session_CP);
         ParamsSection_training_stage.value = 4;
         callback(ParamsSection_training_stage);

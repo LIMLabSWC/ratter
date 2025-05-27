@@ -18,6 +18,7 @@ switch action
             case 1
             % STAGE RUNNING PARAMETERS
             NumeditParam(obj, 'trial_oppSide', 0, x, y,'TooltipString','total trials in opposide side this stage'); next_row(y);
+            NumeditParam(obj, 'Go_Sound_Start', 400, x, y,'TooltipString','trials after which Go/Reward Sound should start'); next_row(y);
             SubheaderParam(obj, 'title', 'Stage Params', x, y);
             % next_row(y);
             % COMPLETION TEST PARAMETERS
