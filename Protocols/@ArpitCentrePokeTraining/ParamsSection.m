@@ -90,7 +90,7 @@ switch action
 		DispParam(obj, 'Total_CP_duration', CP_duration+time_go_cue, x, y,'save_with_settings', 1, 'TooltipString', 'Total expected(rat can poke out anytime after Go cue onset) nose in center port time, in secs. Sum of CP_duration and Go Cue duration'); %#ok<*NODEF>
 		
         next_row(y);
-        ToggleParam(obj, 'Go_Sound', 1, x, y, 'OnString', 'Play Reward Sound', 'OffString', 'No Reward Sound','TooltipString', ...
+        ToggleParam(obj, 'Go_Sound', 0, x, y, 'OnString', 'Play Reward Sound', 'OffString', 'No Reward Sound','TooltipString', ...
 			'If 1 (black), sound is played for intial 2 stages of light chasing; if 0 (brown), leave sound off');
         next_row(y);
         ToggleParam(obj, 'stimuli_on', 0, x,y,...
@@ -299,8 +299,9 @@ switch action
         % change the reward collection duration once we start with centre
         % poke
         if value(training_stage) >=  3
-            RewardCollection_duration.value = 100;
             Go_Sound.value = 1;
+        else
+            CP_duration.value = 0;
         end
 		            
         if value(training_stage) ==  8 % user setting
