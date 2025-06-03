@@ -2,7 +2,7 @@
 
 set -e
 
-REPO_URL="http://172.24.155.100/svn/akramilab/ratter"
+REPO_URL="http://172.24.155.220/svn/akramilab/ratter"
 LOG_FILE="sparse_init.log"
 
 echo ""
