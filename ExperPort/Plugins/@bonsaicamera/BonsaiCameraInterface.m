@@ -173,9 +173,14 @@ switch action
                 rat_name = varargin{5};
         end
 
+        
+        % Changing the Video file save location from C:\ratter_Videos to
+        % C:\ ratter\training_videos
+        
+        % ratter_dir = extractBefore(current_dir,'ratter');
+        % main_dir_video = [current_dir 'ratter_Videos'];
         current_dir = cd;
-        ratter_dir = extractBefore(current_dir,'ratter');
-        main_dir_video = [ratter_dir 'ratter_Videos'];
+        main_dir_video = [current_dir '\training_videos'];
         date_str = regexprep(char(datetime('today','Format','yyyy-MM-dd')), '[^0-9]', '');
         video_foldername = sprintf('video_@%s_%s_%s_%s',protocol_name,experimenter_name,rat_name,date_str);
         rat_dir = sprintf('%s\\%s\\%s',main_dir_video,experimenter_name,rat_name);
