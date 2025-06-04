@@ -2,6 +2,10 @@
 
 set -e
 
+read -p "SVN Username: " SVN_USER
+read -s -p "SVN Password: " SVN_PASS
+echo ""
+
 REPO_URL="http://172.24.155.220/svn/akramilab/ratter"
 LOG_FILE="sparse_init.log"
 
@@ -23,23 +27,23 @@ fi
 
 # Sparse checkout of root
 echo "➡️  Checking out repository root (empty)..." | tee -a "$LOG_FILE"
-svn checkout --depth=empty "$REPO_URL" . | tee -a "$LOG_FILE"
+svn checkout --username "$SVN_USER" --password "$SVN_PASS" --non-interactive --depth=empty "$REPO_URL" . | tee -a "$LOG_FILE"
 
 # Fetch top-level .mat file
 echo "✅ Fetching: PASSWORD_CONFIG-DO_NOT_VERSIONCONTROL.mat" | tee -a "$LOG_FILE"
-svn update PASSWORD_CONFIG-DO_NOT_VERSIONCONTROL.mat | tee -a "$LOG_FILE"
+svn update --username "$SVN_USER" --password "$SVN_PASS" --non-interactive PASSWORD_CONFIG-DO_NOT_VERSIONCONTROL.mat | tee -a "$LOG_FILE"
 
 # Prepare SoloData structure
 echo "" | tee -a "$LOG_FILE"
 echo "📁 Preparing SoloData structure..." | tee -a "$LOG_FILE"
-svn update --set-depth=empty SoloData | tee -a "$LOG_FILE"
-svn update --set-depth=empty SoloData/Data | tee -a "$LOG_FILE"
-svn update --set-depth=empty SoloData/Settings | tee -a "$LOG_FILE"
+svn update --username "$SVN_USER" --password "$SVN_PASS" --non-interactive --set-depth=empty SoloData | tee -a "$LOG_FILE"
+svn update --username "$SVN_USER" --password "$SVN_PASS" --non-interactive --set-depth=empty SoloData/Data | tee -a "$LOG_FILE"
+svn update --username "$SVN_USER" --password "$SVN_PASS" --non-interactive --set-depth=empty SoloData/Settings | tee -a "$LOG_FILE"
 
 # Add training_videos folder
 echo "" | tee -a "$LOG_FILE"
 echo "📁 Adding training_videos folder..." | tee -a "$LOG_FILE"
-svn update --set-depth=empty training_videos | tee -a "$LOG_FILE"
+svn update --username "$SVN_USER" --password "$SVN_PASS" --non-interactive --set-depth=empty training_videos | tee -a "$LOG_FILE"
 
 # Done
 echo "" | tee -a "$LOG_FILE"
