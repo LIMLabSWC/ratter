@@ -625,6 +625,8 @@ if ParamsSection_use_auto_train % do completion check if auto training
 
         ParamsSection_training_stage.value = 5;
         callback(ParamsSection_training_stage);
+        ParamsSection_RewardCollection_duration.value = 8; % Although done in previous stage as well but still to be sure
+        callback(ParamsSection_RewardCollection_duration);
         ParamsSection(obj, 'Changed_Training_Stage');
         SessionDefinition(obj, 'jump_to_stage', 'Introduce Stimuli Sound during Centre Poke');
         TrainingStageParamsSection_last_session_CP.value = value(ParamsSection_CP_duration);
@@ -873,7 +875,7 @@ n_trial_warmup = value(TrainingStageParamsSection_warm_up_trials);
 prestim_min = value(TrainingStageParamsSection_min_prestim);
 prestim_max = value(TrainingStageParamsSection_max_prestim);
 stim_dur = value(TrainingStageParamsSection_stim_dur);
-
+init_CP_duration = value(ParamsSection_init_CP_duration);
 stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
 if stage_no ~= value(ParamsSection_training_stage)
     ParamsSection_training_stage.value = stage_no;
@@ -903,7 +905,7 @@ if new_CP >= starting_cp
     ParamsSection_SettlingIn_time.value = 0.2;
     callback(ParamsSection_SettlingIn_time);
 
-    if value(ParamsSection_CP_duration) < 3 % during the warm up phase
+    if n_done_trials <= n_trial_warmup % during the warm up phase
         ParamsSection_PreStim_time.value = 0.1;
         ParamsSection_A1_time.value = 0.1;
     else
@@ -1218,7 +1220,7 @@ GetSoloFunctionArgs(obj);
 ClearHelperVarsNotOwned(obj);
 %<STAGE_ALGORITHM>
 % Variables for warmup stage
-cp_max = 5;
+cp_max = 3;
 n_trial_warmup = 20;
 starting_cp = 0.5;
 warmup_completed = 0;

@@ -258,57 +258,79 @@ switch action
         
 	case 'prepare_next_trial'
 		
-        if random_A1_time
-            A1_times = [0.2, 0.4];
-            randomix = randi(length(A1_times), 1);
-            A1_time.value = A1_times(randomix);
-        end
-
-        if random_prego_time
-            prego_times = [0.2, 0.4, 0.6, 0.8, 1];
-            randomixx = randi(length(prego_times), 1);
-            time_bet_aud1_gocue.value = prego_times(randomixx);
-        end
-        settling_time.value=0.25;
-        delay_time.value=0;
-        allow_nic_breaks.value=1;
-        side_lights.value=3;
-        training_stage.value=1;
-        trials_in_stage.value=0;
-        reward_delay.value=0.01;
-        left_prob.value=0.5;
-        right_prob.value=0.5;
-        if n_done_trials <1 && warmup_on ==1
-            CP_duration.value=value(init_CP_duration);
-        else
-            CP_duration.value=PreStim_time + A1_time + time_bet_aud1_gocue;
-        end
-        Total_CP_duration.value = CP_duration + time_go_cue; %#ok<*NASGU>
-
+		
+		switch value(training_stage)
+			case 0                 %% learning the reward sound association -left or right led on -> poke -> sound+reward
+				settling_time.value=0.01;
+				delay_time.value=0;
+				allow_nic_breaks.value=1;
+				side_lights.value=3;
+				trials_in_stage.value=0;
+				reward_delay.value=0.01;
+				left_prob.value=0.5;
+				right_prob.value=0.5;
+				time_go_cue.value=0.200;
+				reward_duration=0.200;
+				
+				
+			case 1                  %%  center led on -> poke in the center -> go cue -> reward light and sound
+                %what A1_time and time before go cue?
+                if random_A1_time
+                    A1_times = [0.2, 0.4];
+                    randomix = randi(length(A1_times), 1);
+                    A1_time.value = A1_times(randomix);
+                end
                 
+                if random_prego_time
+                    prego_times = [0.2, 0.4, 0.6, 0.8, 1];
+                    randomixx = randi(length(prego_times), 1);
+                    time_bet_aud1_gocue.value = prego_times(randomixx);
+                end
+				settling_time.value=0.25;
+				delay_time.value=0;
+				allow_nic_breaks.value=1;
+				side_lights.value=3;
+				training_stage.value=1;
+				trials_in_stage.value=0;
+				reward_delay.value=0.01;
+				left_prob.value=0.5;
+				right_prob.value=0.5;
+                if n_done_trials <1 && warmup_on ==1
+                CP_duration.value=value(init_CP_duration);
+                else
+				CP_duration.value=PreStim_time + A1_time + time_bet_aud1_gocue;
+                end
+                Total_CP_duration.value = CP_duration + time_go_cue; %#ok<*NASGU>
+               
+                
+			case 3 % like stage 2, now passive exposure to the stimuli - reward comes anyway
+			case 4 %% now reward comes only if rat goes to the correct side
+				
+		end
+		
 		
 		%% update hit_history, previous_sides, etc
 		was_viol=false;
 		was_hit=false;
         was_timeout=false;
-        if n_done_trials>0
-            if ~isempty(parsed_events)
-                if isfield(parsed_events,'states')
-                    if isfield(parsed_events.states,'timeout_state')
-                        was_timeout=rows(parsed_events.states.timeout_state)>0;
+		if n_done_trials>0
+			if ~isempty(parsed_events)
+				if isfield(parsed_events,'states')
+					if isfield(parsed_events.states,'timeout_state')
+						was_timeout=rows(parsed_events.states.timeout_state)>0;
                     end
                     if isfield(parsed_events.states,'violation_state')
-                        was_viol=rows(parsed_events.states.violation_state)>0;
-                    end
-                end
+						was_viol=rows(parsed_events.states.violation_state)>0;
+					end
+				end
+				
+			end
+			
+			violation_history.value=[violation_history(:); was_viol];
+			timeout_history.value=[timeout_history(:); was_timeout];
 
-            end
-
-            violation_history.value=[violation_history(:); was_viol];
-            timeout_history.value=[timeout_history(:); was_timeout];
-
-            SideSection(obj,'update_side_history');
-
+			SideSection(obj,'update_side_history');
+			
 			if ~was_viol && ~was_timeout
 				%was_hit=rows(parsed_events.states.hit_state)>0;
                 was_hit=rows(parsed_events.states.second_hit_state)==0;
@@ -450,14 +472,14 @@ switch action
 			ps=value(previous_sides);
 			ps(n_done_trials)='r';
 			previous_sides.value=ps;
-        end
+		end;
 		
 	case 'get_current_side'
-        if strcmp(ThisTrial, 'LEFT')
-            x = 'l'; %#ok<NODEF>
-        else
-            x = 'r';
-        end
+		if strcmp(ThisTrial, 'LEFT')
+			x = 'l'; %#ok<NODEF>
+		else
+			x = 'r';
+		end;
 		
 		
 	case 'close'
@@ -466,7 +488,7 @@ switch action
 		delete_sphandle('owner', ['^@' class(obj) '$'], ...
 			'fullname', ['^' mfilename]);
 
-	case 'reinit'
+	case 'reinit',
 		currfig = double(gcf);
 		
 		% Get the original GUI position and figure:

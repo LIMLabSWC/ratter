@@ -188,12 +188,6 @@ switch action
 %     pd.performance=tot_perf(:);
     pd.cp_durs=cp_durs(:);
     
-   
-%     pd.stimuli=stimuli(:);
-    % Athena: look into pair_history perhaps stimulus_history and stimuli
-    % are the same
-    %pd.stimulus=stimulus_history(:);
-    
     pd.stim1dur=stim1dur(:);
 
     %pd.stimul=stim_history(:);
