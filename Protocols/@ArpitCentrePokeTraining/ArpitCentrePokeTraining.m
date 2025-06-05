@@ -158,7 +158,6 @@ switch action
 	set_callback({maxasymp;slp;inflp;minasymp;assym}, {mfilename, 'change_water_modulation_params'});
 	feval(mfilename, obj, 'change_water_modulation_params');
 	
-	%AthenaSMA changed to SoundCatSMA (From AthenaDelayComp)
     SoloFunctionAddVars('ParamsSection', 'ro_args', ...
 			{'maxasymp';'slp';'inflp';'minasymp';'assym'});
      
