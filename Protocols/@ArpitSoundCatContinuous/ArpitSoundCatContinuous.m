@@ -1,13 +1,13 @@
 % AltSoundCatCatch protocol
 % EM, October 2020
 
-function [obj] = Arpit_SoundCatContinuous(varargin)
+function [obj] = ArpitSoundCatContinuous(varargin)
 
 % Default object is of our own class (mfilename);
 % we inherit only from Plugins
 
 obj = class(struct, mfilename, pokesplot2, saveload, sessionmodel2, soundmanager, soundui, antibias, ...
-   water, soundtable, comments, sqlsummary);
+   water, distribui,soundtable, comments, sqlsummary, bonsaicamera);
 
 %---------------------------------------------------------------
 %   BEGIN SECTION COMMON TO ALL PROTOCOLS, DO NOT MODIFY
@@ -24,7 +24,8 @@ if isa(varargin{1}, mfilename) % If first arg is an object of this class itself,
    if length(varargin) < 2 || ~ischar(varargin{2})
       error(['If called with a "%s" object as first arg, a second arg, a ' ...
          'string specifying the action, is required\n']);
-   else action = varargin{2}; varargin = varargin(3:end); %#ok<NASGU>
+   else 
+       action = varargin{2}; varargin = varargin(3:end); %#ok<NASGU>
    end
 else % Ok, regular call with first param being the action string.
    action = varargin{1}; varargin = varargin(2:end); %#ok<NASGU>
@@ -103,10 +104,18 @@ switch action
     SoloFunctionAddVars('SideSection', 'ro_args', ...
 			{'maxasymp';'slp';'inflp';'minasymp';'assym'});
     
-    [x, y] = WaterValvesSection(obj,  'init', x, y);
-    [x, y] = PokesPlotSection(obj, 'init', x, y);
-    [x, y] = CommentsSection(obj, 'init', x, y);
-    SessionDefinition(obj, 'init', x, y, value(myfig)); next_row(y, 2); %#ok<NASGU>
+    figpos = get(double(gcf), 'Position');
+    [expmtr, rname]=SavingSection(obj, 'get_info');
+    HeaderParam(obj, 'prot_title', [mfilename ': ' expmtr ', ' rname], x, y, 'position', [10 figpos(4)-25, 800 20]);
+    
+    [x, y] = WaterValvesSection(obj,  'init', x, y);next_row(y);
+    [x, y] = PokesPlotSection(obj, 'init', x, y);next_row(y);
+    [x, y] = CommentsSection(obj, 'init', x, y);next_row(y);
+    [x, y] = BonsaiCameraInterface(obj,'init',x,y,name,expmtr,rname);
+
+    oldx=x; oldy=y;
+
+    
     
     next_column(x); y=5;
 	
@@ -116,13 +125,27 @@ switch action
 
     [x, y] = PerformanceSection(obj, 'init', x, y);
     [x, y] = StimulatorSection(obj, 'init', x, y); next_row(y, 1.3);
-    figpos = get(double(gcf), 'Position');
-    [expmtr, rname]=SavingSection(obj, 'get_info');
-    HeaderParam(obj, 'prot_title', [mfilename ': ' expmtr ', ' rname], x, y, 'position', [10 figpos(4)-25, 800 20]);
 
-    SoundCatSMA(obj, 'init');
-    feval(mfilename, obj, 'prepare_next_trial');
-         
+    x=oldx; y=oldy;
+
+    SessionDefinition(obj, 'init', x, y, value(myfig)); next_row(y, 2); %#ok<NASGU>
+    % SoundCatSMA(obj, 'init');
+    % feval(mfilename, obj, 'prepare_next_trial');
+     
+    case 'change_water_modulation_params'
+	   display_guys = [1 150 300];
+       for i=1:numel(display_guys)
+           t = display_guys(i);
+
+           myvar = eval(sprintf('trial_%d', t));
+           myvar.value = maxasymp + (minasymp/(1+(t/inflp)^slp).^assym);
+       end
+
+        %% when user presses run on runrats then then is called
+    case 'start_recording'
+
+        BonsaiCameraInterface(obj,'record_start');
+
 	
       %% prepare next trial
    case 'prepare_next_trial'
@@ -131,13 +154,14 @@ switch action
 	% Run SessionDefinition *after* SideSection so we know whether the
 	% trial was a violation or not
        SessionDefinition(obj, 'next_trial');
-       StimulatorSection(obj, 'update_values');
-       PerformanceSection(obj, 'evaluate');
+       StimulatorSection(obj, 'update_values');       
        StimulusSection(obj,'prepare_next_trial');
        SoundManagerSection(obj, 'send_not_yet_uploaded_sounds');
     
-       [sma, prepare_next_trial_states] = SoundCatSMA(obj, 'prepare_next_trial');
+       [sma, prepare_next_trial_states] = ArpitSoundCatContinuousSMA(obj, 'prepare_next_trial');
        sma = add_trialnum_indicator(sma, n_done_trials);
+
+       % PerformanceSection(obj, 'evaluate');
 
     % Default behavior of following call is that every 20 trials, the data
     % gets saved, not interactive, no commit to CVS.
@@ -147,32 +171,34 @@ switch action
        if n_done_trials==1  % Auto-append date for convenience.
             CommentsSection(obj, 'append_date'); CommentsSection(obj, 'append_line', '');
        end
+      
+      %% trial_completed
+   case 'trial_completed'
+    
+       % Change the video trial
+       BonsaiCameraInterface(obj,'next_trial');
 
-       if n_done_trials==1
+       % Update the Metrics Calculated
+       PerformanceSection(obj,'evaluate');
+
+       % Do any updates in the protocol that need doing:
+       feval(mfilename, 'update');
+
+   %% update
+   case 'update'
+      PokesPlotSection(obj, 'update');
+      if n_done_trials==1
             [expmtr, rname]=SavingSection(obj, 'get_info');
             prot_title.value=[mfilename ' on rig ' get_hostname ' : ' expmtr ', ' rname  '.  Started at ' datestr(now, 'HH:MM')];
        end
       
-      %% trial_completed
-   case 'trial_completed'
-       
-    % Do any updates in the protocol that need doing:
-    feval(mfilename, 'update');
-    % And PokesPlot needs completing the trial:
-    PokesPlotSection(obj, 'trial_completed');
-      %% update
-   case 'update'
-      PokesPlotSection(obj, 'update');
-      
-      
-      %% close
+   %% close
    case 'close'
     PokesPlotSection(obj, 'close');
-    %PunishmentSection(obj, 'close');
 	SideSection(obj, 'close');
     StimulusSection(obj,'close');
-    
-    if exist('myfig', 'var') && isa(myfig, 'SoloParamHandle') && ishandle(value(myfig)), %#ok<NODEF>
+    BonsaiCameraInterface(obj,'close');
+    if exist('myfig', 'var') && isa(myfig, 'SoloParamHandle') && ishandle(value(myfig)) %#ok<NODEF>
       delete(value(myfig));
     end
     delete_sphandle('owner', ['^@' class(obj) '$']);
@@ -181,7 +207,8 @@ switch action
       %% end_session
    case 'end_session'
       prot_title.value = [value(prot_title) ', Ended at ' datestr(now, 'HH:MM')];
-    
+      BonsaiCameraInterface(obj,'stop') % Stopping the cameras
+      
       
       %% pre_saving_settings
    case 'pre_saving_settings'
