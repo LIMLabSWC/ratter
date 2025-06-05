@@ -216,8 +216,13 @@ switch action
         if value(use_auto_train) == 1
             disable(training_stage); % user cannot change the training stages    
         else
+            Training_Stages_List = {'Familiarize with Reward Side Pokes','Timeout Rewarded Side Pokes'...
+                'Introduce Centre Poke','Introduce Violation for Centre Poke',...
+                'Introduce Stimuli Sound during Centre Poke','Vary Stimuli location during Centre Poke'...
+                'Variable Stimuli Go Cue location during Centre Poke','User Setting'};
+            stage_name = Training_Stages_List{value(training_stage)};
             enable(training_stage); % user can change the training stages
-            SessionDefinition(obj, 'jump_to_stage',value(training_stage));
+            SessionDefinition(obj, 'jump_to_stage',stage_name);
         end
 
             [stage_fig_x,stage_fig_y] = TrainingStageParamsSection(obj, 'reinit', value(stage_fig_x),value(stage_fig_y)); % update the training params as well
