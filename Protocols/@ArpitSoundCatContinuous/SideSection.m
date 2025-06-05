@@ -110,7 +110,7 @@ switch action
         NumeditParam(obj, 'PreStim_time', 0.20, x,y,'label','Pre-Stim time','TooltipString','Actual Time in NIC before starting the stimulus');
         set_callback(PreStim_time, {mfilename, 'new_CP_duration'});
         next_row(y);
-        NumeditParam(obj, 'PreStim_time_Max', 0.40, x,y,'label','Pre-Stim Max','TooltipString','Max Time in NIC before starting the stimulus');
+        NumeditParam(obj, 'PreStim_time_Max', 1, x,y,'label','Pre-Stim Max','TooltipString','Max Time in NIC before starting the stimulus');
         set_callback(PreStim_time_Max, {mfilename, 'new_CP_duration'});
         next_row(y);
         % A1 Time
@@ -130,7 +130,7 @@ switch action
         NumeditParam(obj, 'time_bet_aud1_gocue', 0.2, x,y,'label','A1-GoCue time','TooltipString','Actual time between the end of the stimulus and the go cue ');
         set_callback(time_bet_aud1_gocue, {mfilename, 'new_CP_duration'});
         next_row(y);
-        NumeditParam(obj, 'time_bet_aud1_gocue_Max', 2, x,y,'label','Max A1-GoCue time','TooltipString','Max time between the end of the stimulus and the go cue ');
+        NumeditParam(obj, 'time_bet_aud1_gocue_Max', 1, x,y,'label','Max A1-GoCue time','TooltipString','Max time between the end of the stimulus and the go cue ');
         set_callback(time_bet_aud1_gocue_Max, {mfilename, 'new_CP_duration'});
         next_row(y);
         set_callback(time_bet_aud1_gocue, {mfilename, 'new_CP_duration'});
@@ -149,24 +149,24 @@ switch action
 
         % Toggle Buttons To Control Parameters
         
-        ToggleParam(obj, 'stimuli_on', 0, x,y,...
+        ToggleParam(obj, 'stimuli_on', 1, x,y,...
         'OnString', 'Stimuli ON',...
         'OffString', 'Stimuli OFF',...
         'TooltipString', sprintf('If on (black) then it enables training with stimuli else using a fixed sound from Stage 5'));
         next_row(y);
-        ToggleParam(obj, 'random_PreStim_time', 0, x,y,...
+        ToggleParam(obj, 'random_PreStim_time', 1, x,y,...
         'OnString', 'random PreStim_time ON',...
         'OffString', 'random PreStim_time OFF',...
         'TooltipString', sprintf('If on (black) then it enables the random time between the user given range'));
         set_callback(random_PreStim_time, {mfilename, 'new_CP_duration'});
         next_row(y);
-        ToggleParam(obj, 'random_A1_time', 0, x,y,...
+        ToggleParam(obj, 'random_A1_time', 1, x,y,...
         'OnString', 'random A1_time ON',...
         'OffString', 'random A1_time OFF',...
         'TooltipString', sprintf('If on (black) then it enables the random sampling of A1_time'));
         set_callback(random_A1_time, {mfilename, 'new_CP_duration'});
         next_row(y);
-        ToggleParam(obj, 'random_prego_time', 0, x,y,...
+        ToggleParam(obj, 'random_prego_time', 1, x,y,...
         'OnString', 'random prego_time ON',...
         'OffString', 'random prego_time OFF',...
         'TooltipString', sprintf('If on (black) then it enables the random sampling of time between the end of the stimulus and the go cue'));
@@ -177,7 +177,8 @@ switch action
         % Training for Centre Poke Increase 
 		next_row(y);
 		ToggleParam(obj,'increase_CP_training',0,x,y,'OnString','Training Increasing CP','OffString','No Training');
-		next_row(y);
+		set_callback(increase_CP_training, {mfilename, 'CP_training'});
+        next_row(y);
         ToggleParam(obj, 'warmup_on', 0, x,y,...
 			'OnString', 'Warmup ON',...
 			'OffString', 'Warmup OFF',...
@@ -190,7 +191,7 @@ switch action
         next_row(y);
         NumeditParam(obj, 'fraction_increase' ,0.001, x,y,'label','Frac_Increment','TooltipString','fraction CP added');
         next_row(y);
-        NumeditParam(obj, 'cp_reached' ,cp_start, x,y,'label','CPDur_Reached','TooltipString','CP dur reached in last session');
+        NumeditParam(obj, 'cp_reached' ,value(cp_start), x,y,'label','CPDur_Reached','TooltipString','CP dur reached in last session');
         make_invisible(cp_start); make_invisible(cp_end); make_invisible(fraction_increase);make_invisible(cp_reached);
 
 
@@ -264,6 +265,14 @@ switch action
 
         CP_duration.value= value(SettlingIn_time) + value(PreStim_time) + value(A1_time) + value(time_bet_aud1_gocue);
 		Total_CP_duration.value = value(CP_duration) + value(time_go_cue); %#ok<*NASGU> 
+
+    case 'CP_training'
+
+        if increase_CP_training
+             make_visible(cp_start); make_visible(cp_end); make_visible(fraction_increase);make_visible(cp_reached);
+        else
+             make_invisible(cp_start); make_invisible(cp_end); make_invisible(fraction_increase);make_invisible(cp_reached);
+        end
 
 	case 'new_time_go_cue'
 		Total_CP_duration.value = value(CP_duration) + value(time_go_cue);
