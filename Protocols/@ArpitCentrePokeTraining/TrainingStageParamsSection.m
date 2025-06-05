@@ -22,7 +22,7 @@ switch action
             SubheaderParam(obj, 'title', 'Stage Params', x, y);
             % next_row(y);
             % COMPLETION TEST PARAMETERS
-            NumeditParam(obj, 'total_trials', 600, x, y,'label','Trials','TooltipString','total trials in this stage for its completion'); next_row(y);
+            NumeditParam(obj, 'total_trials', 400, x, y,'label','Trials','TooltipString','total trials in this stage for its completion'); next_row(y);
             NumeditParam(obj, 'total_trials_opp', 200, x, y,'label','Trials_Opp','TooltipString','total trials with opposide side option in this stage for its completion'); next_row(y);
             SubheaderParam(obj, 'title', 'Completion Params', x, y); next_row(y);
 
@@ -33,7 +33,7 @@ switch action
             NumeditParam(obj, 'min_rColl_dur', 60, x, y,'label','T_Min_RCollect','TooltipString','User given min water collect time(code will optimize for value above this)'); next_row(y);
             SubheaderParam(obj, 'title', 'Stage Params', x, y); next_row(y);
             % COMPLETION TEST PARAMETERS
-            NumeditParam(obj, 'total_trials', 600, x, y,'label','Trials','TooltipString','total trials in this stage for its completion'); next_row(y);
+            NumeditParam(obj, 'total_trials', 400, x, y,'label','Trials','TooltipString','total trials in this stage for its completion'); next_row(y);
             NumeditParam(obj, 'total_trials_opp', 200, x, y,'label','Trials_Opp','TooltipString','total trials with opposide side option in this stage for its completion'); next_row(y);
             SubheaderParam(obj, 'title', 'Completion Params', x, y);next_row(y);
            
@@ -70,7 +70,7 @@ switch action
             NumeditParam(obj, 'recent_violation', 0.15, x, y,'label','Recent_ViolateRate','TooltipString','violation rate for last 20 trials in this stage for its completion'); next_row(y);
             NumeditParam(obj, 'recent_timeout', 0.15, x, y,'label','Recent_TimeoutRate','TooltipString','timeout rate for last 20 trials in this stage for its completion'); next_row(y);
             NumeditParam(obj, 'stage_violation', 0.35, x, y,'label','Stage_ViolationRate','TooltipString','overall violation rate in this stage for its completion'); next_row(y);
-            NumeditParam(obj, 'total_trials', 800, x, y,'label','Trials','TooltipString','total trials in this stage for its completion'); next_row(y);
+            NumeditParam(obj, 'total_trials', 600, x, y,'label','Trials','TooltipString','total trials in this stage for its completion'); next_row(y);
             SubheaderParam(obj, 'title', 'Completion Params', x, y);next_row(y);
 
             case 6
@@ -87,7 +87,7 @@ switch action
             NumeditParam(obj, 'recent_violation', 0.15, x, y,'label','Recent_ViolateRate','TooltipString','violation rate for last 20 trials in this stage for its completion'); next_row(y);
             NumeditParam(obj, 'recent_timeout', 0.15, x, y,'label','Recent_TimeoutRate','TooltipString','timeout rate for last 20 trials in this stage for its completion'); next_row(y);
             NumeditParam(obj, 'stage_violation', 0.25, x, y,'label','Stage_ViolationRate','TooltipString','overall violation rate in this stage for its completion'); next_row(y);
-            NumeditParam(obj, 'total_trials', 800, x, y,'label','Trials','TooltipString','total trials in this stage for its completion'); next_row(y);
+            NumeditParam(obj, 'total_trials', 600, x, y,'label','Trials','TooltipString','total trials in this stage for its completion'); next_row(y);
             SubheaderParam(obj, 'title', 'Completion Params', x, y);next_row(y);
 
             case 7
@@ -106,7 +106,7 @@ switch action
             NumeditParam(obj, 'recent_violation', 0.15, x, y,'label','Recent_ViolateRate','TooltipString','violation rate for last 20 trials in this stage for its completion'); next_row(y);
             NumeditParam(obj, 'recent_timeout', 0.15, x, y,'label','Recent_TimeoutRate','TooltipString','timeout rate for last 20 trials in this stage for its completion'); next_row(y);
             NumeditParam(obj, 'stage_violation', 0.20, x, y,'label','Stage_ViolationRate','TooltipString','overall violation rate in this stage for its completion'); next_row(y);
-            NumeditParam(obj, 'total_trials', 800, x, y,'label','Trials','TooltipString','total trials in this stage for its completion'); next_row(y);
+            NumeditParam(obj, 'total_trials', 600, x, y,'label','Trials','TooltipString','total trials in this stage for its completion'); next_row(y);
             SubheaderParam(obj, 'title', 'Completion Params', x, y); next_row(y);
         end
         SubheaderParam(obj, 'title', 'AUTOMATED TRAINING STAGE', x, y);
