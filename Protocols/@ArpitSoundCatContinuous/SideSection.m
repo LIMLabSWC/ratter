@@ -62,28 +62,7 @@ switch action
 		DeclareGlobals(obj, 'ro_args', 'previous_sides');
 		SubheaderParam(obj, 'title', 'Sides Section', x, y);
 		next_row(y, 1.5);
-        %% slow ramp up of water amount		
-    %%the water volume is controlled by a 5-parameter logistic function: WaterAmount(t) = maxasymp + (minasymp/(1+(t/inflp)^slp).^assym)
-    NumeditParam(obj, 'maxasymp', 38, x,y,'label','maxasymp','TooltipString',...
-        'the water volume is controlled by a 5-parameter logistic function: WaterAmount(trialnum) = maxasymp + (minasymp/(1+(trialnum/inflp)^slp).^assym)');
-	next_row(y);
-	NumeditParam(obj, 'slp', 3, x,y,'label','slp','TooltipString','Water Modulation: Slope of the logistic function');	
-	next_row(y);
-	NumeditParam(obj, 'inflp', 350, x,y,'label','inflp','TooltipString','Water Modulation: concentration at the inflection point');	
-	next_row(y);
-    NumeditParam(obj, 'minasymp', -21, x,y,'label','inflp','TooltipString','Water Modulation: minimum asymptote');	
-	next_row(y);
-    NumeditParam(obj, 'assym', 0.7, x,y,'label','assym','TooltipString','Water Modulation: asymmetry factor');	
-	next_row(y);
-	DispParam(obj, 'trial_1', 0, x, y, 'TooltipString', 'uL on first trial');
-	next_row(y);
-	DispParam(obj, 'trial_150', 0, x, y, 'TooltipString', 'uL on trial 150');
-	next_row(y);
-	DispParam(obj, 'trial_300', 0, x, y, 'TooltipString', 'uL on trial 300');
-	next_row(y);
-	set_callback({maxasymp;slp;inflp;minasymp;assym}, {mfilename, 'change_water_modulation_params'});
-	feval(mfilename, obj, 'change_water_modulation_params');
-
+     
 		next_column(x); y = 5;
         
         % Reward Collection
@@ -164,7 +143,7 @@ switch action
         DispParam(obj, 'CP_duration', PreStim_time+A1_time+time_bet_aud1_gocue, x,y,'label','CP duration','TooltipString','Duration of Nose in Central Poke before Go cue starts (see Total_CP_duration)');
 		set_callback(CP_duration, {mfilename, 'new_CP_duration'});
 		next_row(y);
-		NumeditParam(obj, 'time_go_cue' ,0, x,y,'label','Go Cue Duration','TooltipString','duration of go cue (see Total_CP_duration)');
+		NumeditParam(obj, 'time_go_cue' ,0.2, x,y,'label','Go Cue Duration','TooltipString','duration of go cue (see Total_CP_duration)');
 		set_callback(time_go_cue, {mfilename, 'new_time_go_cue'});
 		next_row(y);
 		DispParam(obj, 'Total_CP_duration', CP_duration+time_go_cue, x, y, 'TooltipString', 'Total nose in center port time, in secs. Sum of CP_duration and Go Cue duration'); %#ok<*NODEF>

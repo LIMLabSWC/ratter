@@ -77,6 +77,31 @@ switch action
     
     x = 5; y = 5;             % Initial position on main GUI window
     
+    %% slow ramp up of water amount		
+    %%the water volume is controlled by a 5-parameter logistic function: WaterAmount(t) = maxasymp + (minasymp/(1+(t/inflp)^slp).^assym)
+    NumeditParam(obj, 'maxasymp', 38, x,y,'label','maxasymp','TooltipString',...
+        'the water volume is controlled by a 5-parameter logistic function: WaterAmount(trialnum) = maxasymp + (minasymp/(1+(trialnum/inflp)^slp).^assym)');
+	next_row(y);
+	NumeditParam(obj, 'slp', 3, x,y,'label','slp','TooltipString','Water Modulation: Slope of the logistic function');	
+	next_row(y);
+	NumeditParam(obj, 'inflp', 350, x,y,'label','inflp','TooltipString','Water Modulation: concentration at the inflection point');	
+	next_row(y);
+    NumeditParam(obj, 'minasymp', -21, x,y,'label','inflp','TooltipString','Water Modulation: minimum asymptote');	
+	next_row(y);
+    NumeditParam(obj, 'assym', 0.7, x,y,'label','assym','TooltipString','Water Modulation: asymmetry factor');	
+	next_row(y);
+	DispParam(obj, 'trial_1', 0, x, y, 'TooltipString', 'uL on first trial');
+	next_row(y);
+	DispParam(obj, 'trial_150', 0, x, y, 'TooltipString', 'uL on trial 150');
+	next_row(y);
+	DispParam(obj, 'trial_300', 0, x, y, 'TooltipString', 'uL on trial 300');
+	next_row(y);
+	set_callback({maxasymp;slp;inflp;minasymp;assym}, {mfilename, 'change_water_modulation_params'});
+	feval(mfilename, obj, 'change_water_modulation_params');
+	
+    SoloFunctionAddVars('SideSection', 'ro_args', ...
+			{'maxasymp';'slp';'inflp';'minasymp';'assym'});
+
     [x, y] = SavingSection(obj,       'init', x, y); 
     [x, y] = WaterValvesSection(obj,  'init', x, y);
     [x, y] = PokesPlotSection(obj, 'init', x, y);
@@ -84,12 +109,13 @@ switch action
     SessionDefinition(obj, 'init', x, y, value(myfig)); next_row(y, 2); %#ok<NASGU>
     
     next_column(x); y=5;
-	[x, y] = PerformanceSection(obj, 'init', x, y);
-    [x, y] = StimulatorSection(obj, 'init', x, y); next_row(y, 1.3);
+	
 	[x, y] = SideSection(obj,  'init', x, y); %#ok<NASGU>
     [x, y] = SoundSection(obj,'init',x,y);
     [x, y] = StimulusSection(obj,'init',x,y);
-
+    
+    [x, y] = PerformanceSection(obj, 'init', x, y);
+    [x, y] = StimulatorSection(obj, 'init', x, y); next_row(y, 1.3);
     figpos = get(double(gcf), 'Position');
     [expmtr, rname]=SavingSection(obj, 'get_info');
     HeaderParam(obj, 'prot_title', [mfilename ': ' expmtr ', ' rname], x, y, 'position', [10 figpos(4)-25, 800 20]);
