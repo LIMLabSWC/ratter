@@ -76,7 +76,8 @@ switch action
     SoundManagerSection(obj, 'init');
     
     x = 5; y = 5;             % Initial position on main GUI window
-    
+    [x, y] = SavingSection(obj,       'init', x, y); 
+
     %% slow ramp up of water amount		
     %%the water volume is controlled by a 5-parameter logistic function: WaterAmount(t) = maxasymp + (minasymp/(1+(t/inflp)^slp).^assym)
     NumeditParam(obj, 'maxasymp', 38, x,y,'label','maxasymp','TooltipString',...
@@ -101,8 +102,7 @@ switch action
 	
     SoloFunctionAddVars('SideSection', 'ro_args', ...
 			{'maxasymp';'slp';'inflp';'minasymp';'assym'});
-
-    [x, y] = SavingSection(obj,       'init', x, y); 
+    
     [x, y] = WaterValvesSection(obj,  'init', x, y);
     [x, y] = PokesPlotSection(obj, 'init', x, y);
     [x, y] = CommentsSection(obj, 'init', x, y);
@@ -113,7 +113,7 @@ switch action
 	[x, y] = SideSection(obj,  'init', x, y); %#ok<NASGU>
     [x, y] = SoundSection(obj,'init',x,y);
     [x, y] = StimulusSection(obj,'init',x,y);
-    
+
     [x, y] = PerformanceSection(obj, 'init', x, y);
     [x, y] = StimulatorSection(obj, 'init', x, y); next_row(y, 1.3);
     figpos = get(double(gcf), 'Position');
