@@ -30,7 +30,7 @@ switch action
         to_sound_id       = SoundManagerSection(obj, 'get_sound_id', 'TimeoutSound');
         timeout_snd_duration  = SoundManagerSection(obj, 'get_sound_duration', 'TimeoutSound');
 
-        [LeftWValveTime,RightWValveTime] = ParamsSection(obj, 'get_water_amount');
+        [LeftWValveTime,RightWValveTime] = SideSection(obj, 'get_water_amount');
         side = ParamsSection(obj, 'get_current_side');
 
         if side == 'l'

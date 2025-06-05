@@ -6,7 +6,7 @@ function [obj] = ArpitCentrePokeTraining(varargin)
 % Default object is of our own class (mfilename);
 % we inherit only from Plugins
 
-obj = class(struct, mfilename, pokesplot2, saveload, sessionmodel2, soundmanager, soundui, ...
+obj = class(struct, mfilename, pokesplot2, saveload, sessionmodel2, soundmanager, soundui,antibias, ...
   water, distribui,comments, soundtable, sqlsummary, bonsaicamera);
 
 %---------------------------------------------------------------

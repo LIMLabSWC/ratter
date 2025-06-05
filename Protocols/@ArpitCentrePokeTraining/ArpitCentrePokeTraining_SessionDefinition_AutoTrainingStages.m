@@ -1386,10 +1386,10 @@ end
 
 %<HELPER_FUNCTIONS>
 
-function [prestim,A1,prego] = param_time_within_range(fixed_length,cp_length,range_min_prestim,range_max_prestim, is_random_prestim, provided_time_prestim,...
+function [prestim,A1,prego] = param_time_within_range(not_fixed_length,cp_length,range_min_prestim,range_max_prestim, is_random_prestim, provided_time_prestim,...
     range_min_A1,range_max_A1, is_random_A1, provided_time_A1,range_min_prego,range_max_prego, is_random_prego, provided_time_prego)
 
-if fixed_length == 1 % warm up stage where cp length is increasing
+if not_fixed_length == 0 % warm up stage where cp length is increasing
 % then calculate the range/typical value
     if cp_length <= 0.3
         prestim = 0.1;
