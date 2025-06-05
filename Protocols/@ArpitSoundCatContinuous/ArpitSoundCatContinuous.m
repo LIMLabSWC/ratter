@@ -79,20 +79,7 @@ switch action
     
     [x, y] = SavingSection(obj,       'init', x, y); 
     [x, y] = WaterValvesSection(obj,  'init', x, y);
-    
-    % For plotting with the pokesplot plugin, we need to tell it what
-    % colors to plot with:
-    my_state_colors = SoundCatSMA(obj, 'get_state_colors');
-    % In pokesplot, the poke colors have a default value, so we don't need
-    % to specify them, but here they are so you know how to change them.
-    my_poke_colors = struct( ...
-    'L',                  0.6*[1 0.66 0],    ...
-    'C',                      [0 0 0],       ...
-    'R',                  0.9*[1 0.66 0]);
-    
-    [x, y] = PokesPlotSection(obj, 'init', x, y, ...
-    struct('states',  my_state_colors, 'pokes', my_poke_colors)); next_row(y);
-
+    [x, y] = PokesPlotSection(obj, 'init', x, y);
     [x, y] = CommentsSection(obj, 'init', x, y);
     SessionDefinition(obj, 'init', x, y, value(myfig)); next_row(y, 2); %#ok<NASGU>
     
