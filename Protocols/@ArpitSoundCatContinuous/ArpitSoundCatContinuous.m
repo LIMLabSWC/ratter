@@ -111,7 +111,7 @@ switch action
     [x, y] = WaterValvesSection(obj,  'init', x, y);next_row(y);
     [x, y] = PokesPlotSection(obj, 'init', x, y);next_row(y);
     [x, y] = CommentsSection(obj, 'init', x, y);next_row(y);
-    [x, y] = BonsaiCameraInterface(obj,'init',x,y,name,expmtr,rname);
+    [x, y] = BonsaiCameraInterface(obj,'init',x,y,name,expmtr,rname);next_row(y);
 
     oldx=x; oldy=y;
 
