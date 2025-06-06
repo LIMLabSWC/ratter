@@ -33,18 +33,38 @@ switch action
         [LeftWValveTime,RightWValveTime] = SideSection(obj, 'get_water_amount');
         side = ParamsSection(obj, 'get_current_side');
 
+        if strcmpi(side_lights,'none')
+            Side_LED = 0;
+        else
+            Side_LED = 1;
+        end
+
         if side == 'l'
             HitEvent = 'Lin';
             ErrorEvent = 'Rin';
             % sound_id = sone_sound_id;
-            SideLight  = left1led;
+            if strcmpi(side_lights,'correct side')
+                SideLight  = left1led;
+            elseif strcmpi(side_lights,'anti side')
+                SideLight  = right1led;
+            elseif strcmpi(side_lights,'both')
+                SideLight  = left1led+right1led;
+            end
             WValveTime = LeftWValveTime;
             WValveSide = left1water;
+            second_hit_light = left1led;
         else
             HitEvent = 'Rin';
             ErrorEvent = 'Lin';
             % sound_id = stwo_sound_id;
-            SideLight  = right1led;
+            if strcmpi(side_lights,'correct side')
+                SideLight  = right1led;
+            elseif strcmpi(side_lights,'anti side')
+                SideLight  = left1led;
+            elseif strcmpi(side_lights,'both')
+                SideLight  = left1led+right1led;
+            end
+            second_hit_light = right1led;
             WValveTime = RightWValveTime;
             WValveSide = right1water;
         end
@@ -184,7 +204,7 @@ switch action
         if strcmp(reward_type, 'Always')
             
             sma = add_state(sma,'name','second_hit_state','self_timer',RewardCollection_duration,...
-                'output_actions',{'DOut', SideLight},...
+                'output_actions',{'DOut', second_hit_light},...
                 'input_to_statechange',{'reward_collection_dur_In', 'timeout_state'; 'Tup','timeout_state'; HitEvent,'hit_state'});
         
         elseif  strcmp(reward_type, 'DelayedReward')
@@ -193,7 +213,7 @@ switch action
                 'input_to_statechange',{'Tup','current_state + 1';});
 
             sma = add_state(sma,'self_timer',RewardCollection_duration,...
-                'output_actions',{'DOut', SideLight},...
+                'output_actions',{'DOut', second_hit_light},...
                 'input_to_statechange',{'Tup','timeout_state'; HitEvent,'hit_state'});
 
         else % no reward but a punishment iti
@@ -205,7 +225,7 @@ switch action
         end
 
         sma = add_state(sma,'name','hit_state','self_timer',reward_delay,...
-            'output_actions', {'DOut', SideLight; 'SchedWaveTrig','reward_delivery'},...
+            'output_actions', {'DOut', second_hit_light; 'SchedWaveTrig','reward_delivery'},...
             'input_to_statechange',{'Tup','drink_state'});
 
         sma = add_state(sma,'name','drink_state','self_timer',drink_time,...

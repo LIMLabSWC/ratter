@@ -175,7 +175,6 @@ switch action
 		y=5;
 		
         % Training for Centre Poke Increase 
-		next_row(y);
 		ToggleParam(obj,'increase_CP_training',0,x,y,'OnString','Training Increasing CP','OffString','No Training');
 		set_callback(increase_CP_training, {mfilename, 'CP_training'});
         next_row(y);
@@ -192,6 +191,7 @@ switch action
         NumeditParam(obj, 'fraction_increase' ,0.001, x,y,'label','Frac_Increment','TooltipString','fraction CP added');
         next_row(y);
         NumeditParam(obj, 'cp_reached' ,value(cp_start), x,y,'label','CPDur_Reached','TooltipString','CP dur reached in last session');
+        next_row(y);
         make_invisible(cp_start); make_invisible(cp_end); make_invisible(fraction_increase);make_invisible(cp_reached);
 
 
