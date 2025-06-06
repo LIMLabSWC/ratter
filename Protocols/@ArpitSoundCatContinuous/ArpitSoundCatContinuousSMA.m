@@ -31,7 +31,7 @@ switch action
         timeout_snd_duration  = SoundManagerSection(obj, 'get_sound_duration', 'TimeoutSound');
 
         [LeftWValveTime,RightWValveTime] = SideSection(obj, 'get_water_amount');
-        side = ParamsSection(obj, 'get_current_side');
+        side = SideSection(obj, 'get_current_side');
 
         if strcmpi(side_lights,'none')
             Side_LED = 0;
@@ -43,7 +43,7 @@ switch action
             HitEvent = 'Lin';
             ErrorEvent = 'Rin';
             % sound_id = sone_sound_id;
-            if strcmpi(side_lights,'correct side')
+            if strcmpi(side_lights,'correct side') | strcmpi(side_lights,'none')
                 SideLight  = left1led;
             elseif strcmpi(side_lights,'anti side')
                 SideLight  = right1led;
@@ -57,7 +57,7 @@ switch action
             HitEvent = 'Rin';
             ErrorEvent = 'Lin';
             % sound_id = stwo_sound_id;
-            if strcmpi(side_lights,'correct side')
+            if strcmpi(side_lights,'correct side') | strcmpi(side_lights,'none')
                 SideLight  = right1led;
             elseif strcmpi(side_lights,'anti side')
                 SideLight  = left1led;
@@ -86,13 +86,15 @@ switch action
         end
         
         % Scheduled Wave for Go Sound
-        if value(Go_Sound) == 1
-            sma = add_scheduled_wave(sma, 'name', 'Go_Cue', 'preamble', 0.001, ...
+
+        % if value(Go_Sound) == 1
+            
+        sma = add_scheduled_wave(sma, 'name', 'Go_Cue', 'preamble', 0.001, ...
                 'sustain', go_cue_duration, 'sound_trig', go_sound_id); % to play the Go Cue/Reward Sound
-        else
-            sma = add_scheduled_wave(sma, 'name', 'Go_Cue', 'preamble', 0.001, ...
-                'sustain', go_cue_duration); % to play the Go Cue/Reward Sound
-        end
+        % else
+        %     sma = add_scheduled_wave(sma, 'name', 'Go_Cue', 'preamble', 0.001, ...
+        %         'sustain', go_cue_duration); % to play the Go Cue/Reward Sound
+        % end
 
         % Scheduled wave for CP Duration
         if CP_duration <= (SettlingIn_time + legal_cbreak)
@@ -219,8 +221,8 @@ switch action
         else % no reward but a punishment iti
             sma = add_state(sma,'name','second_hit_state','self_timer',error_iti,...
                 'input_to_statechange',{'reward_collection_dur_In', 'timeout_state'; 'Tup','preclean_up_state'});
-            sma = add_state(sma, 'name', 'hit_state');
-            sma = add_state(sma, 'name', 'drink_state');
+            % sma = add_state(sma, 'name', 'hit_state');
+            % sma = add_state(sma, 'name', 'drink_state');
 
         end
 

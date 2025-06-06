@@ -147,7 +147,7 @@ switch action
         figure(parentfig);
         
     case 'prepare_next_trial'
-        if value(training_stage) > 4 && stimuli_on
+        if stimuli_on
             StimulusSection(obj,'pick_current_stimulus');
             srate=SoundManagerSection(obj,'get_sample_rate');
             Fs=srate;
@@ -210,16 +210,16 @@ switch action
             stim_max_log = log(value(maxS1));
         end
 
-        if value(training_stage) == 4 % playing fixed sound during this stage
-            if (strcmpi(ThisTrial, 'LEFT') & strcmp(Rule,'S1>S_boundary Left')) | ...
-                    (strcmpi(ThisTrial, 'RIGHT') & strcmp(Rule,'S1>S_boundary Right'))
-                
-                stim_i_log = stim_min_log;
-            else
-                stim_i_log = stim_max_log;
-            end
-         
-        else % will be playing stimuli from the distribution
+        % if value(training_stage) == 4 % playing fixed sound during this stage
+        %     if (strcmpi(ThisTrial, 'LEFT') & strcmp(Rule,'S1>S_boundary Left')) | ...
+        %             (strcmpi(ThisTrial, 'RIGHT') & strcmp(Rule,'S1>S_boundary Right'))
+        % 
+        %         stim_i_log = stim_min_log;
+        %     else
+        %         stim_i_log = stim_max_log;
+        %     end
+        % 
+        % else % will be playing stimuli from the distribution
 
             if strcmpi(ThisTrial, 'LEFT')
                 dist_type  = value(Prob_Dist_Left);
@@ -309,7 +309,7 @@ switch action
                     stim_i_log = CreateSamples_from_Distribution('Sinusoidal',dist_mean,dist_sigma,edge_min,edge_max,1);
 
             end
-        end
+        % end
 
         thisstim.value=exp(stim_i_log);
         thisstimlog(n_done_trials+1) = stim_i_log;
