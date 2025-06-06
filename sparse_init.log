@@ -1,0 +1,36 @@
+=========================================
+🔧  Initializing sparse SVN checkout
+📂  Target directory: /c/ratter
+📡  Repository URL: http://172.24.155.220/svn/akramilab/ratter
+📄  Log file: sparse_init.log
+=========================================
+
+➡️  Checking out repository root (empty)...
+ U   .
+Checked out revision 44223.
+✅ Fetching: PASSWORD_CONFIG-DO_NOT_VERSIONCONTROL.mat
+Updating 'PASSWORD_CONFIG-DO_NOT_VERSIONCONTROL.mat':
+A    PASSWORD_CONFIG-DO_NOT_VERSIONCONTROL.mat
+Updated to revision 44223.
+
+📁 Preparing SoloData structure...
+Updating 'SoloData':
+A    SoloData
+Updated to revision 44223.
+Updating 'SoloData\Data':
+A    SoloData\Data
+Updated to revision 44223.
+Updating 'SoloData\Settings':
+A    SoloData\Settings
+Updated to revision 44223.
+
+📁 Adding training_videos folder...
+Updating 'training_videos':
+A    training_videos
+Updated to revision 44223.
+
+✅ DONE: Sparse checkout initialized.
+📌 You can now selectively fetch folders like:
+   svn update --set-depth=infinity SoloData/Data/arpit
+   svn update --set-depth=infinity training_videos/rig1
+

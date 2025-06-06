@@ -208,7 +208,7 @@ switch action
 			'reward_type';'secondhit_delay';'error_iti';'violation_iti'});
 
         SoloFunctionAddVars('StimulusSection', 'ro_args', ...
-			{'ThisTrial';'A1_time';'time_bet_aud1_gocue' ; ...
+			{'ThisTrial';'stimuli_on';'A1_time';'time_bet_aud1_gocue' ; ...
 			'PreStim_time'});
 
         SoloFunctionAddVars('StimulatorSection', 'ro_args', ...
@@ -490,8 +490,8 @@ switch action
 %         assym=0.7;
 %         left_wtr_mult.value=maxasymp + (minasymp./(1+(n_done_trials/inflp).^slp).^assym);
 %         right_wtr_mult.value=maxasymp + (minasymp./(1+(n_done_trials/inflp).^slp).^assym);
-		x=left_wtr_mult+0;
-		y=right_wtr_mult+0;
+		x=value(left_wtr_mult);
+		y=value(right_wtr_mult);
 	
     case 'get_water_amount'
 
@@ -502,7 +502,9 @@ switch action
         WValveTimes = GetValveTimes(WaterAmount, [2 3]);
         LeftWValveTime = WValveTimes(1);
         RightWValveTime = WValveTimes(2);
-        [LeftWMult, RightWMult] = ParamsSection(obj, 'get_water_mult');
+        % [LeftWMult, RightWMult] = ParamsSection(obj, 'get_water_mult');
+        LeftWMult=value(left_wtr_mult);
+		RightWMult=value(right_wtr_mult);
         x=LeftWValveTime*LeftWMult;
         y=RightWValveTime*RightWMult;
 

@@ -129,8 +129,9 @@ switch action
     x=oldx; y=oldy;
 
     SessionDefinition(obj, 'init', x, y, value(myfig)); next_row(y, 2); %#ok<NASGU>
-    % SoundCatSMA(obj, 'init');
-    % feval(mfilename, obj, 'prepare_next_trial');
+    
+    ArpitSoundCatContinuousSMA(obj, 'init');
+    feval(mfilename, obj, 'prepare_next_trial');
      
     case 'change_water_modulation_params'
 	   display_guys = [1 150 300];

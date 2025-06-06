@@ -1,0 +1,655 @@
+First time connecting with bdata server since matlab start.
+Matlab<->MySQL connector v1.36
+Current database is "akrami_db"
+connected
+<a href="matlab: opentoline('C:\ratter\ExperPort\Plugins\@sqlsummary\CentrePoketrainingsummary.m',54,1)">54  </a>        left_pokes = 0;
+Index: 4, Size: 4
+java.lang.IndexOutOfBoundsException: Index: 4, Size: 4
+	at java.util.ArrayList.rangeCheck(ArrayList.java:657)
+	at java.util.ArrayList.get(ArrayList.java:433)
+	at java.awt.Container.createHierarchyEvents(Container.java:1444)
+	at java.awt.Container.createHierarchyEvents(Container.java:1444)
+	at java.awt.Container.createHierarchyEvents(Container.java:1444)
+	at java.awt.Container.createHierarchyEvents(Container.java:1444)
+	at java.awt.Container.createHierarchyEvents(Container.java:1444)
+	at java.awt.Component.show(Component.java:1639)
+	at java.awt.Component.show(Component.java:1671)
+	at java.awt.Component.setVisible(Component.java:1623)
+	at javax.swing.JComponent.setVisible(JComponent.java:2644)
+	at javax.swing.JTabbedPane.fireStateChanged(JTabbedPane.java:394)
+	at javax.swing.JTabbedPane$ModelListener.stateChanged(JTabbedPane.java:270)
+	at javax.swing.DefaultSingleSelectionModel.fireStateChanged(DefaultSingleSelectionModel.java:132)
+	at javax.swing.DefaultSingleSelectionModel.setSelectedIndex(DefaultSingleSelectionModel.java:67)
+	at javax.swing.JTabbedPane.setSelectedIndexImpl(JTabbedPane.java:616)
+	at javax.swing.JTabbedPane.setSelectedIndex(JTabbedPane.java:591)
+	at com.mathworks.widgets.desk.DTTabbedPane.setSelectedIndex(DTTabbedPane.java:415)
+	at com.mathworks.widgets.desk.DTTabbedPane.toFront(DTTabbedPane.java:362)
+	at com.mathworks.widgets.desk.DTNestingContainer.toFront(DTNestingContainer.java:362)
+	at com.mathworks.widgets.desk.DTMultipleClientFrame.moveToFront(DTMultipleClientFrame.java:718)
+	at com.mathworks.widgets.desk.Desktop.toFront(Desktop.java:1354)
+	at sun.reflect.GeneratedMethodAccessor203.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at com.mathworks.widgets.desk.Desktop$DeferredFacadeProxy.invoke(Desktop.java:8564)
+	at com.sun.proxy.$Proxy6.toFront(Unknown Source)
+	at com.mathworks.widgets.desk.Desktop.toFront(Desktop.java:1247)
+	at com.mathworks.mde.editor.DebugFileOpeningService.doOpenEditorForDebug(DebugFileOpeningService.java:224)
+	at com.mathworks.mde.editor.DebugFileOpeningService.access$200(DebugFileOpeningService.java:42)
+	at com.mathworks.mde.editor.DebugFileOpeningService$3.run(DebugFileOpeningService.java:170)
+	at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:311)
+	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:758)
+	at java.awt.EventQueue.access$500(EventQueue.java:97)
+	at java.awt.EventQueue$3.run(EventQueue.java:709)
+	at java.awt.EventQueue$3.run(EventQueue.java:703)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:74)
+	at java.awt.EventQueue.dispatchEvent(EventQueue.java:728)
+	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:205)
+	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:116)
+	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:105)
+	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
+	at java.awt.EventDispatchThread.run(EventDispatchThread.java:82)
+Exception in thread "AWT-EventQueue-0": java.lang.IndexOutOfBoundsException: Index: 4, Size: 4
+	at java.util.ArrayList.rangeCheck(ArrayList.java:657)
+	at java.util.ArrayList.get(ArrayList.java:433)
+	at java.awt.Container.createHierarchyEvents(Container.java:1444)
+	at java.awt.Container.createHierarchyEvents(Container.java:1444)
+	at java.awt.Container.createHierarchyEvents(Container.java:1444)
+	at java.awt.Container.createHierarchyEvents(Container.java:1444)
+	at java.awt.Container.createHierarchyEvents(Container.java:1444)
+	at java.awt.Component.show(Component.java:1639)
+	at java.awt.Component.show(Component.java:1671)
+	at java.awt.Component.setVisible(Component.java:1623)
+	at javax.swing.JComponent.setVisible(JComponent.java:2644)
+	at javax.swing.JTabbedPane.fireStateChanged(JTabbedPane.java:394)
+	at javax.swing.JTabbedPane$ModelListener.stateChanged(JTabbedPane.java:270)
+	at javax.swing.DefaultSingleSelectionModel.fireStateChanged(DefaultSingleSelectionModel.java:132)
+	at javax.swing.DefaultSingleSelectionModel.setSelectedIndex(DefaultSingleSelectionModel.java:67)
+	at javax.swing.JTabbedPane.setSelectedIndexImpl(JTabbedPane.java:616)
+	at javax.swing.JTabbedPane.setSelectedIndex(JTabbedPane.java:591)
+	at com.mathworks.widgets.desk.DTTabbedPane.setSelectedIndex(DTTabbedPane.java:415)
+	at com.mathworks.widgets.desk.DTTabbedPane.toFront(DTTabbedPane.java:362)
+	at com.mathworks.widgets.desk.DTNestingContainer.toFront(DTNestingContainer.java:362)
+	at com.mathworks.widgets.desk.DTMultipleClientFrame.moveToFront(DTMultipleClientFrame.java:718)
+	at com.mathworks.widgets.desk.Desktop.toFront(Desktop.java:1354)
+	at sun.reflect.GeneratedMethodAccessor203.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at com.mathworks.widgets.desk.Desktop$DeferredFacadeProxy.invoke(Desktop.java:8564)
+	at com.sun.proxy.$Proxy6.toFront(Unknown Source)
+	at com.mathworks.widgets.desk.Desktop.toFront(Desktop.java:1247)
+	at com.mathworks.mde.editor.DebugFileOpeningService.doOpenEditorForDebug(DebugFileOpeningService.java:224)
+	at com.mathworks.mde.editor.DebugFileOpeningService.access$200(DebugFileOpeningService.java:42)
+	at com.mathworks.mde.editor.DebugFileOpeningService$3.run(DebugFileOpeningService.java:170)
+	at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:311)
+	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:758)
+	at java.awt.EventQueue.access$500(EventQueue.java:97)
+	at java.awt.EventQueue$3.run(EventQueue.java:709)
+	at java.awt.EventQueue$3.run(EventQueue.java:703)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:74)
+	at java.awt.EventQueue.dispatchEvent(EventQueue.java:728)
+	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:205)
+	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:116)
+	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:105)
+	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
+	at java.awt.EventDispatchThread.run(EventDispatchThread.java:82)
+if system_dependent('IsDebugMode')==1, dbquit; end
+
+MATLAB:ErrorRecovery:ItemNoLongerOnPath 
+Error using <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('load')" style="font-weight:bold">load</a>
+..\PASSWORD_CONFIG-DO_NOT_VERSIONCONTROL.mat is not found in the current folder or on the MATLAB path, but exists in:
+    C:\ratter\ExperPort
+    C:\ratter\Protocols
+    C:\ratter\Bpod Protocols
+    C:\ratter\SoloData
+
+Change the MATLAB current folder or add its folder to the MATLAB path.
+On line 17 of C:\ratter\ExperPort\MySQLUtility\bdata.m
+On line 7 of C:\ratter\ExperPort\MySQLUtility\get_network_info.m
+On line 18 of C:\ratter\ExperPort\Plugins\@sqlsummary\CentrePoketrainingsummary.m
+On line 317 of C:\ratter\Protocols\@ArpitCentrePokeTraining\ArpitCentrePokeTraining.m
+On line 96 of C:\ratter\ExperPort\Modules\@dispatcher\ProtocolsSection.m
+On line 40 of C:\ratter\ExperPort\HandleParam\parse_and_call_sph_callback.m
+On line 107 of C:\ratter\ExperPort\HandleParam\@SoloParamHandle\callback.m
+On line 165 of C:\ratter\ExperPort\Modules\@dispatcher\ProtocolsSection.m
+On line 210 of C:\ratter\ExperPort\Modules\@dispatcher\dispatcher.m
+Error calculating session length
+Index exceeds the number of array elements. Index must not exceed 0.
+  7×1 <a href="matlab:helpPopup('struct')" style="font-weight:bold">struct</a> array with fields:
+
+    file
+    name
+    line
+
+Failed to send summary to sql
+Output argument "y" (and possibly others) not assigned a value in the execution with "sqlsummary.CentrePoketrainingsummary>sess_length" function.
+  6×1 <a href="matlab:helpPopup('struct')" style="font-weight:bold">struct</a> array with fields:
+
+    file
+    name
+    line
+
+Error occurred during sendsummary execution:
+Output argument "y" (and possibly others) not assigned a value in the execution with "sqlsummary.CentrePoketrainingsummary>sess_length" function.
+
+
+*******
+
+    WARNING: Unable to complete 'close' action on protocol
+    Last error was: "Error using <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('fprintf')" style="font-weight:bold">fprintf</a>
+Function is not defined for 'struct' inputs."
+
+
+
+*******
+
+Warning: B-data NOT enabled for liquid calibration. No calibration values received.
+
+MATLAB:cd:NonExistentFolder 
+Error using <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('cd')" style="font-weight:bold">cd</a>
+Unable to change current folder to 'C:\ratter\Protocols\Sounds' (Name is nonexistent or not a folder).
+On line 13 of C:\ratter\ExperPort\Plugins\@soundui\private\fillSoundsMenu.m
+On line 173 of C:\ratter\ExperPort\Plugins\@soundui\SoundInterface.m
+On line 41 of C:\ratter\Protocols\@ArpitCentrePokeTraining\SoundSection.m
+On line 179 of C:\ratter\Protocols\@ArpitCentrePokeTraining\ArpitCentrePokeTraining.m
+On line 152 of C:\ratter\ExperPort\Modules\@dispatcher\ProtocolsSection.m
+On line 40 of C:\ratter\ExperPort\HandleParam\parse_and_call_sph_callback.m
+On line 107 of C:\ratter\ExperPort\HandleParam\@SoloParamHandle\callback.m
+On line 5 of C:\ratter\ExperPort\HandleParam\generic_callback.m
+Error calculating session length
+Index exceeds the number of array elements. Index must not exceed 0.
+  8×1 <a href="matlab:helpPopup('struct')" style="font-weight:bold">struct</a> array with fields:
+
+    file
+    name
+    line
+
+Failed to send summary to sql
+Output argument "y" (and possibly others) not assigned a value in the execution with "sqlsummary.CentrePoketrainingsummary>sess_length" function.
+  7×1 <a href="matlab:helpPopup('struct')" style="font-weight:bold">struct</a> array with fields:
+
+    file
+    name
+    line
+
+Error occurred during sendsummary execution:
+Output argument "y" (and possibly others) not assigned a value in the execution with "sqlsummary.CentrePoketrainingsummary>sess_length" function.
+
+
+*******
+
+    WARNING: Unable to complete 'close' action on protocol
+    Last error was: "Error using <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('fprintf')" style="font-weight:bold">fprintf</a>
+Function is not defined for 'struct' inputs."
+
+
+
+*******
+
+
+ans = 
+
+       dispatcher object: 1-by-1
+
+clc
+Warning: B-data NOT enabled for liquid calibration. No calibration values received.
+<a href="matlab: opentoline('C:\ratter\ExperPort\Plugins\@sqlsummary\CentrePoketrainingsummary.m',64,1)">64  </a>        sessid = getSessID(obj);
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+
+MATLAB:cd:NonExistentFolder 
+Error using <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('cd')" style="font-weight:bold">cd</a>
+Unable to change current folder to 'C:\ratter\Protocols\Sounds' (Name is nonexistent or not a folder).
+On line 13 of C:\ratter\ExperPort\Plugins\@soundui\private\fillSoundsMenu.m
+On line 173 of C:\ratter\ExperPort\Plugins\@soundui\SoundInterface.m
+On line 41 of C:\ratter\Protocols\@ArpitCentrePokeTraining\SoundSection.m
+On line 179 of C:\ratter\Protocols\@ArpitCentrePokeTraining\ArpitCentrePokeTraining.m
+On line 152 of C:\ratter\ExperPort\Modules\@dispatcher\ProtocolsSection.m
+On line 40 of C:\ratter\ExperPort\HandleParam\parse_and_call_sph_callback.m
+On line 107 of C:\ratter\ExperPort\HandleParam\@SoloParamHandle\callback.m
+On line 5 of C:\ratter\ExperPort\HandleParam\generic_callback.m
+Error calculating session length
+Index exceeds the number of array elements. Index must not exceed 0.
+  8×1 <a href="matlab:helpPopup('struct')" style="font-weight:bold">struct</a> array with fields:
+
+    file
+    name
+    line
+
+if system_dependent('IsDebugMode')==1, dbquit; end
+<a href="matlab: opentoline('C:\ratter\ExperPort\Plugins\@sqlsummary\CentrePoketrainingsummary.m',64,1)">64  </a>        sessid = getSessID(obj);
+if system_dependent('IsDebugMode')==1, dbcont; end
+Failed to send summary to sql
+Dimensions of arrays being concatenated are not consistent.
+  6×1 <a href="matlab:helpPopup('struct')" style="font-weight:bold">struct</a> array with fields:
+
+    file
+    name
+    line
+
+Error occurred during sendsummary execution:
+Dimensions of arrays being concatenated are not consistent.
+
+
+*******
+
+    WARNING: Unable to complete 'close' action on protocol
+    Last error was: "Error using <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('fprintf')" style="font-weight:bold">fprintf</a>
+Function is not defined for 'struct' inputs."
+
+
+
+*******
+
+Warning: B-data NOT enabled for liquid calibration. No calibration values received.
+<a href="matlab: opentoline('C:\ratter\ExperPort\Plugins\@sqlsummary\CentrePoketrainingsummary.m',64,1)">64  </a>        sessid = getSessID(obj);
+if system_dependent('IsDebugMode')==1, dbcont; end
+Failed to send summary to sql
+Dimensions of arrays being concatenated are not consistent.
+  7×1 <a href="matlab:helpPopup('struct')" style="font-weight:bold">struct</a> array with fields:
+
+    file
+    name
+    line
+
+Error occurred during sendsummary execution:
+Dimensions of arrays being concatenated are not consistent.
+
+
+*******
+
+    WARNING: Unable to complete 'close' action on protocol
+    Last error was: "Error using <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('fprintf')" style="font-weight:bold">fprintf</a>
+Function is not defined for 'struct' inputs."
+
+
+
+*******
+
+
+ans = 
+
+       dispatcher object: 1-by-1
+
+
+ans = 
+
+       dispatcher object: 1-by-1
+
+
+ans = 
+
+       dispatcher object: 1-by-1
+
+Warning: B-data NOT enabled for liquid calibration. No calibration values received.
+<a href="matlab: opentoline('C:\ratter\ExperPort\Plugins\@sqlsummary\CentrePoketrainingsummary.m',76,1)">76  </a>        colstr = [
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbquit; end
+clc
+<a href="matlab: opentoline('C:\ratter\ExperPort\Plugins\@sqlsummary\CentrePoketrainingsummary.m',143,1)">143 </a>        valstr = [
+if system_dependent('IsDebugMode')==1, dbcont; end
+if system_dependent('IsDebugMode')==1, dbquit; end
+!git status
+On branch 2_step_soundcat_arpit
+Your branch is up to date with 'origin/2_step_soundcat_arpit'.
+
+Changes not staged for commit:
+  (use "git add/rm <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	deleted:    ../ExperPort/Plugins/@sqlsummary/CentrePoketrainingsummary.asv
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	../ExperPort/settings_@ArpitCentrePokeTraining_arpit_AR01_250506a.mat
+	../ExperPort/settings_@ArpitCentrePokeTraining_arpit_AR01_250507a.mat
+	../ExperPort/settings_@ArpitCentrePokeTraining_arpit_AR02_250506a.mat
+	../ExperPort/settings_@ArpitCentrePokeTraining_arpit_AR02_250507a.mat
+	../ExperPort/settings_@ArpitCentrePokeTraining_arpit_AR03_250506a.mat
+	../ExperPort/settings_@ArpitCentrePokeTraining_arpit_AR03_250507a.mat
+	../ExperPort/settings_@ArpitCentrePokeTraining_arpit_AR04_250506a.mat
+	../ExperPort/settings_@ArpitCentrePokeTraining_arpit_AR04_250507a.mat
+	../ExperPort/settings_@ArpitCentrePokeTraining_experimenter_ratname_250506a.mat
+	../ExperPort/settings_@ArpitCentrePokeTraining_experimenter_ratname_250508a.mat
+	sendsummary_error_log.txt
+	../sendsummary_error_log.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")
+flush
+Bpod successfully disconnected.
+!git status
+On branch 2_step_soundcat_arpit
+Your branch is up to date with 'origin/2_step_soundcat_arpit'.
+
+Changes not staged for commit:
+  (use "git add/rm <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	deleted:    ../ExperPort/Plugins/@sqlsummary/CentrePoketrainingsummary.asv
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	../ExperPort/settings_@ArpitCentrePokeTraining_arpit_AR01_250506a.mat
+	../ExperPort/settings_@ArpitCentrePokeTraining_arpit_AR01_250507a.mat
+	../ExperPort/settings_@ArpitCentrePokeTraining_arpit_AR02_250506a.mat
+	../ExperPort/settings_@ArpitCentrePokeTraining_arpit_AR02_250507a.mat
+	../ExperPort/settings_@ArpitCentrePokeTraining_arpit_AR03_250506a.mat
+	../ExperPort/settings_@ArpitCentrePokeTraining_arpit_AR03_250507a.mat
+	../ExperPort/settings_@ArpitCentrePokeTraining_arpit_AR04_250506a.mat
+	../ExperPort/settings_@ArpitCentrePokeTraining_arpit_AR04_250507a.mat
+	../ExperPort/settings_@ArpitCentrePokeTraining_experimenter_ratname_250506a.mat
+	../ExperPort/settings_@ArpitCentrePokeTraining_experimenter_ratname_250508a.mat
+	sendsummary_error_log.txt
+	../sendsummary_error_log.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")
+!git pull
+From https://github.com/LIMLabSWC/ratter
+   ec159f7..c79aaeb  2_step_soundcat_arpit -> origin/2_step_soundcat_arpit
+Updating ec159f7..c79aaeb
+Fast-forward
+ .../@sqlsummary/CentrePoketrainingsummary.asv      | 315 ---------------------
+ .../@sqlsummary/CentrePoketrainingsummary.m        | 311 +++++++++++---------
+ .../ArpitCentrePokeTraining.m                      |   2 +-
+ Protocols/@ArpitCentrePokeTraining/ParamsSection.m |   2 +-
+ 4 files changed, 177 insertions(+), 453 deletions(-)
+ delete mode 100644 ExperPort/Plugins/@sqlsummary/CentrePoketrainingsummary.asv
+Bpod('COM9'); newstartup;
+Starting Bpod Console v1.8.0
+***********************************************************
+UPDATE NOTICE: Bpod Console v'1.8.1 is available to download!
+                 View release notes <a href="matlab:web('https://github.com/sanworks/Bpod_Gen2/blob/master/Release%20Notes.txt','-browser')">here</a>
+To update run UpdateBpodSoftware() OR see instructions<a href="matlab:web('https://sanworks.github.io/Bpod_Wiki/install-and-update/software-update/','-browser')">here</a>
+***********************************************************
+Bpod State Machine r2 connected on port COM9
+runrats('init');
+test
+First time connecting with bdata server since matlab start.
+Matlab<->MySQL connector v1.36
+Current database is "akrami_db"
+connected
+[Warning: Using 'twister' to set RAND's internal state causes RAND, RANDI, and RANDN to use legacy
+random number generators.  This syntax is not recommended.  See <a href="matlab:helpview([docroot '\techdoc\math\math.map'],'update_random_number_generator')">Replace Discouraged Syntaxes of rand
+and randn</a> to use RNG to replace the old syntax.] 
+[> In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('dispatcher', 'C:\ratter\ExperPort\Modules\@dispatcher\dispatcher.m', 121)" style="font-weight:bold">dispatcher</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\Modules\@dispatcher\dispatcher.m',121,0)">line 121</a>)
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('runrats', 'C:\ratter\ExperPort\Modules\@runrats\runrats.m', 97)" style="font-weight:bold">runrats</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\Modules\@runrats\runrats.m',97,0)">line 97</a>)] 
+############################################################
+ALERT! No WavePlayer module detected!
+Protocols will error out if analog scheduled waves are used.
+############################################################
+WARNING: Failed to keep runrats on top
+ERROR in bdata: mym(CON_ID,'call update_riginfo("{S}","{S}","{S}","{S}","{S}","{S}","{S}")',vs{1}, vs{2} , vs{3} , vs{4} , vs{5} , vs{6} , vs{7} );
+
+ 
+Error using <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('mym')" style="font-weight:bold">mym</a>
+PROCEDURE akrami_db.update_riginfo does not exist
+On line 158 of C:\ratter\ExperPort\MySQLUtility\bdata.m
+On line 19 of C:\ratter\ExperPort\Modules\@runrats\private\update_riginfo.m
+On line 286 of C:\ratter\ExperPort\Modules\@runrats\runrats.m
+Rig Info updated successfully.
+Rig 31: IP=172.24.155.31, MAC=F875A4DEBBD8, Hostname=AKRAMI-RIG031
+Updating Current Session
+ERROR in bdata: mym(CON_ID,'call update_rigtrials("{Si}","{Si}","{S}","{S}")',vs{1}, vs{2} , vs{3} , vs{4} );
+
+ 
+Error using <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('mym')" style="font-weight:bold">mym</a>
+Incorrect number of arguments for PROCEDURE akrami_db.update_rigtrials; expected 0, got 4
+On line 158 of C:\ratter\ExperPort\MySQLUtility\bdata.m
+On line 40 of C:\ratter\ExperPort\Plugins\@sqlsummary\send_n_done_trials.m
+On line 1253 of C:\ratter\ExperPort\Modules\@runrats\runrats.m
+On line 1244 of C:\ratter\ExperPort\Modules\@runrats\runrats.m
+On line 1195 of C:\ratter\ExperPort\Modules\@runrats\runrats.m
+On line 40 of C:\ratter\ExperPort\HandleParam\parse_and_call_sph_callback.m
+On line 107 of C:\ratter\ExperPort\HandleParam\@SoloParamHandle\callback.m
+On line 5 of C:\ratter\ExperPort\HandleParam\generic_callback.m
+
+MATLAB:minrhs 
+Not enough input arguments.
+On line 61 of C:\Program Files\MATLAB\R2024a\toolbox\matlab\codetools\export.m
+On line 155 of C:\ratter\ExperPort\Plugins\@pokesplot\pokesplot_preferences_pane.m
+On line 173 of C:\ratter\ExperPort\Plugins\@pokesplot\PokesPlotSection.m
+On line 168 of C:\ratter\Protocols\@Rigtest_singletrial\Rigtest_singletrial.m
+On line 152 of C:\ratter\ExperPort\Modules\@dispatcher\ProtocolsSection.m
+On line 40 of C:\ratter\ExperPort\HandleParam\parse_and_call_sph_callback.m
+On line 107 of C:\ratter\ExperPort\HandleParam\@SoloParamHandle\callback.m
+On line 184 of C:\ratter\ExperPort\Modules\@dispatcher\ProtocolsSection.m
+On line 211 of C:\ratter\ExperPort\Modules\@dispatcher\dispatcher.m
+On line 1266 of C:\ratter\ExperPort\Modules\@runrats\runrats.m
+On line 1244 of C:\ratter\ExperPort\Modules\@runrats\runrats.m
+On line 1195 of C:\ratter\ExperPort\Modules\@runrats\runrats.m
+On line 40 of C:\ratter\ExperPort\HandleParam\parse_and_call_sph_callback.m
+On line 107 of C:\ratter\ExperPort\HandleParam\@SoloParamHandle\callback.m
+On line 5 of C:\ratter\ExperPort\HandleParam\generic_callback.m
+Flagged stopping process as complete.
+Warning: B-data NOT enabled for liquid calibration. No calibration values received.
+[Warning: You created a new handle ("TrainingStageParamsSection_last_session_CP") since these
+settings
+were saved, no setting for it can be loaded.] 
+[> In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('loading_set_soloparamhandle_values', 'C:\ratter\ExperPort\HandleParam\private\loading_set_soloparamhandle_values.m', 50)" style="font-weight:bold">loading_set_soloparamhandle_values</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\HandleParam\private\loading_set_soloparamhandle_values.m',50,0)">line 50</a>)
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('loading_core_load_sequence', 'C:\ratter\ExperPort\HandleParam\private\loading_core_load_sequence.m', 35)" style="font-weight:bold">loading_core_load_sequence</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\HandleParam\private\loading_core_load_sequence.m',35,0)">line 35</a>)
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('load_solouiparamvalues', 'C:\ratter\ExperPort\HandleParam\load_solouiparamvalues.m', 192)" style="font-weight:bold">load_solouiparamvalues</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\HandleParam\load_solouiparamvalues.m',192,0)">line 192</a>)
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('runrats', 'C:\ratter\ExperPort\Modules\@runrats\runrats.m', 1386)" style="font-weight:bold">runrats</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\Modules\@runrats\runrats.m',1386,0)">line 1386</a>)
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('runrats', 'C:\ratter\ExperPort\Modules\@runrats\runrats.m', 1302)" style="font-weight:bold">runrats</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\Modules\@runrats\runrats.m',1302,0)">line 1302</a>)
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('timer/timercb', 'C:\Program Files\MATLAB\R2024a\toolbox\matlab\timerfun\@timer\timercb.m', 71)" style="font-weight:bold">timer/timercb</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2024a\toolbox\matlab\timerfun\@timer\timercb.m',71,0)">line 71</a>)
+In matlab.graphics.interaction.uiaxes/EditInteraction/figureMotionFcn
+In matlab.graphics.interaction.uiaxes.EditInteraction>@(~,e)this.figureMotionFcn(e)] 
+[Warning: You created a new handle ("TrainingStageParamsSection_max_CP") since these settings
+were saved, no setting for it can be loaded.] 
+[> In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('loading_set_soloparamhandle_values', 'C:\ratter\ExperPort\HandleParam\private\loading_set_soloparamhandle_values.m', 50)" style="font-weight:bold">loading_set_soloparamhandle_values</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\HandleParam\private\loading_set_soloparamhandle_values.m',50,0)">line 50</a>)
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('loading_core_load_sequence', 'C:\ratter\ExperPort\HandleParam\private\loading_core_load_sequence.m', 35)" style="font-weight:bold">loading_core_load_sequence</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\HandleParam\private\loading_core_load_sequence.m',35,0)">line 35</a>)
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('load_solouiparamvalues', 'C:\ratter\ExperPort\HandleParam\load_solouiparamvalues.m', 192)" style="font-weight:bold">load_solouiparamvalues</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\HandleParam\load_solouiparamvalues.m',192,0)">line 192</a>)
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('runrats', 'C:\ratter\ExperPort\Modules\@runrats\runrats.m', 1386)" style="font-weight:bold">runrats</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\Modules\@runrats\runrats.m',1386,0)">line 1386</a>)
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('runrats', 'C:\ratter\ExperPort\Modules\@runrats\runrats.m', 1302)" style="font-weight:bold">runrats</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\Modules\@runrats\runrats.m',1302,0)">line 1302</a>)
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('timer/timercb', 'C:\Program Files\MATLAB\R2024a\toolbox\matlab\timerfun\@timer\timercb.m', 71)" style="font-weight:bold">timer/timercb</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2024a\toolbox\matlab\timerfun\@timer\timercb.m',71,0)">line 71</a>)
+In matlab.graphics.interaction.uiaxes/EditInteraction/figureMotionFcn
+In matlab.graphics.interaction.uiaxes.EditInteraction>@(~,e)this.figureMotionFcn(e)] 
+[Warning: You created a new handle ("TrainingStageParamsSection_CPfraction_inc") since these settings
+were saved, no setting for it can be loaded.] 
+[> In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('loading_set_soloparamhandle_values', 'C:\ratter\ExperPort\HandleParam\private\loading_set_soloparamhandle_values.m', 50)" style="font-weight:bold">loading_set_soloparamhandle_values</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\HandleParam\private\loading_set_soloparamhandle_values.m',50,0)">line 50</a>)
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('loading_core_load_sequence', 'C:\ratter\ExperPort\HandleParam\private\loading_core_load_sequence.m', 35)" style="font-weight:bold">loading_core_load_sequence</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\HandleParam\private\loading_core_load_sequence.m',35,0)">line 35</a>)
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('load_solouiparamvalues', 'C:\ratter\ExperPort\HandleParam\load_solouiparamvalues.m', 192)" style="font-weight:bold">load_solouiparamvalues</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\HandleParam\load_solouiparamvalues.m',192,0)">line 192</a>)
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('runrats', 'C:\ratter\ExperPort\Modules\@runrats\runrats.m', 1386)" style="font-weight:bold">runrats</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\Modules\@runrats\runrats.m',1386,0)">line 1386</a>)
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('runrats', 'C:\ratter\ExperPort\Modules\@runrats\runrats.m', 1302)" style="font-weight:bold">runrats</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\Modules\@runrats\runrats.m',1302,0)">line 1302</a>)
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('timer/timercb', 'C:\Program Files\MATLAB\R2024a\toolbox\matlab\timerfun\@timer\timercb.m', 71)" style="font-weight:bold">timer/timercb</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2024a\toolbox\matlab\timerfun\@timer\timercb.m',71,0)">line 71</a>)
+In matlab.graphics.interaction.uiaxes/EditInteraction/figureMotionFcn
+In matlab.graphics.interaction.uiaxes.EditInteraction>@(~,e)this.figureMotionFcn(e)] 
+[Warning: You created a new handle ("TrainingStageParamsSection_recent_violation") since these
+settings
+were saved, no setting for it can be loaded.] 
+[> In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('loading_set_soloparamhandle_values', 'C:\ratter\ExperPort\HandleParam\private\loading_set_soloparamhandle_values.m', 50)" style="font-weight:bold">loading_set_soloparamhandle_values</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\HandleParam\private\loading_set_soloparamhandle_values.m',50,0)">line 50</a>)
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('loading_core_load_sequence', 'C:\ratter\ExperPort\HandleParam\private\loading_core_load_sequence.m', 35)" style="font-weight:bold">loading_core_load_sequence</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\HandleParam\private\loading_core_load_sequence.m',35,0)">line 35</a>)
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('load_solouiparamvalues', 'C:\ratter\ExperPort\HandleParam\load_solouiparamvalues.m', 192)" style="font-weight:bold">load_solouiparamvalues</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\HandleParam\load_solouiparamvalues.m',192,0)">line 192</a>)
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('runrats', 'C:\ratter\ExperPort\Modules\@runrats\runrats.m', 1386)" style="font-weight:bold">runrats</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\Modules\@runrats\runrats.m',1386,0)">line 1386</a>)
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('runrats', 'C:\ratter\ExperPort\Modules\@runrats\runrats.m', 1302)" style="font-weight:bold">runrats</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\Modules\@runrats\runrats.m',1302,0)">line 1302</a>)
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('timer/timercb', 'C:\Program Files\MATLAB\R2024a\toolbox\matlab\timerfun\@timer\timercb.m', 71)" style="font-weight:bold">timer/timercb</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2024a\toolbox\matlab\timerfun\@timer\timercb.m',71,0)">line 71</a>)
+In matlab.graphics.interaction.uiaxes/EditInteraction/figureMotionFcn
+In matlab.graphics.interaction.uiaxes.EditInteraction>@(~,e)this.figureMotionFcn(e)] 
+[Warning: You created a new handle ("TrainingStageParamsSection_recent_timeout") since these settings
+were saved, no setting for it can be loaded.] 
+[> In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('loading_set_soloparamhandle_values', 'C:\ratter\ExperPort\HandleParam\private\loading_set_soloparamhandle_values.m', 50)" style="font-weight:bold">loading_set_soloparamhandle_values</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\HandleParam\private\loading_set_soloparamhandle_values.m',50,0)">line 50</a>)
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('loading_core_load_sequence', 'C:\ratter\ExperPort\HandleParam\private\loading_core_load_sequence.m', 35)" style="font-weight:bold">loading_core_load_sequence</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\HandleParam\private\loading_core_load_sequence.m',35,0)">line 35</a>)
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('load_solouiparamvalues', 'C:\ratter\ExperPort\HandleParam\load_solouiparamvalues.m', 192)" style="font-weight:bold">load_solouiparamvalues</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\HandleParam\load_solouiparamvalues.m',192,0)">line 192</a>)
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('runrats', 'C:\ratter\ExperPort\Modules\@runrats\runrats.m', 1386)" style="font-weight:bold">runrats</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\Modules\@runrats\runrats.m',1386,0)">line 1386</a>)
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('runrats', 'C:\ratter\ExperPort\Modules\@runrats\runrats.m', 1302)" style="font-weight:bold">runrats</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\Modules\@runrats\runrats.m',1302,0)">line 1302</a>)
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('timer/timercb', 'C:\Program Files\MATLAB\R2024a\toolbox\matlab\timerfun\@timer\timercb.m', 71)" style="font-weight:bold">timer/timercb</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2024a\toolbox\matlab\timerfun\@timer\timercb.m',71,0)">line 71</a>)
+In matlab.graphics.interaction.uiaxes/EditInteraction/figureMotionFcn
+In matlab.graphics.interaction.uiaxes.EditInteraction>@(~,e)this.figureMotionFcn(e)] 
+[Warning: You created a new handle ("TrainingStageParamsSection_stage_violation") since these
+settings
+were saved, no setting for it can be loaded.] 
+[> In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('loading_set_soloparamhandle_values', 'C:\ratter\ExperPort\HandleParam\private\loading_set_soloparamhandle_values.m', 50)" style="font-weight:bold">loading_set_soloparamhandle_values</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\HandleParam\private\loading_set_soloparamhandle_values.m',50,0)">line 50</a>)
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('loading_core_load_sequence', 'C:\ratter\ExperPort\HandleParam\private\loading_core_load_sequence.m', 35)" style="font-weight:bold">loading_core_load_sequence</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\HandleParam\private\loading_core_load_sequence.m',35,0)">line 35</a>)
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('load_solouiparamvalues', 'C:\ratter\ExperPort\HandleParam\load_solouiparamvalues.m', 192)" style="font-weight:bold">load_solouiparamvalues</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\HandleParam\load_solouiparamvalues.m',192,0)">line 192</a>)
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('runrats', 'C:\ratter\ExperPort\Modules\@runrats\runrats.m', 1386)" style="font-weight:bold">runrats</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\Modules\@runrats\runrats.m',1386,0)">line 1386</a>)
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('runrats', 'C:\ratter\ExperPort\Modules\@runrats\runrats.m', 1302)" style="font-weight:bold">runrats</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\Modules\@runrats\runrats.m',1302,0)">line 1302</a>)
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('timer/timercb', 'C:\Program Files\MATLAB\R2024a\toolbox\matlab\timerfun\@timer\timercb.m', 71)" style="font-weight:bold">timer/timercb</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2024a\toolbox\matlab\timerfun\@timer\timercb.m',71,0)">line 71</a>)
+In matlab.graphics.interaction.uiaxes/EditInteraction/figureMotionFcn
+In matlab.graphics.interaction.uiaxes.EditInteraction>@(~,e)this.figureMotionFcn(e)] 
+
+MATLAB:UndefinedFunction 
+Undefined function 'callback' for input arguments of type 'struct'.
+On line 80 of C:\ratter\SoloData\Settings\experimenter\ratname\pipeline_ArpitCentrePokeTraining_experimenter_ratname_250508a.m
+On line 2034 of C:\ratter\ExperPort\Plugins\@sessionmodel2\SessionDefinition.m
+On line 264 of C:\ratter\Protocols\@ArpitCentrePokeTraining\ArpitCentrePokeTraining.m
+On line 539 of C:\ratter\ExperPort\Modules\@dispatcher\RunningSection.m
+On line 314 of C:\ratter\ExperPort\Modules\@dispatcher\RunningSection.m
+On line 278 of C:\ratter\ExperPort\Modules\@dispatcher\RunningSection.m
+On line 150 of C:\ratter\ExperPort\Modules\@dispatcher\RunningSection.m
+On line 202 of C:\ratter\ExperPort\Modules\@dispatcher\dispatcher.m
+On line 1501 of C:\ratter\ExperPort\Modules\@runrats\runrats.m
+On line 1198 of C:\ratter\ExperPort\Modules\@runrats\runrats.m
+On line 40 of C:\ratter\ExperPort\HandleParam\parse_and_call_sph_callback.m
+On line 107 of C:\ratter\ExperPort\HandleParam\@SoloParamHandle\callback.m
+On line 5 of C:\ratter\ExperPort\HandleParam\generic_callback.m
+
+MATLAB:UndefinedFunction 
+Undefined function 'callback' for input arguments of type 'struct'.
+On line 80 of C:\ratter\SoloData\Settings\experimenter\ratname\pipeline_ArpitCentrePokeTraining_experimenter_ratname_250508a.m
+On line 2034 of C:\ratter\ExperPort\Plugins\@sessionmodel2\SessionDefinition.m
+On line 264 of C:\ratter\Protocols\@ArpitCentrePokeTraining\ArpitCentrePokeTraining.m
+On line 539 of C:\ratter\ExperPort\Modules\@dispatcher\RunningSection.m
+On line 314 of C:\ratter\ExperPort\Modules\@dispatcher\RunningSection.m
+On line 278 of C:\ratter\ExperPort\Modules\@dispatcher\RunningSection.m
+On line 150 of C:\ratter\ExperPort\Modules\@dispatcher\RunningSection.m
+On line 202 of C:\ratter\ExperPort\Modules\@dispatcher\dispatcher.m
+On line 1501 of C:\ratter\ExperPort\Modules\@runrats\runrats.m
+On line 1198 of C:\ratter\ExperPort\Modules\@runrats\runrats.m
+On line 40 of C:\ratter\ExperPort\HandleParam\parse_and_call_sph_callback.m
+On line 107 of C:\ratter\ExperPort\HandleParam\@SoloParamHandle\callback.m
+On line 5 of C:\ratter\ExperPort\HandleParam\generic_callback.m
+
+MATLAB:UndefinedFunction 
+Undefined function 'callback' for input arguments of type 'struct'.
+On line 80 of C:\ratter\SoloData\Settings\experimenter\ratname\pipeline_ArpitCentrePokeTraining_experimenter_ratname_250508a.m
+On line 2034 of C:\ratter\ExperPort\Plugins\@sessionmodel2\SessionDefinition.m
+On line 264 of C:\ratter\Protocols\@ArpitCentrePokeTraining\ArpitCentrePokeTraining.m
+On line 539 of C:\ratter\ExperPort\Modules\@dispatcher\RunningSection.m
+On line 314 of C:\ratter\ExperPort\Modules\@dispatcher\RunningSection.m
+On line 278 of C:\ratter\ExperPort\Modules\@dispatcher\RunningSection.m
+On line 150 of C:\ratter\ExperPort\Modules\@dispatcher\RunningSection.m
+On line 202 of C:\ratter\ExperPort\Modules\@dispatcher\dispatcher.m
+On line 1501 of C:\ratter\ExperPort\Modules\@runrats\runrats.m
+On line 1198 of C:\ratter\ExperPort\Modules\@runrats\runrats.m
+On line 40 of C:\ratter\ExperPort\HandleParam\parse_and_call_sph_callback.m
+On line 107 of C:\ratter\ExperPort\HandleParam\@SoloParamHandle\callback.m
+On line 5 of C:\ratter\ExperPort\HandleParam\generic_callback.m
+
+MATLAB:UndefinedFunction 
+Undefined function 'callback' for input arguments of type 'struct'.
+On line 80 of C:\ratter\SoloData\Settings\experimenter\ratname\pipeline_ArpitCentrePokeTraining_experimenter_ratname_250508a.m
+On line 2034 of C:\ratter\ExperPort\Plugins\@sessionmodel2\SessionDefinition.m
+On line 264 of C:\ratter\Protocols\@ArpitCentrePokeTraining\ArpitCentrePokeTraining.m
+On line 539 of C:\ratter\ExperPort\Modules\@dispatcher\RunningSection.m
+On line 314 of C:\ratter\ExperPort\Modules\@dispatcher\RunningSection.m
+On line 278 of C:\ratter\ExperPort\Modules\@dispatcher\RunningSection.m
+On line 150 of C:\ratter\ExperPort\Modules\@dispatcher\RunningSection.m
+On line 202 of C:\ratter\ExperPort\Modules\@dispatcher\dispatcher.m
+On line 1501 of C:\ratter\ExperPort\Modules\@runrats\runrats.m
+On line 1198 of C:\ratter\ExperPort\Modules\@runrats\runrats.m
+On line 40 of C:\ratter\ExperPort\HandleParam\parse_and_call_sph_callback.m
+On line 107 of C:\ratter\ExperPort\HandleParam\@SoloParamHandle\callback.m
+On line 5 of C:\ratter\ExperPort\HandleParam\generic_callback.m
+
+MATLAB:UndefinedFunction 
+Undefined function 'callback' for input arguments of type 'struct'.
+On line 80 of C:\ratter\SoloData\Settings\experimenter\ratname\pipeline_ArpitCentrePokeTraining_experimenter_ratname_250508a.m
+On line 2034 of C:\ratter\ExperPort\Plugins\@sessionmodel2\SessionDefinition.m
+On line 264 of C:\ratter\Protocols\@ArpitCentrePokeTraining\ArpitCentrePokeTraining.m
+On line 539 of C:\ratter\ExperPort\Modules\@dispatcher\RunningSection.m
+On line 314 of C:\ratter\ExperPort\Modules\@dispatcher\RunningSection.m
+On line 278 of C:\ratter\ExperPort\Modules\@dispatcher\RunningSection.m
+On line 150 of C:\ratter\ExperPort\Modules\@dispatcher\RunningSection.m
+On line 202 of C:\ratter\ExperPort\Modules\@dispatcher\dispatcher.m
+On line 1501 of C:\ratter\ExperPort\Modules\@runrats\runrats.m
+On line 1198 of C:\ratter\ExperPort\Modules\@runrats\runrats.m
+On line 40 of C:\ratter\ExperPort\HandleParam\parse_and_call_sph_callback.m
+On line 107 of C:\ratter\ExperPort\HandleParam\@SoloParamHandle\callback.m
+On line 5 of C:\ratter\ExperPort\HandleParam\generic_callback.m
+
+MATLAB:UndefinedFunction 
+Undefined function 'callback' for input arguments of type 'struct'.
+On line 80 of C:\ratter\SoloData\Settings\experimenter\ratname\pipeline_ArpitCentrePokeTraining_experimenter_ratname_250508a.m
+On line 2034 of C:\ratter\ExperPort\Plugins\@sessionmodel2\SessionDefinition.m
+On line 264 of C:\ratter\Protocols\@ArpitCentrePokeTraining\ArpitCentrePokeTraining.m
+On line 539 of C:\ratter\ExperPort\Modules\@dispatcher\RunningSection.m
+On line 314 of C:\ratter\ExperPort\Modules\@dispatcher\RunningSection.m
+On line 278 of C:\ratter\ExperPort\Modules\@dispatcher\RunningSection.m
+On line 150 of C:\ratter\ExperPort\Modules\@dispatcher\RunningSection.m
+On line 202 of C:\ratter\ExperPort\Modules\@dispatcher\dispatcher.m
+On line 1501 of C:\ratter\ExperPort\Modules\@runrats\runrats.m
+On line 1198 of C:\ratter\ExperPort\Modules\@runrats\runrats.m
+On line 40 of C:\ratter\ExperPort\HandleParam\parse_and_call_sph_callback.m
+On line 107 of C:\ratter\ExperPort\HandleParam\@SoloParamHandle\callback.m
+On line 5 of C:\ratter\ExperPort\HandleParam\generic_callback.m
+
+MATLAB:UndefinedFunction 
+Undefined function 'callback' for input arguments of type 'struct'.
+On line 80 of C:\ratter\SoloData\Settings\experimenter\ratname\pipeline_ArpitCentrePokeTraining_experimenter_ratname_250508a.m
+On line 2034 of C:\ratter\ExperPort\Plugins\@sessionmodel2\SessionDefinition.m
+On line 264 of C:\ratter\Protocols\@ArpitCentrePokeTraining\ArpitCentrePokeTraining.m
+On line 539 of C:\ratter\ExperPort\Modules\@dispatcher\RunningSection.m
+On line 314 of C:\ratter\ExperPort\Modules\@dispatcher\RunningSection.m
+On line 278 of C:\ratter\ExperPort\Modules\@dispatcher\RunningSection.m
+On line 150 of C:\ratter\ExperPort\Modules\@dispatcher\RunningSection.m
+On line 202 of C:\ratter\ExperPort\Modules\@dispatcher\dispatcher.m
+On line 1501 of C:\ratter\ExperPort\Modules\@runrats\runrats.m
+On line 1198 of C:\ratter\ExperPort\Modules\@runrats\runrats.m
+On line 40 of C:\ratter\ExperPort\HandleParam\parse_and_call_sph_callback.m
+On line 107 of C:\ratter\ExperPort\HandleParam\@SoloParamHandle\callback.m
+On line 5 of C:\ratter\ExperPort\HandleParam\generic_callback.m
+
+MATLAB:UndefinedFunction 
+Undefined function 'callback' for input arguments of type 'struct'.
+On line 80 of C:\ratter\SoloData\Settings\experimenter\ratname\pipeline_ArpitCentrePokeTraining_experimenter_ratname_250508a.m
+On line 2034 of C:\ratter\ExperPort\Plugins\@sessionmodel2\SessionDefinition.m
+On line 264 of C:\ratter\Protocols\@ArpitCentrePokeTraining\ArpitCentrePokeTraining.m
+On line 539 of C:\ratter\ExperPort\Modules\@dispatcher\RunningSection.m
+On line 314 of C:\ratter\ExperPort\Modules\@dispatcher\RunningSection.m
+On line 278 of C:\ratter\ExperPort\Modules\@dispatcher\RunningSection.m
+On line 150 of C:\ratter\ExperPort\Modules\@dispatcher\RunningSection.m
+On line 202 of C:\ratter\ExperPort\Modules\@dispatcher\dispatcher.m
+On line 1501 of C:\ratter\ExperPort\Modules\@runrats\runrats.m
+On line 1198 of C:\ratter\ExperPort\Modules\@runrats\runrats.m
+On line 40 of C:\ratter\ExperPort\HandleParam\parse_and_call_sph_callback.m
+On line 107 of C:\ratter\ExperPort\HandleParam\@SoloParamHandle\callback.m
+On line 5 of C:\ratter\ExperPort\HandleParam\generic_callback.m
+Flagged stopping process as complete.
+reached sesm
+############################################################
+ALERT! No WavePlayer module detected!
+Protocols will error out if analog scheduled waves are used.
+############################################################
+
+ans = 
+
+       runrats object: 1-by-1
+
+[Warning: WARNING in SoloUtility/add_and_commit.m:
+The CVSROOT_STRING setting is empty.
+Saved behavioral data and settings files will not be sent
+to any data repository.
+
+IF YOU WISH TO EMPLOY THIS FEATURE,
+please set CVSROOT_STRING in the custom settings file
+Settings/Settings_Custom.conf. Instructions are available
+there. If you are running the old RPbox-based system and
+Settings_Custom.conf does not exist, copy
+Settings_Template.conf to Settings_Custom.conf and then
+try again.] 
+[> In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('add_and_commit', 'C:\ratter\ExperPort\SoloUtility\add_and_commit.m', 89)" style="font-weight:bold">add_and_commit</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\SoloUtility\add_and_commit.m',89,0)">line 89</a>)
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('save_soloparamvalues', 'C:\ratter\ExperPort\HandleParam\save_soloparamvalues.m', 229)" style="font-weight:bold">save_soloparamvalues</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\HandleParam\save_soloparamvalues.m',229,0)">line 229</a>)
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('saveload/SavingSection', 'C:\ratter\ExperPort\Plugins\@saveload\SavingSection.m', 289)" style="font-weight:bold">saveload/SavingSection</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\Plugins\@saveload\SavingSection.m',289,0)">line 289</a>)
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('runrats', 'C:\ratter\ExperPort\Modules\@runrats\runrats.m', 1558)" style="font-weight:bold">runrats</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\Modules\@runrats\runrats.m',1558,0)">line 1558</a>)
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('timer/timercb', 'C:\Program Files\MATLAB\R2024a\toolbox\matlab\timerfun\@timer\timercb.m', 71)" style="font-weight:bold">timer/timercb</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2024a\toolbox\matlab\timerfun\@timer\timercb.m',71,0)">line 71</a>)
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('dispatcher/RunningSection', 'C:\ratter\ExperPort\Modules\@dispatcher\RunningSection.m', 280)" style="font-weight:bold">dispatcher/RunningSection</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\Modules\@dispatcher\RunningSection.m',280,0)">line 280</a>)
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('dispatcher/RunningSection', 'C:\ratter\ExperPort\Modules\@dispatcher\RunningSection.m', 150)" style="font-weight:bold">dispatcher/RunningSection</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\Modules\@dispatcher\RunningSection.m',150,0)">line 150</a>)
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('dispatcher', 'C:\ratter\ExperPort\Modules\@dispatcher\dispatcher.m', 202)" style="font-weight:bold">dispatcher</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\Modules\@dispatcher\dispatcher.m',202,0)">line 202</a>)
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('runrats', 'C:\ratter\ExperPort\Modules\@runrats\runrats.m', 1501)" style="font-weight:bold">runrats</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\Modules\@runrats\runrats.m',1501,0)">line 1501</a>)
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('runrats', 'C:\ratter\ExperPort\Modules\@runrats\runrats.m', 1198)" style="font-weight:bold">runrats</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\Modules\@runrats\runrats.m',1198,0)">line 1198</a>)
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('parse_and_call_sph_callback', 'C:\ratter\ExperPort\HandleParam\parse_and_call_sph_callback.m', 40)" style="font-weight:bold">parse_and_call_sph_callback</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\HandleParam\parse_and_call_sph_callback.m',40,0)">line 40</a>)
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('SoloParamHandle/callback', 'C:\ratter\ExperPort\HandleParam\@SoloParamHandle\callback.m', 107)" style="font-weight:bold">SoloParamHandle/callback</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\HandleParam\@SoloParamHandle\callback.m',107,0)">line 107</a>)
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('generic_callback', 'C:\ratter\ExperPort\HandleParam\generic_callback.m', 5)" style="font-weight:bold">generic_callback</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\HandleParam\generic_callback.m',5,0)">line 5</a>)] 

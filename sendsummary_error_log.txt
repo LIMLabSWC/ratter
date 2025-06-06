@@ -1,0 +1,30 @@
+Failed to send summary to sql
+Unable to resolve the name 'perf.violation_rate'.
+  7×1 <a href="matlab:helpPopup('struct')" style="font-weight:bold">struct</a> array with fields:
+
+    file
+    name
+    line
+
+Error occurred during sendsummary execution:
+Unable to resolve the name 'perf.violation_rate'.
+
+
+*******
+
+    WARNING: Unable to complete 'close' action on protocol
+    Last error was: "Error using <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('fprintf')" style="font-weight:bold">fprintf</a>
+Function is not defined for 'struct' inputs."
+
+
+
+*******
+
+
+ans = 
+
+       dispatcher object: 1-by-1
+
+Warning: B-data NOT enabled for liquid calibration. No calibration values received.
+<a href="matlab: opentoline('C:\ratter\ExperPort\Plugins\@sqlsummary\CentrePoketrainingsummary.m',47,1)">47  </a>        if isfield(protocol_data, 'violation_rate')
+if system_dependent('IsDebugMode')==1, dbquit; end
