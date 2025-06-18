@@ -168,14 +168,15 @@ switch action
                 tw=sin(t*2*pi*freq1);
                 RW=RVol*tw;
                 %w=[LW;RW];
-                AUD1 = RW;
+                AUD1 = RW;                
             else
                 % produce noise pattern
+                A1_length = round(A1_time * srate);
                 A1_sigma.value = value(thisstim);
                 A1 = value(thisstimlog(n_done_trials+1));
                 [rawA1, rawA2, normA1, normA2]=noisestim(1,1,T,value(fcut),Fs,value(filter_type));
                 modulator=singlenoise(1,T,[value(lfreq) value(hfreq)],Fs,'BUTTER');
-                AUD1=normA1(1:A1_time*srate).*modulator(1:A1_time*srate).*A1_sigma;
+                AUD1=normA1(1:A1_length) .* modulator(1:A1_length).*A1_sigma;
             end
 
             if ~isempty(AUD1)

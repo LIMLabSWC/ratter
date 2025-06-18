@@ -153,8 +153,8 @@ switch action
           disp('StimState value greater than list of possible stim states');
       else
           StimState.value = ss;
-          disp('test ss')
-          value(ss)
+          % disp('test ss');
+          value(ss);
       end
           
       if sl > length(psl)

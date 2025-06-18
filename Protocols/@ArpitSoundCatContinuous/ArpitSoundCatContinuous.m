@@ -131,7 +131,7 @@ switch action
     SessionDefinition(obj, 'init', x, y, value(myfig)); next_row(y, 2); %#ok<NASGU>
     
     ArpitSoundCatContinuousSMA(obj, 'init');
-    feval(mfilename, obj, 'prepare_next_trial');
+    % feval(mfilename, obj, 'prepare_next_trial');
      
     case 'change_water_modulation_params'
 	   display_guys = [1 150 300];
@@ -216,24 +216,22 @@ switch action
        
     StimulusSection(obj,'hide');
     SessionDefinition(obj, 'run_eod_logic_without_saving');
-    perf    = PerformanceSection(obj, 'evaluate');
-    cp_durs = SideSection(obj, 'get_cp_history');
-    
-    [stim1dur] = SideSection(obj,'get_stimdur_history');
-    %stim_history = StimulatorSection(obj,'get_history');
-    
-    pd.hits=hit_history(:);
-    pd.sides=previous_sides(:);
-    pd.viols=violation_history(:);
-    pd.timeouts=timeout_history(:);
-%     pd.performance=tot_perf(:);
-    pd.cp_durs=cp_durs(:);
-    
-    pd.stim1dur=stim1dur(:);
 
+    % perf    = PerformanceSection(obj, 'evaluate');
+    % cp_durs = SideSection(obj, 'get_cp_history');
+    % 
+    % [stim1dur] = SideSection(obj,'get_stimdur_history');
+    %stim_history = StimulatorSection(obj,'get_history');    
+    % pd.hits=hit_history(:);
+    % pd.sides=previous_sides(:);
+    % pd.viols=violation_history(:);
+    % pd.timeouts=timeout_history(:);
+    % pd.cp_durs=cp_durs(:);    
+    % pd.stim1dur=stim1dur(:);
     %pd.stimul=stim_history(:);
-    
-    sendsummary(obj,'protocol_data',pd);    
+    % sendsummary(obj,'protocol_data',pd);
+
+    sendsummary(obj);    
       
       %% otherwise
     otherwise
