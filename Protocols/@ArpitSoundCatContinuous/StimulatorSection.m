@@ -66,10 +66,9 @@ switch action
       NumeditParam(obj,'StimProb',     0,x,y,'position',[x     y 100 20],'labelfraction',0.65);
       ToggleParam( obj,'ShuffleValues',0,x,y,'position',[x+100 y 100 20],'OnString','Shuffle','OffString','Lock');  next_row(y);
       
-      dionames2 = cell(0);
-      dionames2{1} = {'none','Opto','Ephys'};
+      dionames = {'none','Opto','Ephys'};
       
-      MenuParam(obj,'StimLine',dionames2,1,x,y,'labelfraction',0.30); next_row(y);
+      MenuParam(obj,'StimLine',dionames,1,x,y,'labelfraction',0.30); next_row(y);
       set_callback(StimLine, {mfilename, 'StimSelected'});
 
       SoloParamHandle(obj, 'stimulator_history',   'value', []);
