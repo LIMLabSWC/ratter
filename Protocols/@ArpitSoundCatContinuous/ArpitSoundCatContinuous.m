@@ -160,7 +160,6 @@ switch action
        SoundManagerSection(obj, 'send_not_yet_uploaded_sounds');
     
        [sma, prepare_next_trial_states] = ArpitSoundCatContinuousSMA(obj, 'prepare_next_trial');
-       sma = add_trialnum_indicator(sma, n_done_trials);
 
        % PerformanceSection(obj, 'evaluate');
 

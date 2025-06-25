@@ -93,7 +93,7 @@ switch action
       %    LegalCBrk_temp.value = value(LegalCBrk); %#ok<NODEF>
       %end
       
-      if ~dispatcher('is_running');
+      if ~dispatcher('is_running')
           %dispatcher is not running, last stim_hist not used, lop it off
           sh = sh(1:end-1);
       end

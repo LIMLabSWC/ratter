@@ -263,7 +263,12 @@ switch action
         % defined.
         state_names = get_labels(sma); state_names = state_names(:,1);
         prepare_next_trial_states = {'side_led_wait_RewardCollection','hit_state','second_hit_state','drink_state', 'violation_state','timeout_state','preclean_up_state'};
+        
+        % After defining the states for behavior, adding states for
+        % electrophysiology or LED stimulator.
         sma = StimulatorSection(obj,'prepare_next_trial',sma);
+        sma = add_trialnum_indicator(sma, n_done_trails);
+        
         dispatcher('send_assembler', sma, intersect(state_names, prepare_next_trial_states));
 		
 
