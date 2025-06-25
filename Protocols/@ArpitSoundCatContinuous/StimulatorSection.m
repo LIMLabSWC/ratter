@@ -28,34 +28,13 @@ switch action
 % ----------------------------------------------------------------
   
   case 'init'
-      %NumeditParam(obj,'LCB_onstim', 0,x,y,'position',[x     y 100 20],'labelfraction',0.6);
-      %NumeditParam(obj,'LCB_nostim', 0,x,y,'position',[x+100 y 100 20],'labelfraction',0.6); next_row(y);
-      %SoloParamHandle(obj,'LegalCBrk_temp', 'value',0);
       
-      MenuParam(obj,'StimInterval',{'WholeTrial','S1','DelayDur','GoCue'},1,x,y,'labelfraction',0.30); next_row(y);
-      set_callback(StimInterval, {mfilename, 'StimInterval'});
-      MenuParam(obj,'StimOnSide',{'both','left','right'},1,x,y,'labelfraction',0.3); next_row(y);
-      
-      diolines = bSettings('get','DIOLINES', 'all');
-      for i = 1:size(diolines,1); dionames{i} = diolines{i,1}; dionums(i) = diolines{i,2}; end %#ok<AGROW>
-      [dionums order] = sort(dionums);
-      dionames2 = cell(0);
-      for i = 1:length(dionums); if ~isnan(dionums(i)); dionames2{end+1} = dionames{order(i)}; end; end %#ok<AGROW>
-      dionames2 = cell(0);
-      dionames2{1} = 'opto';
-      
-      MenuParam(obj,'StimLine',dionames2,1,x,y,'labelfraction',0.30); next_row(y);
-      
-      SC = state_colors(obj);
-      WC = wave_colors(obj); 
-      states = fieldnames(SC);
-      waves  = fieldnames(WC);
-      states(2:end+1) = states;
-      states{1} = 'cp';
-      states(end+1:end+length(waves)) = waves;
-      
-      MenuParam(obj,'StimState',states,1,x,y,'labelfraction',0.30); next_row(y);
-      
+      % diolines = bSettings('get','DIOLINES', 'all');
+      % for i = 1:size(diolines,1); dionames{i} = diolines{i,1}; dionums(i) = diolines{i,2}; end %#ok<AGROW>
+      % [dionums order] = sort(dionums);
+      % dionames2 = cell(0);
+      % for i = 1:length(dionums); if ~isnan(dionums(i)); dionames2{end+1} = dionames{order(i)}; end; end %#ok<AGROW>
+           
       NumeditParam(obj,'StimStates', 1,x,y,'position',[x     y 100 20],'labelfraction',0.60);
       NumeditParam(obj,'StimLines',  1,x,y,'position',[x+100 y 100 20],'labelfraction',0.60); next_row(y);
       
@@ -67,14 +46,43 @@ switch action
       DispParam(obj,'SD',0 ,x,y,'position',[x     y 50 20],'labelfraction',0.4);
       DispParam(obj,'SF',20,x,y,'position',[x+50  y 50 20],'labelfraction',0.4);
       DispParam(obj,'PW',15,x,y,'position',[x+100 y 50 20],'labelfraction',0.4);
-      DispParam(obj,'NP',1,x,y,'position',[x+150 y 50 20],'labelfraction',0.4); next_row(y);
+      DispParam(obj,'NP',1,x,y,'position',[x+150 y 50 20],'labelfraction',0.4); next_row(y);  
       
+      MenuParam(obj,'StimInterval',{'WholeCP_Duration','CP_DurationAfterPrestim','Prestim','S1','DelayDur','GoCue'},1,x,y,'labelfraction',0.30); next_row(y);
+      set_callback(StimInterval, {mfilename, 'StimInterval'});
+      
+      MenuParam(obj,'StimOnSide',{'both','left','right'},1,x,y,'labelfraction',0.3); next_row(y);
+      
+      SC = state_colors(obj);
+      WC = wave_colors(obj); 
+      states = fieldnames(SC);
+      waves  = fieldnames(WC);
+      states(2:end+1) = states;
+      states{1} = 'cp';
+      states(end+1:end+length(waves)) = waves;
+      
+      MenuParam(obj,'StimState',states,1,x,y,'labelfraction',0.30); next_row(y);
+
       NumeditParam(obj,'StimProb',     0,x,y,'position',[x     y 100 20],'labelfraction',0.65);
       ToggleParam( obj,'ShuffleValues',0,x,y,'position',[x+100 y 100 20],'OnString','Shuffle','OffString','Lock');  next_row(y);
       
+      dionames2 = cell(0);
+      dionames2{1} = {'none','Opto','Ephys'};
+      
+      MenuParam(obj,'StimLine',dionames2,1,x,y,'labelfraction',0.30); next_row(y);
+      set_callback(StimLine, {mfilename, 'StimSelected'});
+
       SoloParamHandle(obj, 'stimulator_history',   'value', []);
-          
+       
+      make_invisible(StimStates); make_invisible(StimLines); make_invisible(StartDelay); make_invisible(StimFreq);
+      make_invisible(PulseWidth); make_invisible(NumPulses); make_invisible(SD); make_invisible(SF);
+      make_invisible(PW); make_invisible(NP); make_invisible(StimInterval); make_invisible(StimOnSide);
+      make_invisible(StimState); make_invisible(StimProb); make_invisible(ShuffleValues);
+
       SubheaderParam(obj, 'title', 'Stimulator Section', x, y); next_row(y);
+
+      SoloFunctionAddVars('ArpitSoundCatContinuousSMA', 'ro_args',{'StimLine'});
+
       varargout{1} = x;
       varargout{2} = y;
       
@@ -85,28 +93,40 @@ switch action
 %
 % -----------------------------------------------------------------------
 
-  case 'update_values'
-            
-	  StimulatorSection(obj,'StimInterval');
-      sh = value(stimulator_history); %#ok<NODEF>
-      %if n_done_trials == 0 || sh(end) == 0
-      %    LegalCBrk_temp.value = value(LegalCBrk); %#ok<NODEF>
-      %end
-      
-      if ~dispatcher('is_running')
-          %dispatcher is not running, last stim_hist not used, lop it off
-          sh = sh(1:end-1);
-      end
-      
-      if value(StimProb) == 0
-          %LCB_nostim.value = value(LegalCBrk); %#ok<NODEF>
-          stimulator_history.value = [sh, 0];
-      elseif rand(1) <= value(StimProb) %&& ((value(StimOnFree)==1 && strcmp(value(ThisTrial_Free),'FREE')) || value(StimOnFree)==0) 
-          stimulator_history.value = [sh, 1];
-          %LegalCBrk.value = value(LCB_onstim);
+  case 'StimSelected'
+
+      if strcmpi(value(StimLine),'Opto')
+          make_visible(StimStates); make_visible(StimLines); make_visible(StartDelay); make_visible(StimFreq);
+          make_visible(PulseWidth); make_visible(NumPulses); make_visible(SD); make_visible(SF);
+          make_visible(PW); make_visible(NP); make_visible(StimInterval); make_visible(StimOnSide);
+          make_visible(StimState); make_visible(StimProb); make_visible(ShuffleValues);
       else
-          %LegalCBrk.value = value(LCB_nostim); %#ok<NODEF>
-          stimulator_history.value = [sh, 0];
+          make_invisible(StimStates); make_invisible(StimLines); make_invisible(StartDelay); make_invisible(StimFreq);
+          make_invisible(PulseWidth); make_invisible(NumPulses); make_invisible(SD); make_invisible(SF);
+          make_invisible(PW); make_invisible(NP); make_invisible(StimInterval); make_invisible(StimOnSide);
+          make_invisible(StimState); make_invisible(StimProb); make_invisible(ShuffleValues);
+      end
+
+  case 'update_values'
+       
+      if strcmpi(value(StimLine),'Opto')
+    	  
+          StimulatorSection(obj,'StimInterval');
+          sh = value(stimulator_history); %#ok<NODEF>
+          
+          if ~dispatcher('is_running')
+              %dispatcher is not running, last stim_hist not used, lop it off
+              sh = sh(1:end-1);
+          end
+
+          if value(StimProb) == 0
+              stimulator_history.value = [sh, 0];
+          elseif rand(1) <= value(StimProb)
+              stimulator_history.value = [sh, 1];            
+          else
+              stimulator_history.value = [sh, 0];
+          end
+
       end
       
       
@@ -231,10 +251,18 @@ switch action
   %% Case StimInterval  
     case 'StimInterval'
         
-        if strcmp(StimInterval, 'WholeTrial')
+        if strcmp(StimInterval, 'WholeCP_Duration')
             PulseWidth.value = Total_CP_duration*1000;
             StimFreq.value = 1000/PulseWidth;
+            StartDelay.value = 0;
+        elseif strcmp(StimInterval, 'CP_DurationAfterPrestim')
+            PulseWidth.value = (Total_CP_duration - PreStim_time)*1000;
+            StimFreq.value = 1000/PulseWidth;
             StartDelay.value = PreStim_time;
+        elseif strcmp(StimInterval, 'Prestim')
+            PulseWidth.value = PreStim_time*1000;
+            StimFreq.value = 1000/PulseWidth;
+            StartDelay.value = 0;
         elseif strcmp(StimInterval, 'S1')
             PulseWidth.value = A1_time*1000;
             StimFreq.value = 1000/PulseWidth;
@@ -246,8 +274,7 @@ switch action
         elseif strcmp(StimInterval, 'GoCue')
             PulseWidth.value = time_go_cue*1000;
             StimFreq.value = 1000/PulseWidth;
-            StartDelay.value = PreStim_time + A1_time + time_bet_aud1_gocue;
-                
+            StartDelay.value = PreStim_time + A1_time + time_bet_aud1_gocue;                
         end
 %% set
 % -----------------------------------------------------------------------
