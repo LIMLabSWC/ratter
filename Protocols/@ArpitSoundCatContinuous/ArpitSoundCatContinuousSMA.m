@@ -267,7 +267,7 @@ switch action
         % After defining the states for behavior, adding states for
         % electrophysiology or LED stimulator.
         sma = StimulatorSection(obj,'prepare_next_trial',sma);
-        sma = add_trialnum_indicator(sma, n_done_trails);
+        % sma = add_trialnum_indicator(sma, n_done_trails);
         
         dispatcher('send_assembler', sma, intersect(state_names, prepare_next_trial_states));
 		

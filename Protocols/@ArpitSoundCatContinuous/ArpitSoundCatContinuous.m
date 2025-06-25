@@ -154,7 +154,7 @@ switch action
        SideSection(obj, 'prepare_next_trial');
 	% Run SessionDefinition *after* SideSection so we know whether the
 	% trial was a violation or not
-       SessionDefinition(obj, 'next_trial');
+       % SessionDefinition(obj, 'next_trial');
        StimulatorSection(obj, 'update_values');       
        StimulusSection(obj,'prepare_next_trial');
        SoundManagerSection(obj, 'send_not_yet_uploaded_sounds');
