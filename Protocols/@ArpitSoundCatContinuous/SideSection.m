@@ -221,7 +221,7 @@ switch action
 
 		
 	case 'new_leftprob'
-		AntibiasSectionAthena(obj, 'update_biashitfrac', value(LeftProb));
+		AntibiasSection(obj, 'update_biashitfrac', value(LeftProb));
 		
 		
 	case 'new_CP_duration' 
@@ -437,7 +437,7 @@ switch action
                     ThisTrial.value = 'LEFT';
                 end
             else
-                choiceprobs = AntibiasSectionAthena(obj, 'get_posterior_probs');
+                choiceprobs = AntibiasSection(obj, 'get_posterior_probs');
                 if rand(1) <= choiceprobs(1)
                     ThisTrial.value = 'LEFT';
                 else
