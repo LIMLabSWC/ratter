@@ -109,24 +109,17 @@ switch action
     HeaderParam(obj, 'prot_title', [mfilename ': ' expmtr ', ' rname], x, y, 'position', [10 figpos(4)-25, 800 20]);
     
     [x, y] = WaterValvesSection(obj,  'init', x, y);next_row(y);
-    % [x, y] = PokesPlotSection(obj, 'init', x, y);next_row(y);
+    [x, y] = PokesPlotSection(obj, 'init', x, y);next_row(y);
     [x, y] = CommentsSection(obj, 'init', x, y);next_row(y);
     [x, y] = BonsaiCameraInterface(obj,'init',x,y,name,expmtr,rname);next_row(y);
 
-    oldx=x; oldy=y;
-
-        
+    oldx=x; oldy=y;      
     next_column(x); y=5;
 	
 	[x, y] = SideSection(obj,  'init', x, y); %#ok<NASGU>
-    % [x, y] = SoundSection(obj,'init',x,y);
-    % [x, y] = StimulusSection(obj,'init',x,y);
-
+    next_row(y, 1.3);
     [x, y] = PerformanceSection(obj, 'init', x, y);
-    % [x, y] = StimulatorSection(obj, 'init', x, y); next_row(y, 1.3);
-
     x=oldx; y=oldy;
-
     SessionDefinition(obj, 'init', x, y, value(myfig)); next_row(y, 2); %#ok<NASGU>
     
     ArpitSoundCatContinuousSMA(obj, 'init');
