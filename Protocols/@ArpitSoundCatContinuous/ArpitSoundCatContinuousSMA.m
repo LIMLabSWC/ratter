@@ -204,13 +204,13 @@ switch action
         % always or with delay or no reward at all for error event
         
         if strcmp(reward_type, 'Always')
-            
+
             sma = add_state(sma,'name','second_hit_state','self_timer',RewardCollection_duration,...
                 'output_actions',{'DOut', second_hit_light},...
                 'input_to_statechange',{'reward_collection_dur_In', 'timeout_state'; 'Tup','timeout_state'; HitEvent,'hit_state'});
-        
+
         elseif  strcmp(reward_type, 'DelayedReward')
-           
+
             sma = add_state(sma,'name','second_hit_state','self_timer',secondhit_delay,...
                 'input_to_statechange',{'Tup','current_state + 1';});
 

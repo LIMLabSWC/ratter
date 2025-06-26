@@ -55,12 +55,15 @@ switch action
 		next_row(y);		
 		DispParam(obj, 'ThisTrial', 'LEFT', x, y); next_row(y);
 		
-        
+        SubheaderParam(obj, 'title', 'Sides Section', x, y);next_row(y);
+
+        %% Stimulator Section
+        [x, y] = StimulatorSection(obj, 'init', x, y); next_row(y, 1.3);
+        %%
         SoloParamHandle(obj, 'previous_sides', 'value', []);
 		DeclareGlobals(obj, 'ro_args', 'previous_sides');
-		SubheaderParam(obj, 'title', 'Sides Section', x, y);
-		next_row(y, 1.5);
-     
+		
+        next_row(y, 1.5);  
 		next_column(x); y = 5;
         
         % Reward Collection
@@ -107,8 +110,14 @@ switch action
         NumeditParam(obj, 'PreStim_time_Min', 0.20, x,y,'label','Pre-Stim Min','TooltipString','Min Time in NIC before starting the stimulus');
         set_callback(PreStim_time_Min, {mfilename, 'new_CP_duration'});
         next_row(y);
-        NumeditParam(obj, 'PreStim_time', 0.20, x,y,'label','Pre-Stim time','TooltipString','Actual Time in NIC before starting the stimulus');
+        NumeditParam(obj, 'PreStim_time', 0.20, [x, y, 175 20],'label','Pre-Stim time','TooltipString','Actual Time in NIC before starting the stimulus');
         set_callback(PreStim_time, {mfilename, 'new_CP_duration'});
+        % Toggle Buttons To Control Parameters 
+        ToggleParam(obj, 'random_PreStim_time', 1, [x+180 y 20 20],...
+        'OnString', 'random PreStim_time ON',...
+        'OffString', 'random PreStim_time OFF',...
+        'TooltipString', sprintf('If on (black) then it enables the random time between the user given range'));
+        set_callback(random_PreStim_time, {mfilename, 'new_CP_duration'});
         next_row(y);
         NumeditParam(obj, 'PreStim_time_Max', 1, x,y,'label','Pre-Stim Max','TooltipString','Max Time in NIC before starting the stimulus');
         set_callback(PreStim_time_Max, {mfilename, 'new_CP_duration'});
@@ -117,8 +126,14 @@ switch action
         NumeditParam(obj, 'A1_time_Min', 0.1, x,y,'label','Min time AUD1','TooltipString','Min value to select the Duration of fixed stimulus');
         set_callback(A1_time_Min, {mfilename, 'new_CP_duration'});
         next_row(y);
-        NumeditParam(obj, 'A1_time', 0.4, x,y,'label','AUD1 Time','TooltipString','Actual Duration of fixed stimulus');
+        NumeditParam(obj, 'A1_time', 0.4, [x, y, 175 20],'label','AUD1 Time','TooltipString','Actual Duration of fixed stimulus');
         set_callback(A1_time, {mfilename, 'new_CP_duration'});
+        % Toggle Buttons To Control Parameters 
+        ToggleParam(obj, 'random_A1_time', 1, [x+180 y 20 20],...
+        'OnString', 'random A1_time ON',...
+        'OffString', 'random A1_time OFF',...
+        'TooltipString', sprintf('If on (black) then it enables the random sampling of A1_time'));
+        set_callback(random_A1_time, {mfilename, 'new_CP_duration'});
         next_row(y);
         NumeditParam(obj, 'A1_time_Max', 0.4, x,y,'label','Max time AUD1','TooltipString','Max value to select the Duration of fixed stimulus');
         set_callback(A1_time_Max, {mfilename, 'new_CP_duration'});
@@ -127,8 +142,14 @@ switch action
         NumeditParam(obj, 'time_bet_aud1_gocue_Min', 0.2, x,y,'label','Min A1-GoCue time','TooltipString','Min time between the end of the stimulus and the go cue ');
         set_callback(time_bet_aud1_gocue_Min, {mfilename, 'new_CP_duration'});
         next_row(y);
-        NumeditParam(obj, 'time_bet_aud1_gocue', 0.2, x,y,'label','A1-GoCue time','TooltipString','Actual time between the end of the stimulus and the go cue ');
+        NumeditParam(obj, 'time_bet_aud1_gocue', [x, y, 175 20], x,y,'label','A1-GoCue time','TooltipString','Actual time between the end of the stimulus and the go cue ');
         set_callback(time_bet_aud1_gocue, {mfilename, 'new_CP_duration'});
+        % Toggle Buttons To Control Parameters 
+        ToggleParam(obj, 'random_prego_time', 1, [x+180 y 20 20],...
+        'OnString', 'random prego_time ON',...
+        'OffString', 'random prego_time OFF',...
+        'TooltipString', sprintf('If on (black) then it enables the random sampling of time between the end of the stimulus and the go cue'));
+        set_callback(random_prego_time, {mfilename, 'new_CP_duration'});
         next_row(y);
         NumeditParam(obj, 'time_bet_aud1_gocue_Max', 1, x,y,'label','Max A1-GoCue time','TooltipString','Max time between the end of the stimulus and the go cue ');
         set_callback(time_bet_aud1_gocue_Max, {mfilename, 'new_CP_duration'});
@@ -147,30 +168,17 @@ switch action
 		DispParam(obj, 'Total_CP_duration', CP_duration+time_go_cue, x, y, 'TooltipString', 'Total nose in center port time, in secs. Sum of CP_duration and Go Cue duration'); %#ok<*NODEF>
 		next_row(y);
 
-        % Toggle Buttons To Control Parameters
-        
+        % Toggle Buttons To Control Parameters       
         ToggleParam(obj, 'stimuli_on', 1, x,y,...
         'OnString', 'Stimuli ON',...
         'OffString', 'Stimuli OFF',...
         'TooltipString', sprintf('If on (black) then it enables training with stimuli else using a fixed sound from Stage 5'));
         next_row(y);
-        ToggleParam(obj, 'random_PreStim_time', 1, x,y,...
-        'OnString', 'random PreStim_time ON',...
-        'OffString', 'random PreStim_time OFF',...
-        'TooltipString', sprintf('If on (black) then it enables the random time between the user given range'));
-        set_callback(random_PreStim_time, {mfilename, 'new_CP_duration'});
-        next_row(y);
-        ToggleParam(obj, 'random_A1_time', 1, x,y,...
-        'OnString', 'random A1_time ON',...
-        'OffString', 'random A1_time OFF',...
-        'TooltipString', sprintf('If on (black) then it enables the random sampling of A1_time'));
-        set_callback(random_A1_time, {mfilename, 'new_CP_duration'});
-        next_row(y);
-        ToggleParam(obj, 'random_prego_time', 1, x,y,...
-        'OnString', 'random prego_time ON',...
-        'OffString', 'random prego_time OFF',...
-        'TooltipString', sprintf('If on (black) then it enables the random sampling of time between the end of the stimulus and the go cue'));
-        set_callback(random_prego_time, {mfilename, 'new_CP_duration'});
+        
+        %% Sound and Stimulus Section
+        [x, y] = SoundSection(obj,'init',x,y);   next_row(y);
+        [x, y] = StimulusSection(obj,'init',x,y); next_row(y);
+        
         next_column(x);
 		y=5;
 		

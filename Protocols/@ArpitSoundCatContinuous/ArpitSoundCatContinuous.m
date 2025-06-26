@@ -119,11 +119,11 @@ switch action
     next_column(x); y=5;
 	
 	[x, y] = SideSection(obj,  'init', x, y); %#ok<NASGU>
-    [x, y] = SoundSection(obj,'init',x,y);
-    [x, y] = StimulusSection(obj,'init',x,y);
+    % [x, y] = SoundSection(obj,'init',x,y);
+    % [x, y] = StimulusSection(obj,'init',x,y);
 
     [x, y] = PerformanceSection(obj, 'init', x, y);
-    [x, y] = StimulatorSection(obj, 'init', x, y); next_row(y, 1.3);
+    % [x, y] = StimulatorSection(obj, 'init', x, y); next_row(y, 1.3);
 
     x=oldx; y=oldy;
 
