@@ -109,14 +109,13 @@ switch action
     HeaderParam(obj, 'prot_title', [mfilename ': ' expmtr ', ' rname], x, y, 'position', [10 figpos(4)-25, 800 20]);
     
     [x, y] = WaterValvesSection(obj,  'init', x, y);next_row(y);
-    [x, y] = PokesPlotSection(obj, 'init', x, y);next_row(y);
+    % [x, y] = PokesPlotSection(obj, 'init', x, y);next_row(y);
     [x, y] = CommentsSection(obj, 'init', x, y);next_row(y);
     [x, y] = BonsaiCameraInterface(obj,'init',x,y,name,expmtr,rname);next_row(y);
 
     oldx=x; oldy=y;
 
-    
-    
+        
     next_column(x); y=5;
 	
 	[x, y] = SideSection(obj,  'init', x, y); %#ok<NASGU>
@@ -154,7 +153,7 @@ switch action
        SideSection(obj, 'prepare_next_trial');
 	% Run SessionDefinition *after* SideSection so we know whether the
 	% trial was a violation or not
-       % SessionDefinition(obj, 'next_trial');
+       SessionDefinition(obj, 'next_trial');
        StimulatorSection(obj, 'update_values');       
        StimulusSection(obj,'prepare_next_trial');
        SoundManagerSection(obj, 'send_not_yet_uploaded_sounds');
@@ -186,7 +185,7 @@ switch action
 
    %% update
    case 'update'
-      PokesPlotSection(obj, 'update');
+      % PokesPlotSection(obj, 'update');
       if n_done_trials==1
             [expmtr, rname]=SavingSection(obj, 'get_info');
             prot_title.value=[mfilename ' on rig ' get_hostname ' : ' expmtr ', ' rname  '.  Started at ' datestr(now, 'HH:MM')];
@@ -194,7 +193,7 @@ switch action
       
    %% close
    case 'close'
-    PokesPlotSection(obj, 'close');
+    % PokesPlotSection(obj, 'close');
 	SideSection(obj, 'close');
     StimulusSection(obj,'close');
     BonsaiCameraInterface(obj,'close');
