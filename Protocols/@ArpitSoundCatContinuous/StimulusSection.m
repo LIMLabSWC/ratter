@@ -24,24 +24,37 @@ switch action
         oldx=x; oldy=y;    parentfig=double(gcf);
 
         SoloParamHandle(obj, 'myfig', 'value', figure('closerequestfcn', [mfilename '(' class(obj) ', ''hide'');'],...
-            'MenuBar', 'none', 'Name', mfilename), 'saveable', 0);
-        screen_size = get(0, 'ScreenSize');
-        set(value(myfig),'Position',[1 screen_size(4)-740, 400 400]); % put fig at top right
-        set(double(gcf), 'Visible', 'off');
-
+            'MenuBar', 'none', 'Name', mfilename, 'Units', 'normalized'), 'saveable', false);
         SoundManagerSection(obj, 'declare_new_sound', 'StimAUD1')
         SoloParamHandle(obj, 'thisstim', 'value', []);
         SoloParamHandle(obj, 'thisstimlog', 'value', []);
         SoloParamHandle(obj, 'h1', 'value', []);
+        
+        %% Formatting graphics elements
+          
+        %myfig
+        original_width = 0.25;
+        original_height = 0.75;
+        max_size = min(original_width, original_height);
+        aspect_ratio = original_width / original_height;
+        new_width = max_size;
+        new_height = new_width / aspect_ratio;
 
+        center_x = 0.5 - (new_width / 2);
+        center_y = 0.5 - (new_height / 2);
+
+        position_vector = [center_x center_y new_width new_height];
+
+        set(value(myfig), 'Units', 'normalized', 'Name', mfilename, 'Position', position_vector);
+        set(double(gcf), 'Visible', 'off');
+
+       
         x = 10; y=5;
 
         next_row(y);
         next_row(y);
         PushbuttonParam(obj, 'refresh_stimuli', x,y , 'TooltipString', 'Instantiates the stimuli given the new set of parameters');
         set_callback(refresh_stimuli, {mfilename, 'plot_stimuli'});
-
-
         next_row(y);
         next_row(y);
         MenuParam(obj, 'Rule', {'S1>S_boundary Left','S1>S_boundary Right'}, ...
@@ -131,16 +144,21 @@ switch action
         make_invisible(maxF1);make_invisible(minF1);make_invisible(A1_freq);make_invisible(volumeF1);
         next_row(y);
         
-        % next_column(y)
-        SoloParamHandle(obj, 'stim_dist_fig', 'value', figure('closerequestfcn', [mfilename '(' class(obj) ', ''hide'');'], 'MenuBar', 'none', ...
-            'Name', 'StimulusPlot'), 'saveable', 0);
-        set(double(gcf), 'Visible', 'off');
-        ax = axes(value(stim_dist_fig),'Position',[0.1 0.1 0.8 0.8]);
-        ylabel('log_e A','FontSize',16,'FontName','Cambria Math');
-        set(ax,'Fontsize',15)
-        xlabel('Sound Categorization','FontSize',16,'FontName','Cambria Math')
-        SoloParamHandle(obj, 'ax', 'saveable', 0,  'value', ax);
+        % Axes for Plotting
+        hndl_uipanelSettings = uipanel('Units', 'normalized');
+        set(hndl_uipanelSettings, ...
+                'Units', 'normalized', ...
+                'Parent', value(myfig), ...
+                'Title', 'Stimuli Distribution', ...
+                'Tag', 'uipanelstimplot', ...
+                'Position', [0.06,0.42,0.8,0.4]);
 
+        SoloParamHandle(obj, 'axstimplot', 'value', axes(hndl_uipanelSettings,'Units', 'normalized','Position', [0.2,0.2, ...
+            0.75,0.75]), 'saveable', false);
+        xlabel('Stim Distribution','FontSize',8,'FontName','Cambria Math');
+        ylabel('log__e A','FontSize',8,'FontName','Cambria Math');
+         
+        % Plot the Distribution
         StimulusSection(obj,'plot_stimuli');
 
         x=oldx; y=oldy;
@@ -336,17 +354,17 @@ switch action
             end
 
         
-        cla(value(ax))
+        cla(value(axstimplot))
         
-        StimuliDistribution_plot(value(ax),[stim_min_log, value(boundary), stim_max_log], Rule, ...
+        StimuliDistribution_plot(value(axstimplot),[stim_min_log, value(boundary), stim_max_log], Rule, ...
             value(Prob_Dist_Left),value(mean_Left),value(sigma_Left),[edge_min_left edge_max_left], ...
             value(Prob_Dist_Right),value(mean_Right),value(sigma_Right),[edge_min_right edge_max_right]);
 
-        hold (value(ax),'on')
+        hold (value(axstimplot),'on')
         xline([stim_min_log value(boundary) stim_max_log],'-',{'Stim Min','Boundary','Stim Max'});
 
         ylabel('log_e A','FontSize',16,'FontName','Cambria Math');
-        set(value(ax),'Fontsize',15)
+        set(value(axstimplot),'Fontsize',15)
         xlabel('Sound Categorization','FontSize',16,'FontName','Cambria Math')
 
         % plot(xd,stim_min_log,'s','MarkerSize',15,'MarkerEdgeColor',[0 0 0],'LineWidth',2)
@@ -354,10 +372,10 @@ switch action
         % plot(xd,stim_max_log,'s','MarkerSize',15,'MarkerEdgeColor',[0 0 0],'LineWidth',2)
         % line([0,2], [value(boundary),value(boundary)]);
         % axis square
-        % set(value(ax),'ytick',([stim_min_log, stim_max_log]),'xtick',xd);
-        % set(value(ax),'yticklabel',([stim_min, stim_max]),'xticklabel','S1');
+        % set(value(axstimplot),'ytick',([stim_min_log, stim_max_log]),'xtick',xd);
+        % set(value(axstimplot),'yticklabel',([stim_min, stim_max]),'xticklabel','S1');
         % ylabel('\sigma_1 in log scale','FontSize',16,'FontName','Cambria Math');
-        % set(value(ax),'Fontsize',15)
+        % set(value(axstimplot),'Fontsize',15)
         % xlabel('S1','FontSize',16,'FontName','Cambria Math')
 
 
@@ -528,7 +546,8 @@ switch action
     %% Case close
     case 'close'
         set(value(myfig), 'Visible', 'off');
-        set(value(stim_dist_fig), 'Visible', 'off');
+        % set(value(stim_dist_fig), 'Visible', 'off');
+
         % Delete all SoloParamHandles who belong to this object and whose
         % fullname starts with the name of this mfile:
         if exist('myfig', 'var') && isa(myfig, 'SoloParamHandle') && ishandle(value(myfig)) %#ok<NODEF>
@@ -554,22 +573,22 @@ switch action
     case 'hide'
         StimulusShow.value = 0;
         set(value(myfig), 'Visible', 'off');
-        set(value(stim_dist_fig), 'Visible', 'off');
+        % set(value(stim_dist_fig), 'Visible', 'off');
 
     %% Case show
     case 'show'
         StimulusShow.value = 1;
         set(value(myfig), 'Visible', 'on');
-        set(value(stim_dist_fig), 'Visible', 'on');
+        % set(value(stim_dist_fig), 'Visible', 'on');
 
     %% Case Show_hide
     case 'show_hide'
         if StimulusShow == 1
             set(value(myfig), 'Visible', 'on'); 
-            set(value(stim_dist_fig), 'Visible', 'on');%#ok<NODEF> (defined by GetSoloFunctionArgs)
+            % set(value(stim_dist_fig), 'Visible', 'on');%#ok<NODEF> (defined by GetSoloFunctionArgs)
         else
             set(value(myfig), 'Visible', 'off');
-            set(value(stim_dist_fig), 'Visible', 'off');
+            % set(value(stim_dist_fig), 'Visible', 'off');
         end
 
 end
