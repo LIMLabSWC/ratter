@@ -31,6 +31,7 @@
     </VisualizerSettings>
   </WindowSettings>
   <WindowSettings Index="11">
+    <Visible>false</Visible>
     <Location>
       <X>15</X>
       <Y>705</Y>
