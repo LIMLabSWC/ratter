@@ -61,7 +61,8 @@ switch action
 		
 		SubheaderParam(obj, 'title', 'Overall Performance', x, y);
 		next_row(y, 1.5);
-		SoloParamHandle(obj, 'previous_parameters', 'value', []);
+		% SoloParamHandle(obj, 'previous_parameters', 'value', []);
+        
 		
 	% ------------------------------------------------------------------
 	%              evaluate
@@ -73,7 +74,7 @@ switch action
         if n_done_trials > 1
             
             ntrials.value        = n_done_trials;
-            n_trials_valid.value = numel(find(~isnan(hit_history)));
+            ntrials_valid.value = numel(find(~isnan(hit_history)));
             violation_percent.value = numel(find(violation_history))/n_done_trials;
             timeout_percent.value = numel(find(timeout_history))/n_done_trials;
             goods  = ~isnan(hit_history)';

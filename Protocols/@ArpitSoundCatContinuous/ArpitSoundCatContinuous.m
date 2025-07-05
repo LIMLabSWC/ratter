@@ -1,5 +1,3 @@
-% AltSoundCatCatch protocol
-% EM, October 2020
 
 function [obj] = ArpitSoundCatContinuous(varargin)
 
@@ -65,6 +63,10 @@ switch action
     DeclareGlobals(obj, 'ro_args', {'stimulus_history'});
     SoloFunctionAddVars('StimulusSection', 'rw_args', 'stimulus_history');
     
+    SoloParamHandle(obj, 'stimulus_distribution_history', 'value', cell(0));
+    DeclareGlobals(obj, 'ro_args', {'stimulus_distribution_history'});
+    SoloFunctionAddVars('StimulusSection', 'rw_args', 'stimulus_distribution_history');
+    
     SoloParamHandle(obj, 'violation_history', 'value', []);
     DeclareGlobals(obj, 'ro_args', {'violation_history'});
     SoloFunctionAddVars('SideSection', 'rw_args', 'violation_history');
@@ -119,11 +121,13 @@ switch action
 	[x, y] = SideSection(obj,  'init', x, y); %#ok<NASGU>
     next_row(y, 1.3);
     [x, y] = PerformanceSection(obj, 'init', x, y);
+    next_row(y, 1.3);
+    [x, y] = PsychometricSection(obj, 'init', x, y);
     x=oldx; y=oldy;
     SessionDefinition(obj, 'init', x, y, value(myfig)); next_row(y, 2); %#ok<NASGU>
     
     ArpitSoundCatContinuousSMA(obj, 'init');
-    % feval(mfilename, obj, 'prepare_next_trial');
+    feval(mfilename, obj, 'prepare_next_trial');
      
     case 'change_water_modulation_params'
 	   display_guys = [1 150 300];
@@ -152,7 +156,6 @@ switch action
        SoundManagerSection(obj, 'send_not_yet_uploaded_sounds');
     
        [sma, prepare_next_trial_states] = ArpitSoundCatContinuousSMA(obj, 'prepare_next_trial');
-
        % PerformanceSection(obj, 'evaluate');
 
     % Default behavior of following call is that every 20 trials, the data
@@ -168,17 +171,17 @@ switch action
    case 'trial_completed'
     
        % Change the video trial
-       BonsaiCameraInterface(obj,'next_trial');
+        BonsaiCameraInterface(obj,'next_trial');
 
        % Update the Metrics Calculated
        PerformanceSection(obj,'evaluate');
-
+       PsychometricSection(obj, 'update');
        % Do any updates in the protocol that need doing:
        feval(mfilename, 'update');
 
    %% update
    case 'update'
-      % PokesPlotSection(obj, 'update');
+      PokesPlotSection(obj, 'update');
       if n_done_trials==1
             [expmtr, rname]=SavingSection(obj, 'get_info');
             prot_title.value=[mfilename ' on rig ' get_hostname ' : ' expmtr ', ' rname  '.  Started at ' datestr(now, 'HH:MM')];
@@ -186,10 +189,10 @@ switch action
       
    %% close
    case 'close'
-    % PokesPlotSection(obj, 'close');
+    PokesPlotSection(obj, 'close');
 	SideSection(obj, 'close');
     StimulusSection(obj,'close');
-    BonsaiCameraInterface(obj,'close');
+     BonsaiCameraInterface(obj,'close');
     if exist('myfig', 'var') && isa(myfig, 'SoloParamHandle') && ishandle(value(myfig)) %#ok<NODEF>
       delete(value(myfig));
     end

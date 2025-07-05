@@ -1,6 +1,6 @@
 
 
-function [x, y] = StimulusSection(obj, action, varargin)
+function varargout = StimulusSection(obj, action, varargin)
 
 GetSoloFunctionArgs(obj);
 
@@ -28,7 +28,6 @@ switch action
         SoundManagerSection(obj, 'declare_new_sound', 'StimAUD1')
         SoloParamHandle(obj, 'thisstim', 'value', []);
         SoloParamHandle(obj, 'thisstimlog', 'value', []);
-        SoloParamHandle(obj, 'h1', 'value', []);
         
         %% Formatting graphics elements
           
@@ -50,12 +49,6 @@ switch action
 
        
         x = 10; y=5;
-
-        next_row(y);
-        next_row(y);
-        PushbuttonParam(obj, 'refresh_stimuli', x,y , 'TooltipString', 'Instantiates the stimuli given the new set of parameters');
-        set_callback(refresh_stimuli, {mfilename, 'plot_stimuli'});
-        next_row(y);
         next_row(y);
         MenuParam(obj, 'Rule', {'S1>S_boundary Left','S1>S_boundary Right'}, ...
             'S1>S_boundary Left', x, y, 'labelfraction', 0.35, 'TooltipString', sprintf(['\nThis buttom determines the rule\n', ...
@@ -95,8 +88,16 @@ switch action
             '\n''signifying 3 Sigma (99.7 %%) value for the right side distribution, \n',...
             '\n''A value b/w range [0.2 - 1] is acceptable.']));
     	set_callback(sigma_range_Right, {mfilename, 'Cal_Sigma'});
-        next_row(y);
-
+        next_row(y);next_row(y);
+        MenuParam(obj, 'Category_Dist', {'Uniform','Hard A','Hard B'}, ...
+            'Uniform', x, y, 'label','Category Dist', 'labelfraction', 0.35, 'TooltipString', sprintf(['\n Different Distributions for Category.\n', ...
+            '\n''Depending upon the rule it will change switch the distributions for Left and Right.\n',...
+            '\n''If its uniform on both then it will change the distribution to Exponential on one of the side\n',...
+            '\n''depending upon the choice of rule']));
+        set_callback(Category_Dist, {mfilename, 'Distribution_Switch'});
+        next_row(y);next_row(y);
+        PushbuttonParam(obj, 'plot_stim_dist', x,y , 'TooltipString', 'Plots the distribution with the new set of parameters');
+        set_callback(plot_stim_dist, {mfilename, 'plot_stimuli'});
         next_column(x);
         y=5;
         next_row(y, 1)
@@ -145,15 +146,15 @@ switch action
         next_row(y);
         
         % Axes for Plotting
-        hndl_uipanelSettings = uipanel('Units', 'normalized');
-        set(hndl_uipanelSettings, ...
+        hndl_uipanelplotaxes = uipanel('Units', 'normalized');
+        set(hndl_uipanelplotaxes, ...
                 'Units', 'normalized', ...
                 'Parent', value(myfig), ...
                 'Title', 'Stimuli Distribution', ...
                 'Tag', 'uipanelstimplot', ...
                 'Position', [0.06,0.42,0.8,0.4]);
 
-        SoloParamHandle(obj, 'axstimplot', 'value', axes(hndl_uipanelSettings,'Units', 'normalized','Position', [0.2,0.2, ...
+        SoloParamHandle(obj, 'axstimplot', 'value', axes(hndl_uipanelplotaxes,'Units', 'normalized','Position', [0.2,0.2, ...
             0.75,0.75]), 'saveable', false);
         xlabel('Stim Distribution','FontSize',8,'FontName','Cambria Math');
         ylabel('log__e A','FontSize',8,'FontName','Cambria Math');
@@ -164,6 +165,11 @@ switch action
         x=oldx; y=oldy;
         figure(parentfig);
         
+        SoloFunctionAddVars('PsychometricSection', 'ro_args',{'Category_Dist';'Rule';'boundary'});
+            
+        varargout{1} = x;
+        varargout{2} = y;
+
     case 'prepare_next_trial'
         if stimuli_on
             StimulusSection(obj,'pick_current_stimulus');
@@ -212,11 +218,7 @@ switch action
             % end
 
             if n_done_trials > 0
-                if ~violation_history(n_done_trials) && ~timeout_history(n_done_trials)
-                    StimulusSection(obj,'update_stimulus_history');
-                else
-                    StimulusSection(obj,'update_stimulus_history_nan');
-                end
+                StimulusSection(obj,'update_stimulus_history');
             end
         end
         %% Case pick_current_stimulus
@@ -489,6 +491,8 @@ switch action
             end
         end
         
+        StimulusSection(obj,'plot_stimuli');
+        
     %% Calculate Sigma
     case 'Cal_Sigma'
 
@@ -520,6 +524,40 @@ switch action
         end
         sigma_Right.value = (dist_sigma_multiplier * (edge_max - edge_min)) / 3; % as we asked user to provide 3 sigma
 
+    case 'stim_params'
+
+        if frequency_categorization
+            stim_min_log = log(value(minF1));
+            stim_max_log = log(value(maxF1));
+        else
+            stim_min_log = log(value(minS1));
+            stim_max_log = log(value(maxS1));
+        end
+
+            dist_range_multiplier_left = value(sigma_range_Left);
+            dist_range_multiplier_right = value(sigma_range_Right);
+
+            if strcmp(Rule,'S1>S_boundary Left')
+                edge_max_left = stim_max_log;
+                edge_min_left = value(boundary);
+                edge_max_left = edge_min_left + dist_range_multiplier_left * (edge_max_left - edge_min_left);
+                edge_max_right = value(boundary);
+                edge_min_right = stim_min_log;
+                edge_min_right = edge_max_right - dist_range_multiplier_right * (edge_max_right - edge_min_right);
+
+                varargout{1} = [edge_min_right, value(boundary), edge_max_left];
+
+            else % the rule is S1>S_boundary Right
+
+                edge_min_left = stim_min_log;
+                edge_max_left = value(boundary);
+                edge_min_left = edge_max_left - dist_range_multiplier_left * (edge_max_left - edge_min_left);
+                edge_max_right = stim_max_log;
+                edge_min_right = value(boundary);
+                edge_max_right = edge_min_right + dist_range_multiplier_right * (edge_max_right - edge_min_right);
+
+                varargout{1} = [edge_min_left, value(boundary), edge_max_right];
+            end
 
     %% Case frequency ON
     case 'FrequencyCategorization'
@@ -530,7 +568,7 @@ switch action
         else
             make_visible(maxS1);make_visible(minS1);make_visible(A1_sigma);
             make_visible(fcut);make_visible(lfreq);make_visible(hfreq); make_visible(filter_type);
-            make_invisible(maxF1);make_invisible(minF1);make_invisible(A1_freq); make_visible(volumeF1);          
+            make_invisible(maxF1);make_invisible(minF1);make_invisible(A1_freq); make_invisible(volumeF1);          
         end
 
         StimulusSection(obj,'Cal_Boundary'); % update the boundary
@@ -542,6 +580,39 @@ switch action
     %         x=value(S1);
     %     end
 
+    case 'Distribution_Switch'
+
+        switch value(Category_Dist)
+
+            case 'Uniform'
+                Prob_Dist_Right.value = 'Uniform';
+                Prob_Dist_Left.value = 'Uniform';
+
+            case 'Hard A'
+                if strcmp(Rule,'S1>S_boundary Right')
+                    Prob_Dist_Right.value = 'Uniform';
+                    Prob_Dist_Left.value = 'Exponential';
+                else
+                    Prob_Dist_Right.value = 'Exponential';
+                    Prob_Dist_Left.value = 'Uniform';
+                end
+
+            case 'Hard B'
+                if strcmp(Rule,'S1>S_boundary Right')
+                    Prob_Dist_Left.value = 'Uniform';
+                    Prob_Dist_Right.value = 'Exponential';
+                else
+                    Prob_Dist_Left.value = 'Exponential';
+                    Prob_Dist_Right.value = 'Uniform';
+                end
+        end
+        StimulusSection(obj,'plot_stimuli');
+        PsychometricSection(obj,'StimSection_Distribution_Switch');
+
+    case 'Pushbutton_SwitchDistribution'
+        dist = varargin{1};
+        Category_Dist.value = dist;
+        StimulusSection(obj,'Distribution_Switch');
 
     %% Case close
     case 'close'
@@ -561,13 +632,11 @@ switch action
 
     case 'update_stimulus_history'
         ps=value(stimulus_history);
+        ps1 = value(stimulus_distribution_history);
         ps(n_done_trials)=value(thisstimlog(n_done_trials));
+        ps1{n_done_trials}=value(Category_Dist);
         stimulus_history.value=ps;
-
-    case 'update_stimulus_history_nan'
-        ps=value(stimulus_history);
-        ps(n_done_trials)=value(thisstimlog(n_done_trials));%nan;
-        stimulus_history.value=ps;
+        stimulus_distribution_history.value = ps1;
 
     %% Case hide
     case 'hide'
