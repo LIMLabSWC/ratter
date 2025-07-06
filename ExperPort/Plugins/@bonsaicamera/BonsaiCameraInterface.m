@@ -248,7 +248,9 @@ switch action
     case 'record_start'
 
         % create the folder to save the videos
-        mkdir(value(Video_Saving_Folder));
+        if not(isfolder(value(Video_Saving_Folder)))
+            mkdir(value(Video_Saving_Folder));
+        end
         pause(3);
         % To be on safer side that the last streaming message reached lets
         % resend it
@@ -280,9 +282,13 @@ switch action
         write(value(UDPSender), oscMsg_file_directory, "uint8", bonsaiComputerIP,bonsaiUdpPort);
     
 
-    case 'video_filepath'
+    case 'get_video_filepath'
 
         varargout{1} = value(Video_Saving_Folder);
+
+    case 'set_video_filepath'
+
+       Video_Saving_Folder.value = varargin{3};
 
     %% close bonsai and command window
     case 'close'

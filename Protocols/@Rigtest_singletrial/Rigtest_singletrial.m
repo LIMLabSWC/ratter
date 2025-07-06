@@ -225,10 +225,23 @@ switch action,
     nTrials.value = n_done_trials;
     
     % <~> If we've completed our trial, tell RunRats that we're done.
-    if nTrials > 0 && runrats('is_running'), 
-		runrats('rigtest_singletrial_is_complete');
-        return;
-    end;
+    
+    %% Modified by Arpit to run without Runrats
+    % <~> If we've completed our trial, tell RunRats that we're done.
+    if n_done_trials > 0
+        try
+            if nTrials > 0 && runrats('is_running')
+        		runrats('rigtest_singletrial_is_complete');
+                return;
+            end
+        catch
+            if nTrials > 0
+                Rigtest_singletrial(obj,'close')
+                return;
+            end
+        end
+    end
+    
     % <~> end adaptation for single-trial use :P
 
     

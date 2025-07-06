@@ -93,21 +93,20 @@ function [x, y, z] = SavingSection(obj, action, x, y, varargin)
       %the folder to save video files. If it runss into error or runrat is
       %not running then as a default it sets values as 'experimenter and
       %'ratname'
+            
       try
           [~,experimenter_name, rat_name] = runrats('exp_rat_names');
           [~, settings_file_str] = runrats('get_settings_file_path');
+          [~, settings_file_load_time_num] = runrats('get_settings_file_load_time');
       catch %#ok<CTCH>
           settings_file_str = '';
           experimenter_name = 'experimenter';
           rat_name = 'ratname';
-      end
-      SoloParamHandle(obj, 'settings_file', 'value', settings_file_str);
-      try
-          [~, settings_file_load_time_num] = runrats('get_settings_file_load_time');
-      catch %#ok<CTCH>
           settings_file_load_time_num = 0;
       end
+      
       SoloParamHandle(obj, 'settings_file_load_time', 'value', settings_file_load_time_num);
+      SoloParamHandle(obj, 'settings_file', 'value', settings_file_str);
       
       EditParam(obj, 'experimenter', experimenter_name, x, y); next_row(y, 1.5);
       EditParam(obj, 'ratname', rat_name, x, y); next_row(y, 1.5);
@@ -211,6 +210,10 @@ function [x, y, z] = SavingSection(obj, action, x, y, varargin)
        experimenter.value=x; %#ok<STRNU> 
        return;
     
+    case 'set_setting_info'       
+        settings_file.value = varargin{3};
+        settings_file_load_time.value = varargin{4};
+
     case 'savesets',       % ------------ CASE SAVESETS --------------------
       if     nargin == 3, varargin = {x}; 
       elseif nargin == 4, varargin = {x y};

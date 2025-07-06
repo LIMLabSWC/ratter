@@ -143,7 +143,14 @@ switch action
 
         BonsaiCameraInterface(obj,'record_start');
 
-	
+    case 'set_setting_params'
+
+        SavingSection(obj,'set','ratname',varargin{4});
+        SavingSection(obj,'set','experimenter',varargin{3});
+        SavingSection(obj,'set_setting_info',varargin{5},varargin{6});
+        BonsaiCameraInterface(obj,'set_video_filepath',varargin{7});
+
+
       %% prepare next trial
    case 'prepare_next_trial'
 
