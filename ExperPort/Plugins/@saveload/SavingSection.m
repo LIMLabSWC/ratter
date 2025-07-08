@@ -211,8 +211,8 @@ function [x, y, z] = SavingSection(obj, action, x, y, varargin)
        return;
     
     case 'set_setting_info'       
-        settings_file.value = varargin{3};
-        settings_file_load_time.value = varargin{4};
+        settings_file.value = x;
+        settings_file_load_time.value = y;
 
     case 'savesets',       % ------------ CASE SAVESETS --------------------
       if     nargin == 3, varargin = {x}; 

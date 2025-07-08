@@ -288,7 +288,7 @@ switch action
 
     case 'set_video_filepath'
 
-       Video_Saving_Folder.value = varargin{3};
+       Video_Saving_Folder.value = varargin{1};
 
     %% close bonsai and command window
     case 'close'

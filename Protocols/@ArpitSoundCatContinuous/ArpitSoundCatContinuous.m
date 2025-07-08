@@ -127,7 +127,7 @@ switch action
     SessionDefinition(obj, 'init', x, y, value(myfig)); next_row(y, 2); %#ok<NASGU>
     
     ArpitSoundCatContinuousSMA(obj, 'init');
-    feval(mfilename, obj, 'prepare_next_trial');
+    % feval(mfilename, obj, 'prepare_next_trial');
      
     case 'change_water_modulation_params'
 	   display_guys = [1 150 300];
@@ -145,10 +145,10 @@ switch action
 
     case 'set_setting_params'
 
-        SavingSection(obj,'set','ratname',varargin{4});
-        SavingSection(obj,'set','experimenter',varargin{3});
-        SavingSection(obj,'set_setting_info',varargin{5},varargin{6});
-        BonsaiCameraInterface(obj,'set_video_filepath',varargin{7});
+        SavingSection(obj,'set','ratname',varargin{1});
+        SavingSection(obj,'set','experimenter',varargin{2});
+        SavingSection(obj,'set_setting_info',varargin{3},varargin{4});
+        BonsaiCameraInterface(obj,'set_video_filepath',varargin{5});
 
 
       %% prepare next trial

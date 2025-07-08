@@ -165,8 +165,8 @@ switch action,
       'C',                      [0 0 0],       ...
       'R',                  0.9*[1 0.66 0]);
     
-    [x, y] = PokesPlotSection(obj, 'init', x, y, ...
-      struct('states',  my_state_colors, 'pokes', my_poke_colors));
+    % [x, y] = PokesPlotSection(obj, 'init', x, y, ...
+    %   struct('states',  my_state_colors, 'pokes', my_poke_colors));
 
     next_row(y);
     SubheaderParam(obj, 'title', 'Poke in lights', x, y); next_row(y);
@@ -229,17 +229,12 @@ switch action,
     %% Modified by Arpit to run without Runrats
     % <~> If we've completed our trial, tell RunRats that we're done.
     if n_done_trials > 0
-        try
             if nTrials > 0 && runrats('is_running')
         		runrats('rigtest_singletrial_is_complete');
                 return;
-            end
-        catch
-            if nTrials > 0
-                Rigtest_singletrial(obj,'close')
+            else
                 return;
             end
-        end
     end
     
     % <~> end adaptation for single-trial use :P
@@ -339,9 +334,6 @@ switch action,
       'self_timer', 0.2, 'input_to_statechange', {'Tup', 'check_next_trial_ready'});
     dispatcher('send_assembler', sma, 'final_state');
 
-    % Defaul behavior of following call is that every 20 trials, the data
-    % gets saved, not interactive, no commit to CVS.
-%     SavingSection(obj, 'autosave_data');
     
   %---------------------------------------------------------------
   %          CASE TRIAL_COMPLETED
@@ -350,20 +342,20 @@ switch action,
     % Do any updates in the protocol that need doing:
     feval(mfilename, 'update');
     % And PokesPlot needs completing the trial:
-    PokesPlotSection(obj, 'trial_completed');
+    % PokesPlotSection(obj, 'trial_completed');
     
   %---------------------------------------------------------------
   %          CASE UPDATE
   %---------------------------------------------------------------
   case 'update'
-    PokesPlotSection(obj, 'update');
+    % PokesPlotSection(obj, 'update');
     
     
   %---------------------------------------------------------------
   %          CASE CLOSE
   %---------------------------------------------------------------
   case 'close'
-    PokesPlotSection(obj, 'close');
+    % PokesPlotSection(obj, 'close');
     if exist('myfig', 'var') && isa(myfig, 'SoloParamHandle') && ishandle(value(myfig)), %#ok<NODEF>
       delete(value(myfig));
     end;
