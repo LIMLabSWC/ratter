@@ -132,8 +132,8 @@ switch action,
     set(value(myfig), 'Name', name, 'Tag', name, ...
       'closerequestfcn', 'dispatcher(''close_protocol'')', 'MenuBar', 'none');
 
-
-
+    % This flag will be set to 1 when the single trial is complete.
+    SoloParamHandle(obj, 'ManualTestComplete', 'value', 0, 'saveable', 0);
     % At this point we have one SoloParamHandle, myfig
     % Let's put the figure where we want it and give it a reasonable size:
     set(value(myfig), 'Position', [485   144   300   400]);
@@ -148,23 +148,24 @@ switch action,
     next_row(y);
     
     DispParam(obj, 'nTrials', 0, x, y); next_row(y);
-    % For plotting with the pokesplot plugin, we need to tell it what
-    % colors to plot with:
-    my_state_colors = struct( ...
-      'wait_for_left',    [0.2 0.5 0.2], ...
-      'in_left',          [0.5 0.5 1],   ...
-      'in_center',        [0.5 1 0.5],   ...
-      'in_right',         [1 0.5 0.5],   ...
-      'state_0',                [1 1 1],       ...
-      'final_state',            [0.5 0 0],     ...
-      'check_next_trial_ready', [0.7 0.7 0.7]);
-    % In pokesplot, the poke colors have a default value, so we don't need
-    % to specify them, but here they are so you know how to change them.
-    my_poke_colors = struct( ...
-      'L',                  0.6*[1 0.66 0],    ...
-      'C',                      [0 0 0],       ...
-      'R',                  0.9*[1 0.66 0]);
     
+    % % For plotting with the pokesplot plugin, we need to tell it what
+    % % colors to plot with:
+    % my_state_colors = struct( ...
+    %   'wait_for_left',    [0.2 0.5 0.2], ...
+    %   'in_left',          [0.5 0.5 1],   ...
+    %   'in_center',        [0.5 1 0.5],   ...
+    %   'in_right',         [1 0.5 0.5],   ...
+    %   'state_0',                [1 1 1],       ...
+    %   'final_state',            [0.5 0 0],     ...
+    %   'check_next_trial_ready', [0.7 0.7 0.7]);
+    % % In pokesplot, the poke colors have a default value, so we don't need
+    % % to specify them, but here they are so you know how to change them.
+    % my_poke_colors = struct( ...
+    %   'L',                  0.6*[1 0.66 0],    ...
+    %   'C',                      [0 0 0],       ...
+    %   'R',                  0.9*[1 0.66 0]);
+    % 
     % [x, y] = PokesPlotSection(obj, 'init', x, y, ...
     %   struct('states',  my_state_colors, 'pokes', my_poke_colors));
 
@@ -229,14 +230,25 @@ switch action,
     %% Modified by Arpit to run without Runrats
     % <~> If we've completed our trial, tell RunRats that we're done.
     if n_done_trials > 0
-            if nTrials > 0 && runrats('is_running')
-        		runrats('rigtest_singletrial_is_complete');
-                return;
-            else
-                return;
-            end
+        
+        % Set our completion flag to 1. The main GUI will be polling for this.
+        ManualTestComplete.value = 1;
+
+        if nTrials > 0 && runrats('is_running')
+            runrats('rigtest_singletrial_is_complete');
+            return;
+        else % probably called by another function so need to stop the dispatcher from here itself
+            % Send a dummy state machine that does nothing and ends quickly.
+            % This prevents the protocol from running a second trial.
+            sma = StateMachineAssembler('full_trial_structure');
+            sma = add_state(sma, 'name', 'do_nothing', 'self_timer', 0.01, ...
+                'input_to_statechange', {'Tup', 'check_next_trial_ready'});
+            dispatcher('send_assembler', sma, 'do_nothing');
+            return; % IMPORTANT: Exit here to prevent building the real state machine again.
+
+        end
     end
-    
+
     % <~> end adaptation for single-trial use :P
 
     

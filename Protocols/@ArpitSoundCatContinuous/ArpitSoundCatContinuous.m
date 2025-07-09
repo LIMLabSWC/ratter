@@ -111,7 +111,7 @@ switch action
     HeaderParam(obj, 'prot_title', [mfilename ': ' expmtr ', ' rname], x, y, 'position', [10 figpos(4)-25, 800 20]);
     
     [x, y] = WaterValvesSection(obj,  'init', x, y);next_row(y);
-    [x, y] = PokesPlotSection(obj, 'init', x, y);next_row(y);
+    % [x, y] = PokesPlotSection(obj, 'init', x, y);next_row(y);
     [x, y] = CommentsSection(obj, 'init', x, y);next_row(y);
     [x, y] = BonsaiCameraInterface(obj,'init',x,y,name,expmtr,rname);next_row(y);
 
@@ -126,7 +126,12 @@ switch action
     x=oldx; y=oldy;
     SessionDefinition(obj, 'init', x, y, value(myfig)); next_row(y, 2); %#ok<NASGU>
     
+    % saving auto frequency to 20 just in case changed running ephys
+    % experiment. If so then it will again change back to 1;
+    SavingSection(obj,'set_autosave_frequency',20);
+    
     ArpitSoundCatContinuousSMA(obj, 'init');
+                
     % feval(mfilename, obj, 'prepare_next_trial');
      
     case 'change_water_modulation_params'
@@ -143,11 +148,12 @@ switch action
 
         BonsaiCameraInterface(obj,'record_start');
 
-    case 'set_setting_params'
+    case 'set_setting_params' % special case used during ephys experiments when not using runrats
 
         SavingSection(obj,'set','ratname',varargin{1});
         SavingSection(obj,'set','experimenter',varargin{2});
         SavingSection(obj,'set_setting_info',varargin{3},varargin{4});
+        SavingSection(obj,'set_autosave_frequency',1); % saving setting every trial instead of 20
         BonsaiCameraInterface(obj,'set_video_filepath',varargin{5});
 
 
@@ -183,12 +189,13 @@ switch action
        % Update the Metrics Calculated
        PerformanceSection(obj,'evaluate');
        PsychometricSection(obj, 'update');
+       
        % Do any updates in the protocol that need doing:
        feval(mfilename, 'update');
 
    %% update
    case 'update'
-      PokesPlotSection(obj, 'update');
+      % PokesPlotSection(obj, 'update');
       if n_done_trials==1
             [expmtr, rname]=SavingSection(obj, 'get_info');
             prot_title.value=[mfilename ' on rig ' get_hostname ' : ' expmtr ', ' rname  '.  Started at ' datestr(now, 'HH:MM')];
@@ -196,7 +203,7 @@ switch action
       
    %% close
    case 'close'
-    PokesPlotSection(obj, 'close');
+    % PokesPlotSection(obj, 'close');
 	SideSection(obj, 'close');
     StimulusSection(obj,'close');
      BonsaiCameraInterface(obj,'close');
@@ -217,20 +224,6 @@ switch action
        
     StimulusSection(obj,'hide');
     SessionDefinition(obj, 'run_eod_logic_without_saving');
-
-    % perf    = PerformanceSection(obj, 'evaluate');
-    % cp_durs = SideSection(obj, 'get_cp_history');
-    % 
-    % [stim1dur] = SideSection(obj,'get_stimdur_history');
-    %stim_history = StimulatorSection(obj,'get_history');    
-    % pd.hits=hit_history(:);
-    % pd.sides=previous_sides(:);
-    % pd.viols=violation_history(:);
-    % pd.timeouts=timeout_history(:);
-    % pd.cp_durs=cp_durs(:);    
-    % pd.stim1dur=stim1dur(:);
-    %pd.stimul=stim_history(:);
-    % sendsummary(obj,'protocol_data',pd);
 
     sendsummary(obj);    
       

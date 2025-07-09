@@ -284,6 +284,7 @@ switch action,
                         runrats('crashed',me);
                         Running.value = 0;
                     else
+                        Running.value = 0;
                         rethrow(me);
                     end
                     

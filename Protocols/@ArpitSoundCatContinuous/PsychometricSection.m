@@ -273,6 +273,9 @@ switch action
             xGrid = linspace(Stim_Params(1), Stim_Params(3), 300)';
             cla(value(axplot2));
             hold (value(axplot2),'on')
+            
+            colors_to_use = createTemporalColormap(value(thiscontext));
+
             for n_plot = 1:value(thiscontext)
 
                 eval(sprintf('trial_start = value(Context%i_trialStart);',n_plot));
@@ -319,8 +322,8 @@ switch action
 
                 % Plot the Psychometric
                 if ~(contains(methodUsed,'Failed') || contains(methodUsed,'Canceled'))
-                    plot(value(axplot2),xGrid, y_pred, 'b-', 'LineWidth', 2);
-                    xline(value(axplot2),fitParams(1), 'g--', sprintf('PSE (%.2f)', fitParams(1)));
+                    plot(value(axplot2),xGrid, y_pred, 'Color', colors_to_use(n_plot, :), 'LineWidth', 2,'DisplayName',sprintf('Context %s',category_selected));
+                    xline(value(axplot2),fitParams(1), '--','Color', colors_to_use(n_plot, :), 'Label', sprintf('PSE (%.2f)', fitParams(1)));
                 end
 
             end
