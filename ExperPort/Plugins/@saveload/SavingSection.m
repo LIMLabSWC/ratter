@@ -176,7 +176,11 @@ function [x, y, z] = SavingSection(obj, action, x, y, varargin)
               warning('SAVELOAD:InvalidParam', 'Don''t know how to set "%s", not doing anything', parname);
       end;
       
-      
+       case 'get_set_filename'
+           x = value(settings_file);
+           y = [];
+           return;
+
       % ------------ CASE GET_ALL_INFO --------------------
       %Sundeep Tuteja, 22nd December, 2009: Adding a case to get
       %experimenter name, rat name, settings file loaded, if any, and data file. Case
@@ -208,6 +212,7 @@ function [x, y, z] = SavingSection(obj, action, x, y, varargin)
     case 'set_info',        % ------------ CASE SET_INFO --------------------
        ratname.value=y; %#ok<STRNU>
        experimenter.value=x; %#ok<STRNU> 
+       y =[];
        return;
     
     case 'set_setting_info'       

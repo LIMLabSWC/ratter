@@ -132,9 +132,7 @@ switch action,
     set(value(myfig), 'Name', name, 'Tag', name, ...
       'closerequestfcn', 'dispatcher(''close_protocol'')', 'MenuBar', 'none');
 
-    % This flag will be set to 1 when the single trial is complete.
-    SoloParamHandle(obj, 'ManualTestComplete', 'value', 0, 'saveable', 0);
-    % At this point we have one SoloParamHandle, myfig
+        % At this point we have one SoloParamHandle, myfig
     % Let's put the figure where we want it and give it a reasonable size:
     set(value(myfig), 'Position', [485   144   300   400]);
 
@@ -216,6 +214,16 @@ switch action,
     Rigtest_singletrial(obj, 'prepare_next_trial');
     
     
+  case 'set_callback'
+
+      if not(isempty(varargin))
+          callback_info = varargin{1};
+      else
+          callback_info = [];
+      end
+      SoloParamHandle(obj, 'ManualTestCompletionCallback', 'value', callback_info);
+
+    
     
   %---------------------------------------------------------------
   %          CASE PREPARE_NEXT_TRIAL
@@ -231,21 +239,32 @@ switch action,
     % <~> If we've completed our trial, tell RunRats that we're done.
     if n_done_trials > 0
         
-        % Set our completion flag to 1. The main GUI will be polling for this.
-        ManualTestComplete.value = 1;
-
         if nTrials > 0 && runrats('is_running')
             runrats('rigtest_singletrial_is_complete');
             return;
+
+        elseif nTrials > 0 && OpenEphys_Neuroblueprint('is_running')
+           OpenEphys_Neuroblueprint('manual_test_stopping');
+           return;
+        
+        
         else % probably called by another function so need to stop the dispatcher from here itself
             % Send a dummy state machine that does nothing and ends quickly.
             % This prevents the protocol from running a second trial.
-            sma = StateMachineAssembler('full_trial_structure');
-            sma = add_state(sma, 'name', 'do_nothing', 'self_timer', 0.01, ...
-                'input_to_statechange', {'Tup', 'check_next_trial_ready'});
-            dispatcher('send_assembler', sma, 'do_nothing');
-            return; % IMPORTANT: Exit here to prevent building the real state machine again.
+           
+            % Find the callback handle created by the main GUI calling it.
+             h_callback = get_sphandle('owner', ['@' class(obj) '$'], 'name', 'ManualTestCompletionCallback');
+        
+             if ~isempty(h_callback)
+                 callback_info = value(h_callback{1});
+                 if ~isempty(callback_info) && isa(callback_info, 'cell') && numel(callback_info) == 2
+                     % Execute the callback: feval(function_handle, arguments...)
+                     % This directly calls 'continue_load_after_manual_test' in the main GUI.
+                     feval(callback_info{1}, callback_info{2});
+                 end
+             end
 
+            return; % IMPORTANT: Exit here to prevent building the real state machine again.
         end
     end
 

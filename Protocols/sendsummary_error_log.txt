@@ -653,3 +653,15 @@ In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('runrats'
 In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('parse_and_call_sph_callback', 'C:\ratter\ExperPort\HandleParam\parse_and_call_sph_callback.m', 40)" style="font-weight:bold">parse_and_call_sph_callback</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\HandleParam\parse_and_call_sph_callback.m',40,0)">line 40</a>)
 In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('SoloParamHandle/callback', 'C:\ratter\ExperPort\HandleParam\@SoloParamHandle\callback.m', 107)" style="font-weight:bold">SoloParamHandle/callback</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\HandleParam\@SoloParamHandle\callback.m',107,0)">line 107</a>)
 In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('generic_callback', 'C:\ratter\ExperPort\HandleParam\generic_callback.m', 5)" style="font-weight:bold">generic_callback</a> (<a href="matlab: opentoline('C:\ratter\ExperPort\HandleParam\generic_callback.m',5,0)">line 5</a>)] 
+ERROR in bdata: mym(CON_ID,'insert into parsed_events values ("{S}", "{M}")',vs{1}, vs{2} );
+
+ 
+Error using <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('mym')" style="font-weight:bold">mym</a>
+Data too long for column 'events' at row 1
+On line 158 of C:\ratter\ExperPort\MySQLUtility\bdata.m
+On line 177 of C:\ratter\ExperPort\Plugins\@sqlsummary\sendsummary.m
+On line 228 of C:\ratter\Protocols\@ArpitSoundCatContinuous\ArpitSoundCatContinuous.m
+On line 423 of C:\MATLABscripts_EphysExperiment\OpenEphys_Bcontrol_Neuroblueprint_GUI.m
+On line 323 of C:\MATLABscripts_EphysExperiment\OpenEphys_Bcontrol_Neuroblueprint_GUI.m
+On line 157 of C:\MATLABscripts_EphysExperiment\OpenEphys_Bcontrol_Neuroblueprint_GUI.m
+No errors encountered during sendsummary execution.
