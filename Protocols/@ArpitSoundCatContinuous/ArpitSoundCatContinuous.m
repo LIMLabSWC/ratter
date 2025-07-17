@@ -35,7 +35,7 @@ switch action
    
    %% init
    case 'init'
-    dispatcher('set_trialnum_indicator_flag');
+    % dispatcher('set_trialnum_indicator_flag');
     hackvar = 10; SoloFunctionAddVars('SessionModel', 'ro_args', 'hackvar'); %#ok<NASGU>
     SoloParamHandle(obj, 'myfig', 'saveable', 0); myfig.value = figure;
 
@@ -132,7 +132,7 @@ switch action
     
     ArpitSoundCatContinuousSMA(obj, 'init');
                 
-    % feval(mfilename, obj, 'prepare_next_trial');
+    feval(mfilename, obj, 'prepare_next_trial');
      
     case 'change_water_modulation_params'
 	   display_guys = [1 150 300];
@@ -163,13 +163,12 @@ switch action
        SideSection(obj, 'prepare_next_trial');
 	% Run SessionDefinition *after* SideSection so we know whether the
 	% trial was a violation or not
-       SessionDefinition(obj, 'next_trial');
+       % SessionDefinition(obj, 'next_trial');
        StimulatorSection(obj, 'update_values');       
        StimulusSection(obj,'prepare_next_trial');
        SoundManagerSection(obj, 'send_not_yet_uploaded_sounds');
     
        [sma, prepare_next_trial_states] = ArpitSoundCatContinuousSMA(obj, 'prepare_next_trial');
-       % PerformanceSection(obj, 'evaluate');
 
     % Default behavior of following call is that every 20 trials, the data
     % gets saved, not interactive, no commit to CVS.
@@ -223,9 +222,13 @@ switch action
    case 'pre_saving_settings'
        
     StimulusSection(obj,'hide');
+    PsychometricSection(obj,'hide');
     SessionDefinition(obj, 'run_eod_logic_without_saving');
 
-    sendsummary(obj);    
+    % Sending Summary Statistics to SQL Database
+    perf = PsychometricSection(obj, 'evaluate');
+    
+    % SoundCatContextSwitchSummary(obj,'protocol_data',perf);  
       
       %% otherwise
     otherwise

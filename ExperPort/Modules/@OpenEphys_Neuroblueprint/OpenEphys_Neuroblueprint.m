@@ -1,4 +1,4 @@
-function [obj, varargout] = OpenEphys_Neuroblueprint(varargin)
+function [obj, varargout] = OpenEphys_Neuroblueprint_GUI(varargin)
 % This is a class-based version of the GUI controller, structured similarly
 % to runrats.m. It manages the experimental workflow through different
 % 'actions' called via a switch statement.
@@ -11,19 +11,19 @@ function [obj, varargout] = OpenEphys_Neuroblueprint(varargin)
 % --- Boilerplate for class definition and action handling ---
 obj = class(struct, mfilename);
 varargout = {}; % Initialize varargout for actions that return values
-if nargin==0 || (nargin==1 && ischar(varargin{1}) && strcmp(varargin{1}, 'empty')), 
+if nargin==0 || (nargin==1 && ischar(varargin{1}) && strcmp(varargin{1}, 'empty')) 
    return; 
-end;
-if isa(varargin{1}, mfilename),
-  if length(varargin) < 2 || ~ischar(varargin{2}), 
+end
+if isa(varargin{1}, mfilename)
+  if length(varargin) < 2 || ~ischar(varargin{2})
     error(['If called with a "%s" object as first arg, a second arg, a ' ...
       'string specifying the action, is required\n']);
   else action = varargin{2}; varargin = varargin(3:end);
-  end;
+  end
 else
        action = varargin{1}; varargin = varargin(2:end);
-end;
-if ~ischar(action), error('The action parameter must be a string'); end;
+end
+if ~ischar(action), error('The action parameter must be a string'); end
 GetSoloFunctionArgs(obj);
 % --- End of boilerplate ---
 
@@ -35,6 +35,9 @@ switch action
     case 'init'
         % This case is called once to create the GUI and initialize all parameters.
         
+        % So that only the CPU-based software renderer instead of your graphics card
+        opengl software;
+
         % Start Bpod if not already running
         if evalin('base', 'exist(''BpodSystem'', ''var'')')
             if evalin('base', '~isempty(BpodSystem)'), newstartup; else, flush; end
@@ -46,7 +49,6 @@ switch action
         SoloParamHandle(obj, 'oe_controller', 'value', []);
         SoloParamHandle(obj, 'behav_obj', 'value', []);
         SoloParamHandle(obj, 'blinking_timer', 'value', []);
-        SoloParamHandle(obj, 'monitor_timer', 'value', []);
         SoloParamHandle(obj, 'current_params', 'value', []);
         SoloParamHandle(obj, 'session_base_path', 'value', '');
         SoloParamHandle(obj,'is_running','value',0);
@@ -88,7 +90,7 @@ switch action
         uicontrol(p2, 'Style', 'text', 'String', 'Project Name (Root):', 'Units', 'normalized', 'Position', [0.01, 0.85, 0.28, 0.1], 'HorizontalAlignment', 'right');
         handles.proj_edit = uicontrol(p2, 'Style', 'edit', 'String', 'sound_cat_rat', 'Units', 'normalized', 'Position', [0.3, 0.85, 0.65, 0.12]);
         uicontrol(p2, 'Style', 'text', 'String', 'Subject ID:', 'Units', 'normalized', 'Position', [0.01, 0.7, 0.28, 0.1], 'HorizontalAlignment', 'right');
-        handles.sub_edit = uicontrol(p2, 'Style', 'edit', 'String', '002', 'Units', 'normalized', 'Position', [0.3, 0.7, 0.65, 0.12]);
+        handles.sub_edit = uicontrol(p2, 'Style', 'edit', 'String', '003', 'Units', 'normalized', 'Position', [0.3, 0.7, 0.65, 0.12]);
         uicontrol(p2, 'Style', 'text', 'String', 'Local Path:', 'Units', 'normalized', 'Position', [0.01, 0.55, 0.28, 0.1], 'HorizontalAlignment', 'right');
         handles.local_edit = uicontrol(p2, 'Style', 'edit', 'String', 'C:\Ephys_Experiment_Data', 'Units', 'normalized', 'Position', [0.3, 0.55, 0.5, 0.12]);
         handles.local_browse = uicontrol(p2, 'Style', 'pushbutton', 'String', 'Browse...', 'Units', 'normalized', 'Position', [0.81, 0.55, 0.16, 0.13], 'Callback', {@(h,e) feval(mfilename, obj, 'browse_path', 'local')});
@@ -267,7 +269,6 @@ switch action
         currentState.value = 'Stop';
         set(handles.control_button, 'String', 'Stop');
         feval(mfilename, obj, 'start_blinking');
-        feval(mfilename, obj, 'start_monitoring');
         
         try
             log_message(handles, 'Starting behavioral protocol...');
@@ -285,10 +286,11 @@ switch action
         handles = value(ui_handles);
         log_message(handles, '--- STOP sequence initiated ---');
         feval(mfilename, obj, 'stop_blinking');
-        
+        behav_save_dir = fullfile(params.local_path, value(session_base_path), 'behav');
+
         try
             log_message(handles, 'Ending behavioral session (saving data)...');
-            feval(mfilename, obj, 'behav_control', 'end', params.protocol_name, params.behav_path);
+            feval(mfilename, obj, 'behav_control', 'end', params.protocol_name, params.behav_path,behav_save_dir);
             log_message(handles, 'Behavioral data saved successfully.');
         catch ME
             log_message(handles, ['FATAL ERROR ending behavioral session: ' ME.message]);
@@ -337,7 +339,7 @@ switch action
 
             case 'load_protocol_after_crash'
                experimenter = args{1}; ratname = args{2}; protocol_name = args{3}; 
-               video_save_dir = args{4}; behav_path = args{5};
+               behav_path = args{4};
                log_message(handles, ['Loading protocol: ' protocol_name]);
                dispatcher('set_protocol', protocol_name);
                rath = get_sphandle('name', 'ratname', 'owner', protocol_name);
@@ -351,17 +353,15 @@ switch action
                if isfile(fullfile(temp_data_dir,temp_data_file))
                    dispatcher('runstart_disable');
                    load_soloparamvalues(ratname, 'experimenter', experimenter,...
-                       'owner', protobj, 'interactive', 0,'data_file',fullfile(temp_data_dir,temp_data_file));
+                       'owner', protocol_name, 'interactive', 0,'data_file',fullfile(temp_data_dir,temp_data_file));
                    dispatcher('runstart_enable');
                end
-               % [sfile, ~] = SavingSection(protobj, 'get_set_filename');
                if ~dispatcher('is_running'), pop_history(class(protobj), 'include_non_gui', 1); feval(protocol_name, protobj, 'prepare_next_trial'); end
-               % feval(protocol_name, protobj, 'set_setting_params', ratname, experimenter, sfile, char(datetime('now')), video_save_dir);
-
+               
            case 'crashed'
                 log_message(handles, '--- BEHAVIOR CRASH RECOVERY INITIATED ---');
                 params = value(current_params);
-                feval(mfilename, obj, 'behav_control', 'load_protocol_after_crash', params.experimenter, params.rat_name, params.protocol_name, fullfile(params.local_path, value(session_base_path), 'behav'), params.behav_path);
+                feval(mfilename, obj, 'behav_control', 'load_protocol_after_crash', params.experimenter, params.rat_name, params.protocol_name, params.behav_path);
                 feval(mfilename, obj, 'behav_control', 'run', params.protocol_name);
                 log_message(handles, '--- RECOVERY COMPLETE: Behavior protocol restarted ---');
 
@@ -375,19 +375,19 @@ switch action
 
                
             case 'end'
-                protocol_name = args{1}; root_dir = args{2};
+                protocol_name = args{1}; root_dir = args{2}; behav_copy_dir = args{3};
                 log_message(handles, 'Stopping dispatcher...');
                 dispatcher(value(behav_obj), 'Stop');
 
                 %Let's pause until we know dispatcher is done running
-               set(value(stopping_complete_timer), 'Period', 2,'TimerFcn', {@(h,e) feval(mfilename, obj, 'behav_control','end_continued',protocol_name, root_dir)});
+               set(value(stopping_complete_timer), 'Period', 2,'TimerFcn', {@(h,e) feval(mfilename, obj, 'behav_control','end_continued',protocol_name, root_dir,behav_copy_dir)});
                 %set(value(stopping_complete_timer),'TimerFcn',[mfilename,obj,'behav_control','(''end_continued'');']);
                 start(value(stopping_complete_timer));
 
             case 'end_continued'
                 %% end_continued
                 if value(stopping_process_completed) %This is provided by RunningSection
-                    protocol_name = args{1}; root_dir = args{2};
+                    protocol_name = args{1}; root_dir = args{2}; destination_path = args{3};
                     stop(value(stopping_complete_timer)); %Stop looping.                    
                     is_running.value = 0;
                     feval(mfilename, obj, 'behav_control', 'send_empty_state_machine');
@@ -396,13 +396,35 @@ switch action
                     feval(protocol_name, protobj, 'end_session');
                     log_message(handles, 'Saving data and settings...');
                     data_file = SavingSection(protobj, 'savedata', 'interactive', 0);
-                    try, feval(protocol_name, protobj, 'pre_saving_settings'); catch, log_message(handles, 'Protocol does not have a pre_saving_settings section.'); end
+                    try 
+                        feval(protocol_name, protobj, 'pre_saving_settings'); 
+                    catch 
+                        log_message(handles, 'Protocol does not have a pre_saving_settings section.'); 
+                    end
                     [settings_file, ~] = SavingSection(protobj, 'get_set_filename');
                     SavingSection(protobj, 'savesets', 'interactive', 0);
                     log_message(handles, 'Committing data and settings to SVN...');
-                    commit_to_svn(handles, data_file, root_dir);
-                    commit_to_svn(handles, settings_file, root_dir);
+                    commit_to_svn(handles, data_file, settings_file, root_dir);
                     dispatcher('set_protocol', '');
+                    dispatcher('close');
+                    
+                    % wait sometime for dispatcher to stop using a timer object
+                    t = timer;
+                    t.StartDelay = 1;
+                    t.TimerFcn = @(~,~) log_message('waiting for before copying');
+                    start(t);% Start the timer (it runs in the background)
+                    wait(t); % wait() pauses the script until the timer object is done.
+                    delete(t);% Clean up the timer from memory
+
+                    % Copy the data file to the folder saving ephys data                    
+                    [status, msg] = copyfile(data_file, destination_path);
+                    % Check if the copy was successful
+                    if status
+                        log_message(handles,'Data File copied successfully.');
+                    else
+                        log_message(handles,['Error copying Data file: ' msg]);
+                    end
+
                 end
 
             case 'create_svn_data_dir'
@@ -492,7 +514,7 @@ switch action
             blinking_timer.value = [];
         end
         set(handles.control_button, 'BackgroundColor', [1, 0.4, 0.4]);
-           
+
 
     case 'crash_detected'
         % handles = feval(mfilename, obj, 'get_ui_handles');

@@ -275,7 +275,8 @@ function [x, y, z] = SavingSection(obj, action, x, y, varargin)
        case 'get_settings_file_load_time'
            [dummy, x1] = runrats('get_settings_file_load_time'); clear('dummy');
            x2 = value(settings_file_load_time);
-           x = max(x1, x2); settings_file_load_time.value = x;
+           x = max(double(x1), double(x2)); 
+           settings_file_load_time.value = x;
            y = [];
            z = [];
            return;

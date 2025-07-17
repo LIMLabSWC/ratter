@@ -324,6 +324,9 @@ switch action
     % instead not sending it asif required can be taken from session data
     
     % sendsummary(obj);
+
+    % Sending Summary Statistics to SQL Database
+    
     perf = struct([]);
     perf = PerformanceSummarySection(obj, 'evaluate');
     [perf.violation_percent,perf.timeout_percent] = SessionPerformanceSection(obj, 'evaluate');
@@ -337,7 +340,7 @@ switch action
     
     perf.video_filepath = BonsaiCameraInterface(obj,'video_filepath');
     
-    CentrePoketrainingsummary(obj,'protocol_data',perf);
+    CentrePoketrainingsummary(obj,'protocol_data',perf);  
     
 % 	CommentsSection(obj, 'append_line', ...
 % 		sprintf(['ntrials = %d, violations = %.2f, timeouts=%.2f, hits = %.2f\n', ...

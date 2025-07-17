@@ -109,6 +109,21 @@ switch action
             'sustain', WValveTime, 'DOut', WValveSide); % water delivery side
         sma = add_scheduled_wave(sma, 'name', 'reward_collection_dur', 'preamble', SideLed_duration + RewardCollection_duration); % time to collect the reward
 
+        % Scheduled Wave for Ephys Trial
+
+        if ~isnan(bSettings('get', 'DIOLINES', 'trialnum_indicator'))
+            trigephys = bSettings('get', 'DIOLINES', 'trialnum_indicator');
+        else
+            trigephys = nan;
+        end
+
+        if strcmpi(value(StimLine),'Ephys')
+            sma = add_scheduled_wave(sma, 'name', 'EphysTrig', 'preamble', 0, 'sustain', ...
+                0.4, 'DOut',  trigephys, 'loop', 0); %for Ephys
+        else
+            sma = add_scheduled_wave(sma, 'name', 'EphysTrig', 'preamble', 0, 'sustain', 0); %dummy wave.
+        end
+
         %%
         %%%%%%%%%%% % *STATES* %%%%%%%%%%%%%%%%%%%
 
@@ -251,7 +266,8 @@ switch action
         sma = add_state(sma, 'self_timer', max(0.001, violation_iti-viol_snd_duration), ...
             'input_to_statechange',{'Tup','preclean_up_state'});
 
-        sma = add_state(sma,'name','preclean_up_state','self_timer',0.5,...
+        sma = add_state(sma,'name','preclean_up_state','self_timer',0.8,...
+            'output_actions', {'SchedWaveTrig','EphysTrig'},...
             'input_to_statechange',{'Tup','check_next_trial_ready'});
 
         varargout{2} = {'check_next_trial_ready'};

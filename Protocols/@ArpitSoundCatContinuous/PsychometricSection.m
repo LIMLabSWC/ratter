@@ -267,6 +267,7 @@ switch action
             grid on;
         catch
         end
+
     case 'PushButton_Context'
         try
             Stim_Params = StimulusSection(obj,'stim_params');
@@ -450,6 +451,65 @@ switch action
 
             catch
             end
+        end
+
+    case 'evaluate'
+        if n_done_trials > 1
+
+            Stim_Params = StimulusSection(obj,'stim_params');
+            
+            psych_result = cell(1,value(thiscontext));
+            
+            for n_context = 1:value(thiscontext)
+
+                eval(sprintf('trial_start = value(Context%i_trialStart);',n_context));
+                eval(sprintf('trial_end = value(Context%i_trialEnd);',n_context));
+                stim2analyze = stimulus_history(trial_start:trial_end);
+                sides2analyze = previous_sides(trial_start:trial_end);
+                hit_history2analyze = hit_history(trial_start:trial_end);
+                category_distribution2analyze = stimulus_distribution_history(trial_start:trial_end);          
+                valid_hit_history_trials = find(~isnan(hit_history2analyze));
+                sides = sides2analyze(valid_hit_history_trials);
+                stim = stim2analyze(valid_hit_history_trials);
+                category_distribution = category_distribution2analyze(valid_hit_history_trials);
+                hit_values = hit_history2analyze(valid_hit_history_trials)';
+                resp = zeros(size(hit_values));
+
+                if strcmpi(Rule,'S1>S_boundary Left') % Category B is Left so its value is 1
+                    resp((sides == 108 & hit_values == 1) | (sides == 114 & hit_values == 0)) = 1;
+                else % Category B is Right so its value is 1
+                    resp((sides == 114 & hit_values == 1) | (sides == 108 & hit_values == 0)) = 1;
+                end
+
+                try
+                    [~, fitParams, ~,~] = realtimepsychometricFit(stim,resp,Stim_Params);
+                catch                    
+                    fitParams = [nan,nan,nan,nan];
+                end
+
+                psych_result{n_context}.trial_start = trial_start;
+                psych_result{n_context}.trial_end = trial_end;
+                psych_result{n_context}.context = char(unique(category_distribution));
+                psych_result{n_context}.percept_boundary = fitParams(1);
+                try
+                    psych_result{n_context}.total_correct = mean(hit_history2analyze,"omitnan");
+                    psych_result{n_context}.violations =  mean(isnan(hit_history2analyze));
+                    psych_result{n_context}.right_correct = mean(hit_history2analyze(sides2analyze==114),"omitnan");
+                    psych_result{n_context}.left_correct = mean(hit_history2analyze(sides2analyze==108),"omitnan");
+                catch
+                    fprintf(2, 'Error calculating correct pokes\n');
+                    disp(ME.message);
+                    disp(ME.stack);
+                    psych_result{n_context}.total_correct = -1;
+                    psych_result{n_context}.violations =  -1;
+                    psych_result{n_context}.right_correct = -1;
+                    psych_result{n_context}.left_correct = -1;
+                end
+
+            end
+
+            varargout{1} = psych_result;
+
         end
 
         %% Case close

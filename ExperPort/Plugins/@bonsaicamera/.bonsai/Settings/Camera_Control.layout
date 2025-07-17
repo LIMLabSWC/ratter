@@ -15,6 +15,22 @@
       <ObjectTextVisualizer />
     </VisualizerSettings>
   </WindowSettings>
+  <WindowSettings Index="4">
+    <Visible>false</Visible>
+    <Location>
+      <X>234</X>
+      <Y>234</Y>
+    </Location>
+    <Size>
+      <Width>336</Width>
+      <Height>279</Height>
+    </Size>
+    <WindowState>Maximized</WindowState>
+    <VisualizerTypeName>Bonsai.Vision.Design.IplImageVisualizer</VisualizerTypeName>
+    <VisualizerSettings>
+      <IplImageVisualizer />
+    </VisualizerSettings>
+  </WindowSettings>
   <WindowSettings Index="9">
     <Visible>false</Visible>
     <Location>
