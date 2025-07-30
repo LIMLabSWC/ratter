@@ -45,14 +45,15 @@ switch action
         display('test');
         %If we are starting from a forced reboot from runrats itself we
         %need to make sure the do_on_reboot.bat file is set back to nothing
-        try %#ok<TRYNC>
-            p = pwd;
-            cd('\ratter\Rigscripts')
-
-            !del do_on_reboot.bat
-            !copy nothing.bat do_on_reboot.bat /Y
-            cd(p);
-        end
+        
+        % try %#ok<TRYNC>
+        %     p = pwd;
+        %     cd('\ratter\Rigscripts')
+        % 
+        %     !del do_on_reboot.bat
+        %     !copy nothing.bat do_on_reboot.bat /Y
+        %     cd(p);
+        % end
 
         %If a dispatcher is already open, let's close it so we don't ever have
         %more than 1
@@ -115,7 +116,7 @@ switch action
         SoloParamHandle(obj,'myfig', 'value',fig);
         
         try
-            set(myfig, 'WindowStyle', 'modal');
+            set(value(myfig), 'WindowStyle', 'modal');
             pause(0.1);
             
         catch %#ok<CTCH>

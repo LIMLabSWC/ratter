@@ -205,7 +205,7 @@ switch action
     % PokesPlotSection(obj, 'close');
 	SideSection(obj, 'close');
     StimulusSection(obj,'close');
-     BonsaiCameraInterface(obj,'close');
+    BonsaiCameraInterface(obj,'close');
     if exist('myfig', 'var') && isa(myfig, 'SoloParamHandle') && ishandle(value(myfig)) %#ok<NODEF>
       delete(value(myfig));
     end

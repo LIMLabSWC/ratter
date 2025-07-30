@@ -256,8 +256,8 @@ switch action
 
                 if value(StimulusShow) == 1 % only run if the figure window is open
 
-                    stim_values = value(thisstimlog);
-                    stim_present = stim_values(n_done_trials);
+                    stim_values = value(stimulus_history);
+                    stim_present = stim_values(end);
                     stim_history = stim_values(1:end-1);
 
                     % figure out if legends,present stim and histogram to be plotted or not
@@ -287,8 +287,6 @@ switch action
                             'plot_legend',legend_draw...
                             );
                         plot_h.value = handle_h;
-                        drawnow;
-                        pause(0.01);
                     end
                     
                 end
@@ -314,7 +312,7 @@ switch action
     % Changing animals side reference to stimuli reference depending upon Rule
     % Even the setting in StimulusSection is based upon side not on the
     % basis of whether left or right of boundary
-
+    
         if strcmp(Rule,'S1>S_boundary Left') % side left is right to stim boundary
             if strcmpi(ThisTrial, 'LEFT')
                 stim_side = 'right';

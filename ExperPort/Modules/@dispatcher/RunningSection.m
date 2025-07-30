@@ -31,7 +31,8 @@ switch action,
         SoloParamHandle(obj, 'stop_after_next_update', 'value', 0);
         SoloParamHandle(obj, 'stopping_process_completed', 'value', 1);
         SoloFunctionAddVars('runrats','func_owner','@runrats','ro_args','stopping_process_completed'); %     This is a bit unpleasant. We give ro access to the flag denoting the stop process as complete to runrats so that runrats can wait on it using a timer. :P
-        SoloFunctionAddVars('OpenEphys_Neuroblueprint','func_owner','@OpenEphys_Neuroblueprint','ro_args','stopping_process_completed'); %     This is a bit unpleasant. We give ro access to the flag denoting the stop process as complete to runrats so that OpenEphys_Neuropblueprint can wait on it using a timer. :P
+        SoloFunctionAddVars('OpenEphys_Neuroblueprint','func_owner','@OpenEphys_Neuroblueprint','ro_args','stopping_process_completed'); %     This is a bit unpleasant. We give ro access to the flag denoting the stop process as complete so that OpenEphys_Neuropblueprint can wait on it using a timer. :P
+        SoloFunctionAddVars('NeuropixelNeuroblueprint','func_owner','@NeuropixelNeuroblueprint','ro_args','stopping_process_completed'); %     This is a bit unpleasant. We give ro access to the flag denoting the stop process as complete so that NeuropixelNeuropblueprint can wait on it using a timer. :P
         SoloFunctionAddVars('TowerWaterDelivery','func_owner','@TowerWaterDelivery','ro_args','stopping_process_completed'); %     This is a bit unpleasant. We give ro access to the flag denoting the stop process as complete to runrats so that runrats can wait on it using a timer. :P
 
         set(get_ghandle(RunButton), 'FontSize', 20); % (defined by GetSoloFunctionArgs)
@@ -287,6 +288,9 @@ switch action,
                     elseif OpenEphys_Neuroblueprint('is_running')
                         OpenEphys_Neuroblueprint('crash_detected');
                         Running.value = 0;
+                    elseif NeuropixelNeuroblueprint('is_running')
+                        NeuropixelNeuroblueprint('crash_detected');
+                        Running.value = 0;    
                     else
                         rethrow(me);
                     end

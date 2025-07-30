@@ -134,6 +134,10 @@ switch action
 
       end
       
+      if strcmpi(value(StimLine),'Ephys') & n_done_trials == 0
+            dispatcher('set_trialnum_indicator_flag');
+      end
+      
       
       
 %% prepare_next_trial

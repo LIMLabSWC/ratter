@@ -247,7 +247,10 @@ switch action,
            OpenEphys_Neuroblueprint('manual_test_stopping');
            return;
         
-        
+        elseif nTrials > 0 && NeuropixelNeuroblueprint('is_running')
+           NeuropixelNeuroblueprint('manual_test_stopping');
+           return;
+
         else % probably called by another function so need to stop the dispatcher from here itself
             % Send a dummy state machine that does nothing and ends quickly.
             % This prevents the protocol from running a second trial.
