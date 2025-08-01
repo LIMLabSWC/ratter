@@ -67,6 +67,14 @@ switch action
     DeclareGlobals(obj, 'ro_args', {'stimulus_distribution_history'});
     SoloFunctionAddVars('StimulusSection', 'rw_args', 'stimulus_distribution_history');
     
+    SoloParamHandle(obj, 'stimulus_left_distribution_history', 'value', cell(0));
+    DeclareGlobals(obj, 'ro_args', {'stimulus_left_distribution_history'});
+    SoloFunctionAddVars('StimulusSection', 'rw_args', 'stimulus_left_distribution_history');
+
+    SoloParamHandle(obj, 'stimulus_right_distribution_history', 'value', cell(0));
+    DeclareGlobals(obj, 'ro_args', {'stimulus_right_distribution_history'});
+    SoloFunctionAddVars('StimulusSection', 'rw_args', 'stimulus_right_distribution_history');
+
     SoloParamHandle(obj, 'violation_history', 'value', []);
     DeclareGlobals(obj, 'ro_args', {'violation_history'});
     SoloFunctionAddVars('SideSection', 'rw_args', 'violation_history');
@@ -226,7 +234,7 @@ switch action
     SessionDefinition(obj, 'run_eod_logic_without_saving');
 
     % Sending Summary Statistics to SQL Database
-    perf = PsychometricSection(obj, 'evaluate');
+    % perf = PsychometricSection(obj, 'evaluate');
     
     % SoundCatContextSwitchSummary(obj,'protocol_data',perf);  
       

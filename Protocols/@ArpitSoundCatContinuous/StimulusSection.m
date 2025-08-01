@@ -779,10 +779,18 @@ switch action
     case 'update_stimulus_history'
         ps=value(stimulus_history);
         ps1 = value(stimulus_distribution_history);
+        ps2 = value(stimulus_right_distribution_history);
+        ps3 = value(stimulus_left_distribution_history);
+        
         ps(n_done_trials)=value(thisstimlog(n_done_trials));
         ps1{n_done_trials}=value(Category_Dist);
+        ps2{n_done_trials}=value(Prob_Dist_Right);
+        ps3{n_done_trials}=value(Prob_Dist_Left);
+        
         stimulus_history.value=ps;
         stimulus_distribution_history.value = ps1;
+        stimulus_right_distribution_history.value = ps2;
+        stimulus_left_distribution_history.value = ps3;
 
     %% Case hide
     case 'hide'

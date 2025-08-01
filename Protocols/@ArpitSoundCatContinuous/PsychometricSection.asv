@@ -185,7 +185,7 @@ switch action
             config.trials_per_block = value(trial_plot);
             config.true_mu = Stim_Params(2);
             config.stimuli_range = [Stim_Params(1), Stim_Params(3)];
-            config.debug = false;
+            config.debug = true;
 
             state = value(states_value);
             
@@ -199,10 +199,10 @@ switch action
             stim_obj = value(Update_Stimulus);
             flags.stim = logical(stim_obj.Value);
 
-            varargout{1} = state;
-            varargout{2} = data;
-            varargout{3} = handles;
-            varargout{4} = config;
+            varargout{1} = data;
+            varargout{2} = handles;
+            varargout{3} = config;
+            varargout{4} = ;
             varargout{5} = flags;
 
         catch 
@@ -297,12 +297,12 @@ switch action
     %% update after each trial    
     case 'update'
         % update the trial end for this context
-        if n_done_trials > 1
+        if n_done_trials > 1            
             eval(sprintf('Context%i_trialEnd.value = n_done_trials;',value(thiscontext)));
-            [state, data, handles, config, flags] = PsychometricSection(obj,'Calculate_Params');
-            % Calling the function to update the table and plot
-            state = RealTimeAnalysis('live', state, data, handles, config, flags);
-            states_value.value = state;
+                [state, data, handles, config, flags] = PsychometricSection(obj,'Calculate_Params');
+                % Calling the function to update the table and plot
+                state = RealTimeAnalysis('live', state, data, handles, config, flags);
+                states_value.value = state;
         end
 
     %% update the figure if user opened the figure window    

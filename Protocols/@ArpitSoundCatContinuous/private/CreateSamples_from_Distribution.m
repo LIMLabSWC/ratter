@@ -2,6 +2,9 @@ function [samples_history_out, h_fig_out, plot_handles_out] = CreateSamples_from
 
 % CreateSamples_from_Distribution
 %
+% This function is specifically called within StimulusSection to perform
+% the actions
+
 % This function generates random samples from a customizable bimodal
 % distribution and can optionally plot the distribution, a history histogram,
 % and dynamic current picks.
