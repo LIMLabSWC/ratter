@@ -243,10 +243,6 @@ switch action,
             runrats('rigtest_singletrial_is_complete');
             return;
 
-        elseif nTrials > 0 && OpenEphys_Neuroblueprint('is_running')
-           OpenEphys_Neuroblueprint('manual_test_stopping');
-           return;
-        
         elseif nTrials > 0 && NeuropixelNeuroblueprint('is_running')
            NeuropixelNeuroblueprint('manual_test_stopping');
            return;

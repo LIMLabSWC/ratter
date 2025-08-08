@@ -72,17 +72,22 @@ switch action
 		
 
         if n_done_trials > 1
-            
-            ntrials.value        = n_done_trials;
-            ntrials_valid.value = numel(find(~isnan(hit_history)));
-            violation_percent.value = numel(find(violation_history))/n_done_trials;
-            timeout_percent.value = numel(find(timeout_history))/n_done_trials;
-            goods  = ~isnan(hit_history)';
-            lefts  = previous_sides(1:n_done_trials)=='l';
-            rights = previous_sides(1:n_done_trials)=='r';
-            Left_hit_frac.value  = mean(hit_history(goods & lefts));
-            Right_hit_frac.value = mean(hit_history(goods & rights));
-            hit_frac.value       = mean(hit_history(goods));
+            try
+                ntrials.value        = n_done_trials;
+                ntrials_valid.value = numel(find(~isnan(hit_history)));
+                violation_percent.value = numel(find(violation_history))/n_done_trials;
+                timeout_percent.value = numel(find(timeout_history))/n_done_trials;
+                goods  = ~isnan(hit_history(1:n_done_trials));
+                lefts  = previous_sides(1:n_done_trials)=='l';
+                rights = previous_sides(1:n_done_trials)=='r';
+                goods = goods(:);
+                lefts = lefts(:);
+                rights = rights(:);
+                Left_hit_frac.value  = mean(hit_history(goods & lefts));
+                Right_hit_frac.value = mean(hit_history(goods & rights));
+                hit_frac.value       = mean(hit_history(goods));
+            catch
+            end
         end
 
         if nargout > 0

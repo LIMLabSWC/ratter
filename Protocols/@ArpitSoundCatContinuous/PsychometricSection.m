@@ -56,6 +56,8 @@ switch action
         % --- State Management with SoloParamHandles ---
         state.last_analyzed_valid_trial = 0;
         state.block_count = 0;
+        state.context_blocks = 0;
+        state.table_row_editable = [];
         state.blockStatsHistory = struct('indices', {}, 'hitRates', {}, 'stimCounts', {});
         SoloParamHandle(obj, 'states_value', 'value', state);
         SoloParamHandle(obj, 'thiscontext', 'value', 1);
@@ -138,9 +140,9 @@ switch action
     set(get_ghandle(Plot_Context_Button), 'Parent', hndl_controls_panel, 'Units', 'normalized', 'Position', [0.68, 0.25, 0.18, 0.5]);
 
     % Far Right Column: Live Update Checkboxes
-    SoloParamHandle(obj, 'Update_Psychometric', 'value', uicontrol('Parent', hndl_controls_panel, 'Style', 'checkbox', 'Units', 'normalized', 'String', 'Psych', 'Value', 1, 'Position', [0.9, 0.65, 0.08, 0.3]));
-    SoloParamHandle(obj, 'Update_HitRate', 'value', uicontrol('Parent', hndl_controls_panel, 'Style', 'checkbox', 'Units', 'normalized', 'String', 'HitRate', 'Value', 1, 'Position', [0.9, 0.35, 0.08, 0.3]));
-    SoloParamHandle(obj, 'Update_Stimulus', 'value', uicontrol('Parent', hndl_controls_panel, 'Style', 'checkbox', 'Units', 'normalized', 'String', 'Stim', 'Value', 1, 'Position', [0.9, 0.05, 0.08, 0.3]));
+    SoloParamHandle(obj, 'Update_Psychometric', 'value', uicontrol('Parent', hndl_controls_panel, 'Style', 'checkbox', 'Units', 'normalized', 'String', 'Psych', 'Value', 1, 'Position', [0.9, 0.65, 0.08, 0.3]),'saveable', false);
+    SoloParamHandle(obj, 'Update_HitRate', 'value', uicontrol('Parent', hndl_controls_panel, 'Style', 'checkbox', 'Units', 'normalized', 'String', 'HitRate', 'Value', 1, 'Position', [0.9, 0.35, 0.08, 0.3]),'saveable', false);
+    SoloParamHandle(obj, 'Update_Stimulus', 'value', uicontrol('Parent', hndl_controls_panel, 'Style', 'checkbox', 'Units', 'normalized', 'String', 'Stim', 'Value', 1, 'Position', [0.9, 0.05, 0.08, 0.3]),'saveable', false);
 
     % --- Set Callbacks ---
     set_callback(Show_Table_Toggle, {mfilename, 'show_hide_table'});
@@ -154,8 +156,9 @@ switch action
 
     SoloParamHandle(obj, 'uit', 'value', uitable(value(myfig_table), 'Data', t, ...
         'Units', 'normalized', 'Position', [0.02 0.02 0.96 0.96], ...
-        'ColumnEditable', [true, false, false, false, false, false, false, false, false, false, false, false]), ...
-        'saveable', false);
+        'ColumnEditable', [true, false, false, false, false, false, false, false, false, false, false, false], ...
+        'CellEditCallback',@(src, evt) PsychometricSection(obj, 'check_box_table', src, evt)), ... % end of uitable definition
+        'saveable', true);
 
 
     % Returning the x , y position for the main callback GUI
@@ -167,15 +170,16 @@ switch action
     case 'Calculate_Params'
         
         try
-            % figure out if psychometric,sides = zeros(size(previous_sides)); % change the sides from ascii 'l' or 'r' to 0 and 1
+            % figure out if psychometric, change the sides from ascii 'l' or 'r' to 0 and 1
+            sides = zeros(size(previous_sides));
             sides(previous_sides == 114) = 1;
 
-            data.hit_history = hit_history;
-            data.previous_sides = sides;
-            data.stim_history = stimulus_history;
+            data.hit_history = hit_history(1:n_done_trials);
+            data.previous_sides = sides(1:n_done_trials);
+            data.stim_history = stimulus_history(1:n_done_trials);
             data.full_rule_history = Rule;
-            data.full_dist_right = stimulus_right_distribution_history;
-            data.full_dist_left = stimulus_left_distribution_history;
+            data.full_dist_right = stimulus_right_distribution_history(1:n_done_trials);
+            data.full_dist_left = stimulus_left_distribution_history(1:n_done_trials);
 
             handles.ui_table = value(uit);
             handles.main_fig = value(myfig);
@@ -188,6 +192,27 @@ switch action
             config.debug = false;
 
             state = value(states_value);
+            
+            % make the table_row of same size as table rows           
+            required_length = height(handles.ui_table.Data); % Get the required length from the table height
+            % Case 1: The field doesn't exist yet. Initialize it.
+            if ~isfield(state, 'table_row_editable')
+                % Create a column vector of 'false' values matching the table height.
+                state.table_row_editable = false(required_length, 1);
+                % Case 2: The field exists. Check if it needs resizing.
+            elseif numel(state.table_row_editable) ~= required_length
+                current_length = numel(state.table_row_editable);
+                if required_length > current_length
+                    % The table is LONGER, so append 'false' values.
+                    num_to_add = required_length - current_length;
+                    state.table_row_editable = [state.table_row_editable(:); false(num_to_add, 1)];
+                else
+                    % The table is SHORTER, so truncate the vector. This is more readable.
+                    state.table_row_editable = state.table_row_editable(1:required_length);
+                end
+            end
+            % Optional: Ensure it's a column vector for consistency
+            state.table_row_editable = state.table_row_editable(:);
             
             % psychometric, hit rate and stim correct/incorrect histogram to be plotted or not
             psych_obj = value(Update_Psychometric);
@@ -282,17 +307,36 @@ switch action
             states_value.value = state;
 
     case 'PushButton_Context'
-            [state, data, handles, config, flags] = PsychometricSection(obj,'Calculate_Params');
+            [state, data, handles, config, flags] = PsychometricSection(obj,'Calculate_Params');            
             % create a cell array containing the start and end of each context
             context_trials = cell(1,value(thiscontext));
+            contexts_name = cell(1,value(thiscontext));
             for n_plot = 1:value(thiscontext)
                 eval(sprintf('trial_start = value(Context%i_trialStart);',n_plot));
                 eval(sprintf('trial_end = value(Context%i_trialEnd);',n_plot));
+                eval(sprintf('context_name = value(Context%i_Dist);',n_plot));
                 context_trials{1,n_plot} = [trial_start, trial_end];
+                contexts_name{1,n_plot} = context_name;
             end
             % Calling the function to update the table and plot
-            state = RealTimeAnalysis('context', state, data, handles, config, flags, context_trials);
+            state = RealTimeAnalysis('context', state, data, handles, config, flags, context_trials,contexts_name);
             states_value.value = state;
+
+    case 'reload_after_crash'    
+        % make sure that the context values are visible
+        for n_contexts = 1:value(thiscontext)
+                eval(sprintf('make_visible(Context%i_Dist);',n_contexts));
+                eval(sprintf('make_visible(Context%i_trialStart);',n_contexts));
+                eval(sprintf('make_visible(Context%i_trialEnd);',n_contexts));
+        end
+        % set the fig value for uitable as we didn't save the table
+        ui_table_handle = value(uit);
+        table_fig = value(myfig_table);
+        ui_table_handle.Parent = table_fig;
+        if isempty(ui_table_handle.CellEditCallback)
+            ui_table_handle.CellEditCallback = @(src, evt) PsychometricSection(obj, 'check_box_table', src, evt);
+        end
+        uit.value = ui_table_handle;
 
     %% update after each trial    
     case 'update'
@@ -307,6 +351,9 @@ switch action
 
     %% update the figure if user opened the figure window    
     case 'update_plot'
+        % if n_done_trials > 1
+        %     PsychometricSection(obj, 'reload_after_crash');
+        % end
         if n_done_trials > 30
                 [state, data, handles, config, flags] = PsychometricSection(obj,'Calculate_Params');
                 % Calling the function to update the table and plot
@@ -351,6 +398,35 @@ switch action
         varargout{1} = psych_result;
    
    %% cases related to figure handles
+
+    case 'check_box_table'
+        try
+            if numel(varargin) < 2
+                warning('check_box_table action called without event data.');
+                return;
+            end
+            source = varargin{1};
+            event  = varargin{2};
+            editedRow = event.Indices(1);
+            editedCol = event.Indices(2);
+            % Rule 1: Only act on our "Select" column (column 1)
+            if editedCol ~= 1, return; end
+            % Rule 2: Only act when the user tries to CHECK a box to TRUE
+            if ~event.NewData, return; end
+            % Rule 3: Check if the edited row is a "locked" row
+            state = value(states_value);
+            isRowEditable = state.table_row_editable;
+            if editedRow > numel(isRowEditable)
+                warning('Row editability status is out of sync with the table data.');
+                return;
+            end
+            % If the row is NOT editable, then it's locked.
+            if ~isRowEditable(editedRow)
+                source.Data.Select(editedRow) = false;
+                % warndlg('This row is protected and cannot be selected.', 'Selection Blocked');
+            end
+        catch
+        end
 
     case 'close'
         set(value(myfig), 'Visible', 'off');

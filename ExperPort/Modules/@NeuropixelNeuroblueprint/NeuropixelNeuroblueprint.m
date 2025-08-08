@@ -109,17 +109,23 @@ switch action
         uicontrol(handles.software_group, 'Style', 'radiobutton', 'String', 'SpikeGLX', 'Units', 'normalized', 'Position', [0.5, 0.3, 0.4, 0.4], 'Tag', 'SpikeGLX', 'FontSize', 10);
 
         % Panel 1: Behavior
-        p1 = uipanel('Title', '1. Behavior', 'FontSize', 12, 'FontWeight', 'bold', 'BorderType', 'etchedin', 'BorderWidth', 1, 'Units', 'normalized', 'Position', [0.02, 0.74, 0.6, 0.13]);
+       p1 = uipanel('Title', '1. Behavior', 'FontSize', 12, 'FontWeight', 'bold', 'BorderType', 'etchedin', 'BorderWidth', 1, 'Units', 'normalized', 'Position', [0.02, 0.74, 0.6, 0.13]);
         uicontrol(p1, 'Style', 'text', 'String', 'Protocol Name:', 'Units', 'normalized', 'Position', [0.05, 0.7, 0.22, 0.25], 'HorizontalAlignment', 'right');
         handles.protocol_edit = uicontrol(p1, 'Style', 'edit', 'String', 'ArpitSoundCatContinuous', 'Units', 'normalized', 'Position', [0.3, 0.7, 0.45, 0.25]);
         handles.manual_test = uicontrol(p1, 'Style', 'checkbox', 'String', 'Manual Test', 'Value', 1, 'Units', 'normalized', 'Position', [0.78, 0.7, 0.2, 0.25]);
-        uicontrol(p1, 'Style', 'text', 'String', 'Experimenter:', 'Units', 'normalized', 'Position', [0.05, 0.4, 0.22, 0.25], 'HorizontalAlignment', 'right');
-        handles.exp_edit = uicontrol(p1, 'Style', 'edit', 'String', 'lida', 'Units', 'normalized', 'Position', [0.3, 0.4, 0.65, 0.25], 'Callback', {@(h,e) feval(mfilename, obj, 'update_subject_id')});
-        uicontrol(p1, 'Style', 'text', 'String', 'Rat Name:', 'Units', 'normalized', 'Position', [0.05, 0.1, 0.22, 0.25], 'HorizontalAlignment', 'right');
-        handles.rat_name_edit = uicontrol(p1, 'Style', 'edit', 'String', 'LP12', 'Units', 'normalized', 'Position', [0.3, 0.1, 0.4, 0.25], 'Callback', {@(h,e) feval(mfilename, obj, 'update_subject_id')});
-        uicontrol(p1, 'Style', 'text', 'String', 'Path:', 'Units', 'normalized', 'Position', [0.72, 0.1, 0.08, 0.25], 'HorizontalAlignment', 'right');
-        handles.behav_edit = uicontrol(p1, 'Style', 'edit', 'String', 'C:\ratter', 'Units', 'normalized', 'Position', [0.81, 0.1, 0.18, 0.25]);
-
+        uicontrol(p1, 'Style', 'text', 'String', 'Experimenter:', 'Units', 'normalized', 'Position', [0.02, 0.4, 0.2, 0.25], 'HorizontalAlignment', 'right');
+        handles.exp_edit = uicontrol(p1, 'Style', 'edit', 'String', 'lida', 'Units', 'normalized', 'Position', [0.23, 0.4, 0.25, 0.25], 'Callback', {@(h,e) feval(mfilename, obj, 'update_subject_id')});        
+        uicontrol(p1, 'Style', 'text', 'String', 'Rat Name:', 'Units', 'normalized', 'Position', [0.50, 0.4, 0.18, 0.25], 'HorizontalAlignment', 'right');
+        handles.rat_name_edit = uicontrol(p1, 'Style', 'edit', 'String', 'LP12', 'Units', 'normalized', 'Position', [0.69, 0.4, 0.30, 0.25], 'Callback', {@(h,e) feval(mfilename, obj, 'update_subject_id')});
+        uicontrol(p1, 'Style', 'text', 'String', 'Distribution:', 'Units', 'normalized', 'Position', [0.02, 0.1, 0.18, 0.25], 'HorizontalAlignment', 'right');
+        handles.distribution_popup = uicontrol(p1, 'Style', 'popupmenu', ...
+            'String', {'random', 'Uniform', 'Hard A', 'Hard B'}, ...
+            'Units', 'normalized', ...
+            'Position', [0.21, 0.1, 0.35, 0.25]);
+        uicontrol(p1, 'Style', 'text', 'String', 'Path:', 'Units', 'normalized', 'Position', [0.58, 0.1, 0.1, 0.25], 'HorizontalAlignment', 'right');
+        handles.behav_edit = uicontrol(p1, 'Style', 'edit', 'String', 'C:\ratter', 'Units', 'normalized', 'Position', [0.69, 0.1, 0.30, 0.25]);% 
+        
+        
         % Panel 2: NeuroBlueprint Format
         p2 = uipanel('Title', '2. NeuroBlueprint Format', 'FontSize', 12, 'FontWeight', 'bold', 'BorderType', 'etchedin', 'BorderWidth', 1, 'Units', 'normalized', 'Position', [0.02, 0.42, 0.6, 0.31]);
         uicontrol(p2, 'Style', 'text', 'String', 'Project Name:', 'Units', 'normalized', 'Position', [0.01, 0.85, 0.28, 0.1], 'HorizontalAlignment', 'right');
@@ -317,7 +323,7 @@ switch action
             else % SpikeGLX
                 log_message(handles, 'Initializing SpikeGLX controller...');
                 controller = SpikeGL(params.sglx_host_ip, params.sglx_port);
-                if ~controller.IsConnected(), error('Failed to connect to SpikeGLX'); end
+                % if ~controller.IsConnected(), error('Failed to connect to SpikeGLX'); end
             end
             recording_controller.value = controller;
             log_message(handles, sprintf('%s controller initialized successfully.', software));
@@ -344,7 +350,8 @@ switch action
             if strcmp(software, 'OpenEphys')
                 controller.setRecordPath(params.oe_rec_node_id, save_path);
             else % SpikeGLX
-                controller.SetDataDir(save_path);
+                controller = SetDataDir( controller, 0, save_path);
+                recording_controller.value = controller;
             end
             log_message(handles, sprintf('Recording path set to: %s', save_path));
         catch ME
@@ -374,8 +381,22 @@ switch action
             else % SpikeGLX
                 log_message(handles, 'Starting SpikeGLX recording...');
                 run_name = sprintf('experiment_%s', datestr(now, 'yyyymmdd_HHMMSS'));
-                controller.SetRunName(run_name);
-                controller.StartRun();
+                boolval = IsInitialized( controller);
+                if boolval
+                    spikeglx_params = GetParams( controller );
+                    controller = SetRunName(controller,run_name); % setting run name
+                    controller = StartRun(controller); % starting acquisition
+                    pause(2);
+                    
+                    runningval = false;
+                    while  ~runningval % waiting for acquisition to start
+                        runningval = IsRunning( controller );
+                        if runningval
+                            controller = SetRecordingEnable( controller, 1 ); % Start Recording
+                        end
+                    end
+                    recording_controller.value = controller;
+                end
             end
             
             log_message(handles, 'Electrophysiology recording is LIVE.');
@@ -399,7 +420,15 @@ switch action
                 controller.idle();
             else % SpikeGLX
                 log_message(handles, 'Stopping SpikeGLX recording...');
-                controller.StopRun();
+                boolval = IsSaving( controller );
+                if boolval
+                     controller = SetRecordingEnable( controller, 0 );
+                     pause(1); % Brief pause to ensure recording stops
+                     controller = StopRun(controller);
+                else
+                    controller = StopRun(controller);
+                end
+                recording_controller.value = controller;
             end
             
             log_message(handles, 'Electrophysiology recording stopped.');
@@ -482,7 +511,7 @@ switch action
         video_save_dir = fullfile(params.local_path, value(session_base_path), 'behav');
         try
             log_message(handles, 'Loading main behavioral protocol...');
-            feval(mfilename, obj, 'behav_control', 'load_main_protocol', params.experimenter, params.rat_name, params.protocol_name, video_save_dir, params.behav_path);
+            feval(mfilename, obj, 'behav_control', 'load_main_protocol', params.experimenter, params.rat_name, params.protocol_name, video_save_dir, params.behav_path,params.stim_distribution);
             log_message(handles, 'Behavior system loaded and ready.');
             log_message(handles, '--- LOAD sequence complete. Ready to run. ---');
             currentState.value = 'Run';
@@ -546,7 +575,7 @@ switch action
         switch sub_action
            case 'load_main_protocol'
                experimenter = args{1}; ratname = args{2}; protocol_name = args{3}; 
-               video_save_dir = args{4}; behav_path = args{5};
+               video_save_dir = args{4}; behav_path = args{5}; stim_distribution = args{6};
                log_message(handles, ['Loading protocol: ' protocol_name]);
                dispatcher('set_protocol', protocol_name);
                rath = get_sphandle('name', 'ratname', 'owner', protocol_name);
@@ -556,6 +585,7 @@ switch action
                log_message(handles, ['Loading settings for ' ratname]);
                [~, sfile] = load_solouiparamvalues(ratname, 'experimenter', experimenter, 'owner', class(protobj), 'interactive', 0);
                feval(protocol_name, protobj, 'set_setting_params', ratname, experimenter, sfile, char(datetime('now')), video_save_dir);
+               feval(protocol_name, protobj, 'set_stim_distribution',stim_distribution);
                if ~dispatcher('is_running'), pop_history(class(protobj), 'include_non_gui', 1); feval(protocol_name, protobj, 'prepare_next_trial'); end
             
            case 'crashed'
@@ -585,6 +615,7 @@ switch action
                        load_soloparamvalues(ratname, 'experimenter', experimenter, 'owner', protocol_name, 'interactive', 0,'data_file',fullfile(temp_data_dir,temp_data_file));
                        dispatcher('runstart_enable');
                    end
+                   feval(protocol_name, protobj, 'psychometricUpdate_aftercrash'); % update parameters for psychometric plots which were not saved so cant be loaded
                    if ~dispatcher('is_running'), pop_history(class(protobj), 'include_non_gui', 1); feval(protocol_name, protobj, 'prepare_next_trial'); end
                catch
                    log_message(handles, ['Loading settings for ' ratname]);
@@ -1029,6 +1060,8 @@ function params = get_all_parameters(handles,software)
     params.do_manual_test = get(handles.manual_test, 'Value');
     params.experimenter = get(handles.exp_edit, 'String');
     params.rat_name = get(handles.rat_name_edit, 'String');
+    popup_string = get(handles.distribution_popup,'String');
+    params.stim_distribution = popup_string{get(handles.distribution_popup,'Value')};
     params.behav_path = get(handles.behav_edit, 'String');
     params.project_name = get(handles.proj_edit, 'String');
     params.subject_id = get(handles.sub_edit, 'String');
@@ -1151,13 +1184,13 @@ function log_message(handles,logStr)
     try
         if ~isfield(handles, 'log_box') || ~isvalid(handles.log_box), return; end
         current_text = get(handles.log_box, 'String');
-        timestamp = datestr(now, '[HH:MM:SS] ');
+        timestamp = char(datetime('now', 'Format', '[HH:mm:ss] '));
         new_line = [timestamp, logStr];
         new_text = [current_text; {new_line}];
         set(handles.log_box, 'String', new_text, 'Value', numel(new_text));
         drawnow;
     catch
-        fprintf('%s: %s\n', datestr(now, '[HH:MM:SS]'), logStr);
+        fprintf('%s: %s\n', char(datetime('now', 'Format', '[HH:mm:ss] ')), logStr);
     end
 
 function toggle_button_color(~, ~, button_handle)
@@ -1180,18 +1213,20 @@ if isempty(file_path_data), return; end
         return;
     end
     load(configFilePath, 'svn_user', 'svn_password');
-    logmsg = char(strcat('automated commit from GUI for data and settings for ', {' '} ,fname_data,{'@'}));
+    logmsg_data = char(strcat('automated commit from GUI for data and settings for ', {' '} ,fname_data,{'@'}));
     % current_dir = cd;
     cd(pname_data);
     add_cmd_data = char(strcat('svn add', {' '}, fname_data, '.mat',{'@'}));
-    system(add_cmd_data);
+    system(add_cmd_data);    
+    commit_cmd_data = sprintf('svn ci --username="%s" --password="%s" -m "%s"', svn_user, svn_password, logmsg_data);
+    [status, ~] = system(commit_cmd_data);
 
     cd(pname_settings);
     add_cmd_settings = char(strcat('svn add', {' '}, fname_settings, '.mat',{'@'}));
     system(add_cmd_settings);
-
-    commit_cmd = sprintf('svn ci --username="%s" --password="%s" -m "%s"', svn_user, svn_password, logmsg);
-    [status, ~] = system(commit_cmd);
+    logmsg_setting = char(strcat('automated commit from GUI for data and settings for ', {' '} ,fname_settings,{'@'}));
+    commit_cmd_setting = sprintf('svn ci --username="%s" --password="%s" -m "%s"', svn_user, svn_password, logmsg_setting);
+    [status, ~] = system(commit_cmd_setting);
     
     if status == 0
         log_message(handles, ['SVN commit successful for ' fname_data]);

@@ -140,7 +140,7 @@ switch action
     
     ArpitSoundCatContinuousSMA(obj, 'init');
                 
-    feval(mfilename, obj, 'prepare_next_trial');
+    % feval(mfilename, obj, 'prepare_next_trial');
      
     case 'change_water_modulation_params'
 	   display_guys = [1 150 300];
@@ -164,6 +164,22 @@ switch action
         SavingSection(obj,'set_autosave_frequency',1); % saving setting every trial instead of 20
         BonsaiCameraInterface(obj,'set_video_filepath',varargin{5});
 
+    case 'set_stim_distribution'
+
+        if strcmpi(varargin{1},'random')
+                rand_num = rand(1);
+                if rand_num > 0.5
+                    StimulusSection(obj,'Pushbutton_SwitchDistribution','Hard B');
+                else
+                    StimulusSection(obj,'Pushbutton_SwitchDistribution','Hard A');
+                end
+        else
+            StimulusSection(obj,'Pushbutton_SwitchDistribution',varargin{1});
+        end
+
+    case 'psychometricUpdate_aftercrash'
+        
+        PsychometricSection(obj, 'reload_after_crash');
 
       %% prepare next trial
    case 'prepare_next_trial'
@@ -234,7 +250,7 @@ switch action
     SessionDefinition(obj, 'run_eod_logic_without_saving');
 
     % Sending Summary Statistics to SQL Database
-    % perf = PsychometricSection(obj, 'evaluate');
+    %perf = PsychometricSection(obj, 'evaluate');
     
     % SoundCatContextSwitchSummary(obj,'protocol_data',perf);  
       

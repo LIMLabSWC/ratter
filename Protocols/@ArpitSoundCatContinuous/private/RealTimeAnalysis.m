@@ -18,7 +18,11 @@ function state = RealTimeAnalysis(action, state, data, handles, config, varargin
 %           .blockStatsHistory (struct array): Stores analysis results for each block.
 %           .block_count (double): Counter for the number of blocks analyzed.
 %           .last_analyzed_valid_trial (double): Counter for the last valid trial included in an analysis.
-%
+%           .context_blocks (double): array to keep track of the blocks when the context was switched
+%           .table_row_editable (double): array same size as the number of rows in table decides which row the user can
+%                                         edit. Its a sanity check so that user doesn't select custom or context rows
+%           
+%       
 %       data (struct): Contains the complete, read-only data histories for the session.
 %           .hit_history (vector): History of hits (1), misses (0), or NaN.
 %           .previous_sides (vector): History of sides presented (e.g., 0 for left, 1 for right).
@@ -50,6 +54,7 @@ function state = RealTimeAnalysis(action, state, data, handles, config, varargin
 %           For 'context':
 %               varargin{1} (struct): The flags struct (as above).
 %               varargin{2} (cell): A cell array of trial ranges, e.g., {[s1,e1], [s2,e2]}.
+%               varargin{3} (cell): A cell array of context names, e.g., {'Hard A', 'Uniform', 'Hard B'}.
 %           For 'evaluate':
 %               varargin{1} (cell): A cell array of trial ranges, e.g., {[s1,e1], [s2,e2]}.
 %
@@ -64,6 +69,29 @@ function state = RealTimeAnalysis(action, state, data, handles, config, varargin
 %                           .total_violations_percent
 %                           .right_correct_percent
 %                           .left_correct_percent
+
+% Ensure that the core data vectors are of the same length to prevent indexing errors.
+% This can happen if the session is interrupted mid-trial.
+    try
+        len_hit = numel(data.hit_history);
+        len_sides = numel(data.previous_sides);
+        len_stim = numel(data.stim_history);
+        
+        min_len = min([len_hit, len_sides, len_stim]);
+        
+        if len_hit > min_len || len_sides > min_len || len_stim > min_len
+            warning('RealTimeAnalysis:DataMismatch', ...
+                'Data history vectors have mismatched lengths. Truncating to the shortest length (%d).', min_len);
+            
+            data.hit_history = data.hit_history(1:min_len);
+            data.previous_sides = data.previous_sides(1:min_len);
+            data.stim_history = data.stim_history(1:min_len);
+        end
+    catch ME
+        warning('RealTimeAnalysis:DataIntegrityError', 'Could not perform data integrity check: %s', ME.message);
+    end
+    % --- End of Data Integrity Check ---
+
 
     try
         switch lower(action)
@@ -96,15 +124,18 @@ function state = RealTimeAnalysis(action, state, data, handles, config, varargin
                 if numel(varargin) < 1, error('context_switch action requires a flags struct.'); end
                 flags = varargin{1};
 
+                merge_threshold = round(2 * config.trials_per_block / 3);
+
                 lastAnalyzed = state.last_analyzed_valid_trial;
                 validTrials = sum(~isnan(data.hit_history));
                 remaining_valid_trials = validTrials - lastAnalyzed;
+                state.context_blocks(end + 1) = state.block_count;
 
                 if remaining_valid_trials > 0
                     valid_indices = find(~isnan(data.hit_history));
-                    new_valid_indices = valid_indices(valid_indices > find(valid_indices == lastAnalyzed, 1, 'last'));
+                    new_valid_indices = valid_indices(lastAnalyzed + 1 : end);
 
-                    if remaining_valid_trials < 20 && state.block_count > 0
+                    if remaining_valid_trials < merge_threshold && state.block_count > 0
                         last_block_indices = state.blockStatsHistory(end).indices;
                         combined_indices = [last_block_indices, new_valid_indices'];
 
@@ -115,7 +146,7 @@ function state = RealTimeAnalysis(action, state, data, handles, config, varargin
 
                         state = reAnalyzeLastChunk(state, data, handles, config, dataBuffer, flags);
                     
-                    elseif remaining_valid_trials >= 20
+                    elseif remaining_valid_trials >= merge_threshold
                         dataBuffer.stim = data.stim_history(new_valid_indices);
                         dataBuffer.hit  = data.hit_history(new_valid_indices);
                         dataBuffer.side = data.previous_sides(new_valid_indices);
@@ -160,6 +191,7 @@ function state = RealTimeAnalysis(action, state, data, handles, config, varargin
                 [~, newRow] = processBlock(data, config, struct('stim', stim_fit, 'hit', hit_fit, 'side', side_fit, 'indices', indices));
                 newRow{1} = false; % Ensure it's not selected
                 updateTable(handles, newRow);
+                state.table_row_editable(end+1) = false;
 
                 if flags.psych, plotCustomPsychometric(handles.axes_h.custom_psych, stim_fit, side_fit, hit_fit, config, current_rule); end
                 if flags.hit, plotCustomHitRates(handles.axes_h.custom_hitrate, hit_fit, side_fit, [start_idx, end_idx], state.blockStatsHistory); end
@@ -172,6 +204,7 @@ function state = RealTimeAnalysis(action, state, data, handles, config, varargin
                 if numel(varargin) < 2, error('Context action requires flags and a cell array of contexts.'); end
                 flags = varargin{1};
                 contexts = varargin{2};
+                contexts_names = varargin{3};
 
                 if ~iscell(contexts) || isempty(contexts), error('Contexts must be a non-empty cell array of [start, end] pairs.'); end
                 
@@ -204,13 +237,14 @@ function state = RealTimeAnalysis(action, state, data, handles, config, varargin
                     [~, newRow] = processBlock(data, config, struct('stim', stim_fit, 'hit', hit_fit, 'side', side_fit, 'indices', indices));
                     newRow{1} = false; % Ensure it's not selected
                     updateTable(handles, newRow);
+                    state.table_row_editable(end+1) = false;
 
                     physical_response = zeros(size(hit_fit));
                     physical_response(hit_fit == 1) = side_fit(hit_fit == 1);
                     physical_response(hit_fit == 0) = 1 - side_fit(hit_fit == 0);
                     
                     response_for_fitting = physical_response;
-                    if contains(current_rule, 'Left', 'IgnoreCase', true), response_for_fitting = 1 - response_for_fitting; end
+                    if contains(string(current_rule), 'Left', 'IgnoreCase', true), response_for_fitting = 1 - response_for_fitting; end
                     
                     options.MinTrials = 10;
                     [y_pred, fitParams, ~, ~] = realtimepsychometricFit(stim_fit, response_for_fitting, config.stimuli_range, options);
@@ -235,11 +269,13 @@ function state = RealTimeAnalysis(action, state, data, handles, config, varargin
                     end
                     
                     if ~isempty(relevant_blocks)
-                        hit_rate_std(i, 1) = std([relevant_blocks.hitRates.overall], 'omitnan');
-                        hit_rate_std(i, 2) = std([relevant_blocks.hitRates.left], 'omitnan');
-                        hit_rate_std(i, 3) = std([relevant_blocks.hitRates.right], 'omitnan');
-                        counts_matrix_corr = vertcat(relevant_blocks.stimCounts.correct);
-                        counts_matrix_incorr = vertcat(relevant_blocks.stimCounts.incorrect);
+                        hit_rate_std(i, 1) = std(arrayfun(@(blk) blk.hitRates.overall, relevant_blocks), 'omitnan');
+                        hit_rate_std(i, 2) = std(arrayfun(@(blk) blk.hitRates.left, relevant_blocks), 'omitnan');
+                        hit_rate_std(i, 3) = std(arrayfun(@(blk) blk.hitRates.right, relevant_blocks), 'omitnan');
+                        correct_cells = arrayfun(@(s) s.stimCounts.correct(:)', relevant_blocks, 'UniformOutput', false);
+                        counts_matrix_corr = cell2mat(correct_cells);
+                        incorrect_cells = arrayfun(@(s) s.stimCounts.incorrect(:)', relevant_blocks, 'UniformOutput', false);
+                        counts_matrix_incorr = cell2mat(incorrect_cells);
                         stim_hist_data{i}.mean_corr = mean(counts_matrix_corr, 1);
                         stim_hist_data{i}.std_corr = std(counts_matrix_corr, 0, 1);
                         stim_hist_data{i}.mean_incorr = mean(counts_matrix_incorr, 1);
@@ -249,9 +285,9 @@ function state = RealTimeAnalysis(action, state, data, handles, config, varargin
                     end
                 end
                 
-                if flags.psych, plotContextPsychometric(handles.axes_h.custom_psych, psych_data, config, context_colors); end
-                if flags.hit, plotContextHitRates(handles.axes_h.custom_hitrate, hit_rate_data, hit_rate_std, context_colors); end
-                if flags.stim, plotContextStimulusHistogram(handles.axes_h.custom_stim, stim_hist_data, config, context_colors); end
+                if flags.psych, plotContextPsychometric(handles.axes_h.custom_psych, psych_data, config, context_colors,contexts_names); end
+                if flags.hit, plotContextHitRates(handles.axes_h.custom_hitrate, hit_rate_data, hit_rate_std, context_colors,contexts_names); end
+                if flags.stim, plotContextStimulusHistogram(handles.axes_h.custom_stim, stim_hist_data, config, context_colors,contexts_names); end
 
             % =================================================================
             %                   EVALUATE ACTION
@@ -290,7 +326,7 @@ function state = RealTimeAnalysis(action, state, data, handles, config, varargin
                     physical_response(hit_fit == 0) = 1 - side_fit(hit_fit == 0);
                     
                     response_for_fitting = physical_response;
-                    if contains(current_rule, 'Left', 'IgnoreCase', true), response_for_fitting = 1 - response_for_fitting; end
+                    if contains(string(current_rule), 'Left', 'IgnoreCase', true), response_for_fitting = 1 - response_for_fitting; end
                     
                     options.MinTrials = 10;
                     [~, fitParams, ~, ~] = realtimepsychometricFit(stim_fit, response_for_fitting, config.stimuli_range, options);
@@ -316,16 +352,27 @@ function state = RealTimeAnalysis(action, state, data, handles, config, varargin
     catch ME
         % Create a more detailed error message including the line number.
         if ~isempty(ME.stack)
-            errorLocation = sprintf('File: %s, Function: %s, Line: %d', ...
-                ME.stack(1).file, ME.stack(1).name, ME.stack(1).line);
+            
+            % safe_filename = strrep(ME.stack(1).file, '\', '\\');
+            % errorLocation = sprintf('File: %s, Function: %s, Line: %d', ...
+            %     safe_filename, ME.stack(1).name, ME.stack(1).line);
+            
+            errorLocation = ['File: ' ME.stack(1).file ...
+                     ', Function: ' ME.stack(1).name ...
+                     ', Line: ' num2str(ME.stack(1).line)];
         else
             errorLocation = 'Location not available in error stack.';
         end
         
-        fullErrorMessage = sprintf('An error occurred in RealTimeAnalysisApp:\n  Error: %s\n  %s', ...
-            ME.message, errorLocation);
+        % fullErrorMessage = sprintf('An error occurred in RealTimeAnalysis:\n  Error: %s\n  %s', ...
+        %     ME.message, errorLocation);
         
-        warning('RealTimeAnalysisApp:Error', fullErrorMessage);
+        fullErrorMessage = ['An error occurred in RealTimeAnalysis:' newline ...
+                   ' Error: ' ME.message newline ...
+                   ' ' errorLocation];
+
+        fullErrorMsg = strrep(fullErrorMessage, '\', '\\');
+        warning('RealTimeAnalysis:Error', fullErrorMsg);
         
         if config.debug, rethrow(ME); end % In experiment mode, the function will gracefully return the original state.
     end
@@ -338,14 +385,17 @@ function state = RealTimeAnalysis(action, state, data, handles, config, varargin
     function state = analyzeLiveChunk(state, data, handles, config, dataBuffer, flags)
         state.block_count = state.block_count + 1;
         [newBlockStat, newRow] = processBlock(data, config, dataBuffer);
-        state.blockStatsHistory = [state.blockStatsHistory, newBlockStat];
+        state.blockStatsHistory = [state.blockStatsHistory, newBlockStat];       
         updateTable(handles, newRow);
-        
+        state.table_row_editable(end+1) = true;
+
+        state.last_analyzed_valid_trial = sum(~isnan(data.hit_history));
+
         if strcmp(get(handles.main_fig, 'Visible'), 'on')
             updateLivePlots(state, data, handles, config, flags);
         end
         
-        state.last_analyzed_valid_trial = sum(~isnan(data.hit_history));
+        
     end
 
     function state = reAnalyzeLastChunk(state, data, handles, config, dataBuffer, flags)
@@ -353,11 +403,13 @@ function state = RealTimeAnalysis(action, state, data, handles, config, varargin
         state.blockStatsHistory(end) = newBlockStat;
         replaceLastTableRow(handles, newRow);
         
+        state.last_analyzed_valid_trial = sum(~isnan(data.hit_history));
+
         if strcmp(get(handles.main_fig, 'Visible'), 'on')
             updateLivePlots(state, data, handles, config, flags);
         end
         
-        state.last_analyzed_valid_trial = sum(~isnan(data.hit_history));
+        
     end
 
     function [blockStat, tableRow] = processBlock(data, config, dataBuffer)
@@ -368,7 +420,7 @@ function state = RealTimeAnalysis(action, state, data, handles, config, varargin
         current_rule = data.full_rule_history;
 
         response_for_fitting = physical_response;
-        if contains(current_rule, 'Left', 'IgnoreCase', true)
+        if contains(string(current_rule), 'Left', 'IgnoreCase', true)
             response_for_fitting = 1 - physical_response;
         end
         
@@ -406,16 +458,12 @@ function state = RealTimeAnalysis(action, state, data, handles, config, varargin
 
     function updateTable(handles, newRow)
         currentData = get(handles.ui_table, 'Data');
-        if newRow{1} == true && ~isempty(currentData)
-            currentData.Select(:) = false;
-        end
         set(handles.ui_table, 'Data', [currentData; newRow]);
     end
     
     function replaceLastTableRow(handles, newRow)
         currentData = get(handles.ui_table, 'Data');
         if ~isempty(currentData)
-            currentData.Select(:) = false;
             newRow{1} = true; % Select the new row
             currentData(end,:) = newRow;
             set(handles.ui_table, 'Data', currentData);
@@ -424,13 +472,20 @@ function state = RealTimeAnalysis(action, state, data, handles, config, varargin
 
     function updateLivePlots(state, data, handles, config, flags)
         if flags.psych, updatePsychometricPlot(handles.axes_h.live_psych, handles.ui_table, config); end
-        if flags.hit, updateHitRatePlot(handles.axes_h.live_hitrate, state.blockStatsHistory); end
-        if flags.stim, updateStimulusHistogram(handles.axes_h.live_stim, state, data, config); end
+        if flags.hit, updateHitRatePlot(handles.axes_h.live_hitrate,state.context_blocks, handles.ui_table); end
+        if flags.stim, updateStimulusHistogram(handles.axes_h.live_stim, state, data, config,handles.ui_table); end
     end
 
     function updatePsychometricPlot(ax, ui_table_handle, config)
         allData = get(ui_table_handle, 'Data');
-        selectedData = allData(allData.Select, :);
+        if isempty(allData)
+            cla(ax, 'reset');
+            return;
+        end
+        
+        logical_indices = allData.Select == 1;   
+        selectedData = allData(logical_indices, :);
+
         cla(ax, 'reset'); hold(ax, 'on');
         
         xline(ax, config.true_mu, '--k', 'LineWidth', 1.5, 'HandleVisibility', 'off');
@@ -452,9 +507,10 @@ function state = RealTimeAnalysis(action, state, data, handles, config, varargin
                 y_curve = psychometricFun(fitParams, xGrid);
                 
                 alpha = 0.4; width = 1.5;
+
                 if i == num_to_plot, alpha = 0.9; width = 2.5; end
                 
-                plot(ax, xGrid, y_curve, 'Color', [colors(i,:), alpha], 'LineWidth', width, 'DisplayName', sprintf('Block %d', i));
+                plot(ax, xGrid, y_curve, 'Color', [colors(i,:), alpha], 'LineWidth', width, 'DisplayName', sprintf('Block (T %d)', row.Start_trial));
                 xline(ax, row.CalBoundary, '-', 'Color', [colors(i,:), alpha], 'LineWidth', width-0.5, 'HandleVisibility', 'off');
             end
             legend(ax, 'show', 'Location', 'southeast');
@@ -463,32 +519,66 @@ function state = RealTimeAnalysis(action, state, data, handles, config, varargin
         ylabel(ax, 'P(Choice)'); title(ax, 'Live Psychometric Curves');
     end
 
-    function updateHitRatePlot(ax, blockStats)
-        if isempty(blockStats), return; end
+    function updateHitRatePlot(ax, context_blocks, ui_table_handle)
+        allData = get(ui_table_handle, 'Data');
+        if isempty(allData)
+            cla(ax, 'reset');
+            return;
+        end
         
-        hr_overall = [blockStats.hitRates.overall];
-        hr_left = [blockStats.hitRates.left];
-        hr_right = [blockStats.hitRates.right];
-        
-        cla(ax, 'reset'); hold(ax, 'on');
-        x_axis = 1:numel(hr_overall);
+        logical_mask = allData.Select == 1;
+        selectedData = allData(logical_mask, :);
+
+        cla(ax, 'reset');
+        if isempty(selectedData)
+            title(ax, 'Live Hit Rate per Block (Nothing Selected)');
+            xlim(ax, [0.5, 10.5]); ylim(ax, [0 100]); grid(ax, 'on');
+            return;
+        end
+
+        hr_overall = selectedData.("Overall Hit %");
+        hr_left = selectedData.("Left Hit %");
+        hr_right = selectedData.("Right Hit %");
+
+        hold(ax, 'on');
+        x_axis = 1:height(selectedData);
         plot(ax, x_axis, hr_overall, '-ok', 'LineWidth', 2, 'DisplayName', 'Overall');
         plot(ax, x_axis, hr_left, '--ob', 'LineWidth', 1.5, 'DisplayName', 'Left');
         plot(ax, x_axis, hr_right, '--or', 'LineWidth', 1.5, 'DisplayName', 'Right');
+        % plotting context change
+        if length(context_blocks) > 1
+            for k = 2:length(context_blocks)
+                xline(ax, context_blocks(k), '--k', 'LineWidth', 1.5, 'HandleVisibility', 'off');
+            end
+        end
         hold(ax, 'off'); legend(ax, 'show', 'Location', 'southeast');
-        xlim(ax, [0.5, max(10, numel(hr_overall) + 0.5)]); ylim(ax, [0 100]);
-        xlabel(ax, 'Block Number'); ylabel(ax, 'Hit %');
-        title(ax, 'Live Hit Rate per Block');
+        xlim(ax, [0.5, max(10, height(selectedData) + 0.5)]); ylim(ax, [0 100]);
+        xlabel(ax, 'Selected Block Number'); ylabel(ax, 'Hit %');
+        title(ax, 'Live Hit Rate for Selected Blocks');
+        grid(ax, 'on');
     end
 
-    function updateStimulusHistogram(ax, state, data, config)
-        if state.block_count == 0, return; end
+    function updateStimulusHistogram(ax, state, data, config, ui_table_handle)
+        
+        allData = get(ui_table_handle, 'Data');
+        if isempty(allData) || state.block_count == 0
+            cla(ax, 'reset');
+            return;
+        end
+        
+        logical_mask = allData.Select == 1;
+        selected_indices = find(logical_mask); % Get row numbers of selected blocks
+
 
         cla(ax, 'reset');
+        if isempty(selected_indices)
+            title(ax, 'Live Choice Distribution (Nothing Selected)');
+            return;
+        end
 
-        n_blocks = state.block_count;
-        red_map = interp1([0 1], [1 0.7 0.7; 0.9 0.2 0.1], linspace(0, 1, n_blocks));
-        green_map = interp1([0 1], [0.7 1 0.7; 0 0.65 0], linspace(0, 1, n_blocks));
+        n_selected_blocks = numel(selected_indices);
+        red_map = interp1([0 1], [1 0.7 0.7; 0.9 0.2 0.1], linspace(0, 1, n_selected_blocks));
+        green_map = interp1([0 1], [0.7 1 0.7; 0 0.65 0], linspace(0, 1, n_selected_blocks));
 
         left_edges = linspace(min(config.stimuli_range), config.true_mu, 6);
         right_edges = linspace(config.true_mu, max(config.stimuli_range), 6);
@@ -502,48 +592,47 @@ function state = RealTimeAnalysis(action, state, data, handles, config, varargin
 
         max_count = 0;
 
-        for i = 1:n_blocks
-            block_stat = state.blockStatsHistory(i);
-            block_indices = block_stat.indices;
+        for i = 1:n_selected_blocks
+            block_idx = selected_indices(i); % Use the index of the selected row
+            block_stat = state.blockStatsHistory(block_idx);
 
-            multiplier = 1;
-            if i == n_blocks, multiplier = 2; end
-
+        multiplier = 1;
+            if i == n_selected_blocks, multiplier = 2; end
+            
             yyaxis(ax, 'left');
             plot(ax, bin_centers, block_stat.stimCounts.incorrect, '-', 'Color', red_map(i,:), 'LineWidth', multiplier * 1.5);
             plot(ax, bin_centers, block_stat.stimCounts.correct, '-', 'Color', green_map(i,:), 'LineWidth', multiplier * 1.5);
             max_count = max([max_count, block_stat.stimCounts.correct, block_stat.stimCounts.incorrect]);
-
+            
             yyaxis(ax, 'right');
-            valid_mask = ~isnan(data.hit_history(block_indices));
-            stim_valid = data.stim_history(block_indices(valid_mask));
-            hit_valid = data.hit_history(block_indices(valid_mask));
-
+            block_indices_raw = block_stat.indices;
+            valid_mask = ~isnan(data.hit_history(block_indices_raw));
+            stim_valid = data.stim_history(block_indices_raw(valid_mask));
+            hit_valid = data.hit_history(block_indices_raw(valid_mask));
             stim_correct = stim_valid(hit_valid == 1);
             stim_incorrect = stim_valid(hit_valid == 0);
-
+            
             jitter_base = (i - 1) * 0.2;
             jitter_incorrect = jitter_base + 0.08 * rand(size(stim_incorrect));
             jitter_correct = jitter_base + 0.08 * rand(size(stim_correct));
-
             scatter(ax, stim_incorrect, jitter_incorrect, multiplier * 25, red_map(i,:), 'filled', 'MarkerFaceAlpha', multiplier * 0.4);
             scatter(ax, stim_correct, jitter_correct, multiplier * 25, green_map(i,:), 'filled', 'MarkerFaceAlpha', multiplier * 0.4);
         end
-
+        
         yyaxis(ax, 'left');
         ylabel(ax, 'Trial Count (Binned)');
         ax.YColor = 'k';
         ylim(ax, [0, max(1, max_count * 1.1)]);
-
+        
         yyaxis(ax, 'right');
-        ylim(ax, [0, n_blocks * 0.2 + 0.1]);
+        ylim(ax, [0, n_selected_blocks * 0.2 + 0.1]);
         ax.YTick = [];
         ax.YColor = 'none';
-
+        
         hold(ax, 'off');
         xline(ax, config.true_mu, '--k', 'Boundary', 'LineWidth', 2);
         xlabel(ax, 'Stimulus Value');
-        title(ax, 'Live Stimulus Distribution');
+        title(ax, 'Live Choice Distribution for Selected Blocks');
         yyaxis(ax, 'left');
     end
     
@@ -556,7 +645,7 @@ function state = RealTimeAnalysis(action, state, data, handles, config, varargin
         response_for_fitting = physical_response;
         y_label = 'P(Right)';
         
-        if contains(rule, 'Left', 'IgnoreCase', true)
+        if contains(string(rule), 'Left', 'IgnoreCase', true)
             response_for_fitting = 1 - physical_response;
             y_label = 'P(Left)';
         end
@@ -569,7 +658,7 @@ function state = RealTimeAnalysis(action, state, data, handles, config, varargin
         plot(ax, xGrid, y_pred, 'r-', 'LineWidth', 2, 'DisplayName', 'Fitted Curve');
         xline(ax, config.true_mu, '--k', 'LineWidth', 1.5, 'DisplayName', 'True Boundary');
         xline(ax, fitParams(1), '--b', 'LineWidth', 1.5, 'DisplayName', 'Calculated');
-        yline(ax, 0.5, ':', 'Color', [0.5 0.5 0.5]);
+        yline(ax, 0.5, ':', 'Color', [0.5 0.5 0.5],'HandleVisibility', 'off');
         grid(ax, 'on'); hold(ax, 'off');
         legend(ax); title(ax, sprintf('Custom Fit (Mu=%.2f)', fitParams(1)));
         xlabel(ax, 'Stimulus'); ylabel(ax, y_label);
@@ -589,11 +678,16 @@ function state = RealTimeAnalysis(action, state, data, handles, config, varargin
                 relevant_blocks = [relevant_blocks, blockStats(i)];
             end
         end
-
+        
         if ~isempty(relevant_blocks)
-            std_dev.overall = std([relevant_blocks.hitRates.overall], 'omitnan');
-            std_dev.left = std([relevant_blocks.hitRates.left], 'omitnan');
-            std_dev.right = std([relevant_blocks.hitRates.right], 'omitnan');
+            overall_values = arrayfun(@(blk) blk.hitRates.overall, relevant_blocks);
+            left_values = arrayfun(@(blk) blk.hitRates.left, relevant_blocks);
+            right_values = arrayfun(@(blk) blk.hitRates.right, relevant_blocks);
+
+            % Now calculate the standard deviation on the resulting vectors
+            std_dev.overall = std(overall_values, 'omitnan');
+            std_dev.left = std(left_values, 'omitnan');
+            std_dev.right = std(right_values, 'omitnan');
         else
             std_dev.overall = 0; std_dev.left = 0; std_dev.right = 0;
         end
@@ -627,36 +721,45 @@ function state = RealTimeAnalysis(action, state, data, handles, config, varargin
         end
         
         if ~isempty(relevant_blocks)
-            counts_matrix_corr = vertcat(relevant_blocks.stimCounts.correct);
-            counts_matrix_incorr = vertcat(relevant_blocks.stimCounts.incorrect);
+            correct_cells = arrayfun(@(blk) blk.stimCounts.correct, relevant_blocks,'UniformOutput',false);
+            incorrect_cells = arrayfun(@(blk) blk.stimCounts.incorrect, relevant_blocks,'UniformOutput',false);
+            
+            counts_matrix_corr = cell2mat(correct_cells);
+            counts_matrix_incorr = cell2mat(incorrect_cells);
 
             mean_corr = mean(counts_matrix_corr, 1);
             std_corr = std(counts_matrix_corr, 0, 1);
             mean_incorr = mean(counts_matrix_incorr, 1);
             std_incorr = std(counts_matrix_incorr, 0, 1);
             
-            fill(ax, [bin_centers, fliplr(bin_centers)], [mean_corr - std_corr, fliplr(mean_corr + std_corr)], ...
-                [0 0.65 0], 'FaceAlpha', 0.2, 'EdgeColor', 'none', 'DisplayName', 'Correct (Block STD)');
-            fill(ax, [bin_centers, fliplr(bin_centers)], [mean_incorr - std_incorr, fliplr(mean_incorr + std_incorr)], ...
-                [0.9 0.2 0.1], 'FaceAlpha', 0.2, 'EdgeColor', 'none', 'DisplayName', 'Incorrect (Block STD)');
+            if sum(std_corr) > eps
+                fill(ax, [bin_centers, fliplr(bin_centers)], [mean_corr - std_corr, fliplr(mean_corr + std_corr)], ...
+                    [0 0.65 0], 'FaceAlpha', 0.2, 'EdgeColor', 'none', 'DisplayName', 'Correct (Block STD)');
+            end
+            
+            % --- Plot the fill area for INCORRECT trials, only if there is variance ---
+            if sum(std_incorr) > eps
+                fill(ax, [bin_centers, fliplr(bin_centers)], [mean_incorr - std_incorr, fliplr(mean_incorr + std_incorr)], ...
+                    [0.9 0.2 0.1], 'FaceAlpha', 0.2, 'EdgeColor', 'none', 'DisplayName', 'Incorrect (Block STD)');
+            end
         end
         
         plot(ax, bin_centers, counts_custom.correct, '-o', 'Color', [0 0.65 0], 'LineWidth', 2, 'DisplayName', 'Correct (Custom)');
         plot(ax, bin_centers, counts_custom.incorrect, '-o', 'Color', [0.9 0.2 0.1], 'LineWidth', 2, 'DisplayName', 'Incorrect (Custom)');
         
-        xline(ax, config.true_mu, '--k', 'Boundary', 'LineWidth', 2);
+        xline(ax, config.true_mu, '--k', 'Boundary', 'LineWidth', 2,'HandleVisibility', 'off');
         hold(ax, 'off'); legend(ax, 'Location', 'northwest');
-        title(ax, 'Stimulus Distribution (w/ Block STD)');
+        title(ax, 'Choice Distribution (w/ Block STD)');
         xlabel(ax, 'Stimulus Value'); ylabel(ax, 'Trial Count');
     end
     
     %% CONTEXT PLOTTING HELPERS
-    function plotContextPsychometric(ax, psych_data, config, colors)
+    function plotContextPsychometric(ax, psych_data, config, colors,context_names)
         cla(ax, 'reset'); hold(ax, 'on');
         xGrid = linspace(config.stimuli_range(1), config.stimuli_range(2), 300)';
         
         xline(ax, config.true_mu, '--k', 'LineWidth', 1.5, 'DisplayName', 'True Boundary');
-        yline(ax, 0.5, ':', 'Color', [0.5 0.5 0.5]);
+        yline(ax, 0.5, ':', 'Color', [0.5 0.5 0.5], 'HandleVisibility', 'off');
         
         contains_left_rule = false;
         contains_right_rule = false;
@@ -664,13 +767,13 @@ function state = RealTimeAnalysis(action, state, data, handles, config, varargin
         for i = 1:numel(psych_data)
             if isempty(psych_data{i}), continue; end
             
-            if contains(psych_data{i}.rule, 'Left', 'IgnoreCase', true)
+            if contains(string(psych_data{i}.rule), 'Left', 'IgnoreCase', true)                
                 contains_left_rule = true;
             else
                 contains_right_rule = true;
             end
             
-            plot(ax, xGrid, psych_data{i}.y_pred, '-', 'Color', colors(i,:), 'LineWidth', 2, 'DisplayName', sprintf('Context %d', i));
+            plot(ax, xGrid, psych_data{i}.y_pred, '-', 'Color', colors(i,:), 'LineWidth', 2, 'DisplayName', context_names{i});
             xline(ax, psych_data{i}.fitParams(1), '--', 'Color', colors(i,:), 'LineWidth', 1.5, 'HandleVisibility', 'off');
         end
         
@@ -684,46 +787,68 @@ function state = RealTimeAnalysis(action, state, data, handles, config, varargin
         xlabel(ax, 'Stimulus');
     end
 
-    function plotContextHitRates(ax, hit_rate_data, hit_rate_std, colors)
+    function plotContextHitRates(ax, hit_rate_data, hit_rate_std, colors,context_names)
         cla(ax, 'reset'); hold(ax, 'on');
         
         if isempty(hit_rate_data), return; end
         
         num_contexts = size(hit_rate_data, 1);
-        
+        num_groups = size(hit_rate_data, 2); % Should be 3 for Overall, Left, Right
+
         b = bar(ax, hit_rate_data', 'grouped');
         
+        % Set colors for each context
         for i = 1:num_contexts
             b(i).FaceColor = colors(i,:);
-            x_coords = b(i).XData + b(i).XOffset;
-            errorbar(ax, x_coords, hit_rate_data(i,:), hit_rate_std(i,:), 'k', 'linestyle', 'none', 'CapSize', 4);
         end
-        
+
+        % Calculate the x-positions for error bars
+        % For grouped bars, we need to calculate the offset for each group
+        group_width = min(0.8, num_contexts/(num_contexts + 1.5));
+
+        for i = 1:num_contexts
+            % Calculate x-coordinates for this context across all groups
+            x_offset = (-(num_contexts-1)/2 + (i-1)) * group_width/num_contexts;
+            x_coords = (1:num_groups) + x_offset;
+
+            % Plot error bars for this context
+            errorbar(ax, x_coords, hit_rate_data(i,:), hit_rate_std(i,:), ...
+                'k', 'linestyle', 'none', 'CapSize', 4, 'LineWidth', 1);
+        end
+
+        ax.XTick = 1:num_groups;
         ax.XTickLabel = {'Overall', 'Left', 'Right'};
         ylabel(ax, 'Hit %');
         title(ax, 'Contextual Hit Rates (w/ Block STD)');
         ylim(ax, [0 105]);
         grid(ax, 'on');
         
-        legend_labels = arrayfun(@(x) sprintf('Context %d', x), 1:num_contexts, 'UniformOutput', false);
-        legend(ax, legend_labels, 'Location', 'northeastoutside');
+        % legend_labels = arrayfun(@(x) sprintf('Context %d', x), 1:num_contexts, 'UniformOutput', false);
+        % legend_labels = context_names
+        % legend(ax, legend_labels, 'Location', 'northeastoutside');
+        hold(ax, 'off');
     end
 
-    function plotContextStimulusHistogram(ax, stim_hist_data, config, colors)
+    function plotContextStimulusHistogram(ax, stim_hist_data, config, colors,context_names)
         cla(ax, 'reset'); hold(ax, 'on');
 
         left_edges = linspace(min(config.stimuli_range), config.true_mu, 6);
         right_edges = linspace(config.true_mu, max(config.stimuli_range), 6);
+        bin_edges = unique([left_edges, right_edges]);
         bin_centers = (bin_edges(1:end-1) + bin_edges(2:end)) / 2;
         
         for i = 1:numel(stim_hist_data)
             if isempty(stim_hist_data{i}), continue; end
             
             if isfield(stim_hist_data{i}, 'mean_corr')
-                fill(ax, [bin_centers, fliplr(bin_centers)], [stim_hist_data{i}.mean_corr - stim_hist_data{i}.std_corr, fliplr(stim_hist_data{i}.mean_corr + stim_hist_data{i}.std_corr)], ...
-                    colors(i,:), 'FaceAlpha', 0.15, 'EdgeColor', 'none');
-                fill(ax, [bin_centers, fliplr(bin_centers)], [stim_hist_data{i}.mean_incorr - stim_hist_data{i}.std_incorr, fliplr(stim_hist_data{i}.mean_incorr + stim_hist_data{i}.std_incorr)], ...
-                    colors(i,:), 'FaceAlpha', 0.15, 'EdgeColor', 'none');
+                if sum(stim_hist_data{i}.std_corr) > eps
+                    fill(ax, [bin_centers, fliplr(bin_centers)], [stim_hist_data{i}.mean_corr - stim_hist_data{i}.std_corr, fliplr(stim_hist_data{i}.mean_corr + stim_hist_data{i}.std_corr)], ...
+                        colors(i,:), 'FaceAlpha', 0.15, 'EdgeColor', 'none');
+                end
+                if sum(stim_hist_data{i}.std_incorr) > eps
+                    fill(ax, [bin_centers, fliplr(bin_centers)], [stim_hist_data{i}.mean_incorr - stim_hist_data{i}.std_incorr, fliplr(stim_hist_data{i}.mean_incorr + stim_hist_data{i}.std_incorr)], ...
+                        colors(i,:), 'FaceAlpha', 0.15, 'EdgeColor', 'none');
+                end
             end
             
             plot(ax, bin_centers, stim_hist_data{i}.correct, '-o', 'Color', colors(i,:), 'LineWidth', 2, 'DisplayName', sprintf('Correct C%d', i));
@@ -732,8 +857,8 @@ function state = RealTimeAnalysis(action, state, data, handles, config, varargin
         
         xline(ax, config.true_mu, '--k', 'Boundary', 'LineWidth', 2);
         hold(ax, 'off');
-        legend(ax, 'show', 'Location', 'northwest');
-        title(ax, 'Contextual Stimulus Distributions');
+        % legend(ax, 'show', 'Location', 'northwest');
+        title(ax, 'Contextual Choice Distributions');
         xlabel(ax, 'Stimulus Value');
         ylabel(ax, 'Trial Count');
     end
@@ -742,11 +867,12 @@ function state = RealTimeAnalysis(action, state, data, handles, config, varargin
     function dist_type = getDistributionType(data, indices, rule)
         % Determines the distribution type based on the rule and the
         % distributions for left and right sides within the given indices.
-        dist_left = unique(data.full_dist_left(indices));
-        dist_right = unique(data.full_dist_right(indices));
         
-        if numel(dist_left) > 1, dist_left = dist_left{1}; end
-        if numel(dist_right) > 1, dist_right = dist_right{1}; end
+        dist_left_cell = unique(data.full_dist_left(indices));
+        dist_right_cell = unique(data.full_dist_right(indices));
+        
+        dist_left = dist_left_cell{1};
+        dist_right = dist_right_cell{1};
 
         hard_dists = {'exponential', 'half-normal', 'sinusoidal'};
         
@@ -758,7 +884,7 @@ function state = RealTimeAnalysis(action, state, data, handles, config, varargin
         is_left_hard = ismember(dist_left, hard_dists);
         is_right_hard = ismember(dist_right, hard_dists);
         
-        if contains(rule, 'Right', 'IgnoreCase', true) % High stimulus values correspond to Right
+        if contains(string(rule), 'Right', 'IgnoreCase', true) % High stimulus values correspond to Right
             if is_right_hard && ~is_left_hard
                 dist_type = 'hard high';
             elseif ~is_right_hard && is_left_hard

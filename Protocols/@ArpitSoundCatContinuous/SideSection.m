@@ -379,22 +379,27 @@ switch action
                 end
 
             end
-
-            violation_history.value=[violation_history(:); was_viol];
-            timeout_history.value=[timeout_history(:); was_timeout];
+            
+            vio_history = value(violation_history);
+            vio_history(n_done_trials) = was_viol;
+            violation_history.value= vio_history;
+            tout_history = value(timeout_history);
+            tout_history(n_done_trials) = was_timeout;
+            timeout_history.value= tout_history;
 
             SideSection(obj,'update_side_history');
 
+            hit_his = value(hit_history);
 			if ~was_viol && ~was_timeout
 				%was_hit=rows(parsed_events.states.hit_state)>0;
                 was_hit=rows(parsed_events.states.second_hit_state)==0;
-				hit_history.value=[hit_history(:); was_hit];
-				
+				hit_his(n_done_trials) = was_hit;				
 			else
 				% There was a violation or timeout
-				hit_history.value=[hit_history(:); nan];
+				hit_his(n_done_trials) = nan;
 			end
-			
+			hit_history.value = hit_his;
+            
 			% % Now calculate the deltaF and sides - this maybe interesting
 			% % even in a violation or timeout case.
             % 

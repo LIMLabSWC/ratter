@@ -777,7 +777,7 @@ switch action
             'fullname', ['^' mfilename]);
 
     case 'update_stimulus_history'
-        ps=value(stimulus_history);
+        ps  = value(stimulus_history);
         ps1 = value(stimulus_distribution_history);
         ps2 = value(stimulus_right_distribution_history);
         ps3 = value(stimulus_left_distribution_history);
