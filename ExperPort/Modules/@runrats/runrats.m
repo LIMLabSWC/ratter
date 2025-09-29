@@ -145,6 +145,10 @@ switch action
         SoloParamHandle(obj, 'curProtocol', 'value', '');  %Current Protocol
         SoloParamHandle(obj,'schedDay','value',[]);
 
+        % For Live Webcam Feed
+        SoloParamHandle(obj,'Camera_Fig_window','value',[]);
+        SoloParamHandle(obj,'Camera_Obj','value',[]);
+        SoloParamHandle(obj,'Camera_Image','value',[]);
 
         %Let's make the menus
         try
@@ -743,7 +747,27 @@ switch action
 
         %runrats(obj,'updatelog','update_exprat');
 
+%% SPECIAL CASE ADDED BY ARPIT FOR CLICK AND SELECT 
+% doesn't effect the running of the other cases/functions
+    case 'update exp_rat_userclick'
+        
+        ExpMenu.value = varargin{1};
+        runrats(obj,'update_ratmenu',varargin{2});
+        %If the rat has changed, let's update it.
+        if ~strcmp(value(RatMenu),varargin{2})
+            runrats(obj,'update_rat',value(InLiveLoop)); %#ok<NODEF>
+        else
+            %Stay in the loop if we haven't changed anything
+            InLiveLoop.value = 1;
+        end
+        
+        runrats(obj,'begin_load_protocol');
 
+        % Added to send the details about the experimenter and rat
+    case 'exp_rat_names'
+        varargout{1} = value(ExpMenu);
+        varargout{2} = value(RatMenu);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     case 'update_tech_instructions'
         %% update_tech_instructions
         %Posts the tech instructions for the active rat on the screen
@@ -1408,12 +1432,37 @@ switch action
         pause(5);
 
         %Start raspberry pi_camera
-        try
-            disp('trying camera')
-            start_camera(value(RigID),value(RatMenu),value(CurrProtocol),'start')
-        catch
-            disp('failed to start pi camera')
-        end
+        % try
+        %     disp('trying camera')
+        %     start_camera(value(RigID),value(RatMenu),value(CurrProtocol),'start')
+        % catch
+        %     disp('failed to start pi camera')
+        % end
+
+        % If using USB Webcam, then try using it
+        % try
+        %     disp('Connecting to USB HD Camera')
+        %     webcam_connected = webcamlist;
+        %     webcam_idx = find(contains(webcam_connected,'USB'));
+        %     if ~isempty(webcam_idx) % USB Camera connected
+        %         cam = webcam(webcam_connected{webcam_idx});
+        %         fig = figure('NumberTitle','off','MenuBar','none');
+        %         fig.Name = 'My Camera';
+        %         ax = axes(fig);
+        %         frame = snapshot(cam);
+        %         im = image(ax,zeros(size(frame),'uint8'));
+        %         axis(ax,'image');
+        %         preview(cam,im)
+        %         Camera_Fig_window.value = fig;
+        %         Camera_Obj.value = cam;
+        %         Camera_Image.value = im;
+        %     else
+        %         disp('No USB camera connected')
+        %     end            
+        % catch
+        %     disp('failed to connect to USB camera')
+        % end
+
         %Enable the Multi button so the user can stop the session
         enable(Multi);
 
@@ -1443,13 +1492,25 @@ switch action
         runrats(obj,'updatelog','runend');
         runrats(obj,'disable_all');
         set(get_ghandle(Multi),'String','Saving...','Fontsize',32);
+        
         %Stop raspberry pi_camera
-        try
-            disp('stopping camera')
-            start_camera(value(RigID),value(RatMenu),value(CurrProtocol),'stop')
-        catch
-            disp('failed to stop pi camera')
-        end
+        % try
+        %     disp('stopping camera')
+        %     start_camera(value(RigID),value(RatMenu),value(CurrProtocol),'stop')
+        % catch
+        %     disp('failed to stop pi camera')
+        % end
+
+        % Stop USB Camera
+        % try
+        %     closePreview(value(Camera_Obj))
+        %     clear(value(Camera_Image))
+        %     clear(value(Camera_Obj));
+        %     close(value(Camera_Fig_window));
+        %     disp('USB camera stopped')
+        % catch
+        %     disp('failed to stop USB camera')
+        % end
 
         %Stop dispatcher and wait for it to respond
         dispatcher(value(dispobj),'Stop'); %#ok<NODEF>
