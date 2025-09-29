@@ -6,5 +6,9 @@ ExperPort/Settings/Settings_Custom_v2_0.conf
 ExperPort/Settings/Settings_Custom.conf
 ExperPort/sendsummary_error_log.txt
 PASSWORD_CONFIG-DO_NOT_VERSIONCONTROL.mat
+.gitattributes
+.DS_Store
+Screenshot 2025-01-22 at 11.22.30.png
+
 sparse_init.log
 
