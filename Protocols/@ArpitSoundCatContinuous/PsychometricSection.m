@@ -19,7 +19,7 @@ switch action
 
         % Context 1
         DispParam(obj, 'Context3_trialStart', 1,x,y, 'position', [x, y, 100 20],'label','t_start','TooltipString','3rd context started at this trial');
-        DispParam(obj, 'Context3_trialEnd', 1,x,y, 'position', [x + 101, y, 100 20],'label','t_end','TooltipString','3rd context ended at this trial')
+        DispParam(obj, 'Context3_trialEnd', 1,x,y, 'position', [x + 101, y, 100 20],'label','t_end','TooltipString','3rd context ended at this trial');
         next_row(y);
         DispParam(obj, 'Context3_Dist', Category_Dist, x,y,'label','Context3_Distr','TooltipString','stim distribution for 3rd context');
         make_invisible(Context3_Dist); make_invisible(Context3_trialStart);make_invisible(Context3_trialEnd);
@@ -27,7 +27,7 @@ switch action
 
         % Context 2
         DispParam(obj, 'Context2_trialStart', 1,x,y, 'position', [x, y, 100 20],'label','t_start','TooltipString','2nd context started at this trial');
-        DispParam(obj, 'Context2_trialEnd', 1,x,y, 'position', [x + 101, y, 100 20],'label','t_end','TooltipString','2nd context ended at this trial')
+        DispParam(obj, 'Context2_trialEnd', 1,x,y, 'position', [x + 101, y, 100 20],'label','t_end','TooltipString','2nd context ended at this trial');
         next_row(y);
         DispParam(obj, 'Context2_Dist', Category_Dist, x,y,'label','Context2_Distr','TooltipString','stim distribution for 2nd context');    	
         make_invisible(Context2_Dist); make_invisible(Context2_trialStart);make_invisible(Context2_trialEnd);
@@ -35,7 +35,7 @@ switch action
 
         % Context 3
         DispParam(obj, 'Context1_trialStart', 1,x,y, 'position', [x, y, 100 20],'label','Trial_start','TooltipString','1st context started at this trial');
-        DispParam(obj, 'Context1_trialEnd', 1,x,y, 'position', [x +  101, y, 100 20],'label','Trial_end','TooltipString','1st context ended at this trial')        
+        DispParam(obj, 'Context1_trialEnd', 1,x,y, 'position', [x +  101, y, 100 20],'label','Trial_end','TooltipString','1st context ended at this trial');       
         next_row(y);
         DispParam(obj, 'Context1_Dist', Category_Dist, x,y,'label','Context1_Distr','TooltipString','stim distribution for 1st context');
     	next_row(y);
