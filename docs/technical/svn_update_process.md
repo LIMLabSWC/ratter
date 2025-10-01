@@ -1,6 +1,8 @@
-This document explains when and how the automatic SVN updates happen in the BControl system, specifically during startup and protocol loading processes.
+---
+title: Documentation
+layout: default
+---
 
-## Overview
 
 The BControl system includes automatic SVN update functionality that ensures the code is always up-to-date when running experiments. These updates are not performed during the initial `newstartup.m` execution, but rather during the RunRats protocol loading phase.
 

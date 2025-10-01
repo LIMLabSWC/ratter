@@ -1,6 +1,8 @@
-## Introduction
+---
+title: Documentation
+layout: default
+---
 
-This tutorial explains how to set up and use water valves in the ExperPort system for reward delivery in behavioral experiments.
 
 ## Hardware Setup
 

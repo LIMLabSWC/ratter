@@ -1,6 +1,8 @@
-# Protocol Writer's Guide
+---
+title: Documentation
+layout: default
+---
 
-## Introduction
 
 This guide explains how to create and implement protocols for the ExperPort system. Protocols define the experimental procedures and control the behavior of the system during experiments.
 

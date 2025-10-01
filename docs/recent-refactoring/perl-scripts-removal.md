@@ -1,6 +1,8 @@
-## Overview
+---
+title: Documentation
+layout: default
+---
 
-As part of the May 2025 cleanup effort, we have removed several legacy Perl scripts from the codebase. These scripts were not actively maintained and required Perl, which is not a standard dependency for the experimental setup.
 
 ## Removed Scripts
 

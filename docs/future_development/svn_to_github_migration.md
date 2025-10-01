@@ -1,6 +1,8 @@
-## Overview
+---
+title: Documentation
+layout: default
+---
 
-This document outlines the plan to refactor the bcontrol system's SVN update process to incorporate GitHub for protocols and potentially other components.
 
 ## Current System
 

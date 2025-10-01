@@ -1,6 +1,8 @@
-This document tracks potential improvements and enhancements for the bcontrol system.
+---
+title: Documentation
+layout: default
+---
 
-## System Architecture
 
 - [ ] **Modularize core components**
   - Separate UI from business logic

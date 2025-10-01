@@ -1,6 +1,8 @@
-## Introduction
+---
+title: Documentation
+layout: default
+---
 
-ExperPort is a comprehensive behavioral control system designed for rodent experiments. It provides real-time control of experimental parameters, data acquisition, and hardware interfaces.
 
 ## System Architecture
 

@@ -1,6 +1,8 @@
-This directory contains documentation for planned future improvements and enhancements to the bcontrol system.
+---
+title: Documentation
+layout: default
+---
 
-## Available Documents
 
 - [Improvement Tracker](improvement_tracker.md) - A comprehensive list of potential improvements across all aspects of the system
 - [SVN to GitHub Migration Plan](svn_to_github_migration.md) - Detailed plan for migrating protocol management from SVN to GitHub

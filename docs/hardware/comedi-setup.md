@@ -1,6 +1,8 @@
-This guide explains how to set up and configure Comedi for hardware control in the ExperPort system.
+---
+title: Documentation
+layout: default
+---
 
-## Overview
 
 Comedi (Control and Measurement Device Interface) provides a unified interface for data acquisition hardware. In ExperPort, it's used for:
 

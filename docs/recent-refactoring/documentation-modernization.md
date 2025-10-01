@@ -1,6 +1,8 @@
-## Overview
+---
+title: Documentation
+layout: default
+---
 
-As part of the May 2025 cleanup effort, we have modernized the documentation structure and format to improve maintainability and accessibility. This includes converting documentation to markdown format and reorganizing the documentation hierarchy.
 
 ## Changes Made
 

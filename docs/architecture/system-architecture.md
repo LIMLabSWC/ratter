@@ -1,6 +1,8 @@
-This document outlines the permanent architecture of the system, including core components, their relationships, and key workflows.
+---
+title: Documentation
+layout: default
+---
 
-## Core System Components
 
 The diagram below provides an overview of the main system components and their relationships. It shows how the core system, protocol system, and essential plugins interact:
 
