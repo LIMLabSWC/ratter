@@ -142,9 +142,9 @@
   </head>
   <body>
     <main class="container">
-        {% if page.url != '/' and page.url != '/index.html' and page.url != '/ratter/' and page.url != '/ratter/index.html' %}
+        {% unless page.url == '/' or page.url == '/index.html' or page.url contains 'index' %}
             <a href="{{ site.baseurl }}/" class="back-link">← Back to {{ site.title | default: "Documentation" }}</a>
-        {% endif %}
+        {% endunless %}
         {{ content }}
     </main>
   </body>
