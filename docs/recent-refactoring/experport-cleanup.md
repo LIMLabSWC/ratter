@@ -1,10 +1,3 @@
----
-title: ExperPort Cleanup Plan
-layout: default
----
-
-# ExperPort Cleanup Plan
-
 ## Overview
 
 This document outlines the plan to remove unused .m files from the ExperPort directory. The goal is to reduce code clutter and maintenance burden by removing files that are no longer actively used in the codebase.

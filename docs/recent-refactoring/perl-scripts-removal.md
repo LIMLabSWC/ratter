@@ -1,10 +1,3 @@
----
-title: Perl Scripts Removal
-layout: default
----
-
-# Perl Scripts Removal
-
 ## Overview
 
 As part of the May 2025 cleanup effort, we have removed several legacy Perl scripts from the codebase. These scripts were not actively maintained and required Perl, which is not a standard dependency for the experimental setup.

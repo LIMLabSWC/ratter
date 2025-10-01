@@ -1,10 +1,3 @@
----
-title: SVN Update Process in BControl System
-layout: default
----
-
-# SVN Update Process in BControl System
-
 This document explains when and how the automatic SVN updates happen in the BControl system, specifically during startup and protocol loading processes.
 
 ## Overview

@@ -1,10 +1,3 @@
----
-title: Future Improvements for bcontrol
-layout: default
----
-
-# Future Improvements for bcontrol
-
 This document tracks potential improvements and enhancements for the bcontrol system.
 
 ## System Architecture

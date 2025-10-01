@@ -1,8 +1,3 @@
----
-title: Protocol Writer's Guide
-layout: default
----
-
 # Protocol Writer's Guide
 
 ## Introduction

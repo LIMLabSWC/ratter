@@ -1,10 +1,3 @@
----
-title: Protocols Directory Restructuring
-layout: default
----
-
-# Protocols Directory Restructuring
-
 ## Overview
 
 As part of the May 2025 cleanup effort, we have improved the Protocols directory handling to be more robust and configuration-driven. This change affects how protocols are loaded and managed in the BControl system.

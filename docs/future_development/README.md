@@ -1,10 +1,3 @@
----
-title: Future Development Plans
-layout: default
----
-
-# Future Development Plans
-
 This directory contains documentation for planned future improvements and enhancements to the bcontrol system.
 
 ## Available Documents

@@ -1,10 +1,3 @@
----
-title: Comedi Setup Guide
-layout: default
----
-
-# Comedi Setup Guide
-
 This guide explains how to set up and configure Comedi for hardware control in the ExperPort system.
 
 ## Overview
