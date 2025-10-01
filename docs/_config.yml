@@ -8,6 +8,9 @@ markdown: kramdown
 highlighter: rouge
 theme: minima
 
+# Permalinks - use simple structure
+permalink: pretty
+
 # Exclude files from processing
 exclude:
   - Gemfile
@@ -22,13 +25,7 @@ exclude:
 include:
   - "_pages"
 
-# Collections
-collections:
-  docs:
-    output: true
-    permalink: /:collection/:name/
-
-# Defaults
+# Defaults - ensure all files use our layout
 defaults:
   - scope:
       path: ""
@@ -37,6 +34,5 @@ defaults:
       layout: "default"
   - scope:
       path: ""
-      type: "docs"
     values:
       layout: "default"

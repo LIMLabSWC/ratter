@@ -196,7 +196,7 @@
 
     <main>
         <div class="content">
-            {% if page.url != '/' %}
+            {% if page.url != '/' and page.url != '/index.html' %}
                 <a href="/" class="back-link">← Back to Documentation</a>
             {% endif %}
             {{ content }}
