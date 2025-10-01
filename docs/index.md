@@ -3,6 +3,11 @@ title: BControl Documentation
 layout: default
 ---
 
+<div class="intro-section">
+    <h2>About BControl</h2>
+    <p><strong>BControl</strong> is a behavioral experimentation system that provides a flexible and extensible framework for running behavioral protocols. Designed to support a variety of experiments with user-friendly configuration and robust MATLAB-based components, BControl serves as the core platform for our high-throughput behavior training facility. The system enables researchers to design, implement, and execute complex behavioral experiments with precise control over experimental parameters, data collection, and protocol management.</p>
+</div>
+
 <div class="warning-banner">
     <h3>⚠️ Recent Changes (May 2025)</h3>
     <p>We are undergoing a major modernization effort. Please see the <a href="{{ '/recent-refactoring/README' | relative_url }}">Recent Refactoring Overview</a> for details, including:</p>
@@ -59,6 +64,28 @@ layout: default
 </div>
 
 <style>
+.intro-section {
+    background: white;
+    border: 1px solid #e1e8ed;
+    border-radius: 6px;
+    padding: 2rem;
+    margin: 2rem 0;
+    border-left: 4px solid #3498db;
+}
+
+.intro-section h2 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+
+.intro-section p {
+    color: #555;
+    line-height: 1.6;
+    margin: 0;
+}
+
 .warning-banner {
     background: #f8f9fa;
     border: 1px solid #e9ecef;
