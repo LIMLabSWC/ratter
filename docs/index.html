@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BControl Documentation</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -199,6 +200,87 @@
                 padding: 0 15px;
             }
         }
+        
+        .markdown-content {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: none;
+        }
+        
+        .markdown-content h1, .markdown-content h2, .markdown-content h3 {
+            color: #667eea;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .markdown-content h1 {
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 0.5rem;
+        }
+        
+        .markdown-content code {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 0.2rem 0.4rem;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9em;
+        }
+        
+        .markdown-content pre {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 1rem;
+            overflow-x: auto;
+        }
+        
+        .markdown-content pre code {
+            background: none;
+            border: none;
+            padding: 0;
+        }
+        
+        .markdown-content ul, .markdown-content ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .markdown-content li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .markdown-content blockquote {
+            border-left: 4px solid #667eea;
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .back-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .back-button:hover {
+            background: #5a6fd8;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
     </style>
 </head>
 <body>
@@ -359,6 +441,12 @@
                 </ul>
             </div>
         </div>
+        
+        <!-- Markdown content area -->
+        <div id="markdown-content" class="markdown-content">
+            <button class="back-button" onclick="hideMarkdownContent()">← Back to Documentation</button>
+            <div id="markdown-body"></div>
+        </div>
     </main>
 
     <footer>
@@ -367,5 +455,92 @@
             <p style="margin-top: 0.5rem; opacity: 0.8;">This documentation is automatically generated from the repository's markdown files.</p>
         </div>
     </footer>
+
+    <script>
+        // Configure marked for GitHub-style markdown
+        marked.setOptions({
+            breaks: true,
+            gfm: true,
+            sanitize: false,
+            smartLists: true,
+            smartypants: true
+        });
+
+        // Function to load and render markdown files
+        async function loadMarkdownFile(filePath) {
+            const markdownContent = document.getElementById('markdown-content');
+            const markdownBody = document.getElementById('markdown-body');
+            
+            // Show loading state
+            markdownBody.innerHTML = '<div class="loading">Loading documentation...</div>';
+            markdownContent.style.display = 'block';
+            
+            // Scroll to top of content
+            markdownContent.scrollIntoView({ behavior: 'smooth' });
+            
+            try {
+                // Fetch the markdown file
+                const response = await fetch(filePath);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const markdownText = await response.text();
+                
+                // Convert markdown to HTML
+                const htmlContent = marked.parse(markdownText);
+                
+                // Display the content
+                markdownBody.innerHTML = htmlContent;
+                
+                // Update page title
+                const titleMatch = markdownText.match(/^#\s+(.+)$/m);
+                if (titleMatch) {
+                    document.title = `${titleMatch[1]} - BControl Documentation`;
+                }
+                
+            } catch (error) {
+                console.error('Error loading markdown file:', error);
+                markdownBody.innerHTML = `
+                    <div class="loading">
+                        <h3>Error Loading Documentation</h3>
+                        <p>Could not load the requested file: ${filePath}</p>
+                        <p>The file may not exist or there may be a network error.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Function to hide markdown content and return to main page
+        function hideMarkdownContent() {
+            const markdownContent = document.getElementById('markdown-content');
+            markdownContent.style.display = 'none';
+            document.title = 'BControl Documentation';
+            
+            // Scroll back to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Add click handlers to all documentation links
+        document.addEventListener('DOMContentLoaded', function() {
+            const links = document.querySelectorAll('a[href$=".md"]');
+            
+            links.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const filePath = this.getAttribute('href');
+                    loadMarkdownFile(filePath);
+                });
+            });
+        });
+
+        // Handle browser back/forward buttons
+        window.addEventListener('popstate', function(event) {
+            if (event.state && event.state.markdownPath) {
+                loadMarkdownFile(event.state.markdownPath);
+            } else {
+                hideMarkdownContent();
+            }
+        });
+    </script>
 </body>
 </html>
