@@ -66,7 +66,7 @@
         
         .nav-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 1.5rem;
             margin-bottom: 3rem;
         }
@@ -78,6 +78,9 @@
             padding: 1.5rem;
             transition: border-color 0.2s ease;
             border-left: 4px solid #3498db;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
         }
         
         .nav-card:hover {
@@ -198,6 +201,10 @@
                 grid-template-columns: 1fr;
             }
             
+            .nav-card {
+                min-height: auto;
+            }
+            
             .container {
                 padding: 0 15px;
             }
@@ -227,23 +234,6 @@
                 </ul>
             </div>
 
-            <div class="quick-start">
-                <h2>🚀 Quick Start</h2>
-                <h3>1. Clone the Repository</h3>
-                <div class="code-block">git clone git@github.com:LIMLabSWC/ratter.git</div>
-                
-                <h3>2. Initialize the SVN Repository</h3>
-                <div class="code-block">bash svn_sparse_init.sh</div>
-                
-                <h3>3. Configure Your Rig</h3>
-                <div class="code-block">cp ExperPort/Settings/_Settings_Custom.conf ExperPort/Settings/Settings_Custom.conf</div>
-                <p>Then edit it with your rig-specific settings.</p>
-                
-                <div class="info-box">
-                    <h4>ℹ️ Info</h4>
-                    <p>See our <a href="https://github.com/LIMLabSWC/limlab_documentation/blob/main/docs/how_to_set_up_a_rig_-_software.md">rig setup guide</a> for detailed instructions.</p>
-                </div>
-            </div>
 
             <div class="nav-grid">
                 <div class="nav-card">
@@ -252,23 +242,6 @@
                         <li><a href="guides/protocol-writers-guide">Protocol Writer's Guide</a></li>
                         <li><a href="guides/solo-core-guide">Solo Core Guide</a></li>
                         <li><a href="guides/water-valve-tutorial">Water Valve Tutorial</a></li>
-                    </ul>
-                </div>
-
-                <div class="nav-card">
-                    <h3>🔧 Technical References</h3>
-                    <ul>
-                        <li><a href="technical/fsm-documentation">Finite State Machine (FSM) Documentation</a></li>
-                        <li><a href="technical/staircases">Staircase Algorithms</a></li>
-                        <li><a href="technical/svn_update_process">SVN Update Process</a></li>
-                    </ul>
-                </div>
-
-                <div class="nav-card">
-                    <h3>⚙️ Hardware Setup</h3>
-                    <ul>
-                        <li><a href="hardware/lynxtrig-setup">LynxTrig Setup</a></li>
-                        <li><a href="hardware/comedi-setup">Comedi Setup</a></li>
                     </ul>
                 </div>
 
@@ -282,85 +255,29 @@
                 </div>
 
                 <div class="nav-card">
-                    <h3>🔄 Recent Refactoring</h3>
+                    <h3>🔧 Technical References</h3>
                     <ul>
-                        <li><a href="recent-refactoring/README">Overview</a></li>
-                        <li><a href="recent-refactoring/experport-cleanup">ExperPort Cleanup</a></li>
-                        <li><a href="recent-refactoring/perl-scripts-removal">Perl Scripts Removal</a></li>
-                        <li><a href="recent-refactoring/protocols-restructuring">Protocols Restructuring</a></li>
-                        <li><a href="recent-refactoring/documentation-modernization">Documentation Modernization</a></li>
+                        <li><a href="technical/fsm-documentation">Finite State Machine (FSM) Documentation</a></li>
+                        <li><a href="technical/staircases">Staircase Algorithms</a></li>
+                        <li><a href="technical/svn_update_process">SVN Update Process</a></li>
                     </ul>
                 </div>
 
                 <div class="nav-card">
-                    <h3>🚀 Future Development</h3>
+                    <h3>🧪 Protocols</h3>
                     <ul>
-                        <li><a href="future_development/README">Development Plans</a></li>
-                        <li><a href="future_development/improvement_tracker">Improvement Tracker</a></li>
-                        <li><a href="future_development/svn_to_github_migration">SVN to GitHub Migration Plan</a></li>
+                        <li><a href="protocols_overview">Protocols Overview</a></li>
+                        <li><a href="https://github.com/LIMLabSWC/ratter/tree/main/Protocols/@ArpitCentrePokeTraining">Training Protocols</a></li>
+                        <li><a href="https://github.com/LIMLabSWC/ratter/tree/main/Protocols">Browse All Protocols</a></li>
                     </ul>
                 </div>
             </div>
 
-            <div class="quick-start">
-                <h2>📋 Protocols Overview</h2>
-                <p>BControl provides a comprehensive set of behavioral protocols for various experimental paradigms. The system supports:</p>
-                <ul style="margin-top: 1rem; margin-left: 1.5rem;">
-                    <li><strong>Sound Calibration:</strong> <a href="https://github.com/LIMLabSWC/ratter/tree/main/Protocols/@ArpitSoundCalibration">ArpitSoundCalibration</a>, <a href="https://github.com/LIMLabSWC/ratter/tree/main/Protocols/@SoundCalibration">SoundCalibration</a></li>
-                    <li><strong>Continuous Tasks:</strong> <a href="https://github.com/LIMLabSWC/ratter/tree/main/Protocols/@ArpitSoundCatContinuous">ArpitSoundCatContinuous</a>, <a href="https://github.com/LIMLabSWC/ratter/tree/main/Protocols/@SoundCatContinuous">SoundCatContinuous</a></li>
-                    <li><strong>Training Protocols:</strong> <a href="https://github.com/LIMLabSWC/ratter/tree/main/Protocols/@ArpitCentrePokeTraining">ArpitCentrePokeTraining</a></li>
-                    <li><strong>Task Switching:</strong> <a href="https://github.com/LIMLabSWC/ratter/tree/main/Protocols/@TaskSwitch4">TaskSwitch4</a></li>
-                    <li><strong>Calibration Management:</strong> <a href="https://github.com/LIMLabSWC/ratter/tree/main/Protocols/@CalibrationMeister">CalibrationMeister</a></li>
-                </ul>
-                <p style="margin-top: 1rem;"><a href="protocols_overview">View complete protocols documentation →</a></p>
-            </div>
 
-            <div class="quick-start">
-                <h2>🔍 Current Testing Status</h2>
-                <div class="status-grid">
-                    <div class="status-item">
-                        <span class="status-check">✓</span>
-                        <span>Perl scripts removal impact assessment</span>
-                    </div>
-                    <div class="status-item">
-                        <span class="status-check">✓</span>
-                        <span>Protocols directory changes verification</span>
-                    </div>
-                    <div class="status-item">
-                        <span class="status-check">✓</span>
-                        <span>Documentation structure validation</span>
-                    </div>
-                    <div class="status-item">
-                        <span class="status-check">✓</span>
-                        <span>System functionality verification</span>
-                    </div>
-                    <div class="status-item">
-                        <span class="status-pending">⏳</span>
-                        <span>ExperPort cleanup verification</span>
-                    </div>
-                </div>
-            </div>
 
             <div class="quick-start">
                 <h2>🤝 Development and Contribution</h2>
-                <p><strong>BControl</strong> is built on legacy MATLAB code and maintained through incremental patches and continuous development. Some updates are cosmetic, while others introduce core functionality.</p>
-                
-                <p style="margin-top: 1rem;">We welcome contributions to help modernize and improve the system. You can:</p>
-                <ul style="margin-top: 0.5rem; margin-left: 1.5rem;">
-                    <li>Fix small issues</li>
-                    <li>Implement proposed improvements</li>
-                    <li>Join ongoing discussions</li>
-                </ul>
-                
-                <p style="margin-top: 1rem;">See <a href="future_development/README">future development plans</a> for active proposals.</p>
-                
-                <h3>Contribution Guidelines</h3>
-                <ul style="margin-left: 1.5rem;">
-                    <li>The <code>main</code> branch is protected—create a feature branch for your work.</li>
-                    <li>Coordinate major changes with the team.</li>
-                    <li>Document any changes and update relevant planning documents.</li>
-                    <li>Submit a pull request when ready for review.</li>
-                </ul>
+                <p><strong>BControl</strong> is built on legacy MATLAB code and maintained through incremental patches and continuous development. For detailed development instructions, check the <a href="https://github.com/LIMLabSWC/ratter">GitHub page</a>.</p>
             </div>
         </div>
     </main>
