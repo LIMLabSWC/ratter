@@ -6,7 +6,7 @@ layout: default
 
 The diagram below provides an overview of the main system components and their relationships. It shows how the core system, protocol system, and essential plugins interact:
 
-```mermaid
+<div class="mermaid">
 sequenceDiagram
     participant NS as newstartup.m
     participant Settings as Settings Module
@@ -21,7 +21,7 @@ sequenceDiagram
     NS->>Base: Initialize
     Base->>Protocols: Inherit from
     Protocols->>Plugins: Utilize
-```
+</div>
 
 **Core Components Overview:**
 
@@ -34,7 +34,7 @@ sequenceDiagram
 
 This diagram shows the specific plugins used by each protocol and their categorization. It provides a detailed view of how different protocols utilize the plugin system:
 
-```mermaid
+<div class="mermaid">
 sequenceDiagram
     participant AD as @AthenaDelayComp
     participant SC as @SoundCatContinuous
@@ -62,7 +62,7 @@ sequenceDiagram
     AC->>UI: Uses
     AC->>Data: Uses
     AC->>Sound: Uses
-```
+</div>
 
 **Plugin System Details:**
 
@@ -78,7 +78,7 @@ sequenceDiagram
 
 The diagram below details the full system initialization process, showing how the core components interact during startup and the two possible user interface paths:
 
-```mermaid
+<div class="mermaid">
 sequenceDiagram
     participant User
     participant NS as newstartup.m
@@ -107,7 +107,7 @@ sequenceDiagram
         Protocol-->>RunRats: Protocol Ready
         RunRats-->>User: Ready for Experiments
     end
-```
+</div>
 
 **Initialization Process Notes:**
 
@@ -183,7 +183,7 @@ sequenceDiagram
 
 The diagram below illustrates the inheritance structure of protocols and their detailed plugin usage patterns. This provides a more detailed view of how protocols are organized and which specific plugins they utilize:
 
-```mermaid
+<div class="mermaid">
 sequenceDiagram
     participant Base as @protocolobj
     participant AD as @AthenaDelayComp
@@ -208,7 +208,7 @@ sequenceDiagram
     AC->>Core: Uses All
     AC->>Extended: Uses Selective
     Note right of AC: Only uses:<br>comments<br>soundtable<br>sqlsummary<br>antibias
-```
+</div>
 
 **Protocol Hierarchy Details:**
 

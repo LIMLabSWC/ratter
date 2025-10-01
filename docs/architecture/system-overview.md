@@ -27,7 +27,7 @@ layout: default
 
 The diagram below illustrates how data flows through the system during experiment execution. This sequence shows the interactions between system components during a typical behavioral experiment:
 
-```mermaid
+<div class="mermaid">
 sequenceDiagram
     participant P as Protocol
     participant SM as State Machine
@@ -51,7 +51,7 @@ sequenceDiagram
         HW->>DA: Generate New Events
         DA->>P: Update Trial Data
     end
-```
+</div>
 
 **Key Data Flow Processes:**
 
@@ -65,7 +65,7 @@ sequenceDiagram
 
 The following diagram shows how the system initializes and the two possible user interface paths - either through Dispatcher (for researchers) or RunRats (for technicians):
 
-```mermaid
+<div class="mermaid">
 sequenceDiagram
     participant User
     participant NS as newstartup.m
@@ -94,7 +94,7 @@ sequenceDiagram
         Protocol-->>RunRats: Protocol Ready
         RunRats-->>User: Ready for Experiments
     end
-```
+</div>
 
 **System Initialization Highlights:**
 

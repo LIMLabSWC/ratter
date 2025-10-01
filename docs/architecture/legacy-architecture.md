@@ -6,7 +6,7 @@ layout: default
 
 The following diagram shows the current organization of legacy components and their relationships:
 
-```mermaid
+<div class="mermaid">
 graph LR
     %% Define main containers
     subgraph Legacy_Protocols ["Protocols/legacy/"]
@@ -71,13 +71,13 @@ graph LR
     class Investigation investigation;
     class Confirmed confirmed;
     class Data_Files data;
-```
+</div>
 
 ## Investigation Status
 
 The following diagram shows the current status of components under investigation:
 
-```mermaid
+<div class="mermaid">
 graph LR
     subgraph Current_Status ["Component Status"]
         direction LR
@@ -123,7 +123,7 @@ graph LR
     class Ready_Remove ready;
     class Need_Review review;
     class Keep_Active keep;
-```
+</div>
 
 ## Component Status Details
 
