@@ -1,8 +1,8 @@
-# Finite State Machine (FSM) Documentation
+---
+title: Documentation
+layout: default
+---
 
-## Overview
-
-The Finite State Machine (FSM) is a core component of the ExperPort system, providing real-time control of experimental protocols and hardware interfaces.
 
 ## Architecture
 

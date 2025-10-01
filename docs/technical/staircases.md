@@ -1,8 +1,8 @@
-# Staircase Algorithms
+---
+title: Documentation
+layout: default
+---
 
-This document explains the mathematical principles behind the staircase algorithms used in behavioral experiments.
-
-## Basic Principles
 
 The staircase algorithm adjusts a parameter value (v) based on the animal's performance:
 

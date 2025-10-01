@@ -1,8 +1,8 @@
-# Solo Core Guide
+---
+title: Documentation
+layout: default
+---
 
-## Introduction
-
-Solo Core is the foundation of the ExperPort system, providing essential functionality for protocol development, state machine control, and data management.
 
 ## Core Components
 

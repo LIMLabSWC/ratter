@@ -1,0 +1,4 @@
+markdown: kramdown
+theme: minima
+baseurl: "/ratter"
+url: "https://limlabswc.github.io"

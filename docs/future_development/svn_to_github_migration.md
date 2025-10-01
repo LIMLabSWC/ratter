@@ -1,8 +1,8 @@
-# SVN to GitHub Migration Plan
+---
+title: Documentation
+layout: default
+---
 
-## Overview
-
-This document outlines the plan to refactor the bcontrol system's SVN update process to incorporate GitHub for protocols and potentially other components.
 
 ## Current System
 

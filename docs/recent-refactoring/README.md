@@ -1,6 +1,8 @@
-# Recent Refactoring Documentation
+---
+title: Documentation
+layout: default
+---
 
-This directory contains documentation of recent major refactoring efforts in the BControl system. These documents are temporary and will be removed once the changes are fully tested and verified.
 
 ## Current Refactoring Efforts
 

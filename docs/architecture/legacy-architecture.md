@@ -1,8 +1,8 @@
-# Legacy Architecture and Cleanup Tracking
+---
+title: Documentation
+layout: default
+---
 
-This document tracks legacy components, their current status, and relationships. It serves as a temporary reference during the cleanup process and will be updated as components are fully deprecated or removed.
-
-## Legacy Component Organization
 
 The following diagram shows the current organization of legacy components and their relationships:
 

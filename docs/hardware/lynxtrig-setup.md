@@ -1,8 +1,8 @@
-# LynxTrig Setup Guide
+---
+title: Documentation
+layout: default
+---
 
-This guide explains how to set up and use the LynxTrig system for real-time sound triggering in behavioral experiments.
-
-## Prerequisites
 
 1. LynxTWO-RT.o sound driver for the Lynx22 Sound Card
 2. Latest version of LynxTrig software
