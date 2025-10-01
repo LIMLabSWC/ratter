@@ -1,3 +1,8 @@
+---
+title: Solo Core Guide
+layout: default
+---
+
 # Solo Core Guide
 
 ## Introduction

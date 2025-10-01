@@ -1,3 +1,8 @@
+---
+title: Documentation Modernization
+layout: default
+---
+
 # Documentation Modernization
 
 ## Overview

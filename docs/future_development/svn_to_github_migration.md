@@ -1,3 +1,8 @@
+---
+title: SVN to GitHub Migration Plan
+layout: default
+---
+
 # SVN to GitHub Migration Plan
 
 ## Overview

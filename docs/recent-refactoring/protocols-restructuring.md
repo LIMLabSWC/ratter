@@ -1,3 +1,8 @@
+---
+title: Protocols Directory Restructuring
+layout: default
+---
+
 # Protocols Directory Restructuring
 
 ## Overview

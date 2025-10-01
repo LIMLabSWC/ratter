@@ -1,3 +1,8 @@
+---
+title: System Architecture
+layout: default
+---
+
 # System Architecture
 
 This document outlines the permanent architecture of the system, including core components, their relationships, and key workflows.

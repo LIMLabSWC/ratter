@@ -1,3 +1,8 @@
+---
+title: LynxTrig Setup Guide
+layout: default
+---
+
 # LynxTrig Setup Guide
 
 This guide explains how to set up and use the LynxTrig system for real-time sound triggering in behavioral experiments.

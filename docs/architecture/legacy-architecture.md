@@ -1,3 +1,8 @@
+---
+title: Legacy Architecture and Cleanup Tracking
+layout: default
+---
+
 # Legacy Architecture and Cleanup Tracking
 
 This document tracks legacy components, their current status, and relationships. It serves as a temporary reference during the cleanup process and will be updated as components are fully deprecated or removed.

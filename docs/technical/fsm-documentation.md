@@ -1,3 +1,8 @@
+---
+title: Finite State Machine (FSM) Documentation
+layout: default
+---
+
 # Finite State Machine (FSM) Documentation
 
 ## Overview

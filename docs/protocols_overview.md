@@ -1,3 +1,8 @@
+---
+title: Protocols Overview
+layout: default
+---
+
 # Protocols Overview
 
 This document provides a detailed summary of the protocols and related files in the `Protocols` directory. It is intended to help users understand the available behavioral and experimental protocols, as well as the organization and purpose of each folder and file.

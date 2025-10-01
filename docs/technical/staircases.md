@@ -1,3 +1,8 @@
+---
+title: Staircase Algorithms
+layout: default
+---
+
 # Staircase Algorithms
 
 This document explains the mathematical principles behind the staircase algorithms used in behavioral experiments.
