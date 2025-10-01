@@ -592,16 +592,16 @@ function state = RealTimeAnalysis(action, state, data, handles, config, varargin
 
         max_count = 0;
 
-        for i = 1:n_selected_blocks
-            block_idx = selected_indices(i); % Use the index of the selected row
+        for p = 1:n_selected_blocks
+            block_idx = selected_indices(p); % Use the index of the selected row
             block_stat = state.blockStatsHistory(block_idx);
 
-        multiplier = 1;
-            if i == n_selected_blocks, multiplier = 2; end
+            multiplier = 1;
+            if p == n_selected_blocks, multiplier = 2; end
             
             yyaxis(ax, 'left');
-            plot(ax, bin_centers, block_stat.stimCounts.incorrect, '-', 'Color', red_map(i,:), 'LineWidth', multiplier * 1.5);
-            plot(ax, bin_centers, block_stat.stimCounts.correct, '-', 'Color', green_map(i,:), 'LineWidth', multiplier * 1.5);
+            plot(ax, bin_centers, block_stat.stimCounts.incorrect, '-', 'Color', red_map(p,:), 'LineWidth', multiplier * 1.5);
+            plot(ax, bin_centers, block_stat.stimCounts.correct, '-', 'Color', green_map(p,:), 'LineWidth', multiplier * 1.5);
             max_count = max([max_count, block_stat.stimCounts.correct, block_stat.stimCounts.incorrect]);
             
             yyaxis(ax, 'right');
@@ -612,11 +612,11 @@ function state = RealTimeAnalysis(action, state, data, handles, config, varargin
             stim_correct = stim_valid(hit_valid == 1);
             stim_incorrect = stim_valid(hit_valid == 0);
             
-            jitter_base = (i - 1) * 0.2;
+            jitter_base = (p - 1) * 0.2;
             jitter_incorrect = jitter_base + 0.08 * rand(size(stim_incorrect));
             jitter_correct = jitter_base + 0.08 * rand(size(stim_correct));
-            scatter(ax, stim_incorrect, jitter_incorrect, multiplier * 25, red_map(i,:), 'filled', 'MarkerFaceAlpha', multiplier * 0.4);
-            scatter(ax, stim_correct, jitter_correct, multiplier * 25, green_map(i,:), 'filled', 'MarkerFaceAlpha', multiplier * 0.4);
+            scatter(ax, stim_incorrect, jitter_incorrect, multiplier * 25, red_map(p,:), 'filled', 'MarkerFaceAlpha', multiplier * 0.4);
+            scatter(ax, stim_correct, jitter_correct, multiplier * 25, green_map(p,:), 'filled', 'MarkerFaceAlpha', multiplier * 0.4);
         end
         
         yyaxis(ax, 'left');
