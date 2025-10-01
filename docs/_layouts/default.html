@@ -142,9 +142,6 @@
   </head>
   <body>
     <main class="container">
-        {% unless page.url == '/' or page.url == '/index.html' or page.url contains 'index' %}
-            <a href="/ratter/" class="back-link">← Back to {{ site.title | default: "Documentation" }}</a>
-        {% endunless %}
         {{ content }}
     </main>
   </body>
