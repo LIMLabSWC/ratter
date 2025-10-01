@@ -143,7 +143,7 @@
   <body>
     <main class="container">
         {% if page.url != '/' and page.url != '/index.html' and page.url != '/ratter/' and page.url != '/ratter/index.html' %}
-            <a href="../" class="back-link">← Back to Documentation</a>
+            <a href="../" class="back-link">← Back to {{ site.title | default: "Documentation" }}</a>
         {% endif %}
         {{ content }}
     </main>
