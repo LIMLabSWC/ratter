@@ -5,7 +5,8 @@ layout: default
 
 <div class="intro-section">
     <h2>About BControl</h2>
-    <p><strong>BControl</strong> is a behavioral experimentation system that provides a flexible and extensible framework for running behavioral protocols. Designed to support a variety of experiments with user-friendly configuration and robust MATLAB-based components, BControl serves as the core platform for our high-throughput behavior training facility. The system enables researchers to design, implement, and execute complex behavioral experiments with precise control over experimental parameters, data collection, and protocol management.</p>
+    <p><strong>BControl</strong> is a behavioral experimentation system that provides a flexible and extensible framework for running behavioral protocols. Originally developed by the Brody Lab, this system is now used and maintained by the Akrami Lab for our high-throughput behavior training facility. Designed to support a variety of experiments with user-friendly configuration and robust MATLAB-based components, BControl enables researchers to design, implement, and execute complex behavioral experiments with precise control over experimental parameters, data collection, and protocol management.</p>
+    <p>For the original BControl documentation and resources, visit the <a href="https://brodylabwiki.princeton.edu/bcontrol/index.php?title=Main_Page" target="_blank">Brody Lab BControl Wiki</a>.</p>
 </div>
 
 <div class="warning-banner">
