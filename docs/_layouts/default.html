@@ -59,10 +59,17 @@
             background: #f8f9fa;
             color: #333;
             padding: 1rem 0;
-            position: sticky;
+            position: fixed;
             top: 0;
+            left: 0;
+            right: 0;
             z-index: 1000;
             border-bottom: 1px solid #e9ecef;
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        .navbar.hidden {
+            transform: translateY(-100%);
         }
         
         .nav-container {
@@ -147,12 +154,12 @@
         /* Mobile Navigation */
         @media (max-width: 768px) {
             .nav-container {
-                padding: 1rem 10px;
+                padding: 0.5rem 10px;
             }
             
             .nav-menu {
                 flex-direction: column;
-                gap: 0.5rem;
+                gap: 0.25rem;
                 width: 100%;
             }
             
@@ -163,11 +170,12 @@
             .nav-link {
                 display: block;
                 text-align: center;
-                padding: 0.75rem 1rem;
+                padding: 0.5rem 1rem;
                 background: #e9ecef;
                 border-radius: 4px;
                 color: #333 !important;
                 -webkit-tap-highlight-color: transparent;
+                font-size: 0.9rem;
             }
             
             .nav-link:active {
@@ -183,7 +191,7 @@
                 box-shadow: none;
                 border: none;
                 background: #f8f9fa;
-                margin-top: 0.5rem;
+                margin-top: 0.25rem;
                 border-radius: 4px;
                 display: none;
             }
@@ -194,10 +202,11 @@
             }
             
             .nav-dropdown a {
-                padding: 0.5rem 1rem;
+                padding: 0.4rem 1rem;
                 text-align: center;
                 color: #333 !important;
                 -webkit-tap-highlight-color: transparent;
+                font-size: 0.85rem;
             }
             
             .nav-dropdown a:active {
@@ -211,7 +220,7 @@
             margin: 0 auto;
             padding: 2rem;
             background: white;
-            margin-top: 2rem;
+            margin-top: 6rem; /* Add space for fixed navbar */
         }
         
         @media (max-width: 768px) {
@@ -220,6 +229,7 @@
                 margin: 1rem 0.5rem;
                 border-radius: 4px;
                 min-height: auto;
+                margin-top: 4rem; /* Less space needed on mobile */
             }
             
             body {
@@ -360,6 +370,32 @@
     <main class="container">
         {{ content }}
     </main>
+    
+    <script>
+        // Hide/show navbar on scroll
+        let lastScrollTop = 0;
+        const navbar = document.querySelector('.navbar');
+        const scrollThreshold = 100; // Minimum scroll distance to trigger hide/show
+        
+        window.addEventListener('scroll', function() {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            
+            // Only trigger if scrolled enough
+            if (Math.abs(scrollTop - lastScrollTop) < scrollThreshold) {
+                return;
+            }
+            
+            if (scrollTop > lastScrollTop && scrollTop > 200) {
+                // Scrolling down - hide navbar
+                navbar.classList.add('hidden');
+            } else {
+                // Scrolling up - show navbar
+                navbar.classList.remove('hidden');
+            }
+            
+            lastScrollTop = scrollTop;
+        });
+    </script>
     
   </body>
 </html>
