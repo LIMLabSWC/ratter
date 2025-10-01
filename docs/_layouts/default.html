@@ -4,9 +4,30 @@
     <meta charset="utf-8">
     <title>{{ page.title | default: site.title }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
     <script>
-      mermaid.initialize({ startOnLoad: true });
+      document.addEventListener('DOMContentLoaded', function() {
+        mermaid.initialize({ 
+          startOnLoad: true,
+          theme: 'default',
+          securityLevel: 'loose',
+          flowchart: {
+            useMaxWidth: true,
+            htmlLabels: true
+          },
+          sequence: {
+            useMaxWidth: true
+          }
+        });
+        
+        // Also try to render any mermaid divs that might not have been caught
+        const mermaidDivs = document.querySelectorAll('div.mermaid');
+        mermaidDivs.forEach(function(element) {
+          if (!element.hasAttribute('data-processed')) {
+            mermaid.init(undefined, element);
+          }
+        });
+      });
     </script>
     <style>
         * {
@@ -103,6 +124,19 @@
         .back-link:hover {
             background: #2980b9;
             text-decoration: none;
+        }
+        
+        /* Mermaid diagram styling */
+        .mermaid {
+            text-align: center;
+            margin: 2rem 0;
+        }
+        
+        /* Ensure code blocks that contain mermaid are styled properly */
+        pre code.language-mermaid {
+            background: transparent;
+            border: none;
+            padding: 0;
         }
     </style>
   </head>
