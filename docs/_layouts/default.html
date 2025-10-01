@@ -104,8 +104,8 @@
   </head>
   <body>
     <main class="container">
-        {% if page.url != '/' and page.url != '/index.html' %}
-            <a href="/" class="back-link">← Back to Documentation</a>
+        {% if page.url != '/' and page.url != '/index.html' and page.url != '/ratter/' and page.url != '/ratter/index.html' %}
+            <a href="/ratter/" class="back-link">← Back to Documentation</a>
         {% endif %}
         {{ content }}
     </main>
