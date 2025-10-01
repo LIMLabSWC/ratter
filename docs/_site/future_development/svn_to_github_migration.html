@@ -1,0 +1,467 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        mermaid.initialize({ 
+          startOnLoad: true,
+          theme: 'default',
+          securityLevel: 'loose',
+          flowchart: {
+            useMaxWidth: true,
+            htmlLabels: true
+          },
+          sequence: {
+            useMaxWidth: true
+          }
+        });
+        
+        // Also try to render any mermaid divs that might not have been caught
+        const mermaidDivs = document.querySelectorAll('div.mermaid');
+        mermaidDivs.forEach(function(element) {
+          if (!element.hasAttribute('data-processed')) {
+            mermaid.init(undefined, element);
+          }
+        });
+      });
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            line-height: 1.6;
+            color: #2c3e50;
+            background-color: #f8f9fa;
+        }
+        
+        /* Navigation Styles */
+        .navbar {
+            background: #2c3e50;
+            color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-brand {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+        
+        .nav-item {
+            position: relative;
+        }
+        
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
+        
+        .nav-link:hover {
+            background-color: rgba(255,255,255,0.1);
+            text-decoration: none;
+        }
+        
+        .nav-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border: 1px solid #e1e8ed;
+            border-radius: 6px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+        }
+        
+        .nav-item:hover .nav-dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .nav-dropdown a {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: #2c3e50;
+            text-decoration: none;
+            border-bottom: 1px solid #f8f9fa;
+        }
+        
+        .nav-dropdown a:last-child {
+            border-bottom: none;
+        }
+        
+        .nav-dropdown a:hover {
+            background-color: #f8f9fa;
+            text-decoration: none;
+        }
+        
+        /* Mobile Navigation */
+        .nav-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: #2c3e50;
+                flex-direction: column;
+                padding: 1rem;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            
+            .nav-menu.active {
+                display: flex;
+            }
+            
+            .nav-toggle {
+                display: block;
+            }
+            
+            .nav-dropdown {
+                position: static;
+                opacity: 1;
+                visibility: visible;
+                transform: none;
+                box-shadow: none;
+                border: none;
+                background: rgba(255,255,255,0.1);
+                margin-top: 0.5rem;
+            }
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: white;
+            border: 1px solid #e1e8ed;
+            border-radius: 6px;
+            margin-top: 2rem;
+        }
+        
+        h1, h2, h3 {
+            color: #2c3e50;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        h1 {
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 0.5rem;
+        }
+        
+        code {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 0.2rem 0.4rem;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9em;
+        }
+        
+        pre {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 1rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+        
+        pre code {
+            background: none;
+            border: none;
+            padding: 0;
+        }
+        
+        ul, ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        li {
+            margin-bottom: 0.5rem;
+        }
+        
+        p {
+            margin-bottom: 1rem;
+        }
+        
+        a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+        
+        .back-link {
+            background: #3498db;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .back-link:hover {
+            background: #2980b9;
+            text-decoration: none;
+        }
+        
+        /* Mermaid diagram styling */
+        .mermaid {
+            text-align: center;
+            margin: 2rem 0;
+        }
+        
+        /* Ensure code blocks that contain mermaid are styled properly */
+        pre code.language-mermaid {
+            background: transparent;
+            border: none;
+            padding: 0;
+        }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/ratter/" class="nav-brand">BControl</a>
+            <button class="nav-toggle" onclick="toggleNav()">☰</button>
+            <ul class="nav-menu" id="nav-menu">
+                <li class="nav-item">
+                    <a href="/ratter/" class="nav-link">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">User Guides</a>
+                    <div class="nav-dropdown">
+                        <a href="/ratter/guides/protocol-writers-guide">Protocol Writer's Guide</a>
+                        <a href="/ratter/guides/solo-core-guide">Solo Core Guide</a>
+                        <a href="/ratter/guides/water-valve-tutorial">Water Valve Tutorial</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">System Architecture</a>
+                    <div class="nav-dropdown">
+                        <a href="/ratter/architecture/system-overview">System Overview</a>
+                        <a href="/ratter/architecture/system-architecture">System Architecture</a>
+                        <a href="/ratter/architecture/legacy-architecture">Legacy Architecture Notes</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">Technical References</a>
+                    <div class="nav-dropdown">
+                        <a href="/ratter/technical/fsm-documentation">FSM Documentation</a>
+                        <a href="/ratter/technical/staircases">Staircase Algorithms</a>
+                        <a href="/ratter/technical/svn_update_process">SVN Update Process</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">Protocols</a>
+                    <div class="nav-dropdown">
+                        <a href="/ratter/protocols_overview">Protocols Overview</a>
+                        <a href="https://github.com/LIMLabSWC/ratter/tree/main/Protocols/@ArpitCentrePokeTraining">Training Protocols</a>
+                        <a href="https://github.com/LIMLabSWC/ratter/tree/main/Protocols">Browse All Protocols</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    
+    <main class="container">
+        <h2 id="current-system">Current System</h2>
+
+<p>As documented in <code class="language-plaintext highlighter-rouge">/docs/technical/svn_update_process.md</code>, bcontrol currently uses SVN for updating multiple components:</p>
+
+<ul>
+  <li>Main Code Directory</li>
+  <li>Protocols Directory</li>
+  <li>Data Files Directory</li>
+  <li>Settings Files Directory</li>
+  <li>Log Files (weekly archiving)</li>
+</ul>
+
+<p>The SVN update occurs primarily through the <code class="language-plaintext highlighter-rouge">update_folder</code> function in <code class="language-plaintext highlighter-rouge">runrats.m</code> during protocol loading.</p>
+
+<h2 id="migration-goals">Migration Goals</h2>
+
+<ol>
+  <li><strong>Replace SVN with Git/GitHub for Protocol Management</strong>
+    <ul>
+      <li>Move protocol repositories from SVN to GitHub</li>
+      <li>Enable versioning and tracking of protocols in a modern VCS</li>
+      <li>Facilitate collaboration on protocol development</li>
+      <li>Improve protocol review processes</li>
+    </ul>
+  </li>
+  <li><strong>Update Codebase to Support Multiple VCS</strong>
+    <ul>
+      <li>Refactor the <code class="language-plaintext highlighter-rouge">update_folder</code> function to support both SVN and Git</li>
+      <li>Eventually migrate all components to Git</li>
+    </ul>
+  </li>
+</ol>
+
+<h2 id="implementation-plan">Implementation Plan</h2>
+
+<h3 id="phase-1-research-and-analysis">Phase 1: Research and Analysis</h3>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Analyze all SVN dependencies in the codebase</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Determine which GitHub APIs and libraries will be needed</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Evaluate impact on existing workflows</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Identify necessary MATLAB interfaces for Git operations</li>
+</ul>
+
+<h3 id="phase-2-protocol-migration">Phase 2: Protocol Migration</h3>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Create GitHub repositories for all existing protocols</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Migrate protocol history from SVN to Git</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Define branching strategy for protocol development</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Update documentation on protocol management</li>
+</ul>
+
+<h3 id="phase-3-code-implementation">Phase 3: Code Implementation</h3>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Create a Git interface class/module similar to existing SVN functions</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Refactor <code class="language-plaintext highlighter-rouge">update_folder</code> to detect repository type (SVN or Git)</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Implement Git update functionality</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Add proper error handling for Git operations</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Update configuration to support Git repository URLs</li>
+</ul>
+
+<div class="language-matlab highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">% Pseudo-code for refactored update_folder function</span>
+<span class="k">function</span> <span class="n">update_folder</span><span class="p">(</span><span class="n">folder_path</span><span class="p">)</span>
+    <span class="c1">% Detect repository type</span>
+    <span class="k">if</span> <span class="n">is_git_repository</span><span class="p">(</span><span class="n">folder_path</span><span class="p">)</span>
+        <span class="n">update_git_repository</span><span class="p">(</span><span class="n">folder_path</span><span class="p">);</span>
+    <span class="k">elseif</span> <span class="n">is_svn_repository</span><span class="p">(</span><span class="n">folder_path</span><span class="p">)</span>
+        <span class="n">update_svn_repository</span><span class="p">(</span><span class="n">folder_path</span><span class="p">);</span>
+    <span class="k">else</span>
+        <span class="c1">% Handle case where folder is not under version control</span>
+        <span class="nb">warning</span><span class="p">(</span><span class="s1">'Folder is not under version control'</span><span class="p">);</span>
+    <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<h3 id="phase-4-testing-and-deployment">Phase 4: Testing and Deployment</h3>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Conduct thorough testing of Git update functionality</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Test with real protocols in a staging environment</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Develop migration guide for lab members</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Plan gradual rollout strategy</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Monitor for issues during transition period</li>
+</ul>
+
+<h2 id="additional-considerations">Additional Considerations</h2>
+
+<h3 id="authentication">Authentication</h3>
+
+<ul>
+  <li>Determine secure methods for GitHub authentication</li>
+  <li>Consider using Personal Access Tokens or deploy keys</li>
+  <li>Ensure credentials are stored securely</li>
+</ul>
+
+<h3 id="offline-operation">Offline Operation</h3>
+
+<ul>
+  <li>Ensure system can still function without internet access</li>
+  <li>Implement graceful failure if updates cannot be performed</li>
+</ul>
+
+<h3 id="training">Training</h3>
+
+<ul>
+  <li>Provide Git/GitHub training for lab members</li>
+  <li>Document new workflow for protocol development and updates</li>
+</ul>
+
+<h3 id="long-term-vision">Long-term Vision</h3>
+
+<ul>
+  <li>Complete migration from SVN to Git for all system components</li>
+  <li>Implement CI/CD pipelines for testing protocols</li>
+  <li>Add automated validation of protocol changes</li>
+  <li>Consider containerization of the environment for consistency</li>
+</ul>
+
+<h2 id="timeline">Timeline</h2>
+
+<ul>
+  <li>Phase 1: 1-2 weeks</li>
+  <li>Phase 2: 2-3 weeks</li>
+  <li>Phase 3: 3-4 weeks</li>
+  <li>Phase 4: 2-3 weeks</li>
+  <li>Total estimated time: 2-3 months</li>
+</ul>
+
+<h2 id="resources">Resources</h2>
+
+<ul>
+  <li>GitHub API Documentation: <a href="https://docs.github.com/en/rest">https://docs.github.com/en/rest</a></li>
+  <li>MATLAB Git Integration examples</li>
+  <li>Team members with Git expertise</li>
+</ul>
+
+    </main>
+    
+    <script>
+        function toggleNav() {
+            const navMenu = document.getElementById('nav-menu');
+            navMenu.classList.toggle('active');
+        }
+    </script>
+  </body>
+</html>

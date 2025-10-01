@@ -1,0 +1,502 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        mermaid.initialize({ 
+          startOnLoad: true,
+          theme: 'default',
+          securityLevel: 'loose',
+          flowchart: {
+            useMaxWidth: true,
+            htmlLabels: true
+          },
+          sequence: {
+            useMaxWidth: true
+          }
+        });
+        
+        // Also try to render any mermaid divs that might not have been caught
+        const mermaidDivs = document.querySelectorAll('div.mermaid');
+        mermaidDivs.forEach(function(element) {
+          if (!element.hasAttribute('data-processed')) {
+            mermaid.init(undefined, element);
+          }
+        });
+      });
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            line-height: 1.6;
+            color: #2c3e50;
+            background-color: #f8f9fa;
+        }
+        
+        /* Navigation Styles */
+        .navbar {
+            background: #2c3e50;
+            color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-brand {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+        
+        .nav-item {
+            position: relative;
+        }
+        
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
+        
+        .nav-link:hover {
+            background-color: rgba(255,255,255,0.1);
+            text-decoration: none;
+        }
+        
+        .nav-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border: 1px solid #e1e8ed;
+            border-radius: 6px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+        }
+        
+        .nav-item:hover .nav-dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .nav-dropdown a {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: #2c3e50;
+            text-decoration: none;
+            border-bottom: 1px solid #f8f9fa;
+        }
+        
+        .nav-dropdown a:last-child {
+            border-bottom: none;
+        }
+        
+        .nav-dropdown a:hover {
+            background-color: #f8f9fa;
+            text-decoration: none;
+        }
+        
+        /* Mobile Navigation */
+        .nav-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: #2c3e50;
+                flex-direction: column;
+                padding: 1rem;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            
+            .nav-menu.active {
+                display: flex;
+            }
+            
+            .nav-toggle {
+                display: block;
+            }
+            
+            .nav-dropdown {
+                position: static;
+                opacity: 1;
+                visibility: visible;
+                transform: none;
+                box-shadow: none;
+                border: none;
+                background: rgba(255,255,255,0.1);
+                margin-top: 0.5rem;
+            }
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: white;
+            border: 1px solid #e1e8ed;
+            border-radius: 6px;
+            margin-top: 2rem;
+        }
+        
+        h1, h2, h3 {
+            color: #2c3e50;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        h1 {
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 0.5rem;
+        }
+        
+        code {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 0.2rem 0.4rem;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9em;
+        }
+        
+        pre {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 1rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+        
+        pre code {
+            background: none;
+            border: none;
+            padding: 0;
+        }
+        
+        ul, ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        li {
+            margin-bottom: 0.5rem;
+        }
+        
+        p {
+            margin-bottom: 1rem;
+        }
+        
+        a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+        
+        .back-link {
+            background: #3498db;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .back-link:hover {
+            background: #2980b9;
+            text-decoration: none;
+        }
+        
+        /* Mermaid diagram styling */
+        .mermaid {
+            text-align: center;
+            margin: 2rem 0;
+        }
+        
+        /* Ensure code blocks that contain mermaid are styled properly */
+        pre code.language-mermaid {
+            background: transparent;
+            border: none;
+            padding: 0;
+        }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/ratter/" class="nav-brand">BControl</a>
+            <button class="nav-toggle" onclick="toggleNav()">☰</button>
+            <ul class="nav-menu" id="nav-menu">
+                <li class="nav-item">
+                    <a href="/ratter/" class="nav-link">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">User Guides</a>
+                    <div class="nav-dropdown">
+                        <a href="/ratter/guides/protocol-writers-guide">Protocol Writer's Guide</a>
+                        <a href="/ratter/guides/solo-core-guide">Solo Core Guide</a>
+                        <a href="/ratter/guides/water-valve-tutorial">Water Valve Tutorial</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">System Architecture</a>
+                    <div class="nav-dropdown">
+                        <a href="/ratter/architecture/system-overview">System Overview</a>
+                        <a href="/ratter/architecture/system-architecture">System Architecture</a>
+                        <a href="/ratter/architecture/legacy-architecture">Legacy Architecture Notes</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">Technical References</a>
+                    <div class="nav-dropdown">
+                        <a href="/ratter/technical/fsm-documentation">FSM Documentation</a>
+                        <a href="/ratter/technical/staircases">Staircase Algorithms</a>
+                        <a href="/ratter/technical/svn_update_process">SVN Update Process</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">Protocols</a>
+                    <div class="nav-dropdown">
+                        <a href="/ratter/protocols_overview">Protocols Overview</a>
+                        <a href="https://github.com/LIMLabSWC/ratter/tree/main/Protocols/@ArpitCentrePokeTraining">Training Protocols</a>
+                        <a href="https://github.com/LIMLabSWC/ratter/tree/main/Protocols">Browse All Protocols</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    
+    <main class="container">
+        <p>Comedi (Control and Measurement Device Interface) provides a unified interface for data acquisition hardware. In ExperPort, it’s used for:</p>
+
+<ul>
+  <li>Digital I/O control</li>
+  <li>Hardware triggering</li>
+  <li>Device synchronization</li>
+</ul>
+
+<h2 id="installation">Installation</h2>
+
+<ol>
+  <li>
+    <p>Install Comedi:</p>
+
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Install dependencies</span>
+apt-get <span class="nb">install </span>build-essential linux-headers-<span class="si">$(</span><span class="nb">uname</span> <span class="nt">-r</span><span class="si">)</span>
+   
+<span class="c"># Download and compile Comedi</span>
+git clone https://github.com/Linux-Comedi/comedi.git
+<span class="nb">cd </span>comedi
+./configure
+make
+make <span class="nb">install</span>
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Load required kernel modules:</p>
+
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>modprobe kcomedilib
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<h2 id="device-configuration">Device Configuration</h2>
+
+<h3 id="parallel-port-setup">Parallel Port Setup</h3>
+
+<ol>
+  <li>
+    <p>Configure parallel port driver:</p>
+
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>modprobe comedi_parport
+comedi_config /dev/comedi0 comedi_parport 0x378
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Verify BIOS settings:</p>
+    <ul>
+      <li>Enable parallel port</li>
+      <li>Note IO address (typically 0x378)</li>
+    </ul>
+  </li>
+</ol>
+
+<h3 id="national-instruments-cards">National Instruments Cards</h3>
+
+<p>For NI cards:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>modprobe ni_pcimio
+comedi_config /dev/comedi0 ni_pcimio
+</code></pre></div></div>
+
+<h2 id="testing-configuration">Testing Configuration</h2>
+
+<p>Use the ComediClientServer utility:</p>
+
+<ol>
+  <li>
+    <p>Obtain the utility:</p>
+
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cvs <span class="nt">-d</span> :pserver:anonymous@rtlab.org:/cvs co ComediClientServer
+<span class="nb">cd </span>ComediClientServer
+qmake
+make
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Run the server:</p>
+
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># First, unload LynxTrig-RT if running</span>
+rmmod LynxTrig-RT
+   
+<span class="c"># Start the server</span>
+Server/ComediServer
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Run the client:</p>
+
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Client/ComediClient
+</code></pre></div>    </div>
+
+    <ul>
+      <li>Enter ‘localhost’ in server name</li>
+      <li>Click “Connect”</li>
+    </ul>
+  </li>
+</ol>
+
+<h2 id="hardware-connections">Hardware Connections</h2>
+
+<h3 id="parallel-port-pinout">Parallel Port Pinout</h3>
+
+<p>Data pins (D0-D7) are used for DIO lines:</p>
+
+<ul>
+  <li>D0: Data bit 0</li>
+  <li>D1: Data bit 1</li>
+  <li>…</li>
+  <li>D7: Data bit 7</li>
+</ul>
+
+<h3 id="dio-line-configuration">DIO Line Configuration</h3>
+
+<ol>
+  <li>Lines are automatically configured for input</li>
+  <li>Valid range: [first_trig_chan, first_trig_chan + num_trig_chans)</li>
+  <li>Binary pattern is read every 1/10th millisecond</li>
+</ol>
+
+<h2 id="integration-with-lynxtrig">Integration with LynxTrig</h2>
+
+<ol>
+  <li>
+    <p>Load LynxTrig with Comedi support:</p>
+
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>insmod LynxTrig-RT.o <span class="nv">comedi_triggers</span><span class="o">=</span>1 <span class="nv">num_trig_chans</span><span class="o">=</span>8 <span class="nv">first_trig_chan</span><span class="o">=</span>0
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Verify configuration:</p>
+    <ul>
+      <li>Check /proc/interrupts for conflicts</li>
+      <li>Monitor system logs for errors</li>
+      <li>Test with ComediClientServer</li>
+    </ul>
+  </li>
+</ol>
+
+<h2 id="troubleshooting">Troubleshooting</h2>
+
+<ol>
+  <li><strong>Module Load Failures</strong>
+    <ul>
+      <li>Check kernel version compatibility</li>
+      <li>Verify hardware detection</li>
+      <li>Review system logs</li>
+    </ul>
+  </li>
+  <li><strong>Connection Issues</strong>
+    <ul>
+      <li>Verify IO addresses</li>
+      <li>Check cable connections</li>
+      <li>Test with ComediClientServer</li>
+    </ul>
+  </li>
+  <li><strong>Performance Problems</strong>
+    <ul>
+      <li>Monitor interrupt usage</li>
+      <li>Check for resource conflicts</li>
+      <li>Verify timing settings</li>
+    </ul>
+  </li>
+</ol>
+
+<h2 id="support-resources">Support Resources</h2>
+
+<ul>
+  <li><a href="http://www.comedi.org">Comedi Documentation</a></li>
+  <li><a href="https://www.kernel.org/doc/html/latest/">Linux Kernel Documentation</a></li>
+  <li>System Administrator Support</li>
+</ul>
+
+    </main>
+    
+    <script>
+        function toggleNav() {
+            const navMenu = document.getElementById('nav-menu');
+            navMenu.classList.toggle('active');
+        }
+    </script>
+  </body>
+</html>

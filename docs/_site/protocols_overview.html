@@ -1,0 +1,441 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Protocols Overview</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        mermaid.initialize({ 
+          startOnLoad: true,
+          theme: 'default',
+          securityLevel: 'loose',
+          flowchart: {
+            useMaxWidth: true,
+            htmlLabels: true
+          },
+          sequence: {
+            useMaxWidth: true
+          }
+        });
+        
+        // Also try to render any mermaid divs that might not have been caught
+        const mermaidDivs = document.querySelectorAll('div.mermaid');
+        mermaidDivs.forEach(function(element) {
+          if (!element.hasAttribute('data-processed')) {
+            mermaid.init(undefined, element);
+          }
+        });
+      });
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            line-height: 1.6;
+            color: #2c3e50;
+            background-color: #f8f9fa;
+        }
+        
+        /* Navigation Styles */
+        .navbar {
+            background: #2c3e50;
+            color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-brand {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+        
+        .nav-item {
+            position: relative;
+        }
+        
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
+        
+        .nav-link:hover {
+            background-color: rgba(255,255,255,0.1);
+            text-decoration: none;
+        }
+        
+        .nav-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border: 1px solid #e1e8ed;
+            border-radius: 6px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+        }
+        
+        .nav-item:hover .nav-dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .nav-dropdown a {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: #2c3e50;
+            text-decoration: none;
+            border-bottom: 1px solid #f8f9fa;
+        }
+        
+        .nav-dropdown a:last-child {
+            border-bottom: none;
+        }
+        
+        .nav-dropdown a:hover {
+            background-color: #f8f9fa;
+            text-decoration: none;
+        }
+        
+        /* Mobile Navigation */
+        .nav-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: #2c3e50;
+                flex-direction: column;
+                padding: 1rem;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            
+            .nav-menu.active {
+                display: flex;
+            }
+            
+            .nav-toggle {
+                display: block;
+            }
+            
+            .nav-dropdown {
+                position: static;
+                opacity: 1;
+                visibility: visible;
+                transform: none;
+                box-shadow: none;
+                border: none;
+                background: rgba(255,255,255,0.1);
+                margin-top: 0.5rem;
+            }
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: white;
+            border: 1px solid #e1e8ed;
+            border-radius: 6px;
+            margin-top: 2rem;
+        }
+        
+        h1, h2, h3 {
+            color: #2c3e50;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        h1 {
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 0.5rem;
+        }
+        
+        code {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 0.2rem 0.4rem;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9em;
+        }
+        
+        pre {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 1rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+        
+        pre code {
+            background: none;
+            border: none;
+            padding: 0;
+        }
+        
+        ul, ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        li {
+            margin-bottom: 0.5rem;
+        }
+        
+        p {
+            margin-bottom: 1rem;
+        }
+        
+        a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+        
+        .back-link {
+            background: #3498db;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .back-link:hover {
+            background: #2980b9;
+            text-decoration: none;
+        }
+        
+        /* Mermaid diagram styling */
+        .mermaid {
+            text-align: center;
+            margin: 2rem 0;
+        }
+        
+        /* Ensure code blocks that contain mermaid are styled properly */
+        pre code.language-mermaid {
+            background: transparent;
+            border: none;
+            padding: 0;
+        }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/ratter/" class="nav-brand">BControl</a>
+            <button class="nav-toggle" onclick="toggleNav()">☰</button>
+            <ul class="nav-menu" id="nav-menu">
+                <li class="nav-item">
+                    <a href="/ratter/" class="nav-link">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">User Guides</a>
+                    <div class="nav-dropdown">
+                        <a href="/ratter/guides/protocol-writers-guide">Protocol Writer's Guide</a>
+                        <a href="/ratter/guides/solo-core-guide">Solo Core Guide</a>
+                        <a href="/ratter/guides/water-valve-tutorial">Water Valve Tutorial</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">System Architecture</a>
+                    <div class="nav-dropdown">
+                        <a href="/ratter/architecture/system-overview">System Overview</a>
+                        <a href="/ratter/architecture/system-architecture">System Architecture</a>
+                        <a href="/ratter/architecture/legacy-architecture">Legacy Architecture Notes</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">Technical References</a>
+                    <div class="nav-dropdown">
+                        <a href="/ratter/technical/fsm-documentation">FSM Documentation</a>
+                        <a href="/ratter/technical/staircases">Staircase Algorithms</a>
+                        <a href="/ratter/technical/svn_update_process">SVN Update Process</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">Protocols</a>
+                    <div class="nav-dropdown">
+                        <a href="/ratter/protocols_overview">Protocols Overview</a>
+                        <a href="https://github.com/LIMLabSWC/ratter/tree/main/Protocols/@ArpitCentrePokeTraining">Training Protocols</a>
+                        <a href="https://github.com/LIMLabSWC/ratter/tree/main/Protocols">Browse All Protocols</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    
+    <main class="container">
+        <ul>
+  <li><a href="#top-level-protocol-folders">Top-level Protocol Folders</a></li>
+  <li><a href="#top-level-protocol-files">Top-level Protocol Files</a></li>
+  <li><a href="#special-folders">Special Folders</a></li>
+  <li><a href="#notes-on-protocol-organization">Notes on Protocol Organization</a></li>
+</ul>
+
+<h2 id="top-level-protocol-folders">Top-level Protocol Folders</h2>
+
+<h3 id="arpitsoundcalibration">@ArpitSoundCalibration</h3>
+
+<ul>
+  <li><strong>Main file:</strong> <code class="language-plaintext highlighter-rouge">ArpitSoundCalibration.m</code></li>
+  <li><strong>Description:</strong> Protocol for sound calibration, likely used to calibrate auditory stimulus equipment for behavioral experiments.</li>
+</ul>
+
+<h3 id="arpitsoundcatcontinuous">@ArpitSoundCatContinuous</h3>
+
+<ul>
+  <li><strong>Main files:</strong> <code class="language-plaintext highlighter-rouge">ArpitSoundCatContinuous.m</code>, <code class="language-plaintext highlighter-rouge">SideSection.m</code>, <code class="language-plaintext highlighter-rouge">StimulatorSection.m</code></li>
+  <li><strong>Description:</strong> Implements a continuous sound categorization task, with supporting sections for stimulus delivery and side management.</li>
+</ul>
+
+<h3 id="calibrationmeister">@CalibrationMeister</h3>
+
+<ul>
+  <li><strong>Main files:</strong> <code class="language-plaintext highlighter-rouge">CalibrationMeister.m</code>, <code class="language-plaintext highlighter-rouge">TableSection.m</code>, <code class="language-plaintext highlighter-rouge">calcValvestoCalibrate.m</code>, <code class="language-plaintext highlighter-rouge">setDefaultPulseTime.m</code>, <code class="language-plaintext highlighter-rouge">updateCalibrationStatusLabel.m</code></li>
+  <li><strong>Description:</strong> Protocol for managing and automating calibration routines, with helper scripts for valve calibration and pulse timing.</li>
+</ul>
+
+<h3 id="taskswitch4">@TaskSwitch4</h3>
+
+<ul>
+  <li><strong>Main files:</strong> <code class="language-plaintext highlighter-rouge">TaskSwitch4.m</code>, <code class="language-plaintext highlighter-rouge">HistorySection.m</code>, <code class="language-plaintext highlighter-rouge">StimulusSection.m</code>, <code class="language-plaintext highlighter-rouge">TrainingSection.m</code>, and others</li>
+  <li><strong>Description:</strong> Implements a task-switching behavioral experiment, with sections for stimulus control, training, and history tracking.</li>
+</ul>
+
+<h3 id="arpitcentrepoketraining">@ArpitCentrePokeTraining</h3>
+
+<ul>
+  <li><strong>Main files:</strong> <code class="language-plaintext highlighter-rouge">ArpitCentrePokeTraining.m</code>, <code class="language-plaintext highlighter-rouge">ArpitCentrePokeTrainingSMA.m</code>, <code class="language-plaintext highlighter-rouge">ArpitCentrePokeTraining_SessionDefinition_AutoTrainingStages.m</code>, and multiple section/helper files</li>
+  <li><strong>Description:</strong> Protocol for center poke training, including session management, performance tracking, and auto-training stages.</li>
+</ul>
+
+<h3 id="soundcalibration">@SoundCalibration</h3>
+
+<ul>
+  <li><strong>Main file:</strong> <code class="language-plaintext highlighter-rouge">SoundCalibration.m</code>, <code class="language-plaintext highlighter-rouge">private/</code></li>
+  <li><strong>Description:</strong> Protocol for calibrating sound output, with private helper functions.</li>
+</ul>
+
+<h3 id="soundcatcontinuous">@SoundCatContinuous</h3>
+
+<ul>
+  <li><strong>Main files:</strong> <code class="language-plaintext highlighter-rouge">SoundCatContinuous.m</code>, <code class="language-plaintext highlighter-rouge">AntibiasSectionAthena.m</code>, <code class="language-plaintext highlighter-rouge">AthenaSMA_aa.m</code>, <code class="language-plaintext highlighter-rouge">DelayComp.m</code>, <code class="language-plaintext highlighter-rouge">LOGplotPairs.m</code>, <code class="language-plaintext highlighter-rouge">OverallPerformanceSection.m</code>, <code class="language-plaintext highlighter-rouge">PlayStimuli.m</code>, <code class="language-plaintext highlighter-rouge">ProduceNoiseStimuli.m</code>, <code class="language-plaintext highlighter-rouge">PunishmentSection.m</code>, <code class="language-plaintext highlighter-rouge">RewardsSection.m</code>, <code class="language-plaintext highlighter-rouge">SideSection.m</code>, <code class="language-plaintext highlighter-rouge">SoundCatSMA.m</code>, <code class="language-plaintext highlighter-rouge">SoundSection.m</code>, <code class="language-plaintext highlighter-rouge">StimulatorSection.m</code>, <code class="language-plaintext highlighter-rouge">StimulusSection.m</code>, and more</li>
+  <li><strong>Description:</strong> Comprehensive protocol for continuous sound categorization, including antibias, performance, and stimulus management sections.</li>
+</ul>
+
+<h3 id="other-protocol-folders">Other @protocol folders</h3>
+
+<ul>
+  <li><strong>Examples:</strong> <code class="language-plaintext highlighter-rouge">@quadsampobj</code>, <code class="language-plaintext highlighter-rouge">@rigtestobj</code>, <code class="language-plaintext highlighter-rouge">@saja_detection</code>, <code class="language-plaintext highlighter-rouge">@saja_expectation</code>, <code class="language-plaintext highlighter-rouge">@saja_immersedcue</code>, <code class="language-plaintext highlighter-rouge">@saja_norush</code>, <code class="language-plaintext highlighter-rouge">@saja_reversal</code>, <code class="language-plaintext highlighter-rouge">@saja_twocontexts</code>, <code class="language-plaintext highlighter-rouge">@santiago_irrelclicksobj</code>, <code class="language-plaintext highlighter-rouge">@santiago_simple01obj</code>, <code class="language-plaintext highlighter-rouge">@santiago_twocontextobj</code>, <code class="language-plaintext highlighter-rouge">@solo_watervalve2obj</code>, <code class="language-plaintext highlighter-rouge">@synced_durationobj</code>, <code class="language-plaintext highlighter-rouge">@templateobj</code>, <code class="language-plaintext highlighter-rouge">@util_compare</code>, <code class="language-plaintext highlighter-rouge">@odorsegm3obj</code></li>
+  <li><strong>Description:</strong> Each folder contains protocol object code and helper files for specific behavioral or experimental protocols, often with modular section files for different aspects of the experiment (e.g., stimulus, reward, state matrix, performance tracking).</li>
+</ul>
+
+<h3 id="maria_protocol">maria_protocol</h3>
+
+<ul>
+  <li><strong>Main files:</strong> <code class="language-plaintext highlighter-rouge">MariaProtocol.m</code>, <code class="language-plaintext highlighter-rouge">StateMatrixSection.m</code>, <code class="language-plaintext highlighter-rouge">myprot.m</code>, and a subfolder <code class="language-plaintext highlighter-rouge">@myprot</code></li>
+  <li><strong>Description:</strong> Implements a specific protocol with modular code, possibly for a particular experimenter or project.</li>
+</ul>
+
+<h2 id="top-level-protocol-files">Top-level Protocol Files</h2>
+
+<p>These are standalone protocol scripts, each typically implementing a full experiment or a major component of one:</p>
+
+<ul>
+  <li><strong><a href="mailto:settings_@ArpitCentrePokeTraining_experimenter_ratname_250506a.mat">settings_@ArpitCentrePokeTraining_experimenter_ratname_250506a.mat</a></strong>: Settings file for a specific experiment/session.</li>
+  <li><strong>santiago_irrelclicks.m, santiago_simple01.m, santiago_twocontext.m</strong>: Protocol scripts for Santiago’s experiments.</li>
+  <li><strong>OneBank_2AFC.m, Operant.m, PitchSamp.m, Pitch_Disc.m, Pitch_Disc2.m, QuadSamp.m, QuadSamp3.m, RigTest.m, Solo_WaterValve2.m, Synced_Duration.m, Template.m, ToneSamp.m, Tone_Odor_2AFC.m, matt_Operant.m, Adil2AFC.m, Classical2AFC_Solo.m, Clickpattern.m, Dual_Disc.m, Duration_Disc.m, Flow_controller_calib.m, GF2AFC.m, GFOperant.m, LocSamp6.m, LocSampTemplate.m, LocSamp_Child.m, Masa_Delay.m, Masa_Operant.m, Masa_Switch.m, Mix2AFC.m, Multipokes.m, Multipokes2.m, NL2AFC.m, NL2AFC_MIX.m, NL2AFC_MIX2.m, NL2AFC_airMIX.m, NL_OdorSamp.m, NL_OdorSamp2.m, Newclassical.m, OdorSegm.m, OdorSegm2.m, OdorSegm3.m, Odor_Test.m, Odor_Test2.m, Odorsamp.m</strong>: Protocol scripts for a wide variety of behavioral tasks, including two-alternative forced choice (2AFC), operant conditioning, discrimination, sampling, and more.</li>
+  <li><strong>PPfilter.mat, PPfilter_left.mat, PPfilter_right.mat</strong>: MAT files containing filter coefficients or data, likely for signal processing in experiments.</li>
+  <li><strong>RM1Box.c.txt, RM1Box.pdf, RM1Box.rco, RM1Box.rpx</strong>: Files related to the RM1Box hardware or software, including code, documentation, and configuration.</li>
+  <li><strong>XPding88200.wav</strong>: A sound file, likely used as an auditory stimulus in experiments.</li>
+  <li><strong>Old_Protocol_List.txt</strong>: A text file listing old protocols, possibly for reference or migration purposes.</li>
+  <li><strong>OdorNames.mat</strong>: A MAT file with odor names, likely used in olfactory experiments.</li>
+</ul>
+
+<h2 id="special-folders">Special Folders</h2>
+
+<h3 id="oldprotocols">OldProtocols</h3>
+
+<ul>
+  <li><strong>Contents:</strong> Numerous <code class="language-plaintext highlighter-rouge">.m</code> files (e.g., <code class="language-plaintext highlighter-rouge">Probsamp.m</code>, <code class="language-plaintext highlighter-rouge">SeqDiscSamp10.m</code>, <code class="language-plaintext highlighter-rouge">Sigmoidsamp10.m</code>, <code class="language-plaintext highlighter-rouge">Tone2AFC_100ms_HiLo.m</code>, <code class="language-plaintext highlighter-rouge">ToneLoc2AFC.m</code>, <code class="language-plaintext highlighter-rouge">Operant.m</code>, etc.)</li>
+  <li><strong>Description:</strong> A collection of old or deprecated protocol scripts, not organized in the <code class="language-plaintext highlighter-rouge">@protocolname</code> folder style. These are not listed in the main protocol menu and are retained for reference or legacy use.</li>
+</ul>
+
+<h3 id="protocol_backup">protocol_backup</h3>
+
+<ul>
+  <li><strong>Contents:</strong> <code class="language-plaintext highlighter-rouge">Sigmoidsamp6.m</code>, <code class="language-plaintext highlighter-rouge">Tone_Odor_2AFC_forMus.m</code></li>
+  <li><strong>Description:</strong> Backup copies of protocol scripts, possibly for archival or recovery purposes.</li>
+</ul>
+
+<h2 id="notes-on-protocol-organization">Notes on Protocol Organization</h2>
+
+<ul>
+  <li>Folders starting with <code class="language-plaintext highlighter-rouge">@</code> are MATLAB class folders, each typically representing a protocol or a major protocol component.</li>
+  <li>Top-level <code class="language-plaintext highlighter-rouge">.m</code> files are standalone protocol scripts.</li>
+  <li>Section files (e.g., <code class="language-plaintext highlighter-rouge">SideSection.m</code>, <code class="language-plaintext highlighter-rouge">StimulusSection.m</code>) modularize protocol logic for easier maintenance and reuse.</li>
+  <li>The <code class="language-plaintext highlighter-rouge">OldProtocols</code> and <code class="language-plaintext highlighter-rouge">protocol_backup</code> folders are for archival and do not appear in the main protocol selection menu.</li>
+</ul>
+
+    </main>
+    
+    <script>
+        function toggleNav() {
+            const navMenu = document.getElementById('nav-menu');
+            navMenu.classList.toggle('active');
+        }
+    </script>
+  </body>
+</html>

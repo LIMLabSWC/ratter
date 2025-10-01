@@ -43,6 +43,137 @@
             background-color: #f8f9fa;
         }
         
+        /* Navigation Styles */
+        .navbar {
+            background: #2c3e50;
+            color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-brand {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+        
+        .nav-item {
+            position: relative;
+        }
+        
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
+        
+        .nav-link:hover {
+            background-color: rgba(255,255,255,0.1);
+            text-decoration: none;
+        }
+        
+        .nav-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border: 1px solid #e1e8ed;
+            border-radius: 6px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+        }
+        
+        .nav-item:hover .nav-dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .nav-dropdown a {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: #2c3e50;
+            text-decoration: none;
+            border-bottom: 1px solid #f8f9fa;
+        }
+        
+        .nav-dropdown a:last-child {
+            border-bottom: none;
+        }
+        
+        .nav-dropdown a:hover {
+            background-color: #f8f9fa;
+            text-decoration: none;
+        }
+        
+        /* Mobile Navigation */
+        .nav-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: #2c3e50;
+                flex-direction: column;
+                padding: 1rem;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            
+            .nav-menu.active {
+                display: flex;
+            }
+            
+            .nav-toggle {
+                display: block;
+            }
+            
+            .nav-dropdown {
+                position: static;
+                opacity: 1;
+                visibility: visible;
+                transform: none;
+                box-shadow: none;
+                border: none;
+                background: rgba(255,255,255,0.1);
+                margin-top: 0.5rem;
+            }
+        }
+        
         .container {
             max-width: 1000px;
             margin: 0 auto;
@@ -141,8 +272,59 @@
     </style>
   </head>
   <body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="{{ '/' | relative_url }}" class="nav-brand">BControl</a>
+            <button class="nav-toggle" onclick="toggleNav()">☰</button>
+            <ul class="nav-menu" id="nav-menu">
+                <li class="nav-item">
+                    <a href="{{ '/' | relative_url }}" class="nav-link">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">User Guides</a>
+                    <div class="nav-dropdown">
+                        <a href="{{ '/guides/protocol-writers-guide' | relative_url }}">Protocol Writer's Guide</a>
+                        <a href="{{ '/guides/solo-core-guide' | relative_url }}">Solo Core Guide</a>
+                        <a href="{{ '/guides/water-valve-tutorial' | relative_url }}">Water Valve Tutorial</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">System Architecture</a>
+                    <div class="nav-dropdown">
+                        <a href="{{ '/architecture/system-overview' | relative_url }}">System Overview</a>
+                        <a href="{{ '/architecture/system-architecture' | relative_url }}">System Architecture</a>
+                        <a href="{{ '/architecture/legacy-architecture' | relative_url }}">Legacy Architecture Notes</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">Technical References</a>
+                    <div class="nav-dropdown">
+                        <a href="{{ '/technical/fsm-documentation' | relative_url }}">FSM Documentation</a>
+                        <a href="{{ '/technical/staircases' | relative_url }}">Staircase Algorithms</a>
+                        <a href="{{ '/technical/svn_update_process' | relative_url }}">SVN Update Process</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">Protocols</a>
+                    <div class="nav-dropdown">
+                        <a href="{{ '/protocols_overview' | relative_url }}">Protocols Overview</a>
+                        <a href="https://github.com/LIMLabSWC/ratter/tree/main/Protocols/@ArpitCentrePokeTraining">Training Protocols</a>
+                        <a href="https://github.com/LIMLabSWC/ratter/tree/main/Protocols">Browse All Protocols</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    
     <main class="container">
         {{ content }}
     </main>
+    
+    <script>
+        function toggleNav() {
+            const navMenu = document.getElementById('nav-menu');
+            navMenu.classList.toggle('active');
+        }
+    </script>
   </body>
 </html>

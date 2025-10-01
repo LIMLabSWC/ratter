@@ -1,0 +1,573 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        mermaid.initialize({ 
+          startOnLoad: true,
+          theme: 'default',
+          securityLevel: 'loose',
+          flowchart: {
+            useMaxWidth: true,
+            htmlLabels: true
+          },
+          sequence: {
+            useMaxWidth: true
+          }
+        });
+        
+        // Also try to render any mermaid divs that might not have been caught
+        const mermaidDivs = document.querySelectorAll('div.mermaid');
+        mermaidDivs.forEach(function(element) {
+          if (!element.hasAttribute('data-processed')) {
+            mermaid.init(undefined, element);
+          }
+        });
+      });
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            line-height: 1.6;
+            color: #2c3e50;
+            background-color: #f8f9fa;
+        }
+        
+        /* Navigation Styles */
+        .navbar {
+            background: #2c3e50;
+            color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-brand {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+        
+        .nav-item {
+            position: relative;
+        }
+        
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
+        
+        .nav-link:hover {
+            background-color: rgba(255,255,255,0.1);
+            text-decoration: none;
+        }
+        
+        .nav-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border: 1px solid #e1e8ed;
+            border-radius: 6px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+        }
+        
+        .nav-item:hover .nav-dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .nav-dropdown a {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: #2c3e50;
+            text-decoration: none;
+            border-bottom: 1px solid #f8f9fa;
+        }
+        
+        .nav-dropdown a:last-child {
+            border-bottom: none;
+        }
+        
+        .nav-dropdown a:hover {
+            background-color: #f8f9fa;
+            text-decoration: none;
+        }
+        
+        /* Mobile Navigation */
+        .nav-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: #2c3e50;
+                flex-direction: column;
+                padding: 1rem;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            
+            .nav-menu.active {
+                display: flex;
+            }
+            
+            .nav-toggle {
+                display: block;
+            }
+            
+            .nav-dropdown {
+                position: static;
+                opacity: 1;
+                visibility: visible;
+                transform: none;
+                box-shadow: none;
+                border: none;
+                background: rgba(255,255,255,0.1);
+                margin-top: 0.5rem;
+            }
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: white;
+            border: 1px solid #e1e8ed;
+            border-radius: 6px;
+            margin-top: 2rem;
+        }
+        
+        h1, h2, h3 {
+            color: #2c3e50;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        h1 {
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 0.5rem;
+        }
+        
+        code {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 0.2rem 0.4rem;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9em;
+        }
+        
+        pre {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 1rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+        
+        pre code {
+            background: none;
+            border: none;
+            padding: 0;
+        }
+        
+        ul, ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        li {
+            margin-bottom: 0.5rem;
+        }
+        
+        p {
+            margin-bottom: 1rem;
+        }
+        
+        a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+        
+        .back-link {
+            background: #3498db;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .back-link:hover {
+            background: #2980b9;
+            text-decoration: none;
+        }
+        
+        /* Mermaid diagram styling */
+        .mermaid {
+            text-align: center;
+            margin: 2rem 0;
+        }
+        
+        /* Ensure code blocks that contain mermaid are styled properly */
+        pre code.language-mermaid {
+            background: transparent;
+            border: none;
+            padding: 0;
+        }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/ratter/" class="nav-brand">BControl</a>
+            <button class="nav-toggle" onclick="toggleNav()">☰</button>
+            <ul class="nav-menu" id="nav-menu">
+                <li class="nav-item">
+                    <a href="/ratter/" class="nav-link">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">User Guides</a>
+                    <div class="nav-dropdown">
+                        <a href="/ratter/guides/protocol-writers-guide">Protocol Writer's Guide</a>
+                        <a href="/ratter/guides/solo-core-guide">Solo Core Guide</a>
+                        <a href="/ratter/guides/water-valve-tutorial">Water Valve Tutorial</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">System Architecture</a>
+                    <div class="nav-dropdown">
+                        <a href="/ratter/architecture/system-overview">System Overview</a>
+                        <a href="/ratter/architecture/system-architecture">System Architecture</a>
+                        <a href="/ratter/architecture/legacy-architecture">Legacy Architecture Notes</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">Technical References</a>
+                    <div class="nav-dropdown">
+                        <a href="/ratter/technical/fsm-documentation">FSM Documentation</a>
+                        <a href="/ratter/technical/staircases">Staircase Algorithms</a>
+                        <a href="/ratter/technical/svn_update_process">SVN Update Process</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">Protocols</a>
+                    <div class="nav-dropdown">
+                        <a href="/ratter/protocols_overview">Protocols Overview</a>
+                        <a href="https://github.com/LIMLabSWC/ratter/tree/main/Protocols/@ArpitCentrePokeTraining">Training Protocols</a>
+                        <a href="https://github.com/LIMLabSWC/ratter/tree/main/Protocols">Browse All Protocols</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    
+    <main class="container">
+        <p>The following diagram shows the current organization of legacy components and their relationships:</p>
+
+<div class="mermaid">
+graph LR
+    %% Define main containers
+    subgraph Legacy_Protocols ["Protocols/legacy/"]
+        direction LR
+        subgraph Olfactory ["Olfactory Protocols"]
+            OB["@onebank_2afcobj"]
+            AD["@adil2afcobj"]
+            OS2["@odorsegm2obj"]
+            MIX["@mix2afcobj"]
+            OT["@odor_testobj"]
+            NL["@nl2afc_mix2obj"]
+        end
+    end
+
+    subgraph Legacy_Analysis ["Analysis/legacy/"]
+        direction LR
+        subgraph OdorAnalysis ["Odor Analysis"]
+            ODR["Odor_Segm/"]
+            O2A["Odor2AFC/"]
+            NL2["NL2AFC_MIX/"]
+        end
+        SC["state_colors_olf.m"]
+    end
+
+    subgraph Legacy_ExperPort ["ExperPort/legacy/"]
+        direction LR
+        subgraph Confirmed ["Confirmed Unused"]
+            SS["start_script.m"]
+            BI["beginit.m"]
+        end
+        subgraph Investigation ["Under Investigation"]
+            ES["end_script.m"]
+            RE["RExper.m"]
+        end
+    end
+
+    %% Data file relationships
+    subgraph Data_Files ["Critical Data Files"]
+        direction LR
+        OF["olfip.mat"]
+        BG["bgnames.mat"]
+        ON["OdorNames.mat"]
+        OS["OdorSet.mat"]
+    end
+
+    %% Define relationships
+    OF --&gt; Olfactory
+    BG --&gt; OdorAnalysis
+    ON --&gt; AD
+    OS --&gt; OS2
+
+    %% Define investigation relationships
+    ES --&gt; |"Referenced in"| Config["Config Files"]
+    RE --&gt; |"Referenced in"| Control["Control.m"]
+
+    %% Style
+    classDef default fill:#f9f9f9,stroke:#333,stroke-width:1px;
+    classDef investigation fill:#fff0f0,stroke:#c00,stroke-width:2px;
+    classDef confirmed fill:#f0f0f0,stroke:#666,stroke-width:1px;
+    classDef data fill:#e6ffe6,stroke:#060,stroke-width:2px;
+    
+    class Investigation investigation;
+    class Confirmed confirmed;
+    class Data_Files data;
+</div>
+
+<h2 id="investigation-status">Investigation Status</h2>
+
+<p>The following diagram shows the current status of components under investigation:</p>
+
+<div class="mermaid">
+graph LR
+    subgraph Current_Status ["Component Status"]
+        direction LR
+        subgraph Ready_Remove ["Ready for Removal"]
+            SS[start_script.m]
+            BI[beginit.m]
+            RP[remove_protocol_preferences.m]
+            RE1[reporter.m]
+            RB[RPbox_realbox.m]
+            ER[ExperRPBox.m]
+            ES1[ExperStart.m]
+            EV[ExperValveCheck.m]
+        end
+
+        subgraph Need_Review ["Needs Investigation"]
+            ES2[end_script.m]
+            RX[RExper.m]
+        end
+
+        subgraph Keep_Active ["Preserved Data Files"]
+            OF[olfip.mat]
+            BG[bgnames.mat]
+            ON[OdorNames.mat]
+            OS[OdorSet.mat]
+        end
+    end
+
+    %% Dependencies
+    ES2 --&gt; |"Config Dependencies"| CF[Configuration Files]
+    RX --&gt; |"Active Reference"| CT[Control.m]
+    
+    %% Data File Dependencies
+    OF --&gt; |"Used by Legacy"| LP[Legacy Protocols]
+    BG --&gt; |"Used by Legacy"| LA[Legacy Analysis]
+    ON --&gt; |"Used by Legacy"| LP
+    OS --&gt; |"Used by Legacy"| LP
+
+    %% Style
+    classDef ready fill:#e6ffe6,stroke:#060,stroke-width:1px;
+    classDef review fill:#ffe6e6,stroke:#600,stroke-width:1px;
+    classDef keep fill:#e6e6ff,stroke:#006,stroke-width:1px;
+    
+    class Ready_Remove ready;
+    class Need_Review review;
+    class Keep_Active keep;
+</div>
+
+<h2 id="component-status-details">Component Status Details</h2>
+
+<h3 id="confirmed-unused-components">Confirmed Unused Components</h3>
+
+<p>These components have been confirmed as unused and moved to legacy folders:</p>
+
+<ol>
+  <li><strong>ExperPort Legacy</strong> (Commit: 67d64ada04815d3e676f8d651ee90ac35883c4f9)
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">start_script.m</code></li>
+      <li><code class="language-plaintext highlighter-rouge">beginit.m</code></li>
+      <li><code class="language-plaintext highlighter-rouge">remove_protocol_preferences.m</code></li>
+      <li><code class="language-plaintext highlighter-rouge">reporter.m</code></li>
+      <li><code class="language-plaintext highlighter-rouge">RPbox_realbox.m</code></li>
+      <li><code class="language-plaintext highlighter-rouge">ExperRPBox.m</code></li>
+      <li><code class="language-plaintext highlighter-rouge">ExperStart.m</code></li>
+      <li><code class="language-plaintext highlighter-rouge">ExperValveCheck.m</code></li>
+    </ul>
+  </li>
+</ol>
+
+<h3 id="under-investigation">Under Investigation</h3>
+
+<p>Components requiring further analysis before final disposition:</p>
+
+<ol>
+  <li><strong>ExperPort Components</strong>
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">end_script.m</code>: Referenced in configuration files</li>
+      <li><code class="language-plaintext highlighter-rouge">RExper.m</code>: Referenced in Control.m</li>
+    </ul>
+  </li>
+</ol>
+
+<h3 id="preserved-data-files">Preserved Data Files</h3>
+
+<p>Critical data files maintained despite legacy status of dependent components:</p>
+
+<ol>
+  <li><strong>olfip.mat Related</strong> (Commit: 1c8b5d799155912251a1b6ac44881e3b8e00983d)
+    <ul>
+      <li>File preserved while 15 dependent protocol folders moved to legacy</li>
+      <li>May be needed by other components</li>
+    </ul>
+  </li>
+  <li><strong>Other .mat Files</strong> (Commit: b714b1848ac6d1bf70e666daa3f85338b403169f)
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">bgnames.mat</code></li>
+      <li><code class="language-plaintext highlighter-rouge">OdorNames.mat</code></li>
+      <li><code class="language-plaintext highlighter-rouge">OdorSet.mat</code></li>
+      <li>All preserved while dependent protocols moved to legacy</li>
+    </ul>
+  </li>
+</ol>
+
+<h2 id="monitoring-plan">Monitoring Plan</h2>
+
+<h3 id="components-under-investigation">Components Under Investigation</h3>
+
+<ol>
+  <li><strong>end_script.m</strong>
+    <ul>
+      <li>Monitor configuration file dependencies</li>
+      <li>Track any runtime references</li>
+      <li>Document any discovered usage patterns</li>
+    </ul>
+  </li>
+  <li><strong>RExper.m</strong>
+    <ul>
+      <li>Monitor Control.m interactions</li>
+      <li>Track any indirect dependencies</li>
+      <li>Document any system impacts</li>
+    </ul>
+  </li>
+</ol>
+
+<h3 id="investigation-timeline">Investigation Timeline</h3>
+
+<ul>
+  <li>Investigation Period: [Define specific timeframe]</li>
+  <li>Review Points: [Define review schedule]</li>
+  <li>Final Disposition Date: [Define target date]</li>
+</ul>
+
+<h2 id="rollback-procedures">Rollback Procedures</h2>
+
+<p>For any needed rollbacks, follow this sequence (from newest to oldest):</p>
+
+<ol>
+  <li>ExperPort Files (67d64ada04815d3e676f8d651ee90ac35883c4f9)</li>
+  <li>Analysis/Protocol Files (b714b1848ac6d1bf70e666daa3f85338b403169f)</li>
+  <li>Olfip.mat Protocols (1c8b5d799155912251a1b6ac44881e3b8e00983d)</li>
+  <li>Newstartup Refactoring (60932b71d39853a25725e5c52ff2788942cbf243)</li>
+  <li>Unused Code Removal (5da710d356f8385dcfebd856b9ad3c57f2fc50b1)</li>
+  <li>Documentation/Paths (ce835f7a3a290c03fdd847480887898ce7cac6b6)</li>
+</ol>
+
+<h2 id="next-steps">Next Steps</h2>
+
+<ol>
+  <li><strong>Investigation Tasks</strong>
+    <ul>
+      <li>Complete analysis of <code class="language-plaintext highlighter-rouge">end_script.m</code> dependencies</li>
+      <li>Verify <code class="language-plaintext highlighter-rouge">RExper.m</code> usage patterns</li>
+      <li>Document any discovered integrations</li>
+    </ul>
+  </li>
+  <li><strong>Documentation Updates</strong>
+    <ul>
+      <li>Maintain investigation findings</li>
+      <li>Update status as components are cleared</li>
+      <li>Document any new dependencies discovered</li>
+    </ul>
+  </li>
+  <li><strong>Final Disposition</strong>
+    <ul>
+      <li>Plan for permanent removal of confirmed unused components</li>
+      <li>Document any components that need to be retained</li>
+      <li>Update system documentation accordingly</li>
+    </ul>
+  </li>
+</ol>
+
+    </main>
+    
+    <script>
+        function toggleNav() {
+            const navMenu = document.getElementById('nav-menu');
+            navMenu.classList.toggle('active');
+        }
+    </script>
+  </body>
+</html>
