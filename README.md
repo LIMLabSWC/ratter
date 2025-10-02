@@ -101,33 +101,8 @@ See [future development plans](docs/future_development/README.md) for active pro
 
 ## Documentation
 
-### Guides
+📚 **Complete documentation is available on our GitHub Pages site:**
 
-- [Protocol Writer's Guide](docs/guides/protocol-writers-guide.md)
-- [Solo Core Guide](docs/guides/solo-core-guide.md)
-- [Water Valve Tutorial](docs/guides/water-valve-tutorial.md)
+**👉 [View Documentation](https://limlabswc.github.io/ratter/)**
 
-### Technical References
-
-- [Finite State Machine (FSM) Documentation](docs/technical/fsm-documentation.md)
-- [Staircase Algorithms](docs/technical/staircases.md)
-- [SVN Update Process](docs/technical/svn_update_process.md)
-
-### Hardware Setup
-
-- [LynxTrig Setup](docs/hardware/lynxtrig-setup.md)
-- [Comedi Setup](docs/hardware/comedi-setup.md)
-
-### System Architecture
-
-- [System Overview](docs/architecture/system-overview.md)
-- [System Architecture](docs/architecture/system-architecture.md)
-- [Legacy Architecture Notes](docs/architecture/legacy-architecture.md)
-
-### Refactoring
-
-- [Overview](docs/recent-refactoring/README.md)
-- [ExperPort Cleanup](docs/recent-refactoring/experport-cleanup.md)
-- [Perl Scripts Removal](docs/recent-refactoring/perl-scripts-removal.md)
-- [Protocols Restructuring](docs/recent-refactoring/protocols-restructuring.md)
-- [Documentation Modernization](docs/recent-refactoring/documentation-modernization.md)
+This includes all guides, technical references, hardware setup instructions, system architecture details, and refactoring information in an easy-to-navigate format.
