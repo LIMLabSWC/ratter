@@ -70,7 +70,7 @@ switch action
         SoloParamHandle(obj, 'blinking_timer', 'value', []);
         SoloParamHandle(obj, 'current_params', 'value', []);
         SoloParamHandle(obj, 'session_base_path', 'value', '');
-        SoloParamHandle(obj, 'probe_settings', 'value', struct('version', '2.0', 'reference', 'Tip', 'bank', 0, 'imro_path', '', 'sync_slot', 2));
+        SoloParamHandle(obj, 'probe_settings', 'value', struct('version', '2.0', 'reference', 'Tip', 'bank', 0, 'imro_path', ''));
         SoloParamHandle(obj, 'probe_gui_handles', 'value', []);
         SoloParamHandle(obj, 'session_info_list', 'value', []); % Holds parsed info from folders
         
@@ -940,9 +940,7 @@ switch action
         settings.imro_path = get(p_handles.imro_text, 'String');
         settings.sync_slot = str2double(get(p_handles.sync_slot_edit, 'String'));
         if strcmp(settings.imro_path, 'None selected'), settings.imro_path = ''; end
-        
         probe_settings.value = settings;
-        
         if ~isempty(settings.imro_path)
             set(handles.target_display, 'String', 'Target: IMRO File');
         else
@@ -963,14 +961,12 @@ switch action
         try
             if strcmp(software, 'OpenEphys')
                 log_message(handles, sprintf('Setting OE reference to: %s', probe_settings.reference));
-                controller.setParameters(params.oe_proc_node_id, 0, 'Reference', probe_settings.reference);
-                
+                controller.setParameters(params.oe_proc_node_id, 0, 'Reference', probe_settings.reference);                
                 % Applying Sync Slot setting
                 log_message(handles, sprintf('Applying Sync IMEC Slot: %d', probe_settings.sync_slot));
                 % NOTE: This assumes a parameter like 'syncSlot' exists in the Neuropix-PXI plugin.
                 % The actual parameter name might need to be verified in the Open Ephys plugin.
                 % controller.setParameters(params.oe_proc_node_id, 0, 'syncSlot', probe_settings.sync_slot);
-
                 if ~isempty(probe_settings.imro_path)
                     log_message(handles, sprintf('Loading IMRO file: %s', probe_settings.imro_path));
                     controller.config(params.oe_proc_node_id, ['LOADIMRO ' probe_settings.imro_path]);
@@ -979,33 +975,12 @@ switch action
                     controller.setParameters(params.oe_proc_node_id, 0, 'bank', probe_settings.bank);
                 end
             else % SpikeGLX
-                log_message(handles, 'Applying SpikeGLX sync settings...');
-                
-                %% Done Manually by the User but can be uncommented
-                % params_to_set = struct();
-                % params_to_set.syncSourceIdx = 1; % Set sync source to PXI SMA
-                % params_to_set.syncImInputSlot = probe_settings.sync_slot;
-                % 
-                % SetParams(controller, params_to_set);
-                % 
-                % log_message(handles, 'Waiting for SpikeGLX to stabilise (3 seconds)...');
-                % pause(3);
-                % 
-                % log_message(handles, 'Reconnecting to SpikeGLX to reflect changes...');
-                % controller = SpikeGL(params.sglx_host_ip, params.sglx_port);
-                % recording_controller.value = controller; % Update the handle
-                % 
-                
-                % Verify settings
-                prms = GetParams(controller);
-                if prms.syncSourceIdx == 1 && prms.syncImInputSlot == probe_settings.sync_slot
-                    log_message(handles, 'Success! SpikeGLX sync settings applied correctly.');
-                else
-                    log_message(handles, 'Warning: SpikeGLX settings may not have been applied. Please check SpikeGLX.');
-                end
-
+                % SpikeGLX probe configuration (e.g., reference, channel map) is more complex
+                % and typically handled by setting parameters or loading a meta file.
+                % This is a placeholder for those more complex API calls.
+                log_message(handles, 'Applying SpikeGLX probe settings (via meta file or API)...');
                 if ~isempty(probe_settings.imro_path)
-                    log_message(handles, 'Note: For SpikeGLX, ensure IMRO file is loaded within the SpikeGLX GUI and save as part of the meta file.');
+                    log_message(handles, 'Note: For SpikeGLX, ensure IMRO settings are loaded within the SpikeGLX GUI and save as part of the meta file.');
                 end
             end
             log_message(handles, 'Probe configuration applied successfully.');
@@ -1013,6 +988,7 @@ switch action
             log_message(handles, sprintf('Failed to apply probe settings: %s', ME.message));
             rethrow(ME);
         end
+        
     % =========================================================================
     %       UTILITY & OTHER ACTIONS
     % =========================================================================
@@ -1536,4 +1512,3 @@ function display_usage_help()
     
     fprintf('For more information, see function documentation within the code.\n');
     fprintf('================================================================\n\n');
-
