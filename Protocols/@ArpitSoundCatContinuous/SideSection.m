@@ -182,6 +182,14 @@ switch action
         next_column(x);
 		y=5;
 		
+        ToggleParam(obj, 'control_active', 0, x,y,...
+			'OnString', 'Buttons Deative',...
+			'OffString', 'Buttons Active',...
+			'TooltipString', sprintf(['If on (Yellow) then the user can change parameters.\n',...
+            'This is to prevent any unwanted button press']));     
+        set_callback(control_active, {mfilename, 'User_Control'});
+        next_row(y);
+
         % Toggle for WarmUp 
         ToggleParam(obj, 'warmup_on', 0, x,y,...
 			'OnString', 'Warmup ON',...
@@ -229,7 +237,19 @@ switch action
         SoloParamHandle(obj, 'deltaf_history',      'value', []);
 		SoloParamHandle(obj, 'previous_parameters', 'value', []);
 
-		
+    case 'User_Control'
+
+        if value(control_active) == 0
+            disable(antibias_LRprob); disable(stimuli_on);  disable(Switch_Distr); disable(antibias_wtr_mult);
+            disable(random_PreStim_time); disable(random_A1_time); disable(random_prego_time);
+            disable(warmup_on); disable(increase_CP_training);
+        else
+            enable(antibias_LRprob); enable(stimuli_on); enable(Switch_Distr); enable(antibias_wtr_mult);
+            enable(random_PreStim_time); enable(random_A1_time); enable(random_prego_time);
+            enable(warmup_on); enable(increase_CP_training);
+        end
+
+
 	case 'new_leftprob'
 		AntibiasSection(obj, 'update_biashitfrac', value(LeftProb));
 		

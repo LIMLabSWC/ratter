@@ -160,11 +160,12 @@ switch action
         'CellEditCallback',@(src, evt) PsychometricSection(obj, 'check_box_table', src, evt)), ... % end of uitable definition
         'saveable', true);
 
+    SoloFunctionAddVars('SideSection', 'rw_args', ...
+			{'Switch_Distr'});
 
     % Returning the x , y position for the main callback GUI
         varargout{1} = oldx;
         varargout{2} = oldy;
-
 
     %% Calculate Parameters
     case 'Calculate_Params'
@@ -243,40 +244,58 @@ switch action
 
     case 'PushButton_Distribution_Switch'
 
-        % eval(sprintf('present_context_dist = value(Context%i_Dist)',value(thiscontext)));
-        eval(sprintf('present_context_start = value(Context%i_trialStart);',value(thiscontext)));
-        eval(sprintf('present_context_end = value(Context%i_trialEnd);',value(thiscontext)));
-        
-        if ~strcmpi(Category_Dist,'Uniform') && present_context_end > present_context_start
-            
-            if value(thiscontext) < 3 % & ~strcmpi(present_context_dist,Category_Dist)
-                thiscontext.value = value(thiscontext) + 1;
-                eval(sprintf('Context%i_Dist.value = Category_Dist;',value(thiscontext)));
-                eval(sprintf('Context%i_trialStart.value = n_done_trials + 1;',value(thiscontext)));
-                eval(sprintf('Context%i_trialEnd.value = n_done_trials + 1;',value(thiscontext)));
-                eval(sprintf('make_visible(Context%i_Dist);',value(thiscontext)));
-                eval(sprintf('make_visible(Context%i_trialStart);',value(thiscontext)));
-                eval(sprintf('make_visible(Context%i_trialEnd);',value(thiscontext)));
+        % --- Confirmation Dialog ---
+        % Display a dialog box to ask the user for confirmation before proceeding.
+        % 'questdlg' creates a dialog with a question, title, and button options.
+        choice = questdlg('Are you sure you want to switch the distribution?', ...
+            'Confirm Action', ...
+            'Yes', 'No', 'No'); % The last 'No' sets it as the default button.
+
+        % --- Handle User's Response ---
+        % The code proceeds only if the user clicks the 'Yes' button.
+        % The strcmp function compares the 'choice' variable with 'Yes'.
+        if strcmp(choice, 'Yes')
+
+            % --- Original Code Execution ---
+            % This is your original code, which will run after confirmation.
+
+            % eval(sprintf('present_context_dist = value(Context%i_Dist)',value(thiscontext)));
+            eval(sprintf('present_context_start = value(Context%i_trialStart);',value(thiscontext)));
+            eval(sprintf('present_context_end = value(Context%i_trialEnd);',value(thiscontext)));
+
+            if ~strcmpi(Category_Dist,'Uniform') && present_context_end > present_context_start
+
+                if value(thiscontext) < 3 % & ~strcmpi(present_context_dist,Category_Dist)
+                    thiscontext.value = value(thiscontext) + 1;
+                    eval(sprintf('Context%i_Dist.value = Category_Dist;',value(thiscontext)));
+                    eval(sprintf('Context%i_trialStart.value = n_done_trials + 1;',value(thiscontext)));
+                    eval(sprintf('Context%i_trialEnd.value = n_done_trials + 1;',value(thiscontext)));
+                    eval(sprintf('make_visible(Context%i_Dist);',value(thiscontext)));
+                    eval(sprintf('make_visible(Context%i_trialStart);',value(thiscontext)));
+                    eval(sprintf('make_visible(Context%i_trialEnd);',value(thiscontext)));
+                end
+                if strcmpi(Category_Dist,'Hard A')
+                    StimulusSection(obj,'Pushbutton_SwitchDistribution','Hard B');
+                elseif strcmpi(Category_Dist,'Hard B')
+                    StimulusSection(obj,'Pushbutton_SwitchDistribution','Hard A');
+                end
+
+                % Also update the table and make changes to plot
+                [state, data, handles, config, flags] = PsychometricSection(obj,'Calculate_Params');
+                % Calling the function to update the table and plot
+                state = RealTimeAnalysis('context_switch', state, data, handles, config, flags);
+                states_value.value = state;
             end
 
-            if strcmpi(Category_Dist,'Hard A')
-                StimulusSection(obj,'Pushbutton_SwitchDistribution','Hard B');
-            elseif strcmpi(Category_Dist,'Hard B')
-                StimulusSection(obj,'Pushbutton_SwitchDistribution','Hard A');
-            end
-            
-            % Also update the table and make changes to plot
-            [state, data, handles, config, flags] = PsychometricSection(obj,'Calculate_Params');
-            % Calling the function to update the table and plot
-            state = RealTimeAnalysis('context_switch', state, data, handles, config, flags);
-            states_value.value = state;
-        end
-         
+        end % This 'end' closes the 'if strcmp(choice, 'Yes')' block.
+        % If the user clicks 'No' or closes the dialog, the code inside the if-block is skipped.
+
+
     case 'StimSection_Distribution_Switch'
-        
+
         eval(sprintf('present_context_start = value(Context%i_trialStart);',value(thiscontext)));
         eval(sprintf('present_context_end = value(Context%i_trialEnd);',value(thiscontext)));
-        
+
         if present_context_end > present_context_start
             if value(thiscontext) < 3 % & ~strcmpi(present_context_dist,Category_Dist)
                 thiscontext.value = value(thiscontext) + 1;
@@ -301,33 +320,33 @@ switch action
         end
 
     case 'PushButton_SelectedTrial'
-            [state, data, handles, config, flags] = PsychometricSection(obj,'Calculate_Params');
-            % Calling the function to update the table and plot
-            state = RealTimeAnalysis('custom', state, data, handles, config, flags,value(Plot_Trial_Start),value(Plot_Trial_End));
-            states_value.value = state;
+        [state, data, handles, config, flags] = PsychometricSection(obj,'Calculate_Params');
+        % Calling the function to update the table and plot
+        state = RealTimeAnalysis('custom', state, data, handles, config, flags,value(Plot_Trial_Start),value(Plot_Trial_End));
+        states_value.value = state;
 
     case 'PushButton_Context'
-            [state, data, handles, config, flags] = PsychometricSection(obj,'Calculate_Params');            
-            % create a cell array containing the start and end of each context
-            context_trials = cell(1,value(thiscontext));
-            contexts_name = cell(1,value(thiscontext));
-            for n_plot = 1:value(thiscontext)
-                eval(sprintf('trial_start = value(Context%i_trialStart);',n_plot));
-                eval(sprintf('trial_end = value(Context%i_trialEnd);',n_plot));
-                eval(sprintf('context_name = value(Context%i_Dist);',n_plot));
-                context_trials{1,n_plot} = [trial_start, trial_end];
-                contexts_name{1,n_plot} = context_name;
-            end
-            % Calling the function to update the table and plot
-            state = RealTimeAnalysis('context', state, data, handles, config, flags, context_trials,contexts_name);
-            states_value.value = state;
+        [state, data, handles, config, flags] = PsychometricSection(obj,'Calculate_Params');
+        % create a cell array containing the start and end of each context
+        context_trials = cell(1,value(thiscontext));
+        contexts_name = cell(1,value(thiscontext));
+        for n_plot = 1:value(thiscontext)
+            eval(sprintf('trial_start = value(Context%i_trialStart);',n_plot));
+            eval(sprintf('trial_end = value(Context%i_trialEnd);',n_plot));
+            eval(sprintf('context_name = value(Context%i_Dist);',n_plot));
+            context_trials{1,n_plot} = [trial_start, trial_end];
+            contexts_name{1,n_plot} = context_name;
+        end
+        % Calling the function to update the table and plot
+        state = RealTimeAnalysis('context', state, data, handles, config, flags, context_trials,contexts_name);
+        states_value.value = state;
 
-    case 'reload_after_crash'    
+    case 'reload_after_crash'
         % make sure that the context values are visible
         for n_contexts = 1:value(thiscontext)
-                eval(sprintf('make_visible(Context%i_Dist);',n_contexts));
-                eval(sprintf('make_visible(Context%i_trialStart);',n_contexts));
-                eval(sprintf('make_visible(Context%i_trialEnd);',n_contexts));
+            eval(sprintf('make_visible(Context%i_Dist);',n_contexts));
+            eval(sprintf('make_visible(Context%i_trialStart);',n_contexts));
+            eval(sprintf('make_visible(Context%i_trialEnd);',n_contexts));
         end
         % set the fig value for uitable as we didn't save the table
         ui_table_handle = value(uit);
@@ -338,7 +357,7 @@ switch action
         end
         uit.value = ui_table_handle;
 
-    %% update after each trial    
+        %% update after each trial
     case 'update'
         % update the trial end for this context
         if n_done_trials > 1
@@ -349,16 +368,16 @@ switch action
             states_value.value = state;
         end
 
-    %% update the figure if user opened the figure window    
+        %% update the figure if user opened the figure window
     case 'update_plot'
         % if n_done_trials > 1
         %     PsychometricSection(obj, 'reload_after_crash');
         % end
         if n_done_trials > 30
-                [state, data, handles, config, flags] = PsychometricSection(obj,'Calculate_Params');
-                % Calling the function to update the table and plot
-                state = RealTimeAnalysis('redraw', state, data, handles, config, flags);
-                states_value.value = state;
+            [state, data, handles, config, flags] = PsychometricSection(obj,'Calculate_Params');
+            % Calling the function to update the table and plot
+            state = RealTimeAnalysis('redraw', state, data, handles, config, flags);
+            states_value.value = state;
         end
 
     case 'evaluate'
