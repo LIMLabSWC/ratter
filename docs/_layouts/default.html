@@ -63,7 +63,7 @@
             top: 0;
             left: 0;
             right: 0;
-            z-index: 1000;
+            z-index: 1100;
             border-bottom: 1px solid #e9ecef;
             transition: transform 0.3s ease-in-out;
         }
@@ -151,35 +151,127 @@
             text-decoration: none;
         }
         
+        /* Hamburger Menu Button */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            justify-content: space-around;
+            width: 28px;
+            height: 24px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            z-index: 1200;
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .hamburger:focus {
+            outline: none;
+        }
+        
+        .hamburger-line {
+            width: 28px;
+            height: 3px;
+            background-color: #333;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+            transform-origin: center;
+        }
+        
+        /* Hamburger animation to X */
+        .hamburger.active .hamburger-line:nth-child(1) {
+            transform: translateY(10.5px) rotate(45deg);
+        }
+        
+        .hamburger.active .hamburger-line:nth-child(2) {
+            opacity: 0;
+            transform: translateX(-10px);
+        }
+        
+        .hamburger.active .hamburger-line:nth-child(3) {
+            transform: translateY(-10.5px) rotate(-45deg);
+        }
+        
+        /* Mobile Overlay */
+        .nav-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1001;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .nav-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+        
+        /* Prevent body scroll when menu is open */
+        body.menu-open {
+            overflow: hidden;
+        }
+        
         /* Mobile Navigation */
         @media (max-width: 768px) {
+            .hamburger {
+                display: flex;
+            }
+            
             .nav-container {
                 padding: 0.5rem 10px;
+                position: relative;
             }
             
             .nav-menu {
+                position: fixed;
+                top: 0;
+                right: -280px;
+                width: 280px;
+                height: 100vh;
+                background: #fff;
                 flex-direction: column;
-                gap: 0.25rem;
-                width: 100%;
+                gap: 0;
+                margin: 0;
+                padding: 80px 20px 20px 20px;
+                box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+                transition: right 0.3s ease;
+                z-index: 1150;
+                overflow-y: auto;
+            }
+            
+            .nav-menu.active {
+                right: 0;
             }
             
             .nav-item {
                 width: 100%;
+                margin-bottom: 0.5rem;
             }
             
             .nav-link {
                 display: block;
-                text-align: center;
-                padding: 0.5rem 1rem;
-                background: #e9ecef;
+                text-align: left;
+                padding: 0.75rem 1rem;
+                background: #f8f9fa;
                 border-radius: 4px;
                 color: #333 !important;
                 -webkit-tap-highlight-color: transparent;
-                font-size: 0.9rem;
+                font-size: 0.95rem;
+                font-weight: 500;
             }
             
-            .nav-link:active {
-                background: #dee2e6;
+            .nav-link:active,
+            .nav-link:hover {
+                background: #e9ecef;
                 color: #333 !important;
             }
             
@@ -190,27 +282,32 @@
                 transform: none;
                 box-shadow: none;
                 border: none;
-                background: #f8f9fa;
-                margin-top: 0.25rem;
+                background: transparent;
+                margin-top: 0.5rem;
                 border-radius: 4px;
                 display: none;
+                padding-left: 10px;
             }
             
-            .nav-item:hover .nav-dropdown,
-            .nav-item:focus-within .nav-dropdown {
+            .nav-item.dropdown-open .nav-dropdown {
                 display: block;
             }
             
             .nav-dropdown a {
-                padding: 0.4rem 1rem;
-                text-align: center;
+                padding: 0.6rem 1rem;
+                text-align: left;
                 color: #333 !important;
                 -webkit-tap-highlight-color: transparent;
-                font-size: 0.85rem;
+                font-size: 0.9rem;
+                background: #fff;
+                border: 1px solid #e9ecef;
+                margin-bottom: 0.25rem;
+                border-radius: 4px;
             }
             
-            .nav-dropdown a:active {
-                background: #e9ecef;
+            .nav-dropdown a:active,
+            .nav-dropdown a:hover {
+                background: #f8f9fa;
                 color: #333 !important;
             }
         }
@@ -325,8 +422,18 @@
     </style>
   </head>
   <body>
+    <!-- Mobile overlay -->
+    <div class="nav-overlay"></div>
+    
     <nav class="navbar">
         <div class="nav-container">
+            <!-- Hamburger menu button -->
+            <button class="hamburger" aria-label="Toggle menu" aria-expanded="false">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+            
             <ul class="nav-menu">
                 <li class="nav-item">
                     <a href="{{ '/' | relative_url }}" class="nav-link">Home</a>
@@ -372,6 +479,83 @@
     </main>
     
     <script>
+        // Mobile hamburger menu functionality
+        const hamburger = document.querySelector('.hamburger');
+        const navMenu = document.querySelector('.nav-menu');
+        const navOverlay = document.querySelector('.nav-overlay');
+        const body = document.body;
+        const navLinks = document.querySelectorAll('.nav-link');
+        const navItems = document.querySelectorAll('.nav-item');
+        
+        // Toggle menu
+        function toggleMenu() {
+            const isActive = navMenu.classList.contains('active');
+            
+            if (isActive) {
+                closeMenu();
+            } else {
+                openMenu();
+            }
+        }
+        
+        // Open menu
+        function openMenu() {
+            navMenu.classList.add('active');
+            hamburger.classList.add('active');
+            navOverlay.classList.add('active');
+            body.classList.add('menu-open');
+            hamburger.setAttribute('aria-expanded', 'true');
+        }
+        
+        // Close menu
+        function closeMenu() {
+            navMenu.classList.remove('active');
+            hamburger.classList.remove('active');
+            navOverlay.classList.remove('active');
+            body.classList.remove('menu-open');
+            hamburger.setAttribute('aria-expanded', 'false');
+        }
+        
+        // Hamburger button click
+        hamburger.addEventListener('click', toggleMenu);
+        
+        // Close menu when clicking overlay
+        navOverlay.addEventListener('click', closeMenu);
+        
+        // Close menu when clicking navigation links
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                // For dropdown parent links on mobile, toggle dropdown instead
+                if (window.innerWidth <= 768) {
+                    const parentItem = this.parentElement;
+                    const hasDropdown = parentItem.querySelector('.nav-dropdown');
+                    
+                    if (hasDropdown && this.getAttribute('href') === '#') {
+                        e.preventDefault();
+                        parentItem.classList.toggle('dropdown-open');
+                    } else {
+                        // Close menu for actual links
+                        closeMenu();
+                    }
+                } else {
+                    closeMenu();
+                }
+            });
+        });
+        
+        // Close menu when clicking dropdown links
+        const dropdownLinks = document.querySelectorAll('.nav-dropdown a');
+        dropdownLinks.forEach(link => {
+            link.addEventListener('click', closeMenu);
+        });
+        
+        // Close menu on window resize if switching to desktop view
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                closeMenu();
+            }
+        });
+        
         // Hide/show navbar on scroll
         let lastScrollTop = 0;
         const navbar = document.querySelector('.navbar');
