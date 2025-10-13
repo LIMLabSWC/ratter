@@ -151,35 +151,127 @@
             text-decoration: none;
         }
         
+        /* Hamburger Menu Button */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            justify-content: space-around;
+            width: 30px;
+            height: 25px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            z-index: 2700;
+            position: relative;
+        }
+        
+        .hamburger-line {
+            width: 30px;
+            height: 3px;
+            background-color: #333;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+            transform-origin: center;
+        }
+        
+        .hamburger.active .hamburger-line:nth-child(1) {
+            transform: translateY(11px) rotate(45deg);
+        }
+        
+        .hamburger.active .hamburger-line:nth-child(2) {
+            opacity: 0;
+        }
+        
+        .hamburger.active .hamburger-line:nth-child(3) {
+            transform: translateY(-11px) rotate(-45deg);
+        }
+        
+        /* Mobile Menu Overlay */
+        .mobile-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2500;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: auto;
+        }
+        
+        .mobile-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+        
         /* Mobile Navigation */
         @media (max-width: 768px) {
+            /* Raise navbar stacking context above overlay so the sidebar (child) sits on top */
+            .navbar {
+                z-index: 2700; /* higher than .mobile-overlay (2500) */
+            }
+            
+            .hamburger {
+                display: flex;
+                position: fixed;
+                top: 1rem;
+                right: 1rem;
+                z-index: 3002;
+            }
+            
             .nav-container {
                 padding: 0.5rem 10px;
+                justify-content: flex-start;
             }
             
             .nav-menu {
+                position: fixed;
+                top: 0;
+                right: -280px;
+                height: 100vh;
+                width: 280px;
+                background: white;
                 flex-direction: column;
-                gap: 0.25rem;
-                width: 100%;
+                gap: 0;
+                margin: 0;
+                padding: 4rem 1rem 2rem;
+                box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+                overflow-y: auto;
+                transition: right 0.3s ease;
+                z-index: 3001;
+                pointer-events: auto;
+            }
+            
+            .nav-menu.active {
+                right: 0;
             }
             
             .nav-item {
                 width: 100%;
+                border-bottom: 1px solid #f8f9fa;
             }
             
             .nav-link {
                 display: block;
-                text-align: center;
-                padding: 0.5rem 1rem;
-                background: #e9ecef;
-                border-radius: 4px;
+                text-align: left;
+                padding: 1rem;
+                background: transparent;
+                border-radius: 0;
                 color: #333 !important;
                 -webkit-tap-highlight-color: transparent;
-                font-size: 0.9rem;
+                font-size: 1rem;
+                font-weight: 500;
+            }
+            
+            .nav-link:hover {
+                background-color: #f8f9fa;
             }
             
             .nav-link:active {
-                background: #dee2e6;
+                background: #e9ecef;
                 color: #333 !important;
             }
             
@@ -191,27 +283,44 @@
                 box-shadow: none;
                 border: none;
                 background: #f8f9fa;
-                margin-top: 0.25rem;
-                border-radius: 4px;
+                margin: 0;
+                border-radius: 0;
                 display: none;
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.3s ease;
             }
             
-            .nav-item:hover .nav-dropdown,
-            .nav-item:focus-within .nav-dropdown {
+            .nav-item.active .nav-dropdown {
                 display: block;
+                max-height: 500px;
             }
             
             .nav-dropdown a {
-                padding: 0.4rem 1rem;
-                text-align: center;
-                color: #333 !important;
+                padding: 0.75rem 1rem 0.75rem 2rem;
+                text-align: left;
+                color: #555 !important;
                 -webkit-tap-highlight-color: transparent;
-                font-size: 0.85rem;
+                font-size: 0.9rem;
+                border-bottom: 1px solid #e9ecef;
+            }
+            
+            .nav-dropdown a:last-child {
+                border-bottom: none;
+            }
+            
+            .nav-dropdown a:hover {
+                background: #e9ecef;
             }
             
             .nav-dropdown a:active {
-                background: #e9ecef;
-                color: #333 !important;
+                background: #dee2e6;
+                color: #555 !important;
+            }
+            
+            /* Prevent body scroll when menu is open */
+            body.menu-open {
+                overflow: hidden;
             }
         }
         
@@ -325,9 +434,19 @@
     </style>
   </head>
   <body>
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+    
+    <!-- Hamburger Menu Button -->
+    <button class="hamburger" id="hamburger" aria-label="Toggle navigation menu">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+    </button>
+    
     <nav class="navbar">
         <div class="nav-container">
-            <ul class="nav-menu">
+            <ul class="nav-menu" id="navMenu">
                 <li class="nav-item">
                     <a href="{{ '/' | relative_url }}" class="nav-link">Home</a>
                 </li>
@@ -372,24 +491,89 @@
     </main>
     
     <script>
-        // Hide/show navbar on scroll
+        // Mobile Menu Toggle
+        const hamburger = document.getElementById('hamburger');
+        const navMenu = document.getElementById('navMenu');
+        const mobileOverlay = document.getElementById('mobileOverlay');
+        const navItems = document.querySelectorAll('.nav-item');
+        const body = document.body;
+        
+        // Toggle menu function
+        function toggleMenu() {
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+            mobileOverlay.classList.toggle('active');
+            body.classList.toggle('menu-open');
+        }
+        
+        // Close menu function
+        function closeMenu() {
+            hamburger.classList.remove('active');
+            navMenu.classList.remove('active');
+            mobileOverlay.classList.remove('active');
+            body.classList.remove('menu-open');
+        }
+        
+        // Hamburger button click
+        hamburger.addEventListener('click', toggleMenu);
+        
+        // Overlay click to close menu
+        mobileOverlay.addEventListener('click', closeMenu);
+        
+        // Handle dropdown toggle on mobile
+        navItems.forEach(item => {
+            const link = item.querySelector('.nav-link');
+            const dropdown = item.querySelector('.nav-dropdown');
+            
+            if (dropdown) {
+                link.addEventListener('click', function(e) {
+                    // Only toggle on mobile
+                    if (window.innerWidth <= 768) {
+                        e.preventDefault();
+                        item.classList.toggle('active');
+                    }
+                });
+                
+                // Close menu when clicking dropdown links
+                const dropdownLinks = dropdown.querySelectorAll('a');
+                dropdownLinks.forEach(dropdownLink => {
+                    dropdownLink.addEventListener('click', closeMenu);
+                });
+            } else {
+                // Close menu when clicking regular nav links
+                link.addEventListener('click', closeMenu);
+            }
+        });
+        
+        // Close menu on window resize if switching to desktop
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                closeMenu();
+                // Remove active class from all nav items
+                navItems.forEach(item => item.classList.remove('active'));
+            }
+        });
+        
+        // Hide/show navbar on scroll (desktop only)
         let lastScrollTop = 0;
         const navbar = document.querySelector('.navbar');
-        const scrollThreshold = 100; // Minimum scroll distance to trigger hide/show
+        const scrollThreshold = 100;
         
         window.addEventListener('scroll', function() {
+            // Don't hide navbar on mobile or when menu is open
+            if (window.innerWidth <= 768 || navMenu.classList.contains('active')) {
+                return;
+            }
+            
             const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
             
-            // Only trigger if scrolled enough
             if (Math.abs(scrollTop - lastScrollTop) < scrollThreshold) {
                 return;
             }
             
             if (scrollTop > lastScrollTop && scrollTop > 200) {
-                // Scrolling down - hide navbar
                 navbar.classList.add('hidden');
             } else {
-                // Scrolling up - show navbar
                 navbar.classList.remove('hidden');
             }
             

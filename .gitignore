@@ -12,3 +12,18 @@ Screenshot 2025-01-22 at 11.22.30.png
 
 sparse_init.log
 
+# Local development (docs site)
+docs/_site/
+docs/.jekyll-cache/
+docs/.sass-cache/
+docs/.jekyll-metadata
+docs/vendor/bundle/
+docs/.bundle/
+docs/Gemfile.lock
+
+# OS/editor cruft
+.DS_Store
+Thumbs.db
+*.log
+*.swp
+*.swo
