@@ -234,8 +234,12 @@ switch action
                 'input_to_statechange',{'Tup','timeout_state'; HitEvent,'hit_state'});
 
         else % no reward but a punishment iti
-            sma = add_state(sma,'name','second_hit_state','self_timer',error_iti,...
-                'input_to_statechange',{'reward_collection_dur_In', 'timeout_state'; 'Tup','preclean_up_state'});
+            sma = add_state(sma,'name','second_hit_state','self_timer',2,...
+                'output_actions', {'DOut', second_hit_light},...
+                'input_to_statechange',{'Tup','current_state + 1'});
+            sma = add_state(sma,'self_timer',error_iti - 2,...
+                'input_to_statechange',{'Tup','preclean_up_state'});
+            
             % sma = add_state(sma, 'name', 'hit_state');
             % sma = add_state(sma, 'name', 'drink_state');
 
@@ -246,6 +250,7 @@ switch action
             'input_to_statechange',{'Tup','drink_state'});
 
         sma = add_state(sma,'name','drink_state','self_timer',drink_time,...
+            'output_actions', {'DOut', second_hit_light},...
             'input_to_statechange',{'Tup','preclean_up_state'});
 
         %%%%%%%%%%%%%%% FAILURE TO CENTRE POKE %%%%%%%%%%%%%%%%%%%%%%

@@ -385,11 +385,10 @@ function state = RealTimeAnalysis(action, state, data, handles, config, varargin
     function state = analyzeLiveChunk(state, data, handles, config, dataBuffer, flags)
         state.block_count = state.block_count + 1;
         [newBlockStat, newRow] = processBlock(data, config, dataBuffer);
-        state.blockStatsHistory = [state.blockStatsHistory, newBlockStat];       
-        updateTable(handles, newRow);
-        state.table_row_editable(end+1) = true;
-
+        state.blockStatsHistory = [state.blockStatsHistory, newBlockStat];
         state.last_analyzed_valid_trial = sum(~isnan(data.hit_history));
+        updateTable(handles, newRow);
+        state.table_row_editable(end+1) = true;        
 
         if strcmp(get(handles.main_fig, 'Visible'), 'on')
             updateLivePlots(state, data, handles, config, flags);
@@ -401,9 +400,8 @@ function state = RealTimeAnalysis(action, state, data, handles, config, varargin
     function state = reAnalyzeLastChunk(state, data, handles, config, dataBuffer, flags)
         [newBlockStat, newRow] = processBlock(data, config, dataBuffer);
         state.blockStatsHistory(end) = newBlockStat;
-        replaceLastTableRow(handles, newRow);
-        
         state.last_analyzed_valid_trial = sum(~isnan(data.hit_history));
+        replaceLastEditableTableRow(handles, newRow, state.table_row_editable);
 
         if strcmp(get(handles.main_fig, 'Visible'), 'on')
             updateLivePlots(state, data, handles, config, flags);
@@ -461,12 +459,25 @@ function state = RealTimeAnalysis(action, state, data, handles, config, varargin
         set(handles.ui_table, 'Data', [currentData; newRow]);
     end
     
-    function replaceLastTableRow(handles, newRow)
+    function replaceLastTableRow(handles, newRow, table_row_editable)
         currentData = get(handles.ui_table, 'Data');
-        if ~isempty(currentData)
+        if isempty(currentData)
+            return;
+        end
+
+        % Find the index of the last 'live' block (which is editable)
+        last_editable_row_index = find(table_row_editable, 1, 'last');
+
+        if ~isempty(last_editable_row_index)
             newRow{1} = true; % Select the new row
-            currentData(end,:) = newRow;
+
+            % Replace the correct row, not just the last one
+            currentData(last_editable_row_index, :) = newRow;
+
             set(handles.ui_table, 'Data', currentData);
+        else
+            % Fallback in case no editable row is found (should not happen)
+            updateTable(handles, newRow);
         end
     end
 
