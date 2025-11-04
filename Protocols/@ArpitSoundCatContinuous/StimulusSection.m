@@ -56,7 +56,7 @@ switch action
             '\n''S1>S_boundary Right'' means if Aud1 < Aud_boundry then reward will be delivered from the left water spout and if Aud1 > Aud_boundry then water comes from right\n']));
         
         next_row(y, 1);next_row(y, 1);
-        NumeditParam(obj,'P_centre_region',0.25,x,y,'label','P_centre','TooltipString','probability for choosing stim near boundary. 0 = same probability as the rest, 1 = only choose from centre');
+        NumeditParam(obj,'P_centre_region',0,x,y,'label','P_centre','TooltipString','probability for choosing stim near boundary. 0 = same probability as the rest, 1 = only choose from centre');
         next_row(y);
         NumeditParam(obj,'centre_region_width',0.1,x,y,'label','Centre Width','TooltipString','total width around boundary to be considered as central region');
         next_row(y);next_row(y);
