@@ -531,7 +531,8 @@ switch action
     case 'get_water_amount'
 
         %% Calculate the water amount for each side valve
-        WaterAmount=maxasymp + (minasymp./(1+(n_done_trials/inflp).^slp).^assym);
+        trials_use = max(1,numel(find(~isnan(hit_history)))); 
+        WaterAmount=maxasymp + (minasymp./(1+(trials_use/inflp).^slp).^assym); % using valid trials only instead of total trials
         %         WaterValvesSection(obj, 'set_water_amounts', WaterAmount, WaterAmount);
         %         [LeftWValveTime RightWValveTime] = WaterValvesSection(obj, 'get_water_times');
         WValveTimes = GetValveTimes(WaterAmount, [2 3]);

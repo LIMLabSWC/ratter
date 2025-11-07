@@ -91,14 +91,14 @@ switch action
 
     %% slow ramp up of water amount		
     %%the water volume is controlled by a 5-parameter logistic function: WaterAmount(t) = maxasymp + (minasymp/(1+(t/inflp)^slp).^assym)
-    NumeditParam(obj, 'maxasymp', 38, x,y,'label','maxasymp','TooltipString',...
+    NumeditParam(obj, 'maxasymp', 30, x,y,'label','maxasymp','TooltipString',...
         'the water volume is controlled by a 5-parameter logistic function: WaterAmount(trialnum) = maxasymp + (minasymp/(1+(trialnum/inflp)^slp).^assym)');
 	next_row(y);
 	NumeditParam(obj, 'slp', 3, x,y,'label','slp','TooltipString','Water Modulation: Slope of the logistic function');	
 	next_row(y);
 	NumeditParam(obj, 'inflp', 350, x,y,'label','inflp','TooltipString','Water Modulation: concentration at the inflection point');	
 	next_row(y);
-    NumeditParam(obj, 'minasymp', -21, x,y,'label','inflp','TooltipString','Water Modulation: minimum asymptote');	
+    NumeditParam(obj, 'minasymp', -13, x,y,'label','minasymp','TooltipString','Water Modulation: minimum asymptote');	
 	next_row(y);
     NumeditParam(obj, 'assym', 0.7, x,y,'label','assym','TooltipString','Water Modulation: asymmetry factor');	
 	next_row(y);
