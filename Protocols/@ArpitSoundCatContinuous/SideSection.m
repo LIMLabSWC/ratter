@@ -531,9 +531,9 @@ switch action
     case 'get_water_amount'
 
         %% Calculate the water amount for each side valve
-        if n_done_trials > 30
-            trials_use = max(1,numel(find(~isnan(hit_history)))); 
-        else
+        try
+            trials_use = max(1,numel(find(~isnan(value(hit_history))))); 
+        catch
             trials_use = n_done_trials;
         end
         WaterAmount=maxasymp + (minasymp./(1+(trials_use/inflp).^slp).^assym); % using valid trials only instead of total trials
