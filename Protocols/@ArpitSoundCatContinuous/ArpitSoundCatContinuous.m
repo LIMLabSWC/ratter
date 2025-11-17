@@ -163,6 +163,7 @@ switch action
         SavingSection(obj,'set_setting_info',varargin{3},varargin{4});
         SavingSection(obj,'set_autosave_frequency',1); % saving setting every trial instead of 20
         BonsaiCameraInterface(obj,'set_video_filepath',varargin{5});
+        BonsaiCameraInterface(obj,'camera_connection');
 
     case 'set_stim_distribution'
 

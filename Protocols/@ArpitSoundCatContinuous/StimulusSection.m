@@ -752,8 +752,18 @@ switch action
                     make_invisible(sigma_Right);
                 end
         end
-        StimulusSection(obj,'plot_stim_distribution');
-        PsychometricSection(obj,'StimSection_Distribution_Switch');
+       
+        % Checking if the distribution changed from previous value and then
+        % only run the following script
+        category_dist_history = get_history(Category_Dist);
+        if n_done_trials > 1 
+            if strcmpi(category_dist_history{n_done_trials},value(Category_Dist)) ~= 1
+                StimulusSection(obj,'plot_stim_distribution');
+                PsychometricSection(obj,'StimSection_Distribution_Switch');
+            end
+        else
+            StimulusSection(obj,'plot_stim_distribution');
+        end
 
     case 'Pushbutton_SwitchDistribution'
         dist = varargin{1};
