@@ -98,8 +98,8 @@ switch action
         % Panel 0: Recording Software Selection
         p0 = uipanel('Title', '0. Recording Software', 'FontSize', 12, 'FontWeight', 'bold', 'BorderType', 'etchedin', 'BorderWidth', 1, 'Units', 'normalized', 'Position', [0.02, 0.88, 0.6, 0.09]);
         handles.software_group = uibuttongroup(p0, 'Title', '', 'BorderType', 'none', 'Units', 'normalized', 'Position', [0.05, 0.1, 0.9, 0.8], 'SelectionChangedFcn', {@(h,e) feval(mfilename, obj, 'recording_software_callback')});
-        uicontrol(handles.software_group, 'Style', 'radiobutton', 'String', 'Open Ephys', 'Units', 'normalized', 'Position', [0.1, 0.3, 0.4, 0.4], 'Tag', 'OpenEphys', 'FontSize', 10);
-        uicontrol(handles.software_group, 'Style', 'radiobutton', 'String', 'SpikeGLX', 'Units', 'normalized', 'Position', [0.5, 0.3, 0.4, 0.4], 'Tag', 'SpikeGLX', 'FontSize', 10);
+        uicontrol(handles.software_group, 'Style', 'radiobutton', 'String', 'SpikeGLX', 'Units', 'normalized', 'Position', [0.1, 0.3, 0.4, 0.4], 'Tag', 'SpikeGLX', 'FontSize', 10);
+        uicontrol(handles.software_group, 'Style', 'radiobutton', 'String', 'Open Ephys', 'Units', 'normalized', 'Position', [0.5, 0.3, 0.4, 0.4], 'Tag', 'OpenEphys', 'FontSize', 10);
         
         % Panel 1: Behavior
         p1 = uipanel('Title', '1. Behavior', 'FontSize', 12, 'FontWeight', 'bold', 'BorderType', 'etchedin', 'BorderWidth', 1, 'Units', 'normalized', 'Position', [0.02, 0.74, 0.6, 0.13]);
