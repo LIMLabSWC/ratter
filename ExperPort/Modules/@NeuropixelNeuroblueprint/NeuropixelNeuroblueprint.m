@@ -64,7 +64,7 @@ switch action
         SoloParamHandle(obj, 'behavState', 'value', 'Run');
         SoloParamHandle(obj, 'ephysState', 'value', 'Run');
         SoloParamHandle(obj, 'is_running', 'value', 0);
-        SoloParamHandle(obj, 'recording_software', 'value', 'OpenEphys'); % 'OpenEphys' or 'SpikeGLX'
+        SoloParamHandle(obj, 'recording_software', 'value', 'SpikeGLX'); % 'OpenEphys' or 'SpikeGLX'
         SoloParamHandle(obj, 'recording_controller', 'value', []); % Will hold OE or SpikeGLX controller
         SoloParamHandle(obj, 'behav_obj', 'value', []);
         SoloParamHandle(obj, 'blinking_timer', 'value', []);
