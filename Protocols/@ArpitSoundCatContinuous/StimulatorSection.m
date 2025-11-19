@@ -106,12 +106,6 @@ switch action
           make_invisible(StimState); make_invisible(StimProb); make_invisible(ShuffleValues);
       end
 
-      if strcmpi(value(StimLine),'Ephys')
-          dispatcher('set_trialnum_indicator_flag');
-      else
-          dispatcher('unset_trialnum_indicator_flag');
-      end
-
   case 'update_values'
        
       if strcmpi(value(StimLine),'Opto')
@@ -133,12 +127,7 @@ switch action
           end
 
       end
-      
-      if strcmpi(value(StimLine),'Ephys') & n_done_trials == 0
-            dispatcher('set_trialnum_indicator_flag');
-      end
-      
-      
+           
       
 %% prepare_next_trial
 % -----------------------------------------------------------------------

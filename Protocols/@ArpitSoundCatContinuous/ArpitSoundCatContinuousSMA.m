@@ -292,8 +292,8 @@ switch action
         
         if strcmpi(value(StimLine),'Opto')
             sma = StimulatorSection(obj,'prepare_next_trial',sma);        
-        % elseif strcmpi(value(StimLine),'Ephys')
-        %     sma = add_trialnum_indicator(sma, n_done_trials+1);
+        elseif strcmpi(value(StimLine),'Ephys')
+            sma = add_trialnum_indicator(sma, n_done_trials+1, 'time_per_state', 5e-3);
         end
         
         dispatcher('send_assembler', sma, intersect(state_names, prepare_next_trial_states));

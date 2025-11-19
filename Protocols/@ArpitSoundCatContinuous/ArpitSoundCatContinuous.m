@@ -35,7 +35,12 @@ switch action
    
    %% init
    case 'init'
-    % dispatcher('set_trialnum_indicator_flag');
+
+    % Instead of sending the trialnum_indicator by dispatcher, 
+    % I will be sending it through my own sma as I can control the timing of
+    % the each bit pulse
+    dispatcher('unset_trialnum_indicator_flag');
+    
     hackvar = 10; SoloFunctionAddVars('SessionModel', 'ro_args', 'hackvar'); %#ok<NASGU>
     SoloParamHandle(obj, 'myfig', 'saveable', 0); myfig.value = figure;
 
