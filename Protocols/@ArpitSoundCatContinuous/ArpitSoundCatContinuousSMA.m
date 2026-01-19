@@ -75,14 +75,14 @@ switch action
         %%%%%%%%%%%%%%%% SCHEDULED WAVES %%%%%%%%%%%%%%%%%%%%%%%
 
         % scheduled wave for stimuli / fixed (No) sound, based upon side
-        if value(stimuli_on)
+        if strcmpi(Stimuli_State,'No Sound')
             sma = add_scheduled_wave(sma, 'name', 'stimplay', 'preamble', PreStim_time, ...
-                'sustain', sound_duration, 'sound_trig', A1_sound_id); % to play a sound before Go Cue
+                'sustain', sound_duration); % to play No sound before Go Cue          
         else
             % sma = add_scheduled_wave(sma, 'name', 'stimplay', 'preamble', PreStim_time, ...
             %     'sustain', sound_duration, 'sound_trig', sound_id); % to play a fixed sound before Go Cue
-            sma = add_scheduled_wave(sma, 'name', 'stimplay', 'preamble', PreStim_time, ...
-                'sustain', sound_duration); % to play No sound before Go Cue
+             sma = add_scheduled_wave(sma, 'name', 'stimplay', 'preamble', PreStim_time, ...
+                'sustain', sound_duration, 'sound_trig', A1_sound_id); % to play a sound before Go Cue
         end
         
         % Scheduled Wave for Go Sound
