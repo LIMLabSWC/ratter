@@ -94,7 +94,7 @@ switch action
         sma = StateMachineAssembler('full_trial_structure','use_happenings', 1);
 
         % scheduled wave for stimuli/fixed sound, based upon side
-        if stimuli_on
+        if strcmpi(Stimuli_State,'Fixed')
             sma = add_scheduled_wave(sma, 'name', 'stimplay', 'preamble', PreStim_time, ...
                 'sustain', sound_duration, 'sound_trig', A1_sound_id); % to play a sound before Go Cue
         else
@@ -337,14 +337,47 @@ switch action
 
                 %%%%%%%%%%%%%%% REWARD COLLECTION STATE START %%%%%%%%%%%%%%%
 
-                sma = add_state(sma, 'name', 'side_led_wait_RewardCollection', 'self_timer', SideLed_duration + RewardCollection_duration, ...
-                    'output_actions', {'DOut', SideLight; 'SchedWaveTrig', 'reward_collection_dur+Go_Cue'}, ...
-                    'input_to_statechange',{HitEvent,'hit_state'; 'Tup','timeout_state'; ErrorEvent,'second_hit_state'});
+                if strcmpi(Stimuli_State,'Discrete Stimuli') & value(training_stage) > 4 % special case for teaching discrete stimuli
+                    % which sarts as soon as the stage 5 starts, when side light no longer cues for rewarded side
 
-                sma = add_state(sma,'name','second_hit_state','self_timer',RewardCollection_duration,...
-                    'output_actions',{'DOut', SideLight},...
-                    'input_to_statechange',{'reward_collection_dur_In', 'timeout_state'; 'Tup','timeout_state'; HitEvent,'hit_state'});
+                    sma = add_state(sma, 'name', 'side_led_wait_RewardCollection', 'self_timer', SideLed_duration + RewardCollection_duration, ...
+                        'output_actions', {'DOut', SideLight * 0; 'SchedWaveTrig', 'reward_collection_dur+Go_Cue'}, ...
+                        'input_to_statechange',{HitEvent,'hit_state'; 'Tup','timeout_state'; ErrorEvent,'second_hit_state'});
 
+                    if value(training_stage) < 8 % its always rewarded the second time if first time choice is wrong
+
+                        sma = add_state(sma,'name','second_hit_state','self_timer',RewardCollection_duration,...
+                            'output_actions',{'DOut', SideLight},...
+                            'input_to_statechange',{'reward_collection_dur_In', 'timeout_state'; 'Tup','timeout_state'; HitEvent,'hit_state'});
+
+                    else % for stage 8 the wrong choice leads to timeout of 5 seconds and no reward
+
+                        sma = add_state(sma,'name','second_hit_state','self_timer',2,...
+                            'output_actions',{'DOut', SideLight},...
+                            'input_to_statechange',{'Tup','current_state+1'});
+
+                        sma = add_state(sma,'self_timer',3,...
+                            'input_to_statechange',{'Tup','preclean_up_state'});
+                                    
+                        sma = add_state(sma, 'name', 'hit_state');
+                        sma = add_state(sma, 'name', 'drink_state');
+
+                    end
+
+
+                else % usual case of passively listening to entire distribution or fixed stimuli with side light cuing for rewarded side
+
+                    sma = add_state(sma, 'name', 'side_led_wait_RewardCollection', 'self_timer', SideLed_duration + RewardCollection_duration, ...
+                        'output_actions', {'DOut', SideLight; 'SchedWaveTrig', 'reward_collection_dur+Go_Cue'}, ...
+                        'input_to_statechange',{HitEvent,'hit_state'; 'Tup','timeout_state'; ErrorEvent,'second_hit_state'});
+
+                    sma = add_state(sma,'name','second_hit_state','self_timer',RewardCollection_duration,...
+                        'output_actions',{'DOut', SideLight},...
+                        'input_to_statechange',{'reward_collection_dur_In', 'timeout_state'; 'Tup','timeout_state'; HitEvent,'hit_state'});
+
+                end
+
+                % Common for all except error trial in stage 8
                 sma = add_state(sma,'name','hit_state','self_timer',0.01,...
                     'output_actions', {'SchedWaveTrig','reward_delivery'},...
                     'input_to_statechange',{'Tup','drink_state'});

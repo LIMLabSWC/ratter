@@ -50,12 +50,12 @@ end
 % it gradually until the max sound played at around 0.05. We will start
 % with 0.001
 if value(PerformanceSummarySection_stage_1_TrialsValid) < value(TrainingStageParamsSection_Go_Sound_Start)
-    ParamsSection_Go_Sound.Value = 0;
+    ParamsSection_Go_Sound.value = 0;
 elseif  value(PerformanceSummarySection_stage_1_TrialsValid) == value(TrainingStageParamsSection_Go_Sound_Start)% start gradual increase
-    ParamsSection_Go_Sound.Value = 1;
+    ParamsSection_Go_Sound.value = 1;
     SoundInterface_GoSoundVol.value = 0.001;
 else
-    ParamsSection_Go_Sound.Value = 1;
+    ParamsSection_Go_Sound.value = 1;
     SoundInterface_GoSoundVol.value = value(SoundInterface_GoSoundVol) + ((0.05 - 0.001) / (value(TrainingStageParamsSection_total_trials) - value(TrainingStageParamsSection_Go_Sound_Start)));
 end
 callback(SoundInterface_GoSoundVol);
@@ -137,15 +137,13 @@ clear('ans');
 %<COMPLETION_TEST>
 if ParamsSection_use_auto_train % do completion check if auto training
     stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
-    % only run it if its the start of the day, number of trials is small
-    if n_done_trials < 100
-        if value(PerformanceSummarySection_stage_1_TrialsValid) > value(TrainingStageParamsSection_total_trials) && ...
-                value(TrainingStageParamsSection_trial_oppSide) > value(TrainingStageParamsSection_total_trials_opp)
-            ParamsSection_training_stage.value = stage_no + 1;
-            callback(ParamsSection_training_stage);
-            ParamsSection(obj, 'Changed_Training_Stage');
-            SessionDefinition(obj, 'jump_to_stage', 'Timeout Rewarded Side Pokes');
-        end
+
+    if value(PerformanceSummarySection_stage_1_TrialsValid) > value(TrainingStageParamsSection_total_trials) && ...
+            value(TrainingStageParamsSection_trial_oppSide) > value(TrainingStageParamsSection_total_trials_opp)
+        ParamsSection_training_stage.value = stage_no + 1;
+        callback(ParamsSection_training_stage);
+        ParamsSection(obj, 'Changed_Training_Stage');
+        SessionDefinition(obj, 'jump_to_stage', 'Timeout Rewarded Side Pokes');
     end
 end
 %</COMPLETION_TEST>
