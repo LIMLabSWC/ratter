@@ -251,7 +251,7 @@ switch action
 
 
    %% pick_current_dicrete_stimulus
-    case 'pick_current_dicrete_stimulus'
+    case 'pick_current_discrete_stimulus'
 
         StimulusSection(obj,'update_discrete_performance');
         
