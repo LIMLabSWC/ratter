@@ -197,7 +197,7 @@ switch action
                 A1 = value(thisstimlog(n_done_trials+1));
                 [rawA1, rawA2, normA1, normA2]=noisestim(1,1,T,value(fcut),Fs,value(filter_type));
                 modulator=singlenoise(1,T,[value(lfreq) value(hfreq)],Fs,'BUTTER');
-                AUD1=normA1(1:A1_time*srate).*modulator(1:A1_time*srate).*A1_sigma;
+                AUD1=normA1(1:round(A1_time*srate)).*modulator(1:round(A1_time*srate)).*A1_sigma;
             end
 
             if ~isempty(AUD1)
