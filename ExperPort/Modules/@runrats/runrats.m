@@ -116,7 +116,7 @@ switch action
         SoloParamHandle(obj,'myfig', 'value',fig);
         
         try
-            set(value(myfig), 'WindowStyle', 'modal');
+            set(value(myfig), 'WindowStyle', 'normal');
             pause(0.1);
             
         catch %#ok<CTCH>
