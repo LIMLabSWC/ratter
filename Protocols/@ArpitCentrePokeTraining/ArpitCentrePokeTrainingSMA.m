@@ -378,12 +378,14 @@ switch action
                 end
 
                 % Common for all except error trial in stage 8
-                sma = add_state(sma,'name','hit_state','self_timer',0.01,...
-                    'output_actions', {'SchedWaveTrig','reward_delivery'},...
-                    'input_to_statechange',{'Tup','drink_state'});
+                if ~(strcmpi(Stimuli_State, 'Discrete Stimuli') && value(training_stage) == 8)
+                    sma = add_state(sma, 'name', 'hit_state', 'self_timer', 0.01, ...
+                        'output_actions', {'SchedWaveTrig', 'reward_delivery'}, ...
+                        'input_to_statechange', {'Tup', 'drink_state'});
 
-                sma = add_state(sma,'name','drink_state','self_timer',drink_time,...
-                    'input_to_statechange',{'Tup','preclean_up_state'});
+                    sma = add_state(sma, 'name', 'drink_state', 'self_timer', drink_time, ...
+                        'input_to_statechange', {'Tup', 'preclean_up_state'});
+                end
 
                 % For Timeout
 
