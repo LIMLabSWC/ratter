@@ -338,7 +338,7 @@ switch action
             'Variable Stimuli Go Cue location during Centre Poke','User Setting'};
         perf.stage_name = stage_name_list{perf.stage_no};
 
-        perf.video_filepath = BonsaiCameraInterface(obj,'video_filepath');
+        perf.video_filepath = BonsaiCameraInterface(obj,'get_video_filepath');
 
         CentrePoketrainingsummary(obj,'protocol_data',perf);
     
