@@ -243,6 +243,14 @@ switch action
                     'output_actions', {'DOut', center1led}, ...
                     'input_to_statechange', {'Cin','settling_in_state';'Tup','timeout_state'});
 
+                % Count states before the branch
+                states_before_branch = size(get_labels(sma), 1);
+
+                % Number of states the else-branch adds - update this if you ever
+                % add states to the else block (the assert below will tell you)
+                ELSE_BRANCH_N_STATES = 8;  % settle + 2 anon + legal_start + soft_cp + 2 anon + legal_end
+
+
                 %%%%%%%%%%%%% SETTLING IN STATE START %%%%%%%%%%%%%%%%%%%%
                 % Before progressing check if its still centre poking or pokes within legal c_break other wise its a violation
 
@@ -262,6 +270,14 @@ switch action
                     % directly to give reward
                     sma = add_state(sma,'self_timer',CP_duration,...
                         'input_to_statechange', {'CP_Duration_wave_In','side_led_wait_RewardCollection'; 'Cout','current_state - 1';'Tup','side_led_wait_RewardCollection'});
+
+                    % Auto-pad to match else-branch state count
+                    states_added_if = size(get_labels(sma), 1) - states_before_branch;
+                    n_padding = ELSE_BRANCH_N_STATES - states_added_if;
+                    for i = 1:n_padding
+                        sma = add_state(sma, 'self_timer', 0.001, ...
+                            'input_to_statechange', {'Tup', 'side_led_wait_RewardCollection'});
+                    end
 
                 else % the usual state machine
 
@@ -358,9 +374,6 @@ switch action
 
                         sma = add_state(sma,'self_timer',3,...
                             'input_to_statechange',{'Tup','preclean_up_state'});
-                                    
-                        sma = add_state(sma, 'name', 'hit_state');
-                        sma = add_state(sma, 'name', 'drink_state');
 
                     end
 
@@ -377,16 +390,20 @@ switch action
 
                 end
 
-                % Common for all except error trial in stage 8
-                if ~(strcmpi(Stimuli_State, 'Discrete Stimuli') && value(training_stage) == 8)
-                    sma = add_state(sma, 'name', 'hit_state', 'self_timer', 0.01, ...
-                        'output_actions', {'SchedWaveTrig', 'reward_delivery'}, ...
-                        'input_to_statechange', {'Tup', 'drink_state'});
+                % States common for all stages
 
-                    sma = add_state(sma, 'name', 'drink_state', 'self_timer', drink_time, ...
-                        'input_to_statechange', {'Tup', 'preclean_up_state'});
-                end
+                sma = add_state(sma, 'name', 'hit_state', 'self_timer', 0.01, ...
+                    'output_actions', {'SchedWaveTrig', 'reward_delivery'}, ...
+                    'input_to_statechange', {'Tup', 'drink_state'});
 
+                sma = add_state(sma, 'name', 'drink_state', 'self_timer', drink_time, ...
+                    'input_to_statechange', {'Tup', 'preclean_up_state'});
+
+
+                %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+                %%%%%%%%%% OTHER STATES %%%%%%%%%%%%%%%%
+               
                 % For Timeout
 
                 sma = add_state(sma,'name','timeout_state','self_timer',timeout_snd_duration,...

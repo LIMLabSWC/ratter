@@ -117,7 +117,7 @@ switch action
             trigephys = nan;
         end
 
-        if strcmpi(value(StimLine),'Ephys')
+        if strcmpi(value(StimLine),'Ephys')  && ~isnan(trigephys)
             sma = add_scheduled_wave(sma, 'name', 'EphysTrig', 'preamble', 0, 'sustain', ...
                 0.4, 'DOut',  trigephys, 'loop', 0); %for Ephys
         else
@@ -130,6 +130,8 @@ switch action
         sma = add_state(sma,'name','wait_for_cpoke','self_timer',CenterLed_duration, ...
             'output_actions', {'DOut', center1led}, ...
             'input_to_statechange', {'Cin','settling_in_state';'Tup','timeout_state'});
+
+        states_before_branch = size(get_labels(sma), 1); % needed for assert
 
         %%%%%%%%%%%%% SETTLING IN STATE START %%%%%%%%%%%%%%%%%%%%
         % Before progressing check if its still centre poking or pokes within legal c_break other wise its a violation
@@ -150,6 +152,12 @@ switch action
             % directly to give reward
             sma = add_state(sma,'self_timer',CP_duration,...
                 'input_to_statechange', {'CP_Duration_wave_In','side_led_wait_RewardCollection'; 'Cout','current_state - 1';'Tup','side_led_wait_RewardCollection'});
+
+            % ---- Padding: 2 states to match else-branch count ----
+            sma = add_state(sma,'self_timer',0.001,...
+                'input_to_statechange',{'Tup','side_led_wait_RewardCollection'});
+            sma = add_state(sma,'self_timer',0.001,...
+                'input_to_statechange',{'Tup','side_led_wait_RewardCollection'});
 
         else % the usual state machine
 
@@ -184,29 +192,45 @@ switch action
                 'output_actions', {'SchedWaveTrig',  'CP_Duration_wave+stimplay'},...
                 'input_to_statechange', {'Cout','current_state + 1'; 'Tup','side_led_wait_RewardCollection';...
                 'Rin', 'violation_state'; 'Rout', 'violation_state'; 'Lin', 'violation_state'; 'Lout', 'violation_state'}); %more stringent by giving half the legal cp time
-
+            
+            % Safety assert: fires immediately if you ever add/remove states here
+            states_added_else = size(get_labels(sma),1) - states_before_branch;
+            assert(states_added_else == 5, ...
+                'Update padding: else-branch now has %d states', states_added_else);
+        
         end
 
-        % Intermediate State
+       %% Intermediate State 
+        if CP_duration > SettlingIn_time + legal_cbreak
 
-        % This intermediate state is considering the poke is out before the end of settling time / at the start of this state
-        sma = add_state(sma,'self_timer',legal_cbreak,'output_actions', {'DOut', center1led * LED_during_legal_cbreak}, ...
-            'input_to_statechange', {'CP_Duration_wave_In','legal_poke_end_state';'Cin','current_state + 1';'Tup','violation_state';...
-            'Rin',  'violation_state';'Rout', 'violation_state'; 'Lin', 'violation_state';'Lout', 'violation_state'});
+            % This intermediate state is considering the poke is out before the end of settling time / at the start of this state
+            sma = add_state(sma,'self_timer',legal_cbreak,'output_actions', {'DOut', center1led * LED_during_legal_cbreak}, ...
+                'input_to_statechange', {'CP_Duration_wave_In','legal_poke_end_state';'Cin','current_state + 1';'Tup','violation_state';...
+                'Rin',  'violation_state';'Rout', 'violation_state'; 'Lin', 'violation_state';'Lout', 'violation_state'});
 
-        % The state jump to here when the nose is still in then go directly to soft_cp
-        sma = add_state(sma,'self_timer',CP_duration - SettlingIn_time, ...
-            'input_to_statechange', {'CP_Duration_wave_In','side_led_wait_RewardCollection';'Cout','current_state - 1';'Tup','side_led_wait_RewardCollection';...
-            'Rin',  'violation_state';'Rout', 'violation_state'; 'Lin', 'violation_state';'Lout', 'violation_state'});
+            % The state jump to here when the nose is still in then go directly to soft_cp
+            sma = add_state(sma,'self_timer',CP_duration - SettlingIn_time, ...
+                'input_to_statechange', {'CP_Duration_wave_In','side_led_wait_RewardCollection';'Cout','current_state - 1';'Tup','side_led_wait_RewardCollection';...
+                'Rin',  'violation_state';'Rout', 'violation_state'; 'Lin', 'violation_state';'Lout', 'violation_state'});
 
-        %%%%%%%%%%%% LEGAL SOFT POKE STATE END %%%%%%%%%%%%%%%%%
+            %%%%%%%%%%%% LEGAL SOFT POKE STATE END %%%%%%%%%%%%%%%%%
 
-        % Before giving the reward check if its still centre poking or pokes
-        % within legal c_break other wise its a violation
+            % Before giving the reward check if its still centre poking or pokes
+            % within legal c_break other wise its a violation
 
-        sma = add_state(sma,'name','legal_poke_end_state','self_timer',legal_cbreak/2, ...
-            'output_actions', {'DOut', center1led * LED_during_legal_cbreak}, ...
-            'input_to_statechange', {'Cin','side_led_wait_RewardCollection'; 'Tup','violation_state'});
+            sma = add_state(sma,'name','legal_poke_end_state','self_timer',legal_cbreak/2, ...
+                'output_actions', {'DOut', center1led * LED_during_legal_cbreak}, ...
+                'input_to_statechange', {'Cin','side_led_wait_RewardCollection'; 'Tup','violation_state'});
+
+        else
+            % Padding to match else-branch state count
+            states_before = size(get_labels(sma),1); % measure after your fix
+            % add padding states equal to 3 (the states above)
+            for i = 1:3
+                sma = add_state(sma,'self_timer',0.001,...
+                    'input_to_statechange',{'Tup','side_led_wait_RewardCollection'});
+            end
+        end
 
 
         %%%%%%%%%%%%%%% REWARD COLLECTION STATE START %%%%%%%%%%%%%%%
@@ -226,7 +250,7 @@ switch action
 
         elseif  strcmp(reward_type, 'DelayedReward')
 
-            sma = add_state(sma,'name','second_hit_state','self_timer',secondhit_delay,...
+            sma = add_state(sma,'name','second_hit_state','self_timer',max(0.001, secondhit_delay),...
                 'input_to_statechange',{'Tup','current_state + 1'});
 
             sma = add_state(sma,'self_timer',RewardCollection_duration,...
@@ -281,11 +305,6 @@ switch action
 
         varargout{1} = sma;
 
-        % Not all 'prepare_next_trial_states' are defined in all training
-        % stages. So we send to dispatcher only those states that are
-        % defined.
-        state_names = get_labels(sma); state_names = state_names(:,1);
-        prepare_next_trial_states = {'side_led_wait_RewardCollection','hit_state','second_hit_state','drink_state', 'violation_state','timeout_state'};
         
         % After defining the states for behavior, adding states for
         % electrophysiology or LED stimulator.
@@ -295,6 +314,12 @@ switch action
         elseif strcmpi(value(StimLine),'Ephys')
             sma = add_trialnum_indicator(sma, n_done_trials+1, 'time_per_state', 5e-3);
         end
+        
+        % Not all 'prepare_next_trial_states' are defined in all training
+        % stages. So we send to dispatcher only those states that are
+        % defined.
+        state_names = get_labels(sma); state_names = state_names(:,1);
+        prepare_next_trial_states = {'side_led_wait_RewardCollection','hit_state','second_hit_state','drink_state', 'violation_state','timeout_state'};
         
         dispatcher('send_assembler', sma, intersect(state_names, prepare_next_trial_states));
 		
