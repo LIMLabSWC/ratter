@@ -35,7 +35,7 @@ for hi= 1:length(handles)
     sph_fullname=get_fullname(handles{hi});
     if strcmpi(sph_fullname,stage_handle_name)
         handles{hi}.value = loaded_data.saved.(sph_fullname); 
-        callback(handles{i});
+        % callback(handles{i});
         break
     end
 end
