@@ -75,29 +75,32 @@ return
 end
 
 function create_gui(obj)
+        GetSoloFunctionArgs(obj);
+
         % Make the GUI
         SoloParamHandle(obj, 'myfig', 'saveable', 0);
         myfig.value = figure;
         set(value(myfig), 'Name', mfilename, 'Tag', mfilename, ...
         'closerequestfcn', 'dispatcher(''close_protocol'')', 'MenuBar', 'none');
-        set(value(myfig), 'Position', [150 550   910  440 ]);
+        set(value(myfig), 'Position', [150 550   910  440]);
 
+        % Column 1: Saving and Sound Config
         x = 5;
         y = 5;
         [x, y] = SavingSection(obj, 'init', x, y);
 
-        % Add sound configuration section
-        next_column(x); y = 5;
+        next_row(y, 1);
         [x, y] = SoundConfigSection(obj, 'init', x, y);
 
-        % PokesPlot on the right
-        next_column(x); y = 5;
+        % Column 2: PokesPlot
+        x = 400;
+        y = 5;
         [x, y] = PokesPlotSection(obj, 'init', x, y);
         PokesPlotSection(obj, 'set_alignon', 'wait_for_center_poke(1,1)');
 
         [expmtr, rname] = SavingSection(obj, 'get_info');
         figpos = get(value(myfig), 'Position');
-        HeaderParam(obj, 'prot_title', ['Sound2AFC: ' expmtr ', ' rname] , ...
+        HeaderParam(obj, 'prot_title', ['Sound2AFC: ' expmtr ', ' rname], ...
             x, y, 'position', [10 figpos(4)-25, 600 20]);
 end
 
@@ -159,13 +162,19 @@ function obj = create_sounds(obj)
         loop_flag = 0;
         [audio_data, orig_rate] = audioread(config.file);
 
-        % Resample to target rate
-        audio_data = resample(audio_data, target_sample_rate, orig_rate);
-
-        % Convert to mono if stereo, then make stereo (both speakers)
+        % Convert to mono if stereo
         if size(audio_data, 2) == 2
             audio_data = mean(audio_data, 2);
         end
+
+        % Resample to target rate using interpolation (no Signal Toolbox needed)
+        if orig_rate ~= target_sample_rate
+            orig_time = (0:length(audio_data)-1) / orig_rate;
+            target_time = (0:1/target_sample_rate:orig_time(end));
+            audio_data = interp1(orig_time, audio_data, target_time, 'linear');
+            audio_data = audio_data(:);  % Ensure column vector
+        end
+
         stereo_waveform = [audio_data'; audio_data'];  % Both speakers
 
         % Declare the sound with the label as its name
