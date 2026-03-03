@@ -45,7 +45,7 @@ GetSoloFunctionArgs(obj);
 
 switch action
     case 'init'
-        create_gui()
+        create_gui(obj);
 
         obj = create_sounds(obj);
         Sound2AFC(obj, 'prepare_next_trial')
@@ -74,53 +74,113 @@ return
 
 end
 
-function create_gui()
-            % Make the GUI
-        SoloParamHandle(obj, 'myfig', 'saveable', 0); 
+function create_gui(obj)
+        % Make the GUI
+        SoloParamHandle(obj, 'myfig', 'saveable', 0);
         myfig.value = figure;
         set(value(myfig), 'Name', mfilename, 'Tag', mfilename, ...
         'closerequestfcn', 'dispatcher(''close_protocol'')', 'MenuBar', 'none');
         set(value(myfig), 'Position', [150 550   910  440 ]);
-        
-        x = 5; 
+
+        x = 5;
         y = 5;
         [x, y] = SavingSection(obj, 'init', x, y);
+
+        % Add sound configuration section
+        next_column(x); y = 5;
+        [x, y] = SoundConfigSection(obj, 'init', x, y);
+
+        % PokesPlot on the right
+        next_column(x); y = 5;
         [x, y] = PokesPlotSection(obj, 'init', x, y);
         PokesPlotSection(obj, 'set_alignon', 'wait_for_center_poke(1,1)');
+
+        [expmtr, rname] = SavingSection(obj, 'get_info');
+        figpos = get(value(myfig), 'Position');
+        HeaderParam(obj, 'prot_title', ['Sound2AFC: ' expmtr ', ' rname] , ...
+            x, y, 'position', [10 figpos(4)-25, 600 20]);
 end
 
 function trial_params = get_trial_params(obj)
-    trial_params = struct('sound_name', 'bus', ...
-        'correct_side', 'left');
+    GetSoloFunctionArgs(obj);
+
+    % Get normalized probabilities and labels
+    probs = value(normalized_probs);
+    labels = value(sound_labels);
+
+    % Select sound based on probabilities
+    cumprobs = cumsum(probs);
+    r = rand();
+    sound_idx = find(r <= cumprobs, 1, 'first');
+    selected_label = labels{sound_idx};
+
+    % Get the port mapping for this sound
+    port_param = sprintf('sound_%s_port', selected_label);
+    port_mapping = value(eval(port_param));
+
+    % Determine correct side based on port mapping
+    switch port_mapping
+        case 'left'
+            correct_side = 'left';
+        case 'right'
+            correct_side = 'right';
+        case 'random'
+            if rand() < 0.5
+                correct_side = 'left';
+            else
+                correct_side = 'right';
+            end
+        otherwise
+            error('Unknown port_mapping: %s', port_mapping);
+    end
+
+    trial_params = struct('sound_name', selected_label, ...
+                         'correct_side', correct_side, ...
+                         'port_mapping', port_mapping);
 end
 
 function obj = create_sounds(obj)
-    sound_files = {'181900__yurkobb__bus-engine-looped.wav'};
-    sound_names = {'bus'};
-    sound_port_mappings = {'left'};
-    assert(length(sound_files) == length(sound_names))
+    GetSoloFunctionArgs(obj);
 
-    SoundManagerSection(obj, 'init')
+    SoundManagerSection(obj, 'init');
     target_sample_rate = SoundManagerSection(obj, 'get_sample_rate');
-    
-    for i = 1:length(sound_files)
-        loop_flag = 0;
-        [y, orig_rate] = audioread(sound_files{i});
-            
-        y = resample(y, target_sample_rate, orig_rate);
 
-        SoundManagerSection(obj, 'declare_new_sound', sound_names{i}, y, loop_flag);
+    % Get sound labels from SoundConfigSection
+    labels = value(sound_labels);
+
+    % Create sounds based on configuration for each label (A, B, C, D)
+    for i = 1:length(labels)
+        label = labels{i};
+
+        % Get configuration for this sound
+        config = SoundConfigSection(obj, 'get_sound_config', label);
+
+        % Load audio file
+        loop_flag = 0;
+        [audio_data, orig_rate] = audioread(config.file);
+
+        % Resample to target rate
+        audio_data = resample(audio_data, target_sample_rate, orig_rate);
+
+        % Convert to mono if stereo, then make stereo (both speakers)
+        if size(audio_data, 2) == 2
+            audio_data = mean(audio_data, 2);
+        end
+        stereo_waveform = [audio_data'; audio_data'];  % Both speakers
+
+        % Declare the sound with the label as its name
+        SoundManagerSection(obj, 'declare_new_sound', label, stereo_waveform, loop_flag);
     end
 
-    % Define the correct sound
+    % Define the correct sound (reward feedback)
     duration = .5;  % seconds
     volume = .1;
     t = (0:1/target_sample_rate:duration);
     t = t(1:end-1);
     carrier = sin(2*pi*12000*t);
     modulation = 1 + 0.5*sin(2*pi*8*t);  % 0.5 is modulation depth (0-1)
-    waveform = volume * modulation .* carrier;  % 0.01 is overall volume
-    waveform = [waveform; waveform];
+    waveform = volume * modulation .* carrier;
+    waveform = [waveform; waveform];  % Both speakers for feedback
 
     SoundManagerSection(obj, 'declare_new_sound', 'correct', waveform, loop_flag);
 
@@ -128,6 +188,7 @@ function obj = create_sounds(obj)
     duration = 0.25;  % seconds
     n_samples = round(target_sample_rate * duration);
     waveform = 0.01 * randn(1, n_samples);
+    waveform = [waveform; waveform];  % Both speakers for error
     SoundManagerSection(obj, 'declare_new_sound', 'error', waveform, loop_flag);
 
     SoundManagerSection(obj, 'send_not_yet_uploaded_sounds');
@@ -145,22 +206,41 @@ function [sma, prep_next_trial_states] = build_sma(obj, trial_params)
     choice_timer = 5;
     cpoke_viol_state = 'check_next_trial_ready';
     
-    sound_name = trial_params.sound_name ;
+    sound_name = trial_params.sound_name;
     correct_side = trial_params.correct_side;
-    
-    correct_state = sprintf('%s_reward', correct_side);
-    error_state = 'error_state';
+    port_mapping = trial_params.port_mapping;
+
+    % Determine if this is a random trial
+    is_random = strcmp(port_mapping, 'random');
+
+    % Set up inputs and outputs based on correct side
     switch correct_side
         case 'left'
             correct_in = 'Lin';
             error_in = 'Rin';
             rew_dout = left1water;
+            % State names: left poke = reward, right poke = error
+            if is_random
+                correct_state = 'left_random_reward';
+                error_state = 'right_random_error';
+            else
+                correct_state = 'left_reward';
+                error_state = 'right_error';
+            end
         case 'right'
             correct_in = 'Rin';
             error_in = 'Lin';
             rew_dout = right1water;
+            % State names: right poke = reward, left poke = error
+            if is_random
+                correct_state = 'right_random_reward';
+                error_state = 'left_random_error';
+            else
+                correct_state = 'right_reward';
+                error_state = 'left_error';
+            end
         otherwise
-            error('Don''t know how to handle correct_side')
+            error('Don''t know how to handle correct_side: %s', correct_side)
     end
 
     stim_id = SoundManagerSection(obj, 'get_sound_id', sound_name);
