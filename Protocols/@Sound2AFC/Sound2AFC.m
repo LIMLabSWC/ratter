@@ -35,7 +35,9 @@ elseif ischar(varargin{1})
 else
     warning("The first argument should be an instance of the class object or an action")
 end;
-if ~ischar(action), error('The action parameter must be a string'); end;
+if ~ischar(action), 
+    error('The action parameter must be a string'); 
+end;
 
 GetSoloFunctionArgs(obj);
 
@@ -43,11 +45,14 @@ GetSoloFunctionArgs(obj);
 
 switch action
     case 'init'
+        create_gui()
+
         obj = create_sounds(obj);
         Sound2AFC(obj, 'prepare_next_trial')
 
     case 'prepare_next_trial'
-        [sma, prep_next_trial_states] = build_sma(obj);
+        trial_params = get_trial_params(obj);
+        [sma, prep_next_trial_states] = build_sma(obj, trial_params);
 
         dispatcher('send_assembler', sma, prep_next_trial_states);
 
@@ -58,7 +63,7 @@ switch action
     case 'end_session'
 
     case 'pre_saving_settings'
-
+        % Make and send summary
     case 'close'
 
     otherwise
@@ -67,6 +72,26 @@ end
 
 return
 
+end
+
+function create_gui()
+            % Make the GUI
+        SoloParamHandle(obj, 'myfig', 'saveable', 0); 
+        myfig.value = figure;
+        set(value(myfig), 'Name', mfilename, 'Tag', mfilename, ...
+        'closerequestfcn', 'dispatcher(''close_protocol'')', 'MenuBar', 'none');
+        set(value(myfig), 'Position', [150 550   910  440 ]);
+        
+        x = 5; 
+        y = 5;
+        [x, y] = SavingSection(obj, 'init', x, y);
+        [x, y] = PokesPlotSection(obj, 'init', x, y);
+        PokesPlotSection(obj, 'set_alignon', 'wait_for_center_poke(1,1)');
+end
+
+function trial_params = get_trial_params(obj)
+    trial_params = struct('sound_name', 'bus', ...
+        'correct_side', 'left');
 end
 
 function obj = create_sounds(obj)
@@ -88,7 +113,7 @@ function obj = create_sounds(obj)
     end
 
     % Define the correct sound
-    duration = 1;  % seconds
+    duration = .5;  % seconds
     volume = .1;
     t = (0:1/target_sample_rate:duration);
     t = t(1:end-1);
@@ -111,7 +136,7 @@ end
 
 
 
-function [sma, prep_next_trial_states] = build_sma(obj, action)
+function [sma, prep_next_trial_states] = build_sma(obj, trial_params)
     global left1water;
     global right1water;
 
@@ -120,9 +145,9 @@ function [sma, prep_next_trial_states] = build_sma(obj, action)
     choice_timer = 5;
     cpoke_viol_state = 'check_next_trial_ready';
     
-    sound_name = 'bus';
+    sound_name = trial_params.sound_name ;
+    correct_side = trial_params.correct_side;
     
-    correct_side = 'left';
     correct_state = sprintf('%s_reward', correct_side);
     error_state = 'error_state';
     switch correct_side
