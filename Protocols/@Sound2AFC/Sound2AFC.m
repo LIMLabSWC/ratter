@@ -73,11 +73,14 @@ switch action
         PokesPlotSection(obj, 'update');
 
     case 'end_session'
-
-    case 'pre_saving_settings'
         % TO DO Make and send summary
 
+    case 'pre_saving_settings'
+        % 
+        
+
     case 'close'
+        PokesPlotSection(obj, 'close');
         if exist('myfig', 'var') && isa(myfig, 'SoloParamHandle') && ishandle(value(myfig))
             delete(value(myfig));
         end
@@ -118,11 +121,11 @@ function create_gui(obj)
         [x, y] = SoundConfigSection(obj, 'init', x, y);
 
         % Column 2: PokesPlot
-        x = 400;
-        y = 5;
-        [x, y] = PokesPlotSection(obj, 'init', x, y);
+        next_row(y, 1);
+        [x, y] = PokesPlotSection(obj, 'init', x, y, struct('states',  state_colors()));
         PokesPlotSection(obj, 'set_alignon', 'wait_for_center_poke(1,1)');
         PokesPlotSection(obj, 'hide');
+    
 
         [expmtr, rname] = SavingSection(obj, 'get_info');
         figpos = get(value(myfig), 'Position');
