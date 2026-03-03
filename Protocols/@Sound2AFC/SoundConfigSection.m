@@ -121,8 +121,12 @@ switch action
         file_param = sprintf('sound_%s_file', label);
         port_param = sprintf('sound_%s_port', label);
 
+        % Get the file list and index
+        files = value(available_sound_files);
+        file_idx = value(eval(file_param));
+
         config = struct();
-        config.file = value(available_sound_files){value(eval(file_param))};
+        config.file = files{file_idx};
         config.port = value(eval(port_param));
         config.label = label;
 
