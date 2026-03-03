@@ -19,7 +19,9 @@ switch action
         % Define available sound files
         SoloParamHandle(obj, 'available_sound_files', 'value', {
             '181900__yurkobb__bus-engine-looped.wav'
-            % Add more files here as needed
+            '788203__klankbeeld__storm-bare-trees-7bft-421-pm-170223_1093.wav'
+            '803709__itinerantmonk108__electric-leaf-blower-in-quad.wav'
+            '805977__kevp888__250510_121339_fr_large_crowd_in_palais_garnier.wav'
         }, 'save_with_settings', 0);
 
         % Create fixed sound labels
@@ -107,6 +109,11 @@ switch action
         % Get the file list and index
         files = value(available_sound_files);
         file_idx = value(eval(file_param));
+
+        % Bounds check
+        if file_idx < 1 || file_idx > length(files)
+            file_idx = 1;  % Default to first file
+        end
 
         config = struct();
         config.file = files{file_idx};
