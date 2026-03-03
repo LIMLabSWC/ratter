@@ -33,7 +33,7 @@ switch action
 
         % Create GUI elements for each sound label
         labels = value(sound_labels);
-        for i = 1:length(labels)
+        for i = length(labels):-1:1
             label = labels{i};
 
             % File selection menu with label

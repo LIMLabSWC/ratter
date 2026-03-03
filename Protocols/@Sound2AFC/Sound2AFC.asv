@@ -127,6 +127,8 @@ function trial_params = get_trial_params(obj)
     % Get the port mapping for this sound
     port_param = sprintf('sound_%s_port', selected_label);
     port_mapping = value(eval(port_param));
+    config = SoundConfigSection(obj, 'get_sound_config', selected_label);
+    port_mapping = config.port;
 
     % Determine correct side based on port mapping
     switch port_mapping
@@ -162,8 +164,8 @@ function obj = create_sounds(obj)
     for i = 1:length(labels)
         label = labels{i};
 
-        % Get configuration for this sound
-        [config, ] = SoundConfigSection(obj, 'get_sound_config', label);
+        % Get configuration for this sounds
+        config = SoundConfigSection(obj, 'get_sound_config', label);
 
         % Load audio file
         loop_flag = 0;

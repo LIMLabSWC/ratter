@@ -104,11 +104,13 @@ function create_gui(obj)
         y = 5;
         [x, y] = PokesPlotSection(obj, 'init', x, y);
         PokesPlotSection(obj, 'set_alignon', 'wait_for_center_poke(1,1)');
+        PokesPlotSection(obj, 'hide');
 
         [expmtr, rname] = SavingSection(obj, 'get_info');
         figpos = get(value(myfig), 'Position');
         HeaderParam(obj, 'prot_title', ['Sound2AFC: ' expmtr ', ' rname], ...
             x, y, 'position', [10 figpos(4)-25, 600 20]);
+        
 end
 
 function trial_params = get_trial_params(obj)
@@ -125,8 +127,8 @@ function trial_params = get_trial_params(obj)
     selected_label = labels{sound_idx};
 
     % Get the port mapping for this sound
-    port_param = sprintf('sound_%s_port', selected_label);
-    port_mapping = value(eval(port_param));
+    config = SoundConfigSection(obj, 'get_sound_config', selected_label);
+    port_mapping = config.port;
 
     % Determine correct side based on port mapping
     switch port_mapping
@@ -275,17 +277,17 @@ function [sma, prep_next_trial_states] = build_sma(obj, trial_params)
         'input_to_statechange',{'Cin', 'cpoke_pre_stim'});
 
     % center poke to start stimulus
-    sma = add_state(sma, 'name', 'cpoke_pre_stim','timer', pre_stim_cpoke_dur, ...
+    sma = add_state(sma, 'name', 'cpoke_pre_stim','self_timer', pre_stim_cpoke_dur, ...
         'output_actions', {'DOut', center1led}, ...
         'input_to_statechange',{'Cout', 'wait_for_center_poke', ...
         'Tup', 'cpoke_stim'});
-    sma = add_state(sma, 'name', 'cpoke_stim', 'timer', post_stim_cpoke_dur, ...
-        'output_actions', {'DOut', center1led, 'SoundOut', stim_id}, ...
+    sma = add_state(sma, 'name', 'cpoke_stim', 'self_timer', post_stim_cpoke_dur, ...
+        'output_actions', {'DOut', center1led; 'SoundOut', stim_id}, ...
         'input_to_statechange',{'Cout', cpoke_viol_state, ...
         'Tup', 'wait_for_choice'});
 
     % wait for a choice
-    sma = add_state(sma, 'name', 'wait_for_choice', 'timer', choice_timer, ...
+    sma = add_state(sma, 'name', 'wait_for_choice', 'self_timer', choice_timer, ...
         'input_to_statechange', {correct_in, correct_state; ...
         error_in, error_state; 'Tup', 'check_next_trial_ready'});
 
@@ -293,6 +295,6 @@ function [sma, prep_next_trial_states] = build_sma(obj, trial_params)
     sma = add_state(sma, 'name', correct_state, ...
         'output_actions', {'DOut', rew_dout, 'SoundOut', rew_snd_id});
 
-    sma = add_state(sma, 'name', error_state, {'SoundOut', err_snd_id});
+    sma = add_state(sma, 'name', error_state, 'output_actions', {'SoundOut', err_snd_id});
     
 end
