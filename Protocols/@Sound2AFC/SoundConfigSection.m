@@ -71,6 +71,8 @@ switch action
         % Normalize on init
         SoundConfigSection(obj, 'normalize_probs');
 
+        DeclareGlobals(obj, 'ro_args', {'normalized_probs'});
+
     case 'normalize_probs'
         % Collect raw probability weights
         sound_labels = value(sound_labels);
@@ -106,21 +108,14 @@ switch action
         file_param = sprintf('sound_%s_file', label);
         port_param = sprintf('sound_%s_port', label);
 
-        % Get the file list and index
-        files = value(available_sound_files);
-        file_idx = value(eval(file_param));
-
-        % Bounds check
-        if file_idx < 1 || file_idx > length(files)
-            file_idx = 1;  % Default to first file
-        end
-
+        
         config = struct();
-        config.file = files{file_idx};
+        config.file = value(eval(file_param));
         config.port = value(eval(port_param));
         config.label = label;
 
-        y = config;  % Return via y
+        x = config;  
+        y = label;
 
     case 'reinit'
         % Get original GUI position

@@ -162,8 +162,8 @@ function obj = create_sounds(obj)
     for i = 1:length(labels)
         label = labels{i};
 
-        % Get configuration for this sounds
-        config = SoundConfigSection(obj, 'get_sound_config', label);
+        % Get configuration for this sound
+        [config, ] = SoundConfigSection(obj, 'get_sound_config', label);
 
         % Load audio file
         loop_flag = 0;
