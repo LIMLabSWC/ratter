@@ -65,7 +65,9 @@ switch action
     case 'pre_saving_settings'
         % Make and send summary
     case 'close'
-
+        if exist('myfig', 'var') && isa(myfig, 'SoloParamHandle') && ishandle(value(myfig))
+            delete(value(myfig));
+        end
     otherwise
         warning('Unknown action! "%s"\n', action); %#ok<WNTAG>
 end

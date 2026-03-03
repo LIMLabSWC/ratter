@@ -46,7 +46,7 @@ switch action
         labels = value(sound_labels);
         sound_names = value(available_sound_names);
 
-        for i = 1:length(labels)
+        for i = length(labels):-1:1
             label = labels{i};
             def = defaults.(label);
 
@@ -54,15 +54,12 @@ switch action
             default_name_idx = find(strcmp(sound_names, def.name));
             default_port_idx = find(strcmp({'left', 'right', 'random'}, def.port));
 
-            % Section label
-            SubheaderParam(obj, sprintf('sound_%s_header', label), ...
-                sprintf('Sound %s', label), x, y);
-            next_row(y);
-
-            % Sound name selection menu
-            MenuParam(obj, sprintf('sound_%s_name', label), ...
-                sound_names, default_name_idx, x, y, ...
-                'label', 'Name');
+            % Probability weight
+            NumeditParam(obj, sprintf('sound_%s_prob', label), ...
+                def.weight, x, y, ...
+                'label', 'Weight');
+            set_callback(eval(sprintf('sound_%s_prob', label)), ...
+                {mfilename, 'normalize_probs'});
             next_row(y);
 
             % Port mapping menu (which port is correct)
@@ -70,13 +67,16 @@ switch action
                 {'left', 'right', 'random'}, default_port_idx, x, y, ...
                 'label', 'Port');
             next_row(y);
+            
+            % Sound name selection menu
+            MenuParam(obj, sprintf('sound_%s_name', label), ...
+                sound_names, default_name_idx, x, y, ...
+                'label', 'Name');
+            next_row(y);
 
-            % Probability weight
-            NumeditParam(obj, sprintf('sound_%s_prob', label), ...
-                def.weight, x, y, ...
-                'label', 'Weight');
-            set_callback(eval(sprintf('sound_%s_prob', label)), ...
-                {mfilename, 'normalize_probs'});
+            % Section label
+            SubheaderParam(obj, sprintf('sound_%s_header', label), ...
+                sprintf('Sound %s', label), x, y);
             next_row(y);
 
             next_row(y, 0.5);  % Extra space between sounds
