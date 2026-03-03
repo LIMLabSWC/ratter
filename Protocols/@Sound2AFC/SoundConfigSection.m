@@ -23,16 +23,16 @@ switch action
         }, 'save_with_settings', 0);
 
         % Create fixed sound labels
-        sound_labels = {'A', 'B', 'C', 'D'};
-        SoloParamHandle(obj, 'sound_labels', 'value', sound_labels, 'save_with_settings', 0);
+        SoloParamHandle(obj, 'sound_labels', 'value', {'A', 'B', 'C', 'D'}, 'save_with_settings', 0);
 
         % Title
         SubheaderParam(obj, 'soundconfig_title', 'Sound Configuration', x, y);
         next_row(y, 1.5);
 
         % Create GUI elements for each sound label
-        for i = 1:length(sound_labels)
-            label = sound_labels{i};
+        labels = value(sound_labels);
+        for i = 1:length(labels)
+            label = labels{i};
 
             % File selection menu with label
             MenuParam(obj, sprintf('sound_%s_file', label), ...
