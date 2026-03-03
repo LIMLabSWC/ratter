@@ -16,13 +16,17 @@ switch action
         % Save GUI position
         SoloParamHandle(obj, 'soundconfig_gui_info', 'value', [x y double(gcf)]);
 
-        % Define available sound files
-        SoloParamHandle(obj, 'available_sound_files', 'value', {
-            '181900__yurkobb__bus-engine-looped.wav'
-            '788203__klankbeeld__storm-bare-trees-7bft-421-pm-170223_1093.wav'
-            '803709__itinerantmonk108__electric-leaf-blower-in-quad.wav'
-            '805977__kevp888__250510_121339_fr_large_crowd_in_palais_garnier.wav'
-        }, 'save_with_settings', 0);
+        % Define sound name to file mapping
+        SoloParamHandle(obj, 'sound_name_to_file_map', 'value', struct(...
+            'bus', '181900__yurkobb__bus-engine-looped.wav', ...
+            'storm', '788203__klankbeeld__storm-bare-trees-7bft-421-pm-170223_1093.wav', ...
+            'leafblower', '803709__itinerantmonk108__electric-leaf-blower-in-quad.wav', ...
+            'crowd', '805977__kevp888__250510_121339_fr_large_crowd_in_palais_garnier.wav' ...
+        ), 'save_with_settings', 0);
+
+        % Available sound names
+        SoloParamHandle(obj, 'available_sound_names', 'value', ...
+            {'bus', 'storm', 'leafblower', 'crowd'}, 'save_with_settings', 0);
 
         % Create fixed sound labels
         SoloParamHandle(obj, 'sound_labels', 'value', {'A', 'B', 'C', 'D'}, 'save_with_settings', 0);
@@ -31,27 +35,46 @@ switch action
         SubheaderParam(obj, 'soundconfig_title', 'Sound Configuration', x, y);
         next_row(y, 1.5);
 
+        % Define defaults for each sound
+        defaults = struct();
+        defaults.A = struct('name', 'bus', 'weight', 0.5, 'port', 'left');
+        defaults.B = struct('name', 'leafblower', 'weight', 0.5, 'port', 'right');
+        defaults.C = struct('name', 'storm', 'weight', 0, 'port', 'random');
+        defaults.D = struct('name', 'crowd', 'weight', 0, 'port', 'random');
+
         % Create GUI elements for each sound label
         labels = value(sound_labels);
-        for i = length(labels):-1:1
-            label = labels{i};
+        sound_names = value(available_sound_names);
 
-            % File selection menu with label
-            MenuParam(obj, sprintf('sound_%s_file', label), ...
-                value(available_sound_files), 1, x, y, ...
-                'label', sprintf('%s File', label));
+        for i = 1:length(labels)
+            label = labels{i};
+            def = defaults.(label);
+
+            % Find default indices
+            default_name_idx = find(strcmp(sound_names, def.name));
+            default_port_idx = find(strcmp({'left', 'right', 'random'}, def.port));
+
+            % Section label
+            SubheaderParam(obj, sprintf('sound_%s_header', label), ...
+                sprintf('Sound %s', label), x, y);
+            next_row(y);
+
+            % Sound name selection menu
+            MenuParam(obj, sprintf('sound_%s_name', label), ...
+                sound_names, default_name_idx, x, y, ...
+                'label', 'Name');
             next_row(y);
 
             % Port mapping menu (which port is correct)
             MenuParam(obj, sprintf('sound_%s_port', label), ...
-                {'left', 'right', 'random'}, 1, x, y, ...
-                'label', sprintf('%s Port', label));
+                {'left', 'right', 'random'}, default_port_idx, x, y, ...
+                'label', 'Port');
             next_row(y);
 
             % Probability weight
             NumeditParam(obj, sprintf('sound_%s_prob', label), ...
-                1, x, y, ...
-                'label', sprintf('%s Weight', label));
+                def.weight, x, y, ...
+                'label', 'Weight');
             set_callback(eval(sprintf('sound_%s_prob', label)), ...
                 {mfilename, 'normalize_probs'});
             next_row(y);
@@ -71,7 +94,15 @@ switch action
         % Normalize on init
         SoundConfigSection(obj, 'normalize_probs');
 
-        DeclareGlobals(obj, 'ro_args', {'normalized_probs'});
+        % Make all sound parameters globally accessible
+        global_vars = {'normalized_probs', 'sound_name_to_file_map', 'available_sound_names'};
+        for i = 1:length(labels)
+            label = labels{i};
+            global_vars{end+1} = sprintf('sound_%s_name', label);
+            global_vars{end+1} = sprintf('sound_%s_port', label);
+            global_vars{end+1} = sprintf('sound_%s_prob', label);
+        end
+        DeclareGlobals(obj, 'ro_args', global_vars);
 
     case 'normalize_probs'
         % Collect raw probability weights
@@ -105,16 +136,21 @@ switch action
 
         label = x;  % x parameter used for label when called this way
 
-        file_param = sprintf('sound_%s_file', label);
+        name_param = sprintf('sound_%s_name', label);
         port_param = sprintf('sound_%s_port', label);
 
-        
+        % Get the sound name and look up the file
+        sound_name = value(eval(name_param));
+        file_map = value(sound_name_to_file_map);
+        sound_file = file_map.(sound_name);
+
         config = struct();
-        config.file = value(eval(file_param));
+        config.name = sound_name;
+        config.file = sound_file;
         config.port = value(eval(port_param));
         config.label = label;
 
-        x = config;  
+        x = config;
         y = label;
 
     case 'reinit'
