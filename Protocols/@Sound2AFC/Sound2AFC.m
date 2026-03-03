@@ -82,7 +82,14 @@ function create_gui(obj)
         myfig.value = figure;
         set(value(myfig), 'Name', mfilename, 'Tag', mfilename, ...
         'closerequestfcn', 'dispatcher(''close_protocol'')', 'MenuBar', 'none');
-        set(value(myfig), 'Position', [150 550   910  440]);
+
+        % Center the window on screen with good size
+        screen_size = get(0, 'ScreenSize');
+        fig_width = 910;
+        fig_height = 700;
+        fig_x = (screen_size(3) - fig_width) / 2;
+        fig_y = (screen_size(4) - fig_height) / 2;
+        set(value(myfig), 'Position', [fig_x fig_y fig_width fig_height]);
 
         % Column 1: Saving and Sound Config
         x = 5;

@@ -114,6 +114,8 @@ switch action
 
     case 'get_sound_config'
         % Returns struct with configuration for a given label
+        GetSoloFunctionArgs(obj);
+
         label = x;  % x parameter used for label when called this way
 
         file_param = sprintf('sound_%s_file', label);
