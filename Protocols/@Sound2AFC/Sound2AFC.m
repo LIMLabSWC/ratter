@@ -43,27 +43,40 @@ GetSoloFunctionArgs(obj);
 
 % END HEADER COMMON TO ALL PROTOCOLS -------------
 
+% Every protocol needs to have a behavior defined for each of the following actions: init, prepare_next_trial, trial_completed, update, end_session, pre_saving_settings, close
+
 switch action
     case 'init'
+        % Build the GUI and set up solo param handle variables
         create_gui(obj);
 
+        % Define the sounds to use in this task
         obj = create_sounds(obj);
+
+        % Need to prepare the first trial to present
         Sound2AFC(obj, 'prepare_next_trial')
 
     case 'prepare_next_trial'
+        % Decide which kind of trial to present
         trial_params = get_trial_params(obj);
+
+        % Make the state machine for this trial
         [sma, prep_next_trial_states] = build_sma(obj, trial_params);
 
+        % Send the sma to RTLinux using dispatcher
         dispatcher('send_assembler', sma, prep_next_trial_states);
 
     case 'trial_completed'
+        PokesPlotSection(obj, 'trial_completed');
 
     case 'update'
+        PokesPlotSection(obj, 'update');
 
     case 'end_session'
 
     case 'pre_saving_settings'
-        % Make and send summary
+        % TO DO Make and send summary
+
     case 'close'
         if exist('myfig', 'var') && isa(myfig, 'SoloParamHandle') && ishandle(value(myfig))
             delete(value(myfig));
@@ -75,6 +88,9 @@ end
 return
 
 end
+
+% Define helper functions used above 
+% ----------------------------------
 
 function create_gui(obj)
         GetSoloFunctionArgs(obj);
@@ -295,7 +311,8 @@ function [sma, prep_next_trial_states] = build_sma(obj, trial_params)
 
     % deliver the outcome
     sma = add_state(sma, 'name', correct_state, ...
-        'output_actions', {'DOut', rew_dout, 'SoundOut', rew_snd_id});
+        'output_actions', {'DOut', rew_dout, 'SoundOut', rew_snd_id},
+        'input_to_statechange', {'Tup'});
 
     sma = add_state(sma, 'name', error_state, 'output_actions', {'SoundOut', err_snd_id});
     
