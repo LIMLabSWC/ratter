@@ -70,8 +70,6 @@ switch action
         SoloParamHandle(obj, 'blinking_timer', 'value', []);
         SoloParamHandle(obj, 'current_params', 'value', []);
         SoloParamHandle(obj, 'session_base_path', 'value', '');
-        SoloParamHandle(obj, 'probe_settings', 'value', struct('version', '2.0', 'reference', 'Tip', 'bank', 0, 'imro_path', '', 'sync_slot', 2));
-        SoloParamHandle(obj, 'probe_gui_handles', 'value', []);
         SoloParamHandle(obj, 'session_info_list', 'value', []); % Holds parsed info from folders
         
         % Create stopping timer for behavior
@@ -135,33 +133,25 @@ switch action
         handles.cb_anat = uicontrol(p2, 'Style', 'checkbox', 'String', 'anat', 'Value', 0, 'Units', 'normalized', 'Position', [0.51, 0.05, 0.2, 0.15]);
         handles.cb_funcimg = uicontrol(p2, 'Style', 'checkbox', 'String', 'funcimg', 'Value', 0, 'Units', 'normalized', 'Position', [0.74, 0.05, 0.25, 0.15]);
         
-        % Panel 3: Pre/Post-Experiment Sampling
-        p3 = uipanel('Title', '3. Pre/Post-Experiment Sampling', 'FontSize', 12, 'FontWeight', 'bold', 'BorderType', 'etchedin', 'BorderWidth', 1, 'Units', 'normalized', 'Position', [0.02, 0.28, 0.6, 0.12]);
-        uicontrol(p3, 'Style', 'text', 'String', 'Duration/Bank (s):', 'Units', 'normalized', 'Position', [0.01, 0.6, 0.25, 0.25], 'HorizontalAlignment', 'right');
-        handles.sample_duration = uicontrol(p3, 'Style', 'edit', 'String', '60', 'Units', 'normalized', 'Position', [0.27, 0.6, 0.1, 0.3]);
-        handles.target_display = uicontrol(p3, 'Style', 'text', 'String', 'Target: Bank 0', 'Units', 'normalized', 'Position', [0.38, 0.6, 0.3, 0.25], 'HorizontalAlignment', 'right', 'FontWeight', 'bold');
-        handles.probe_button = uicontrol(p3, 'Style', 'pushbutton', 'String', 'Probe Setting', 'Units', 'normalized', 'Position', [0.7, 0.55, 0.28, 0.4], 'FontSize', 10, 'Callback', {@(h,e) feval(mfilename, obj, 'open_probe_gui')});
-        handles.sample_button = uicontrol(p3, 'Style', 'pushbutton', 'String', 'Start Sample Recording', 'Units', 'normalized', 'Position', [0.05, 0.1, 0.9, 0.4], 'FontSize', 12, 'FontWeight', 'bold', 'BackgroundColor', [0.8, 0.7, 1], 'Callback', {@(h,e) feval(mfilename, obj, 'sample_recording_wrapper')});
-        
-        % Panel 4: Recording Settings
-        p4 = uipanel('Title', '4. Recording Settings', 'FontSize', 12, 'FontWeight', 'bold', 'BorderType', 'etchedin', 'BorderWidth', 1, 'Units', 'normalized', 'Position', [0.02, 0.15, 0.6, 0.11]);
+        % Panel 3: Recording Settings
+        p4 = uipanel('Title', '3. Recording Settings', 'FontSize', 12, 'FontWeight', 'bold', 'BorderType', 'etchedin', 'BorderWidth', 1, 'Units', 'normalized', 'Position', [0.02, 0.15, 0.6, 0.11]);
         handles.settings_panel = p4;
         
         % Open Ephys Settings (initially visible)
-        handles.oe_ip_label = uicontrol(p4, 'Style', 'text', 'String', 'GUI IP:', 'Units', 'normalized', 'Position', [0.01, 0.3, 0.15, 0.4], 'HorizontalAlignment', 'right');
-        handles.oe_ip_edit = uicontrol(p4, 'Style', 'edit', 'String', '127.0.0.1', 'Units', 'normalized', 'Position', [0.17, 0.25, 0.15, 0.5]);
-        handles.oe_proc_label = uicontrol(p4, 'Style', 'text', 'String', 'Proc ID:', 'Units', 'normalized', 'Position', [0.33, 0.3, 0.15, 0.4], 'HorizontalAlignment', 'right');
-        handles.oe_proc_edit = uicontrol(p4, 'Style', 'edit', 'String', '100', 'Units', 'normalized', 'Position', [0.49, 0.25, 0.15, 0.5]);
-        handles.oe_rec_label = uicontrol(p4, 'Style', 'text', 'String', 'Rec ID:', 'Units', 'normalized', 'Position', [0.65, 0.3, 0.15, 0.4], 'HorizontalAlignment', 'right');
-        handles.oe_rec_edit = uicontrol(p4, 'Style', 'edit', 'String', '101', 'Units', 'normalized', 'Position', [0.81, 0.25, 0.15, 0.5]);
+        handles.oe_ip_label = uicontrol(p4, 'Style', 'text', 'String', 'GUI IP:', 'Units', 'normalized', 'Position', [0.01, 0.3, 0.15, 0.4], 'HorizontalAlignment', 'right', 'Visible', 'off');
+        handles.oe_ip_edit = uicontrol(p4, 'Style', 'edit', 'String', '127.0.0.1', 'Units', 'normalized', 'Position', [0.17, 0.25, 0.15, 0.5], 'Visible', 'off');
+        handles.oe_proc_label = uicontrol(p4, 'Style', 'text', 'String', 'Proc ID:', 'Units', 'normalized', 'Position', [0.33, 0.3, 0.15, 0.4], 'HorizontalAlignment', 'right', 'Visible', 'off');
+        handles.oe_proc_edit = uicontrol(p4, 'Style', 'edit', 'String', '100', 'Units', 'normalized', 'Position', [0.49, 0.25, 0.15, 0.5], 'Visible', 'off');
+        handles.oe_rec_label = uicontrol(p4, 'Style', 'text', 'String', 'Rec ID:', 'Units', 'normalized', 'Position', [0.65, 0.3, 0.15, 0.4], 'HorizontalAlignment', 'right', 'Visible', 'off');
+        handles.oe_rec_edit = uicontrol(p4, 'Style', 'edit', 'String', '101', 'Units', 'normalized', 'Position', [0.81, 0.25, 0.15, 0.5], 'Visible', 'off');
         
         % SpikeGLX Settings (initially hidden)
-        handles.sglx_host_label = uicontrol(p4, 'Style', 'text', 'String', 'Host IP:', 'Units', 'normalized', 'Position', [0.01, 0.3, 0.15, 0.4], 'HorizontalAlignment', 'right', 'Visible', 'off');
-        handles.sglx_host_edit = uicontrol(p4, 'Style', 'edit', 'String', 'localhost', 'Units', 'normalized', 'Position', [0.17, 0.25, 0.15, 0.5], 'Visible', 'off');
-        handles.sglx_port_label = uicontrol(p4, 'Style', 'text', 'String', 'Port:', 'Units', 'normalized', 'Position', [0.33, 0.3, 0.15, 0.4], 'HorizontalAlignment', 'right', 'Visible', 'off');
-        handles.sglx_port_edit = uicontrol(p4, 'Style', 'edit', 'String', '4142', 'Units', 'normalized', 'Position', [0.49, 0.25, 0.15, 0.5], 'Visible', 'off');
-        handles.sglx_probe_label = uicontrol(p4, 'Style', 'text', 'String', 'Probe Idx:', 'Units', 'normalized', 'Position', [0.65, 0.3, 0.15, 0.4], 'HorizontalAlignment', 'right', 'Visible', 'off');
-        handles.sglx_probe_edit = uicontrol(p4, 'Style', 'edit', 'String', '0', 'Units', 'normalized', 'Position', [0.81, 0.25, 0.15, 0.5], 'Visible', 'off');
+        handles.sglx_host_label = uicontrol(p4, 'Style', 'text', 'String', 'Host IP:', 'Units', 'normalized', 'Position', [0.01, 0.3, 0.15, 0.4], 'HorizontalAlignment', 'right');
+        handles.sglx_host_edit = uicontrol(p4, 'Style', 'edit', 'String', 'localhost', 'Units', 'normalized', 'Position', [0.17, 0.25, 0.15, 0.5]);
+        handles.sglx_port_label = uicontrol(p4, 'Style', 'text', 'String', 'Port:', 'Units', 'normalized', 'Position', [0.33, 0.3, 0.15, 0.4], 'HorizontalAlignment', 'right');
+        handles.sglx_port_edit = uicontrol(p4, 'Style', 'edit', 'String', '4142', 'Units', 'normalized', 'Position', [0.49, 0.25, 0.15, 0.5]);
+        handles.sglx_probe_label = uicontrol(p4, 'Style', 'text', 'String', 'Probe Idx:', 'Units', 'normalized', 'Position', [0.65, 0.3, 0.15, 0.4], 'HorizontalAlignment', 'right');
+        handles.sglx_probe_edit = uicontrol(p4, 'Style', 'edit', 'String', '0', 'Units', 'normalized', 'Position', [0.81, 0.25, 0.15, 0.5]);
         % --- Control Buttons Panel ---
         p5 = uipanel('Title', 'Controls', 'FontSize', 12, 'FontWeight', 'bold', 'BorderType', 'etchedin', 'BorderWidth', 1, 'Units', 'normalized', 'Position', [0.02, 0.02, 0.6, 0.11]);
         handles.control_button = uicontrol(p5, 'Style', 'pushbutton', 'String', 'Load', 'Units', 'normalized', 'FontSize', 14, 'FontWeight', 'bold', 'Position', [0.02, 0.1, 0.3, 0.8], 'BackgroundColor', [0.2, 0.6, 0.8], 'Callback', {@(h,e) feval(mfilename, obj, 'main_control_callback')});
@@ -169,7 +159,7 @@ switch action
         handles.ephys_button = uicontrol(p5, 'Style', 'pushbutton', 'String', 'Run Ephys', 'Units', 'normalized', 'FontSize', 12, 'Position', [0.68, 0.1, 0.3, 0.8], 'BackgroundColor', [0.8, 0.6, 1], 'Callback', {@(h,e) feval(mfilename, obj, 'ephys_control_callback')});
         
         SoloParamHandle(obj, 'ui_handles', 'value', handles);
-        
+        feval(mfilename, obj, 'recording_software_callback'); 
         feval(mfilename, obj, 'populate_and_filter_lists', 'rescan');
         log_message(handles, 'GUI initialization complete.');
     % =========================================================================
@@ -209,7 +199,6 @@ switch action
         handles = value(ui_handles);
         log_message(handles, '--- LOAD sequence initiated ---');
         set(handles.control_button, 'Enable', 'off', 'String', 'Loading...');
-        set(handles.sample_button, 'Enable', 'off');
         
         try
             software = value(recording_software);
@@ -266,7 +255,19 @@ switch action
     case 'run_sequence'
         handles = value(ui_handles);
         params = value(current_params);
-        
+        software = value(recording_software);
+        % Overwrite only the ephys connection fields with current GUI values
+        if strcmp(software, 'OpenEphys')
+            params.oe_gui_ip      = get(handles.oe_ip_edit,   'String');
+            params.oe_proc_node_id = get(handles.oe_proc_edit, 'String');
+            params.oe_rec_node_id  = get(handles.oe_rec_edit,  'String');
+        else
+            params.sglx_host_ip    = get(handles.sglx_host_edit,  'String');
+            params.sglx_port       = str2double(get(handles.sglx_port_edit, 'String'));
+            params.sglx_probe_index = str2double(get(handles.sglx_probe_edit, 'String'));
+        end
+        current_params.value = params; % save back so stop_sequence sees the same values
+
         % --- ADDED: Pre-run checklist dialog ---
         software = value(recording_software);
         if strcmp(software, 'OpenEphys')
@@ -275,11 +276,11 @@ switch action
                 'Before continuing, please ensure the following in Open Ephys:', ...
                 '', ...
                 '1. Refresh the Neuropixel PXI module to ensure probes are detected.', ...
-                '2. Set the probe geometry (Bank, Reference, or select the IMRO file).', ...
-                '3. Configure the main sync slot and SMA settings.', ...
+                '2. Set the probe geometry (Bank, Reference, or IMRO) manually in the OE GUI.', ...
+                '3. Configure the sync slot and SMA settings manually in the OE GUI.', ...
                 '', ...
-                'NOTE: The file save directory and name will be set automatically by this program.' ...
-            };
+                'NOTE: The file save directory will be set and verified automatically.' ...
+                };
         else % SpikeGLX
             title = 'SpikeGLX Pre-Run Checklist';
             message = {
@@ -303,13 +304,11 @@ switch action
         % --- END ADDED SECTION ---
 
         log_message(handles, '--- RUN sequence initiated ---');
-        set(handles.sample_button, 'Enable', 'off');
         
         try
             if get(handles.cb_ephys, 'Value')
                  % Initialize the selected recording system
-                 recording_save_path = fullfile(params.local_path, value(session_base_path), 'ephys');
-                 feval(mfilename, obj, 'initialize_recording_system', params, recording_save_path);
+                 feval(mfilename, obj, 'initialize_recording_system', params);
                  if isempty(value(recording_controller))
                      feval(mfilename, obj, 'reset_to_load_state');
                      return;
@@ -346,10 +345,9 @@ switch action
                 feval(mfilename, obj, 'stop_electrophysiology_recording');
             end
             
-            log_message(handles, '--- Experiment finished. Post-session sampling available. ---');
+            log_message(handles, '--- Experiment finished. Data saved successfully. ---');
             currentState.value = 'PostExperiment';
             set(handles.control_button, 'String', 'Start New Experiment', 'BackgroundColor', [0.2, 0.8, 0.6]);
-            set(handles.sample_button, 'Enable', 'on');
         
         catch ME
             log_message(handles, sprintf('ERROR during stop sequence: %s', ME.message));
@@ -358,34 +356,54 @@ switch action
     % =========================================================================
     %       SYSTEM INITIALIZATION & CONTROL
     % =========================================================================
+    
     case 'initialize_recording_system'
         params = varargin{1};
-        save_path = varargin{2};
         software = value(recording_software);
         handles = value(ui_handles);
-        
+
         try
             if strcmp(software, 'OpenEphys')
                 log_message(handles, 'Initializing Open Ephys controller...');
                 controller = OpenEphysHTTPServer(params.oe_gui_ip, 37497);
                 if isempty(controller), error('Failed to create Open Ephys controller'); end
+                recording_controller.value = controller;
+                log_message(handles, 'Open Ephys controller initialized successfully.');
+
+                % Query and log actual Record Node IDs so user can verify GUI settings
+                try
+                    rec_info = controller.getRecordingInfo();
+                    if isfield(rec_info, 'record_nodes') && ~isempty(rec_info.record_nodes)
+                        found_ids = [rec_info.record_nodes.node_id];
+                        for i = 1:numel(rec_info.record_nodes)
+                            log_message(handles, sprintf('Found Record Node ID: %d | Current save path: %s', ...
+                                rec_info.record_nodes(i).node_id, ...
+                                rec_info.record_nodes(i).parent_directory));
+                        end
+                        if ~ismember(str2double(params.oe_rec_node_id), found_ids)
+                            log_message(handles, sprintf('WARNING: Rec ID "%s" does not match any found node IDs: [%s]', ...
+                                params.oe_rec_node_id, num2str(found_ids)));
+                        end
+                    else
+                        log_message(handles, 'WARNING: No Record Nodes found in OE signal chain. Data will NOT be saved.');
+                    end
+                catch ME_query
+                    log_message(handles, sprintf('WARNING: Could not query OE Record Nodes: %s', ME_query.message));
+                end
+
             else % SpikeGLX
                 log_message(handles, 'Initializing SpikeGLX controller...');
                 controller = SpikeGL(params.sglx_host_ip, params.sglx_port);
-                % if ~controller.IsConnected(), error('Failed to connect to SpikeGLX'); end
+                recording_controller.value = controller;
+                log_message(handles, 'SpikeGLX controller initialized successfully.');
             end
-            recording_controller.value = controller;
-            log_message(handles, sprintf('%s controller initialized successfully.', software));
-            
-            % Set initial recording path
-            feval(mfilename, obj, 'set_recording_path', save_path);
-            
+
         catch ME
             log_message(handles, sprintf('Failed to initialize %s: %s', software, ME.message));
             recording_controller.value = [];
             rethrow(ME);
         end
-    
+
     case 'set_recording_path'
         save_path = varargin{1};
         software = value(recording_software);
@@ -393,72 +411,98 @@ switch action
         params = value(current_params);
         handles = value(ui_handles);
         if isempty(controller), return; end
-        
+
         try
             if strcmp(software, 'OpenEphys')
+                % setRecordPath internally uses node-specific /api/recording/<nodeId>
                 controller.setRecordPath(params.oe_rec_node_id, save_path);
+
+                % Verify using SDK method
+                pause(0.5);
+                rec_info = controller.getRecordingInfo();
+                actual_path = '';
+                if isfield(rec_info, 'record_nodes')
+                    for i = 1:numel(rec_info.record_nodes)
+                        if rec_info.record_nodes(i).node_id == str2double(params.oe_rec_node_id)
+                            actual_path = rec_info.record_nodes(i).parent_directory;
+                        end
+                    end
+                end
+                if strcmp(actual_path, save_path)
+                    log_message(handles, sprintf('OE recording path confirmed: %s', save_path));
+                else
+                    log_message(handles, sprintf('WARNING: OE path mismatch! Requested: %s | Got: %s', ...
+                        save_path, actual_path));
+                end
+
             else % SpikeGLX
-                controller = SetDataDir( controller, 0, save_path);
+                controller = SetDataDir(controller, 0, save_path);
                 recording_controller.value = controller;
+                log_message(handles, sprintf('SpikeGLX recording path set to: %s', save_path));
             end
-            log_message(handles, sprintf('Recording path set to: %s', save_path));
+
         catch ME
             log_message(handles, sprintf('Failed to set recording path: %s', ME.message));
             rethrow(ME);
         end
+
     case 'start_electrophysiology_recording'
         params = varargin{1};
         software = value(recording_software);
         controller = value(recording_controller);
         handles = value(ui_handles);
         if isempty(controller), error('Recording controller not initialized'); end
-        
+
         try
-            probe_settings_struct = value(probe_settings);
-            feval(mfilename, obj, 'apply_probe_configuration', probe_settings_struct);
-            
+            % Set and verify recording path before starting
             main_ephys_path = fullfile(params.local_path, value(session_base_path), 'ephys');
             feval(mfilename, obj, 'set_recording_path', main_ephys_path);
-            
+
             if strcmp(software, 'OpenEphys')
-                log_message(handles, 'Starting Open Ephys acquisition and recording...');
-                controller.acquire(); pause(1);
+                log_message(handles, 'Starting Open Ephys acquisition...');
+                controller.acquire();
+                pause(2); % Allow acquisition to stabilise before recording
+                log_message(handles, 'Starting Open Ephys recording...');
                 controller.record();
+
             else % SpikeGLX
                 log_message(handles, 'Starting SpikeGLX recording...');
                 run_name = sprintf('experiment_%s', datestr(now, 'yyyymmdd_HHMMSS'));
-                boolval = IsInitialized( controller);
+                boolval = IsInitialized(controller);
                 if boolval
-                    spikeglx_params = GetParams( controller );
-                    controller = SetRunName(controller,run_name); % setting run name
-                    controller = StartRun(controller); % starting acquisition
+                    controller = SetRunName(controller, run_name);
+                    log_message(handles, sprintf('SpikeGLX run name set to: %s', run_name));
+                    controller = StartRun(controller);
                     pause(2);
-                    
+
                     runningval = false;
-                    while  ~runningval % waiting for acquisition to start
-                        runningval = IsRunning( controller );
+                    while ~runningval
+                        runningval = IsRunning(controller);
                         if runningval
-                            controller = SetRecordingEnable( controller, 1 ); % Start Recording
+                            controller = SetRecordingEnable(controller, 1);
                         end
                     end
                     recording_controller.value = controller;
+                else
+                    error('SpikeGLX is not initialized. Cannot start recording.');
                 end
             end
-            
+
             log_message(handles, 'Electrophysiology recording is LIVE.');
             ephysState.value = 'Stop';
             set(handles.ephys_button, 'String', 'Stop Ephys', 'BackgroundColor', [1 0.6 0.6]);
-            
+
         catch ME
             log_message(handles, sprintf('Failed to start recording: %s', ME.message));
             rethrow(ME);
         end
+
     case 'stop_electrophysiology_recording'
         software = value(recording_software);
         controller = value(recording_controller);
         handles = value(ui_handles);
         if isempty(controller), return; end
-        
+
         try
             if strcmp(software, 'OpenEphys')
                 log_message(handles, 'Stopping Open Ephys recording...');
@@ -555,7 +599,6 @@ switch action
             log_message(handles, '--- LOAD sequence complete. Ready to run. ---');
             currentState.value = 'Run';
             set(handles.control_button, 'Enable', 'on', 'String', 'Run', 'BackgroundColor', [0.4, 0.8, 0.4]);
-            set(handles.sample_button, 'Enable', 'on');
             
             % --- ADDED: Confirmation dialog after successful load ---
             msgbox('Behavior settings loaded successfully. The system is now ready to run.', 'Load Complete', 'help');
@@ -585,11 +628,25 @@ switch action
     case 'run_ephys_individually'
         params = value(current_params);
         handles = value(ui_handles);
+        software = value(recording_software);
+
+        % Re-read ephys connection fields fresh from GUI, same as run_sequence
+        if strcmp(software, 'OpenEphys')
+            params.oe_gui_ip       = get(handles.oe_ip_edit,   'String');
+            params.oe_proc_node_id = get(handles.oe_proc_edit, 'String');
+            params.oe_rec_node_id  = get(handles.oe_rec_edit,  'String');
+        else
+            params.sglx_host_ip    = get(handles.sglx_host_edit,  'String');
+            params.sglx_port       = str2double(get(handles.sglx_port_edit, 'String'));
+            params.sglx_probe_index = str2double(get(handles.sglx_probe_edit, 'String'));
+        end
+        current_params.value = params;
+
         log_message(handles, '--- Starting Ephys Recording Individually ---');
         set(handles.ephys_button, 'Enable', 'off');
         try
             if isempty(value(recording_controller))
-                feval(mfilename, obj, 'initialize_recording_system', params, '');
+                feval(mfilename, obj, 'initialize_recording_system', params);
             end
             feval(mfilename, obj, 'start_electrophysiology_recording', params);
         catch ME
@@ -773,246 +830,7 @@ switch action
             getReport(ME, 'extended', 'hyperlinks', 'on');
             errordlg('Automatic recovery failed. Please stop the experiment manually.', 'Recovery Failed');
         end
-    % =========================================================================
-    %       SAMPLE EPHYS RECORDINGS   
-    % =========================================================================
-    case 'sample_recording_wrapper'
-        if strcmp(value(currentState), 'PostExperiment')
-            feval(mfilename, obj, 'sample_recording', 'post_session');
-        else
-            feval(mfilename, obj, 'sample_recording', 'pre_session');
-        end
-        
-    case 'sample_recording'
-        prefix = varargin{1};
-        handles = value(ui_handles);
-        log_message(handles, ['--- ' upper(prefix) ' SAMPLE RECORDING INITIATED ---']);
-        set([handles.sample_button, handles.control_button], 'Enable', 'off', 'String', 'Sampling...');
-        drawnow;
-        
-        try
-            software = value(recording_software);
-            params = get_all_parameters(handles,software);
-            if isempty(value(recording_controller))
-                feval(mfilename, obj, 'initialize_recording_system', params, '');
-            end
-            
-            if isempty(value(session_base_path))
-                [session_path, ~] = construct_session_paths(handles, params);
-                if isempty(session_path) || ~create_session_directories(handles, params, session_path)
-                    error('Failed to create session directories');
-                end
-                session_base_path.value = session_path;
-            end
-            
-            sample_dir_name = sprintf('%s_sample_recording', prefix);
-            sample_save_path = fullfile(params.local_path, value(session_base_path), 'ephys', sample_dir_name);
-            if ~exist(sample_save_path, 'dir'), mkdir(sample_save_path); end
-            
-            software = value(recording_software);
-            if strcmp(software, 'OpenEphys')
-                feval(mfilename, obj, 'execute_openephys_sampling', sample_save_path);
-            else
-                feval(mfilename, obj, 'execute_spikeglx_sampling', sample_save_path);
-            end
-            log_message(handles, '--- SAMPLE RECORDING COMPLETE ---');
-            
-        catch ME
-            log_message(handles, sprintf('ERROR during sample recording: %s', ME.message));
-            rethrow(ME);
-        end
-        
-        % Reset button states
-        if strcmp(value(currentState), 'PostExperiment')
-            set(handles.control_button, 'Enable', 'on', 'String', 'Start New Experiment');
-            feval(mfilename, obj, 'save_log_file');
-        else
-            set(handles.control_button, 'Enable', 'on', 'String', 'Load');
-        end
-        set(handles.sample_button, 'Enable', 'on', 'String', 'Start Sample Recording');
-        
-    case 'execute_openephys_sampling'
-        save_path = varargin{1};
-        controller = value(recording_controller);
-        params = value(current_params);
-        handles = value(ui_handles);
-        probe_settings_struct = value(probe_settings);
-        duration = str2double(get(handles.sample_duration, 'String'));
-        
-        controller.setParameters(params.oe_proc_node_id, 0, 'Reference', probe_settings_struct.reference);
-        if strcmp(probe_settings_struct.version, '1.0'), num_banks = 3; else, num_banks = 4; end
-        
-        for bank = 0:(num_banks - 1)
-            log_message(handles, sprintf('Recording OE Bank %d for %d seconds...', bank, duration));
-            controller.setParameters(params.oe_proc_node_id, 0, 'bank', bank); pause(1);
-            controller.setRecordPath(params.oe_rec_node_id, save_path); pause(1);
-            controller.acquire(duration); pause(1);
-            controller.record(duration);
-            controller.idle();
-            log_message(handles, sprintf('Finished recording Bank %d.', bank)); pause(1);
-        end
-        
-        if ~isempty(probe_settings_struct.imro_path)
-            controller.config(params.oe_proc_node_id, ['LOADIMRO ' probe_settings_struct.imro_path]);
-        else
-            controller.setParameters(params.oe_proc_node_id, 0, 'bank', probe_settings_struct.bank);
-        end
-        
-    case 'execute_spikeglx_sampling'
-        save_path = varargin{1};
-        controller = value(recording_controller);
-        handles = value(ui_handles);
-        probe_settings_struct = value(probe_settings);
-        duration = str2double(get(handles.sample_duration, 'String'));
-        
-        controller.SetDataDir(save_path);
-        if strcmp(probe_settings_struct.version, '1.0'), num_banks = 3; else, num_banks = 4; end
-        
-        for bank = 0:(num_banks - 1)
-            log_message(handles, sprintf('Recording SGLX Bank %d for %d seconds...', bank, duration));
-            % Bank selection for SpikeGLX depends on specific API calls for channel selection, not a simple 'bank' parameter
-            % This is a placeholder for more complex channel/bank setting logic.
-            % For now, we record with the currently active map.
-            
-            run_name = sprintf('sample_bank_%d_%s', bank, datestr(now, 'yyyymmdd_HHMMSS'));
-            controller.SetRunName(run_name);
-            controller.StartRun();
-            pause(duration);
-            controller.StopRun();
-            log_message(handles, sprintf('Finished recording Bank %d.', bank)); pause(1);
-        end
-        
-    % =========================================================================
-    %       PROBE GUI AND SETTINGS
-    % =========================================================================
-    case 'open_probe_gui' 
-        handles = value(ui_handles);
-        log_message(handles, 'Opening probe settings GUI...');
-        probe_fig = figure('Name', 'Neuropixel Probe Settings', 'Position', [300 300 450 350], ...
-            'MenuBar', 'none', 'ToolBar', 'none', 'NumberTitle', 'off', 'Resize', 'off');
-        p_handles = struct();
-        
-        p_handles.version_group = uibuttongroup(probe_fig, 'Title', 'Probe Version', 'Position', [0.05 0.78 0.9 0.2]);
-        uicontrol(p_handles.version_group, 'Style', 'radiobutton', 'String', 'NP 1.0 (3 Banks)', 'Position', [10 5 150 25], 'Tag', '1.0');
-        uicontrol(p_handles.version_group, 'Style', 'radiobutton', 'String', 'NP 2.0 (4 Banks)', 'Position', [200 5 150 25], 'Tag', '2.0');
-        
-        p_handles.ref_group = uibuttongroup(probe_fig, 'Title', 'Reference', 'Position', [0.05 0.55 0.4 0.2]);
-        uicontrol(p_handles.ref_group, 'Style', 'radiobutton', 'String', 'Tip', 'Position', [10 5 80 25], 'Tag', 'Tip');
-        uicontrol(p_handles.ref_group, 'Style', 'radiobutton', 'String', 'External', 'Position', [100 5 80 25], 'Tag', 'External');
-        
-        p_handles.bank_panel = uipanel(probe_fig, 'Title', 'Target Bank', 'Position', [0.5 0.55 0.45 0.2]);
-        uicontrol(p_handles.bank_panel, 'Style', 'text', 'String', 'Bank:', 'Position', [10 5 40 20]);
-        p_handles.bank_edit = uicontrol(p_handles.bank_panel, 'Style', 'edit', 'String', '0', 'Position', [60 5 50 25]);
-
-        uicontrol(probe_fig, 'Style', 'text', 'String', 'Sync IMEC Slot:', 'Position', [20 160 100 20], 'HorizontalAlignment', 'right');
-        p_handles.sync_slot_edit = uicontrol(probe_fig, 'Style', 'edit', 'String', '2', 'Position', [130 160 50 25]);
-        
-        uicontrol(probe_fig, 'Style', 'text', 'String', 'IMRO File:', 'Position', [20 120 100 20], 'HorizontalAlignment', 'right');
-        p_handles.imro_text = uicontrol(probe_fig, 'Style', 'text', 'String', 'None selected', 'Position', [130 120 280 20], 'HorizontalAlignment', 'left');
-        
-        uicontrol(probe_fig, 'Style', 'pushbutton', 'String', 'Browse...', 'Position', [130 85 100 30], 'Callback', {@(h,e) feval(mfilename, obj, 'browse_imro', p_handles)});
-        uicontrol(probe_fig, 'Style', 'pushbutton', 'String', 'Clear IMRO', 'Position', [240 85 100 30], 'Callback', {@(h,e) feval(mfilename, obj, 'clear_imro', p_handles)});
-        
-        uicontrol(probe_fig, 'Style', 'pushbutton', 'String', 'Apply & Close', 'Position', [250 25 180 30], 'FontWeight', 'bold', 'Callback', {@(h,e) feval(mfilename, obj, 'apply_probe_settings', p_handles)});
-        probe_gui_handles.value = p_handles;
-        
-    case 'browse_imro'
-        p_handles = varargin{1};
-        [file, path] = uigetfile('*.imro', 'Select IMRO File');
-        if isequal(file, 0) || isequal(path, 0), return;
-        else
-            full_path = fullfile(path, file);
-            set(p_handles.imro_text, 'String', full_path);
-            set(findobj(p_handles.bank_panel, '-property', 'Enable'), 'Enable', 'off');
-        end
     
-    case 'clear_imro'
-        p_handles = varargin{1};
-        set(p_handles.imro_text, 'String', 'None selected');
-        set(findobj(p_handles.bank_panel, '-property', 'Enable'), 'Enable', 'on');
-        
-    case 'apply_probe_settings'
-        p_handles = varargin{1};
-        handles = value(ui_handles);
-        settings.version = get(get(p_handles.version_group, 'SelectedObject'), 'Tag');
-        settings.reference = get(get(p_handles.ref_group, 'SelectedObject'), 'Tag');
-        settings.bank = str2double(get(p_handles.bank_edit, 'String'));
-        settings.imro_path = get(p_handles.imro_text, 'String');
-        settings.sync_slot = str2double(get(p_handles.sync_slot_edit, 'String'));
-        if strcmp(settings.imro_path, 'None selected'), settings.imro_path = ''; end
-        
-        probe_settings.value = settings;
-        
-        if ~isempty(settings.imro_path)
-            set(handles.target_display, 'String', 'Target: IMRO File');
-        else
-            set(handles.target_display, 'String', ['Target: Bank ' num2str(settings.bank)]);
-        end
-        log_message(handles, 'Probe settings saved.');
-        close(p_handles.ref_group.Parent);
-        probe_gui_handles.value = [];
-        
-    case 'apply_probe_configuration'
-        probe_settings = varargin{1};
-        software = value(recording_software);
-        controller = value(recording_controller);
-        params = value(current_params);
-        handles = value(ui_handles);
-        if isempty(controller), return; end
-        
-        try
-            if strcmp(software, 'OpenEphys')
-                log_message(handles, sprintf('Setting OE reference to: %s', probe_settings.reference));
-                controller.setParameters(params.oe_proc_node_id, 0, 'Reference', probe_settings.reference);
-                
-                % Applying Sync Slot setting
-                log_message(handles, sprintf('Applying Sync IMEC Slot: %d', probe_settings.sync_slot));
-                % NOTE: This assumes a parameter like 'syncSlot' exists in the Neuropix-PXI plugin.
-                % The actual parameter name might need to be verified in the Open Ephys plugin.
-                % controller.setParameters(params.oe_proc_node_id, 0, 'syncSlot', probe_settings.sync_slot);
-
-                if ~isempty(probe_settings.imro_path)
-                    log_message(handles, sprintf('Loading IMRO file: %s', probe_settings.imro_path));
-                    controller.config(params.oe_proc_node_id, ['LOADIMRO ' probe_settings.imro_path]);
-                else
-                    log_message(handles, sprintf('Setting bank to: %d', probe_settings.bank));
-                    controller.setParameters(params.oe_proc_node_id, 0, 'bank', probe_settings.bank);
-                end
-            else % SpikeGLX
-                log_message(handles, 'Applying SpikeGLX sync settings...');
-                
-                %% Done Manually by the User but can be uncommented
-                % params_to_set = struct();
-                % params_to_set.syncSourceIdx = 1; % Set sync source to PXI SMA
-                % params_to_set.syncImInputSlot = probe_settings.sync_slot;
-                % 
-                % SetParams(controller, params_to_set);
-                % 
-                % log_message(handles, 'Waiting for SpikeGLX to stabilise (3 seconds)...');
-                % pause(3);
-                % 
-                % log_message(handles, 'Reconnecting to SpikeGLX to reflect changes...');
-                % controller = SpikeGL(params.sglx_host_ip, params.sglx_port);
-                % recording_controller.value = controller; % Update the handle
-                % 
-                
-                % Verify settings
-                prms = GetParams(controller);
-                if prms.syncSourceIdx == 1 && prms.syncImInputSlot == probe_settings.sync_slot
-                    log_message(handles, 'Success! SpikeGLX sync settings applied correctly.');
-                else
-                    log_message(handles, 'Warning: SpikeGLX settings may not have been applied. Please check SpikeGLX.');
-                end
-
-                if ~isempty(probe_settings.imro_path)
-                    log_message(handles, 'Note: For SpikeGLX, ensure IMRO file is loaded within the SpikeGLX GUI and save as part of the meta file.');
-                end
-            end
-            log_message(handles, 'Probe configuration applied successfully.');
-        catch ME
-            log_message(handles, sprintf('Failed to apply probe settings: %s', ME.message));
-            rethrow(ME);
-        end
     % =========================================================================
     %       UTILITY & OTHER ACTIONS
     % =========================================================================
@@ -1181,7 +999,6 @@ switch action
         behavState.value = 'Run';
         ephysState.value = 'Run';
         set(handles.control_button, 'Enable', 'on', 'String', 'Load', 'BackgroundColor', [0.2, 0.6, 0.8]);
-        set(handles.sample_button, 'Enable', 'on');
         recording_controller.value = [];
         behav_obj.value = [];
         current_params.value = [];
@@ -1500,17 +1317,10 @@ function display_usage_help()
     fprintf('   a) Select recording software (Open Ephys or SpikeGLX)\n');
     fprintf('   b) Configure behavior settings (protocol, experimenter, rat)\n');
     fprintf('   c) Set up NeuroBlueprint data paths\n');
-    fprintf('   d) Configure probe settings (version, reference, bank/IMRO)\n');
-    fprintf('   e) Set recording software connection parameters\n');
-    fprintf('   f) Click "Load" to initialize systems\n');
-    fprintf('   g) Click "Run" to start experiment\n');
-    fprintf('   h) Click "Stop" to end experiment and save data\n\n');
-    
-    fprintf('3. PROBE CONFIGURATION:\n');
-    fprintf('   - Supports Neuropixels 1.0 (3 banks) and 2.0 (4 banks)\n');
-    fprintf('   - Reference options: Tip or External\n');
-    fprintf('   - Bank selection: Manual bank number or IMRO file\n');
-    fprintf('   - Pre/post-session sampling across all banks\n\n');
+    fprintf('   d) Set recording software connection parameters\n');
+    fprintf('   e) Click "Load" to initialize systems\n');
+    fprintf('   f) Click "Run" to start experiment\n');
+    fprintf('   g) Click "Stop" to end experiment and save data\n\n');
     
     fprintf('4. DATA ORGANIZATION:\n');
     fprintf('   - Follows NeuroBlueprint format\n');
@@ -1536,4 +1346,3 @@ function display_usage_help()
     
     fprintf('For more information, see function documentation within the code.\n');
     fprintf('================================================================\n\n');
-
