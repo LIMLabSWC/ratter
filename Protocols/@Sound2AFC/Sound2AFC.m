@@ -114,9 +114,9 @@ end
 function trial_params = get_trial_params(obj)
     GetSoloFunctionArgs(obj);
 
-    % Get normalized probabilities and labels
+    % Get normalized probabilities
     probs = value(normalized_probs);
-    labels = value(sound_labels);
+    labels = {'A', 'B', 'C', 'D'};
 
     % Select sound based on probabilities
     cumprobs = cumsum(probs);
@@ -155,8 +155,8 @@ function obj = create_sounds(obj)
     SoundManagerSection(obj, 'init');
     target_sample_rate = SoundManagerSection(obj, 'get_sample_rate');
 
-    % Get sound labels from SoundConfigSection
-    labels = value(sound_labels);
+    % Sound labels are fixed: A, B, C, D
+    labels = {'A', 'B', 'C', 'D'};
 
     % Create sounds based on configuration for each label (A, B, C, D)
     for i = 1:length(labels)
