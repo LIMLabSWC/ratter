@@ -310,10 +310,15 @@ function [sma, prep_next_trial_states] = build_sma(obj, trial_params)
         error_in, error_state; 'Tup', 'check_next_trial_ready'});
 
     % deliver the outcome
-    sma = add_state(sma, 'name', correct_state, ...
-        'output_actions', {'DOut', rew_dout, 'SoundOut', rew_snd_id},
-        'input_to_statechange', {'Tup'});
+    drink_timer_1 = 2;
+    err_timer = 2;
 
-    sma = add_state(sma, 'name', error_state, 'output_actions', {'SoundOut', err_snd_id});
+    sma = add_state(sma, 'name', correct_state, 'self_timer', drink_timer_1, ...
+        'output_actions', {'DOut', rew_dout, 'SoundOut', rew_snd_id},...
+        'input_to_statechange', {'Tup', 'check_next_trial_ready'});
+
+    sma = add_state(sma, 'name', error_state, 'self_timer', err_timer, ...
+        'output_actions', {'SoundOut', err_snd_id}, ...
+        'input_to_statechange', {'Tup', 'check_next_trial_ready'});
     
 end
