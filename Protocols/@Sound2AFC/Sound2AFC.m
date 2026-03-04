@@ -134,6 +134,68 @@ function create_gui(obj)
         
 end
 
+function obj = create_sounds(obj)
+    GetSoloFunctionArgs(obj);
+
+    SoundManagerSection(obj, 'init');
+    target_sample_rate = SoundManagerSection(obj, 'get_sample_rate');
+
+    % Sound labels are fixed: A, B, C, D
+    labels = {'A', 'B', 'C', 'D'};
+
+    % Create sounds based on configuration for each label (A, B, C, D)
+    for i = 1:length(labels)
+        label = labels{i};
+
+        % Get configuration for this sounds
+        config = SoundConfigSection(obj, 'get_sound_config', label);
+
+        % Load audio file
+        loop_flag = 0;
+        [audio_data, orig_rate] = audioread(config.file);
+
+        % Convert to mono if stereo
+        if size(audio_data, 2) == 2
+            audio_data = mean(audio_data, 2);
+        end
+
+        % Resample to target rate using interpolation (no Signal Toolbox needed)
+        if orig_rate ~= target_sample_rate
+            orig_time = (0:length(audio_data)-1) / orig_rate;
+            target_time = (0:1/target_sample_rate:orig_time(end));
+            audio_data = interp1(orig_time, audio_data, target_time, 'linear');
+            audio_data = audio_data(:);  % Ensure column vector
+        end
+
+        stereo_waveform = .1*[audio_data'; audio_data'];  % Both speakers
+
+        % Declare the sound with the label as its name
+        SoundManagerSection(obj, 'declare_new_sound', label, stereo_waveform, loop_flag);
+    end
+
+    % Define the correct sound (reward feedback)
+    duration = .5;  % seconds
+    volume = .1;
+    t = (0:1/target_sample_rate:duration);
+    t = t(1:end-1);
+    carrier = sin(2*pi*12000*t);
+    modulation = 1 + 0.5*sin(2*pi*8*t);  % 0.5 is modulation depth (0-1)
+    waveform = volume * modulation .* carrier;
+    waveform = [waveform; waveform];  % Both speakers for feedback
+
+    SoundManagerSection(obj, 'declare_new_sound', 'correct', waveform, loop_flag);
+
+    % Define the error sound
+    duration = 0.25;  % seconds
+    n_samples = round(target_sample_rate * duration);
+    waveform = 0.01 * randn(1, n_samples);
+    waveform = [waveform; waveform];  % Both speakers for error
+    SoundManagerSection(obj, 'declare_new_sound', 'error', waveform, loop_flag);
+
+    SoundManagerSection(obj, 'send_not_yet_uploaded_sounds');
+end
+
+
 function trial_params = get_trial_params(obj)
     GetSoloFunctionArgs(obj);
 
@@ -172,77 +234,19 @@ function trial_params = get_trial_params(obj)
                          'port_mapping', port_mapping);
 end
 
-function obj = create_sounds(obj)
-    GetSoloFunctionArgs(obj);
-
-    SoundManagerSection(obj, 'init');
-    target_sample_rate = SoundManagerSection(obj, 'get_sample_rate');
-
-    % Sound labels are fixed: A, B, C, D
-    labels = {'A', 'B', 'C', 'D'};
-
-    % Create sounds based on configuration for each label (A, B, C, D)
-    for i = 1:length(labels)
-        label = labels{i};
-
-        % Get configuration for this sounds
-        config = SoundConfigSection(obj, 'get_sound_config', label);
-
-        % Load audio file
-        loop_flag = 0;
-        [audio_data, orig_rate] = audioread(config.file);
-
-        % Convert to mono if stereo
-        if size(audio_data, 2) == 2
-            audio_data = mean(audio_data, 2);
-        end
-
-        % Resample to target rate using interpolation (no Signal Toolbox needed)
-        if orig_rate ~= target_sample_rate
-            orig_time = (0:length(audio_data)-1) / orig_rate;
-            target_time = (0:1/target_sample_rate:orig_time(end));
-            audio_data = interp1(orig_time, audio_data, target_time, 'linear');
-            audio_data = audio_data(:);  % Ensure column vector
-        end
-
-        stereo_waveform = [audio_data'; audio_data'];  % Both speakers
-
-        % Declare the sound with the label as its name
-        SoundManagerSection(obj, 'declare_new_sound', label, stereo_waveform, loop_flag);
-    end
-
-    % Define the correct sound (reward feedback)
-    duration = .5;  % seconds
-    volume = .1;
-    t = (0:1/target_sample_rate:duration);
-    t = t(1:end-1);
-    carrier = sin(2*pi*12000*t);
-    modulation = 1 + 0.5*sin(2*pi*8*t);  % 0.5 is modulation depth (0-1)
-    waveform = volume * modulation .* carrier;
-    waveform = [waveform; waveform];  % Both speakers for feedback
-
-    SoundManagerSection(obj, 'declare_new_sound', 'correct', waveform, loop_flag);
-
-    % Define the error sound
-    duration = 0.25;  % seconds
-    n_samples = round(target_sample_rate * duration);
-    waveform = 0.01 * randn(1, n_samples);
-    waveform = [waveform; waveform];  % Both speakers for error
-    SoundManagerSection(obj, 'declare_new_sound', 'error', waveform, loop_flag);
-
-    SoundManagerSection(obj, 'send_not_yet_uploaded_sounds');
-end
-
-
-
 
 function [sma, prep_next_trial_states] = build_sma(obj, trial_params)
     global left1water;
     global right1water;
+    center1led   = bSettings('get', 'DIOLINES', 'center1led');
+    right1led   = bSettings('get', 'DIOLINES', 'right1led');
+    left1led   = bSettings('get', 'DIOLINES', 'left1led');
+
+    light_correct_port = true;
 
     pre_stim_cpoke_dur = .1;
     post_stim_cpoke_dur = .3;
-    choice_timer = 5;
+    choice_timer = 45;
     cpoke_viol_state = 'check_next_trial_ready';
     
     sound_name = trial_params.sound_name;
@@ -251,10 +255,14 @@ function [sma, prep_next_trial_states] = build_sma(obj, trial_params)
 
     % Determine if this is a random trial
     is_random = strcmp(port_mapping, 'random');
-
+    
+    correct_side_led = '';
     % Set up inputs and outputs based on correct side
     switch correct_side
         case 'left'
+            if light_correct_port
+                correct_side_led = left1led;
+            end
             correct_in = 'Lin';
             error_in = 'Rin';
             rew_dout = left1water;
@@ -267,6 +275,9 @@ function [sma, prep_next_trial_states] = build_sma(obj, trial_params)
                 error_state = 'right_error';
             end
         case 'right'
+            if light_correct_port
+                correct_side_led = right1led;
+            end
             correct_in = 'Rin';
             error_in = 'Lin';
             rew_dout = right1water;
@@ -286,7 +297,7 @@ function [sma, prep_next_trial_states] = build_sma(obj, trial_params)
     rew_snd_id = SoundManagerSection(obj, 'get_sound_id', 'correct'); 
     err_snd_id = SoundManagerSection(obj, 'get_sound_id', 'error');
 
-    center1led   = bSettings('get', 'DIOLINES', 'center1led');
+    
     % Initialize a state machine with some default states: including check_next_trial_ready
     prep_next_trial_states = {'check_next_trial_ready'};
 
@@ -310,7 +321,8 @@ function [sma, prep_next_trial_states] = build_sma(obj, trial_params)
     % wait for a choice
     sma = add_state(sma, 'name', 'wait_for_choice', 'self_timer', choice_timer, ...
         'input_to_statechange', {correct_in, correct_state; ...
-        error_in, error_state; 'Tup', 'check_next_trial_ready'});
+        error_in, error_state; 'Tup', 'check_next_trial_ready'},...
+        'output_actions', {'DOut', correct_side_led});
 
     % deliver the outcome
     drink_timer_1 = 2;
