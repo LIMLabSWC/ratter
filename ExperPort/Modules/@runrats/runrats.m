@@ -1860,6 +1860,8 @@ switch action
         rath{1}.value=value(RatMenu); %#ok<NASGU>
         exph{1}.value=value(ExpMenu); %#ok<NASGU>
 
+        sfile = '';
+
         try
             try
                 protobj = eval(value(CurrProtocol));
@@ -1906,9 +1908,14 @@ switch action
         end
 
         set(get_ghandle(Multi),'String',['Run: ',value(RatMenu)],'BackgroundColor',[0.3,1,0.3],'Fontsize',32);
-        [pname,fname,ext] = fileparts(sfile); %#ok<NASGU>
+        
+        if ~isempty(sfile)
+            [pname, fname, ext] = fileparts(sfile);
+            StatusBar.value = ['Using settings file: ', fname];
+        else
+            StatusBar.value = 'Using ASV data file.';
+        end
 
-        StatusBar.value=['Using settings file: ',fname];
         if value(phys)==1
             create_phys_session(eval(value(CurrProtocol)))
         end
@@ -1918,7 +1925,7 @@ switch action
         InLiveLoop.value = 0;
 
         %Check to see if the experimenter wants to enable the safety before
-        if ~isempty(strfind(value(SafetyMode),'B')) %#ok<NODEF>
+        if contains(value(SafetyMode),'B') %#ok<NODEF>
             set(get_ghandle(Multi),'enable','off');
             set(get_ghandle(Safety),'visible','on','string',value(Instructions)); %#ok<NODEF>
         else

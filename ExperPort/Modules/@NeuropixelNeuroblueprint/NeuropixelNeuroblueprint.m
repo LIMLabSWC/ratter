@@ -327,10 +327,20 @@ switch action
             log_message(handles, '--- RUN sequence complete. Experiment is live. ---');
         
         catch ME
-            log_message(handles, sprintf('ERROR during run sequence: %s', ME.message));
             feval(mfilename, obj, 'stop_blinking');
-            rethrow(ME);
+            if strcmp(ME.identifier, 'SGLX:userAbort')
+                log_message(handles, sprintf(['Ephys start aborted: %s. ' ...
+                    'Behavior is still loaded. Fix the issue in SpikeGLX ' ...
+                    'and press Run again.'], ME.message));
+                set(handles.control_button, 'Enable', 'on', 'String', 'Run', ...
+                    'BackgroundColor', [0.4, 0.8, 0.4]);
+            else
+                log_message(handles, sprintf('ERROR during run sequence: %s', ME.message));
+                feval(mfilename, obj, 'reset_to_load_state');
+                rethrow(ME);
+            end
         end
+        
     case 'stop_sequence'
         handles = value(ui_handles);
         params = value(current_params);
@@ -381,8 +391,12 @@ switch action
                                 rec_info.record_nodes(i).parent_directory));
                         end
                         if ~ismember(str2double(params.oe_rec_node_id), found_ids)
-                            log_message(handles, sprintf('WARNING: Rec ID "%s" does not match any found node IDs: [%s]', ...
-                                params.oe_rec_node_id, num2str(found_ids)));
+                            auto_id = found_ids(1); % Use first found node if entered ID is wrong
+                            log_message(handles, sprintf(['WARNING: Rec ID "%s" not found in signal chain. ' ...
+                                'Auto-correcting to %d and updating GUI.'], params.oe_rec_node_id, auto_id));
+                            params.oe_rec_node_id = num2str(auto_id);
+                            current_params.value = params; % Push corrected ID back so set_recording_path sees it
+                            set(handles.oe_rec_edit, 'String', num2str(auto_id)); % Update GUI field
                         end
                     else
                         log_message(handles, 'WARNING: No Record Nodes found in OE signal chain. Data will NOT be saved.');
@@ -431,8 +445,9 @@ switch action
                 if strcmp(actual_path, save_path)
                     log_message(handles, sprintf('OE recording path confirmed: %s', save_path));
                 else
-                    log_message(handles, sprintf('WARNING: OE path mismatch! Requested: %s | Got: %s', ...
-                        save_path, actual_path));
+                    error(['OE path mismatch after set attempt. Requested: %s | Got: "%s". ' ...
+                        'Recording path was NOT applied — aborting to prevent data loss.'], ...
+                        save_path, actual_path);
                 end
 
             else % SpikeGLX
@@ -470,18 +485,85 @@ switch action
                 run_name = sprintf('experiment_%s', datestr(now, 'yyyymmdd_HHMMSS'));
                 boolval = IsInitialized(controller);
                 if boolval
-                    controller = SetRunName(controller, run_name);
-                    log_message(handles, sprintf('SpikeGLX run name set to: %s', run_name));
-                    controller = StartRun(controller);
-                    pause(2);
-
-                    runningval = false;
-                    while ~runningval
-                        runningval = IsRunning(controller);
-                        if runningval
-                            controller = SetRecordingEnable(controller, 1);
+                    automated_ok = false;
+                    try
+                        controller = SetRunName(controller, run_name);
+                        log_message(handles, sprintf('SpikeGLX run name set to: %s', run_name));
+                        controller = StartRun(controller);
+                        pause(2);
+                        runningval = false;
+                        while ~runningval
+                            runningval = IsRunning(controller);
+                            if runningval
+                                controller = SetRecordingEnable(controller, 1);
+                            end
                         end
+                        automated_ok = true;
+                    catch ME_sglx
+                        log_message(handles, sprintf(['SpikeGLX automated start failed: %s. ' ...
+                            'Falling back to manual mode.'], ME_sglx.message));
                     end
+
+                    if ~automated_ok
+                        expected_save_dir = fullfile(params.local_path, value(session_base_path), 'ephys');
+                        manual_msg = {
+                            'SpikeGLX could not be controlled automatically.', ...
+                            '', ...
+                            'Please do the following manually in SpikeGLX:', ...
+                            '  1. Press the RUN button to start acquisition.', ...
+                            '  2. Ensure recording (saving) is enabled.', ...
+                            '  3. Confirm the save directory is set to:', ...
+                            sprintf('     %s', expected_save_dir), ...
+                            '', ...
+                            'Press OK once acquisition and recording are live.'
+                            };
+                        answer = questdlg(manual_msg, 'Manual SpikeGLX Start Required', ...
+                            'OK - Recording is live', 'Abort', 'OK - Recording is live');
+
+                        if ~strcmp(answer, 'OK - Recording is live')
+                            error('SGLX:userAbort', 'SpikeGLX manual start aborted by user.');
+                        end
+
+                        log_message(handles, 'Verifying SpikeGLX state after manual start...');
+                        pause(1);
+                        if ~IsRunning(controller)
+                            error('SGLX:userAbort', ['SpikeGLX does not appear to be running. ' ...
+                                'Please check SpikeGLX and press Run again.']);
+                        end
+                        if ~IsSaving(controller)
+                            log_message(handles, ['WARNING: SpikeGLX is running but recording ' ...
+                                '(saving) does not appear to be enabled. ' ...
+                                'Data may not be saved — check SpikeGLX.']);
+                        end
+
+                        try
+                            actual_dir = GetDataDir(controller, 0);
+                            if strcmp(normalize_path(strtrim(actual_dir)), normalize_path(strtrim(expected_save_dir)))
+                                log_message(handles, sprintf('SpikeGLX save directory confirmed: %s', actual_dir));
+                            else
+                                log_message(handles, sprintf(['WARNING: SpikeGLX save directory mismatch. ' ...
+                                    'Expected: %s | Got: %s'], normalize_path(expected_save_dir), normalize_path(actual_dir)));
+                                dir_answer = questdlg( ...
+                                    sprintf('Save directory mismatch!\n\nExpected:\n%s\n\nActual:\n%s\n\nFix the path in SpikeGLX and press Run again, or continue anyway.', ...
+                                    normalize_path(expected_save_dir), normalize_path(actual_dir)), ...
+                                    'Save Directory Mismatch', ...
+                                    'Continue Anyway', 'Abort', 'Abort');
+                                if ~strcmp(dir_answer, 'Continue Anyway')
+                                    error('SGLX:userAbort', ...
+                                        'Aborted due to SpikeGLX save directory mismatch.');
+                                end
+                            end
+                        catch ME_dir
+                            if strcmp(ME_dir.identifier, 'SGLX:userAbort')
+                                rethrow(ME_dir);
+                            end
+                            log_message(handles, sprintf(['Could not verify SpikeGLX save directory: %s. ' ...
+                                'Proceeding with caution.'], ME_dir.message));
+                        end
+
+                        log_message(handles, 'Manual SpikeGLX start confirmed. Continuing...');
+                    end
+
                     recording_controller.value = controller;
                 else
                     error('SpikeGLX is not initialized. Cannot start recording.');
@@ -1167,6 +1249,16 @@ function success = create_session_directories(handles, params,session_base_path)
         msg = sprintf('Failed to create directories: %s', ME.message);
         log_message(handles, ['ERROR: ' msg]); errordlg(msg, 'Directory Error');
     end
+
+function p = normalize_path(p)
+% Normalize path separators to be OS-independent
+% Converts all forward and back slashes to filesep,
+% then removes any trailing separator
+p = strrep(p, '\', filesep);
+p = strrep(p, '/', filesep);
+if ~isempty(p) && p(end) == filesep
+    p = p(1:end-1);
+end
 %% =======================================================================
 %  HELPER & UTILITY FUNCTIONS
 %  =======================================================================
