@@ -369,64 +369,64 @@ switch action
                 edge_max = value(boundary);
                 edge_min = edge_max - dist_range_multiplier * (edge_max - edge_min);
             end
+        end
 
-            % Create a Stimuli with the selected Distribution and Side
-            switch dist_type
+        % Create a Stimuli with the selected Distribution and Side
+        switch dist_type
 
-                case 'Uniform' % uniform distribution
-                    stim_i_log = random('Uniform',edge_min,edge_max);
+            case 'Uniform' % uniform distribution
+                stim_i_log = random('Uniform',edge_min,edge_max);
 
-                case 'Exponential'
+            case 'Exponential'
 
-                    lambda = 2.153 * (edge_max - edge_min); % In mice they are using 2.153 for normalized stim range [0 1]
-                    stim_i_log = edge_min - 1; % preinitialize for while loop
-                    while stim_i_log < edge_min || stim_i_log > edge_max
-                        U = rand(1);
-                        if edge_min == value(boundary) % exponentially decreasing
-                            stim_i_log = edge_min + (-(1/lambda)*log(U)); % the distribution would be between range [0 1], so added the edge_min
-                        else
-                            stim_i_log = edge_max - (-(1/lambda)*log(U));
-                        end
-                    end
-
-                case 'Anti Exponential'
-
-                    lambda = 2.153 * (edge_max - edge_min); % In mice they are using 2.153 for normalized stim range [0 1]
-                    stim_i_log = edge_min - 1; % preinitialize for while loop
-                    while stim_i_log < edge_min || stim_i_log > edge_max
-                        U = rand(1);
-                        if edge_min == value(boundary) % exponentially decreasing
-                            stim_i_log = edge_max - (-(1/lambda)*log(U)); % the distribution would be between range [0 1], so added the edge_min
-                        else
-                            stim_i_log = edge_min - ((1/lambda)*log(U));
-                        end
-                    end
-
-                case 'Half Normal'
-                    if edge_min == value(boundary)
-                        stim_i_log = random('Half Normal',dist_mean,dist_sigma);
-                        while stim_i_log < edge_min || stim_i_log > edge_max
-                            stim_i_log = random('Half Normal',dist_mean,dist_sigma);
-                        end
+                lambda = 2.153 * (edge_max - edge_min); % In mice they are using 2.153 for normalized stim range [0 1]
+                stim_i_log = edge_min - 1; % preinitialize for while loop
+                while stim_i_log < edge_min || stim_i_log > edge_max
+                    U = rand(1);
+                    if edge_min == value(boundary) % exponentially decreasing
+                        stim_i_log = edge_min + (-(1/lambda)*log(U)); % the distribution would be between range [0 1], so added the edge_min
                     else
-                        stim_i_log = CreateSamples_from_Distribution('normal',dist_mean,dist_sigma,edge_min,edge_max,1);
+                        stim_i_log = edge_max - (-(1/lambda)*log(U));
                     end
+                end
 
-                case 'Anti Half Normal'
+            case 'Anti Exponential'
 
-                    stim_i_log = CreateSamples_from_Distribution('normal',dist_mean,dist_sigma,edge_min,edge_max,1);
+                lambda = 2.153 * (edge_max - edge_min); % In mice they are using 2.153 for normalized stim range [0 1]
+                stim_i_log = edge_min - 1; % preinitialize for while loop
+                while stim_i_log < edge_min || stim_i_log > edge_max
+                    U = rand(1);
+                    if edge_min == value(boundary) % exponentially decreasing
+                        stim_i_log = edge_max - (-(1/lambda)*log(U)); % the distribution would be between range [0 1], so added the edge_min
+                    else
+                        stim_i_log = edge_min - ((1/lambda)*log(U));
+                    end
+                end
 
-                case 'Normal'
-                    stim_i_log = random('Normal',dist_mean,dist_sigma);
+            case 'Half Normal'
+                if edge_min == value(boundary)
+                    stim_i_log = random('Half Normal',dist_mean,dist_sigma);
                     while stim_i_log < edge_min || stim_i_log > edge_max
-                        stim_i_log = random('Normal',dist_mean,dist_sigma);
+                        stim_i_log = random('Half Normal',dist_mean,dist_sigma);
                     end
+                else
+                    stim_i_log = CreateSamples_from_Distribution('normal',dist_mean,dist_sigma,edge_min,edge_max,1);
+                end
 
-                case {'Sinusoidal', 'Anti Sinusoidal'}
+            case 'Anti Half Normal'
 
-                    stim_i_log = CreateSamples_from_Distribution('Sinusoidal',dist_mean,dist_sigma,edge_min,edge_max,1);
+                stim_i_log = CreateSamples_from_Distribution('normal',dist_mean,dist_sigma,edge_min,edge_max,1);
 
-            end
+            case 'Normal'
+                stim_i_log = random('Normal',dist_mean,dist_sigma);
+                while stim_i_log < edge_min || stim_i_log > edge_max
+                    stim_i_log = random('Normal',dist_mean,dist_sigma);
+                end
+
+            case {'Sinusoidal', 'Anti Sinusoidal'}
+
+                stim_i_log = CreateSamples_from_Distribution('Sinusoidal',dist_mean,dist_sigma,edge_min,edge_max,1);
+
         end
 
         thisstim.value=exp(stim_i_log);
