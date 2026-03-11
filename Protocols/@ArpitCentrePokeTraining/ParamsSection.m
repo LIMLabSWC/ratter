@@ -379,31 +379,75 @@ switch action
 
         %% Choose Side for the Next Trial
         
-        if ~isinf(MaxSame) && length(previous_sides) > MaxSame && ...
-                all(previous_sides(n_done_trials-MaxSame+1:n_done_trials) == previous_sides(n_done_trials)) %#ok<NODEF>
-            if previous_sides(end)=='l'
-                ThisTrial.value = 'RIGHT';
-            else
-                ThisTrial.value = 'LEFT';
-            end
+        % ---------------------------------------------------------------
+        % Determine whether adaptive antibias should be active this trial
+        % Conditions: training_stage >= 6
+        % ---------------------------------------------------------------
+        use_antibias = value(training_stage) >= 6 && ...
+               ~strcmpi(value(Stimuli_State), 'Fixed');
 
-            if previous_sides(end)=='r'
-                ThisTrial.value = 'LEFT';
+        % Tau only meaningful for stage 6+; scale with stage for future flexibility
+        tau = 30; % trials, exponential kernel decay constant
+
+        % ---------------------------------------------------------------
+        % Update antibias estimate using completed trial's outcome
+        % (only on valid — non-violation, non-timeout — trials)
+        % ---------------------------------------------------------------
+        if use_antibias && n_done_trials > 0
+
+            if ~was_viol && ~was_timeout
+                % Strip NaN (violation/timeout) trials from both histories
+                nan_mask = isnan(hit_history(1:n_done_trials));
+                nonan_hit_history    = hit_history(1:n_done_trials);
+                nonan_previous_sides = previous_sides(1:n_done_trials);
+                nonan_hit_history(nan_mask)    = [];
+                nonan_previous_sides(nan_mask) = [];
+
+                % Need at least 5 valid trials before antibias is meaningful
+                if length(nonan_hit_history) >= 5
+                    [antibias_left_prob, ~, ~] = calculate_adaptive_antibias( ...
+                        nonan_hit_history(:),nonan_previous_sides(:), ...
+                        value(LeftProb), ...   % user-set prior as baseline
+                        tau);
+                else
+                    antibias_left_prob = value(LeftProb); % fall back to flat prior
+                end
             else
+                % Violation or timeout: don't update, carry forward last probability
+                antibias_left_prob = value(LeftProb);
+            end
+        else
+            % Not in antibias mode: use user-set LeftProb directly
+            antibias_left_prob = value(LeftProb);
+        end
+
+        % ---------------------------------------------------------------
+        % Choose next trial side
+        % Priority 1: MaxSame override (always applies regardless of antibias)
+        % Priority 2: Antibias-weighted random draw (or flat LeftProb)
+        % ---------------------------------------------------------------
+        if ~isinf(value(MaxSame)) && ...
+                length(previous_sides) > value(MaxSame) && ...
+                all(previous_sides(n_done_trials - value(MaxSame) + 1 : n_done_trials) == ...
+                previous_sides(n_done_trials))
+
+            % Force a side-switch after MaxSame consecutive same-side trials
+            if previous_sides(end) == 'l'
                 ThisTrial.value = 'RIGHT';
+            else
+                ThisTrial.value = 'LEFT';
             end
 
         else
-
-            if (rand(1)<=LeftProb)
-                ThisTrial.value='LEFT';
-
+            % Normal draw — uses antibias probability when active,
+            % flat LeftProb otherwise (antibias_left_prob == LeftProb in that case)
+            if rand(1) <= antibias_left_prob
+                ThisTrial.value = 'LEFT';
             else
-                ThisTrial.value='RIGHT';
+                ThisTrial.value = 'RIGHT';
             end
 
         end
-        
        				
 % 		%% Do the anti-bias with changing reward delivery
 % 		% reset anti-bias

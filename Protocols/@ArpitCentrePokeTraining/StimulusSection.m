@@ -218,22 +218,27 @@ switch action
 
     case 'update_discrete_performance'
 
-        current_done_trials = value(ValidTrial_thisStimNumber);
-        current_performance = value(Performance_thisStimNumber);
+        window_size = 100;
         current_stimuli = value(NumberStimuli);
         if n_done_trials > 0
             if ~isnan(hit_history(end))  % Trial is valid
                 ValidTrial_thisStimNumber.value = value(ValidTrial_thisStimNumber) + 1; % Increment valid trial count
                 % Get the current trial outcome (1 for correct, 0 for incorrect)
-                current_trial_correct = hit_history(end);  % 1 = hit/correct, 0 = miss/incorrect
-                % Update performance recursively
-                % Formula: new_performance = (old_performance * old_trials + current_trial_correct * 100) / new_trials
-                new_done_trials = current_done_trials + 1;
-                Performance_thisStimNumber.value = (current_performance * current_done_trials + current_trial_correct * 100) / new_done_trials;
+                n = value(ValidTrial_thisStimNumber);
+                old_perf = value(Performance_thisStimNumber);
+                new_outcome = hit_history(end) * 100; % 100 or 0
+                if n < window_size
+                    % Phase 1: exact cumulative mean
+                    Performance_thisStimNumber.value = (old_perf * (n-1) + new_outcome) / n;
+                else
+                    % Phase 2: fixed-denominator incremental update
+                    % equivalent to EMA with alpha = 1/window_size
+                    Performance_thisStimNumber.value = old_perf + (new_outcome - old_perf) / window_size;
+                end
             end
 
             % Check whether to upgrade to higher discrete number or stay in this one
-            if value(Performance_thisStimNumber) > 85 && value(ValidTrial_thisStimNumber) > 400
+            if value(Performance_thisStimNumber) > 80 && value(ValidTrial_thisStimNumber) > 400
                 if current_stimuli < 8
                     % Define the discrete sequence of NumberStimuli values
                     stimuli_sequence = [1, 2, 4, 8];
@@ -335,46 +340,34 @@ switch action
             stim_max_log = log(value(maxS1));
         end
 
-        if value(training_stage) == 4 % playing fixed sound during this stage
-            if (strcmpi(ThisTrial, 'LEFT') & strcmp(Rule,'S1>S_boundary Left')) | ...
-                    (strcmpi(ThisTrial, 'RIGHT') & strcmp(Rule,'S1>S_boundary Right'))
-                
-                stim_i_log = stim_max_log;
-            else
-                stim_i_log = stim_min_log;
+        if strcmpi(ThisTrial, 'LEFT')
+            dist_type  = value(Prob_Dist_Left);
+            dist_mean  = value(mean_Left);
+            dist_sigma = value(sigma_Left);
+            dist_range_multiplier = value(sigma_range_Left);
+            if strcmp(Rule,'S1>S_boundary Left')
+                edge_max = stim_max_log;
+                edge_min = value(boundary);
+                edge_max = edge_min + dist_range_multiplier * (edge_max - edge_min);
+            else % the rule is S1>S_boundary Right
+                edge_min = stim_min_log;
+                edge_max = value(boundary);
+                edge_min = edge_max - dist_range_multiplier * (edge_max - edge_min);
             end
-         
-        else % will be playing stimuli from the distribution
 
-            if strcmpi(ThisTrial, 'LEFT')
-                dist_type  = value(Prob_Dist_Left);
-                dist_mean  = value(mean_Left);
-                dist_sigma = value(sigma_Left);
-                dist_range_multiplier = value(sigma_range_Left);
-                if strcmp(Rule,'S1>S_boundary Left')
-                    edge_max = stim_max_log;
-                    edge_min = value(boundary);
-                    edge_max = edge_min + dist_range_multiplier * (edge_max - edge_min);
-                else % the rule is S1>S_boundary Right
-                    edge_min = stim_min_log;
-                    edge_max = value(boundary);
-                    edge_min = edge_max - dist_range_multiplier * (edge_max - edge_min);
-                end
-
-            else % trial is Right
-                dist_type  = value(Prob_Dist_Right);
-                dist_mean  = value(mean_Right);
-                dist_sigma = value(sigma_Right);
-                dist_range_multiplier = value(sigma_range_Right);
-                if strcmp(Rule,'S1>S_boundary Right')
-                    edge_max = stim_max_log;
-                    edge_min = value(boundary);
-                    edge_max = edge_min + dist_range_multiplier * (edge_max - edge_min);
-                else % the rule is S1>S_boundary Left
-                    edge_min = stim_min_log;
-                    edge_max = value(boundary);
-                    edge_min = edge_max - dist_range_multiplier * (edge_max - edge_min);
-                end
+        else % trial is Right
+            dist_type  = value(Prob_Dist_Right);
+            dist_mean  = value(mean_Right);
+            dist_sigma = value(sigma_Right);
+            dist_range_multiplier = value(sigma_range_Right);
+            if strcmp(Rule,'S1>S_boundary Right')
+                edge_max = stim_max_log;
+                edge_min = value(boundary);
+                edge_max = edge_min + dist_range_multiplier * (edge_max - edge_min);
+            else % the rule is S1>S_boundary Left
+                edge_min = stim_min_log;
+                edge_max = value(boundary);
+                edge_min = edge_max - dist_range_multiplier * (edge_max - edge_min);
             end
 
             % Create a Stimuli with the selected Distribution and Side
@@ -429,7 +422,7 @@ switch action
                         stim_i_log = random('Normal',dist_mean,dist_sigma);
                     end
 
-                case 'Sinusoidal' | 'Anti Sinusoidal'
+                case {'Sinusoidal', 'Anti Sinusoidal'}
 
                     stim_i_log = CreateSamples_from_Distribution('Sinusoidal',dist_mean,dist_sigma,edge_min,edge_max,1);
 

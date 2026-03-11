@@ -353,26 +353,26 @@ switch action
 
                 %%%%%%%%%%%%%%% REWARD COLLECTION STATE START %%%%%%%%%%%%%%%
 
-                if strcmpi(Stimuli_State,'Discrete Stimuli') & value(training_stage) > 4 % special case for teaching discrete stimuli
-                    % which sarts as soon as the stage 5 starts, when side light no longer cues for rewarded side
+                if value(training_stage) >= 6 % 
+                    % which sarts as soon as the stage 6 starts, when side light no longer cues for rewarded side
 
                     sma = add_state(sma, 'name', 'side_led_wait_RewardCollection', 'self_timer', SideLed_duration + RewardCollection_duration, ...
                         'output_actions', {'DOut', SideLight * 0; 'SchedWaveTrig', 'reward_collection_dur+Go_Cue'}, ...
                         'input_to_statechange',{HitEvent,'hit_state'; 'Tup','timeout_state'; ErrorEvent,'second_hit_state'});
 
-                    if value(training_stage) < 8 % its always rewarded the second time if first time choice is wrong
+                    if value(training_stage) == 6 % its always rewarded the second time if first time choice is wrong
 
                         sma = add_state(sma,'name','second_hit_state','self_timer',RewardCollection_duration,...
                             'output_actions',{'DOut', SideLight},...
                             'input_to_statechange',{'reward_collection_dur_In', 'timeout_state'; 'Tup','timeout_state'; HitEvent,'hit_state'});
 
-                    else % for stage 8 the wrong choice leads to timeout of 5 seconds and no reward
+                    else % for stage 7 and 8 the wrong choice leads to timeout of 3 seconds and no reward
 
                         sma = add_state(sma,'name','second_hit_state','self_timer',2,...
                             'output_actions',{'DOut', SideLight},...
                             'input_to_statechange',{'Tup','current_state+1'});
 
-                        sma = add_state(sma,'self_timer',3,...
+                        sma = add_state(sma,'self_timer',1,...
                             'input_to_statechange',{'Tup','preclean_up_state'});
 
                     end

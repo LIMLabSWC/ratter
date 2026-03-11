@@ -44,6 +44,7 @@ stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
 if stage_no ~= value(ParamsSection_training_stage)
     ParamsSection_training_stage.value = stage_no;
     callback(ParamsSection_training_stage);
+    ParamsSection(obj, 'Changed_Training_Stage');
 end
 
 % Introduce Go/Reward Sound intensity after the rat did some trials and also increase
@@ -70,7 +71,7 @@ if n_done_trials >= 2
 end
 
 % Updating Disp Values for Training_Peformance_Summary
-% Performance section updates
+% FIX: all performance updates guarded by n_done_trials > 0 to avoid divide-by-zero
 if n_done_trials > 0
     if n_done_trials == 1
         for k = 1:8
@@ -174,9 +175,6 @@ end
 %</TRAINING_STAGE>
 
 
-
-
-
 %% Timeout Rewarded Side Pokes
 
 %<TRAINING_STAGE>
@@ -204,6 +202,7 @@ stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
 if stage_no ~= value(ParamsSection_training_stage)
     ParamsSection_training_stage.value = stage_no;
     callback(ParamsSection_training_stage);
+    ParamsSection(obj, 'Changed_Training_Stage');
 end
 % Update the reward collection time based upon behav
 if length(timeout_history) > 5
@@ -237,7 +236,6 @@ if n_done_trials >= 2
 end
 
 
-% Updating Disp Values for Training_Peformance_Summary
 % Performance section updates
 if n_done_trials > 0
     if n_done_trials == 1
@@ -357,7 +355,9 @@ if stage_algorithm_eval
 GetSoloFunctionArgs(obj);
 ClearHelperVarsNotOwned(obj);
 %<STAGE_ALGORITHM>
-% Maximum & Minimum duration of center poke, in secs:
+% Maximum & Minimum duration of center poke, in secs.
+% max_CP here is SettlingIn + legal_cbreak (the ceiling for this stage
+% before violation is introduced).
 cp_max = value(ParamsSection_SettlingIn_time) + value(ParamsSection_legal_cbreak);
 cp_min = value(ParamsSection_init_CP_duration);
 % Minimum increment (in secs) in center poke duration every time there is a non-cp-violation trial:
@@ -369,16 +369,16 @@ stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
 if stage_no ~= value(ParamsSection_training_stage)
     ParamsSection_training_stage.value = stage_no;
     callback(ParamsSection_training_stage);
-end
-% Change the value of CP Duration
-if value(TrainingStageParamsSection_last_session_CP) == 0 && value(PerformanceSummarySection_stage_3_Trials) < 2
-    ParamsSection_CP_duration.value = cp_min; % initialize to min_CP
+    ParamsSection(obj, 'Changed_Training_Stage');
 end
 
-if n_done_trials < 1 % intialize to min value at the start of each session/day
-    ParamsSection_CP_duration.value = value(ParamsSection_init_CP_duration);
+% FIX: guard against last_session_CP being 0 (default) on a fresh animal.
+% Use max() so CP never starts below init_CP_duration.
+if n_done_trials < 1
+    ParamsSection_CP_duration.value = cp_min;
 elseif n_done_trials == 1
-    ParamsSection_CP_duration.value = value(TrainingStageParamsSection_last_session_CP);
+    last_cp = value(TrainingStageParamsSection_last_session_CP);
+    ParamsSection_CP_duration.value = max(last_cp, cp_min);
 else
     if ~timeout_history(end) && value(ParamsSection_CP_duration) < cp_max
         increment = value(ParamsSection_CP_duration) * value(TrainingStageParamsSection_CPfraction_inc);
@@ -387,6 +387,10 @@ else
         end
         ParamsSection_CP_duration.value = value(ParamsSection_CP_duration) + increment;
     end	
+end
+% Never exceed stage ceiling
+if value(ParamsSection_CP_duration) > cp_max
+    ParamsSection_CP_duration.value = cp_max;
 end
 callback(ParamsSection_CP_duration);
 
@@ -510,29 +514,29 @@ GetSoloFunctionArgs(obj);
 ClearHelperVarsNotOwned(obj);
 %<STAGE_ALGORITHM>
 
-% Maximum & Minimum duration of center poke, in secs:
+% Maximum & Minimum duration of center poke, in secs.
+% cp_min is where Stage 3 left off (its ceiling becomes Stage 4's floor).
 cp_min = value(ParamsSection_SettlingIn_time) + value(ParamsSection_legal_cbreak);
 cp_max = value(TrainingStageParamsSection_max_CP);
 % Fractional increment in center poke duration every time there is a non-cp-violation trial:
 cp_fraction = value(TrainingStageParamsSection_CPfraction_inc);
-% Minimum increment (in secs) in center poke duration every time there is a non-cp-violation trial:
+% Minimum increment (in secs):
 cp_minimum_increment = 0.001;
 
 stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
 if stage_no ~= value(ParamsSection_training_stage)
     ParamsSection_training_stage.value = stage_no;
     callback(ParamsSection_training_stage);
+    ParamsSection(obj, 'Changed_Training_Stage');
 end
 
-% Change the value of CP Duration
-if value(PerformanceSummarySection_stage_4_Trials) < 2
-    ParamsSection_CP_duration.value = cp_min; % initialize to min_CP
-end
-
+% FIX: guard against last_session_CP being 0 (default) on a fresh animal.
+% Use max() so CP never starts below cp_min for this stage.
 if n_done_trials == 0
     ParamsSection_CP_duration.value = value(ParamsSection_init_CP_duration);
 elseif n_done_trials == 1
-    ParamsSection_CP_duration.value = value(TrainingStageParamsSection_last_session_CP);
+    last_cp = value(TrainingStageParamsSection_last_session_CP);
+    ParamsSection_CP_duration.value = max(last_cp, cp_min);
 else
     if ~violation_history(end) && ~timeout_history(end) && value(ParamsSection_CP_duration) < cp_max
         increment = value(ParamsSection_CP_duration) * cp_fraction;
@@ -652,9 +656,6 @@ end
 %</TRAINING_STAGE>
 
 
-
-
-
 %% Introduce Stimuli Sound during Centre Poke
 
 %<TRAINING_STAGE>
@@ -672,38 +673,39 @@ if stage_algorithm_eval
 GetSoloFunctionArgs(obj);
 ClearHelperVarsNotOwned(obj);
 %<STAGE_ALGORITHM>
-% Initial parameter fetch
-cp_max = value(TrainingStageParamsSection_max_CP);
-cp_min = value(TrainingStageParamsSection_min_CP);
-cp_fraction = value(TrainingStageParamsSection_CPfraction_inc);
+% Read all timing parameters from TrainingStageParamsSection (single source of truth)
+cp_max          = value(TrainingStageParamsSection_max_CP);
+cp_min          = value(TrainingStageParamsSection_min_CP);
+cp_fraction     = value(TrainingStageParamsSection_CPfraction_inc);
 cp_minimum_increment = 0.001;
-starting_cp = value(TrainingStageParamsSection_starting_CP) + value(ParamsSection_SettlingIn_time);
-n_trial_warmup = value(TrainingStageParamsSection_warm_up_trials);
-cp_range = cp_max - cp_min;
-a1_min = 0.1;
-a1_max = 0.4;
+starting_cp     = value(TrainingStageParamsSection_starting_CP) + value(ParamsSection_SettlingIn_time);
+n_trial_warmup  = value(TrainingStageParamsSection_warm_up_trials);
+stim_dur        = value(TrainingStageParamsSection_stim_dur);
+settling_in     = value(ParamsSection_SettlingIn_time);
+% Minimum buffer between go cue onset and end of CP window (safety margin)
+min_prego_buffer = 0.05;
 
 stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
 if stage_no ~= value(ParamsSection_training_stage)
     ParamsSection_training_stage.value = stage_no;
     callback(ParamsSection_training_stage);
+    ParamsSection(obj, 'Changed_Training_Stage');
 end
 
-% CP duration logic
+% --- CP duration logic (warmup ramp then fractional increase) ---
 init_CP_duration = value(ParamsSection_init_CP_duration);
-last_CP = value(TrainingStageParamsSection_last_session_CP);
-curr_CP = value(ParamsSection_CP_duration);
+last_CP  = value(TrainingStageParamsSection_last_session_CP);
+curr_CP  = value(ParamsSection_CP_duration);
 
 if n_done_trials == 0
     new_CP = init_CP_duration;
-
 elseif n_done_trials <= n_trial_warmup
+    % Linear ramp from init_CP up to last_CP (where Stage 4 ended)
     cp_delta = (last_CP - init_CP_duration) / n_trial_warmup;
     new_CP = init_CP_duration + cp_delta * n_done_trials;
-    if new_CP < starting_cp
-        new_CP = starting_cp;
-    end  
+    new_CP = max(new_CP, starting_cp);
 else
+    % Fractional increment only on clean (non-violation, non-timeout) trials
     if ~violation_history(end) && ~timeout_history(end)
         increment = curr_CP * cp_fraction;
         if increment < cp_minimum_increment
@@ -714,33 +716,43 @@ else
         new_CP = curr_CP;
     end
 end
-ParamsSection_CP_duration.value = min(new_CP, cp_max);
+new_CP = min(new_CP, cp_max);
+ParamsSection_CP_duration.value = new_CP;
 callback(ParamsSection_CP_duration);
 
-% Timing parameter adjustments based on CP_duration
-if new_CP >= starting_cp && new_CP ~= curr_CP
-    if new_CP >= cp_min
-        % Scale A1_time linearly between 0.1 to 0.4
-        scale = (new_CP - cp_min) / cp_range;
-        scale = min(max(scale, 0), 1);
-        ParamsSection_A1_time.value = a1_min + scale * (a1_max - a1_min);
-    else
-        ParamsSection_A1_time.value = a1_min;
+% --- Timing sub-components: single authoritative calculation ---
+% Priority: SettlingIn (fixed) > A1/stim (fixed at stim_dur) >
+%           PreStim (scales with CP) > prego (fills remainder, >= min_prego_buffer)
+%
+% FIX: Removed the duplicated/overwriting block that was present in the
+% original. All timing is computed once here and clamped so nothing
+% goes negative regardless of what max_CP or stim_dur are set to.
+if new_CP >= starting_cp
+
+    % PreStim scales linearly from 0.1s (at cp_min) to 0.3s (at cp_max),
+    % but is capped so that A1 + PreStim + SettlingIn + min_prego_buffer
+    % always fits inside the actual CP window.
+    cp_available = new_CP - settling_in;
+    raw_scale    = (new_CP - cp_min) / max(cp_max - cp_min, 1e-6);
+    raw_scale    = min(max(raw_scale, 0), 1);
+    prestim      = 0.1 + raw_scale * (0.3 - 0.1);  % 0.1 → 0.3 s
+
+    % Clamp: if stim + prestim already eat into the safety buffer, reduce prestim first
+    if (prestim + stim_dur + min_prego_buffer) > cp_available
+        prestim = max(0, cp_available - stim_dur - min_prego_buffer);
     end
 
-    if new_CP >= 1
-        ParamsSection_PreStim_time.value = 0.4;
-    else
-        ParamsSection_PreStim_time.value = 0.1;
-    end
+    prego = cp_available - prestim - stim_dur;
+    prego = max(prego, min_prego_buffer);  % never let prego go below safety buffer
 
-    ParamsSection_SettlingIn_time.value = 0.2;
+    ParamsSection_SettlingIn_time.value = settling_in;
+    ParamsSection_PreStim_time.value    = prestim;
+    ParamsSection_A1_time.value         = stim_dur;
+    ParamsSection_time_bet_aud1_gocue.value = prego;
+
+    callback(ParamsSection_SettlingIn_time);
     callback(ParamsSection_PreStim_time);
     callback(ParamsSection_A1_time);
-    callback(ParamsSection_SettlingIn_time);
-
-    % Update time between Auditory and GoCue
-    ParamsSection_time_bet_aud1_gocue.value = new_CP - value(ParamsSection_SettlingIn_time) - value(ParamsSection_A1_time)  - value(ParamsSection_PreStim_time);
     callback(ParamsSection_time_bet_aud1_gocue);
 end
 
@@ -812,15 +824,18 @@ clear('ans');
 %<COMPLETION_TEST>
 if ParamsSection_use_auto_train % do completion check if auto training
     stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
-    if value(ParamsSection_CP_duration) >= value(TrainingStageParamsSection_max_CP) && value(PerformanceSummarySection_stage_5_TrialsValid) > value(TrainingStageParamsSection_total_trials)
-        if value(SessionPerformanceSection_violation_recent) < value(TrainingStageParamsSection_recent_violation) && value(SessionPerformanceSection_timeout_recent) < value(TrainingStageParamsSection_recent_timeout) && ...
-                value(SessionPerformanceSection_violation_stage) < value(TrainingStageParamsSection_stage_violation) && n_done_trials > 100
-            ParamsSection_training_stage.value = stage_no + 1;
-            callback(ParamsSection_training_stage);
-            ParamsSection(obj, 'Changed_Training_Stage');
-            SessionDefinition(obj, 'jump_to_stage', 'Vary Stimuli location during Centre Poke');
-            TrainingStageParamsSection_last_session_CP.value = value(ParamsSection_CP_duration);
-        end
+    if value(ParamsSection_CP_duration) >= value(TrainingStageParamsSection_max_CP) && ...
+            value(PerformanceSummarySection_stage_5_TrialsValid) > value(TrainingStageParamsSection_total_trials) && ...
+            value(SessionPerformanceSection_violation_recent) < value(TrainingStageParamsSection_recent_violation) && ...
+            value(SessionPerformanceSection_timeout_recent) < value(TrainingStageParamsSection_recent_timeout) && ...
+            value(SessionPerformanceSection_violation_stage) < value(TrainingStageParamsSection_stage_violation) && ...
+            n_done_trials > 100
+        ParamsSection_training_stage.value = stage_no + 1;
+        callback(ParamsSection_training_stage);
+        ParamsSection(obj, 'Changed_Training_Stage');
+        SessionDefinition(obj, 'jump_to_stage', 'Vary Stimuli location during Centre Poke');
+        TrainingStageParamsSection_last_session_CP.value = value(ParamsSection_CP_duration);
+        callback(TrainingStageParamsSection_last_session_CP);
     end
 end
 %</COMPLETION_TEST>
@@ -865,32 +880,31 @@ if stage_algorithm_eval
 GetSoloFunctionArgs(obj);
 ClearHelperVarsNotOwned(obj);
 %<STAGE_ALGORITHM>
-cp_max = value(TrainingStageParamsSection_max_CP);
-% Starting total center poke duration:
-starting_cp = value(TrainingStageParamsSection_starting_CP) + value(ParamsSection_SettlingIn_time);
-% number of warm-up trials
-n_trial_warmup = value(TrainingStageParamsSection_warm_up_trials);
-prestim_min = value(TrainingStageParamsSection_min_prestim);
-prestim_max = value(TrainingStageParamsSection_max_prestim);
-stim_dur = value(TrainingStageParamsSection_stim_dur);
+% Read all timing parameters from TrainingStageParamsSection
+cp_max          = value(TrainingStageParamsSection_max_CP);
+starting_cp     = value(TrainingStageParamsSection_starting_CP) + value(ParamsSection_SettlingIn_time);
+n_trial_warmup  = value(TrainingStageParamsSection_warm_up_trials);
+prestim_min     = value(TrainingStageParamsSection_min_prestim);
+prestim_max     = value(TrainingStageParamsSection_max_prestim);
+stim_dur        = value(TrainingStageParamsSection_stim_dur);
+settling_in     = value(ParamsSection_SettlingIn_time);
 init_CP_duration = value(ParamsSection_init_CP_duration);
+min_prego_buffer = 0.05;
+
 stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
 if stage_no ~= value(ParamsSection_training_stage)
     ParamsSection_training_stage.value = stage_no;
     callback(ParamsSection_training_stage);
+    ParamsSection(obj, 'Changed_Training_Stage');
 end
 
+% --- CP warmup ramp then hold at max ---
 if n_done_trials == 0
     new_CP = init_CP_duration;
 elseif n_done_trials <= n_trial_warmup
     cp_delta = (cp_max - init_CP_duration) / n_trial_warmup;
     new_CP = init_CP_duration + cp_delta * n_done_trials;
-    if new_CP < starting_cp
-        new_CP = starting_cp;
-    end
-    if new_CP > cp_max
-        new_CP = cp_max;
-    end
+    new_CP = min(max(new_CP, starting_cp), cp_max);
 else
     new_CP = cp_max;
 end
@@ -898,24 +912,43 @@ end
 ParamsSection_CP_duration.value = new_CP;
 callback(ParamsSection_CP_duration);
 
+% --- Timing sub-components ---
+% FIX: compute available time first, then clamp prestim so prego is
+% always >= min_prego_buffer, regardless of what min/max_prestim are set to.
 if new_CP >= starting_cp
-
-    ParamsSection_SettlingIn_time.value = 0.2;
+    ParamsSection_SettlingIn_time.value = settling_in;
     callback(ParamsSection_SettlingIn_time);
 
-    if n_done_trials <= n_trial_warmup % during the warm up phase
-        ParamsSection_PreStim_time.value = 0.1;
-        ParamsSection_A1_time.value = 0.1;
+    cp_available = new_CP - settling_in;
+
+    if n_done_trials <= n_trial_warmup
+        % During warmup: use small fixed values so animal can succeed
+        prestim = 0.1;
+        A1      = 0.1;
     else
-        ParamsSection_A1_time.value = stim_dur; % actual training stage
-        time_range_PreStim_time = prestim_min : 0.01 : prestim_max;
-        ParamsSection_PreStim_time.value = time_range_PreStim_time(randi([1, numel(time_range_PreStim_time)],1,1));
+        % Steady state: randomise prestim within [prestim_min, prestim_max]
+        % but clamp so stim + prestim + safety buffer fit in the window
+        max_allowed_prestim = cp_available - stim_dur - min_prego_buffer;
+        effective_prestim_max = min(prestim_max, max_allowed_prestim);
+        effective_prestim_max = max(effective_prestim_max, prestim_min); % never below min
+        time_range = prestim_min : 0.01 : effective_prestim_max;
+        if isempty(time_range)
+            time_range = prestim_min;
+        end
+        prestim = time_range(randi([1, numel(time_range)], 1, 1));
+        A1 = stim_dur;
     end
 
-    ParamsSection_time_bet_aud1_gocue.value = value(ParamsSection_CP_duration) - value(ParamsSection_SettlingIn_time) - value(ParamsSection_A1_time) - value(ParamsSection_PreStim_time);
-    callback(ParamsSection_time_bet_aud1_gocue)
+    prego = cp_available - prestim - A1;
+    prego = max(prego, min_prego_buffer); % safety clamp
+
+    ParamsSection_PreStim_time.value            = prestim;
+    ParamsSection_A1_time.value                 = A1;
+    ParamsSection_time_bet_aud1_gocue.value     = prego;
+
     callback(ParamsSection_PreStim_time);
     callback(ParamsSection_A1_time);
+    callback(ParamsSection_time_bet_aud1_gocue);
 end
 
 % --- Performance Logging ---
@@ -927,7 +960,6 @@ if n_done_trials > 0
         end
     end
 
-    % Example using stage 6
     PerformanceSummarySection_stage_6_Trials.value = value(PerformanceSummarySection_stage_6_Trials) + 1;
     PerformanceSummarySection_stage_6_TrialsToday.value = value(PerformanceSummarySection_stage_6_TrialsToday) + 1;
     PerformanceSummarySection_stage_6_ViolationRate.value = ...
@@ -947,7 +979,7 @@ if n_done_trials > 0
     callback(PerformanceSummarySection_stage_6_TimeoutRate);
     callback(PerformanceSummarySection_stage_6_TrialsValid);
 
-    % SessionPerformance updates
+    % Session-wide stats
     SessionPerformanceSection_ntrials.value = n_done_trials;
     SessionPerformanceSection_violation_percent.value = mean(violation_history);
     SessionPerformanceSection_timeout_percent.value = mean(timeout_history);
@@ -985,14 +1017,15 @@ clear('ans');
 %<COMPLETION_TEST>
 if ParamsSection_use_auto_train % do completion check if auto training
     stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
-    if value(PerformanceSummarySection_stage_6_TrialsValid) > value(TrainingStageParamsSection_total_trials)
-        if value(SessionPerformanceSection_violation_recent) < value(TrainingStageParamsSection_recent_violation) && value(SessionPerformanceSection_timeout_recent) < value(TrainingStageParamsSection_recent_timeout) && ...
-                value(SessionPerformanceSection_violation_stage) < value(TrainingStageParamsSection_stage_violation) && n_done_trials > 100
-            ParamsSection_training_stage.value = stage_no + 1;
-            callback(ParamsSection_training_stage);
-            ParamsSection(obj, 'Changed_Training_Stage');
-            SessionDefinition(obj, 'jump_to_stage', 'Variable Stimuli Go Cue location during Centre Poke');
-        end
+    if value(PerformanceSummarySection_stage_6_TrialsValid) > value(TrainingStageParamsSection_total_trials) && ...
+            value(SessionPerformanceSection_violation_recent) < value(TrainingStageParamsSection_recent_violation) && ...
+            value(SessionPerformanceSection_timeout_recent) < value(TrainingStageParamsSection_recent_timeout) && ...
+            value(SessionPerformanceSection_violation_stage) < value(TrainingStageParamsSection_stage_violation) && ...
+            n_done_trials > 100
+        ParamsSection_training_stage.value = stage_no + 1;
+        callback(ParamsSection_training_stage);
+        ParamsSection(obj, 'Changed_Training_Stage');
+        SessionDefinition(obj, 'jump_to_stage', 'Variable Stimuli Go Cue location during Centre Poke');
     end
 end
 %</COMPLETION_TEST>
@@ -1033,70 +1066,88 @@ if stage_algorithm_eval
 GetSoloFunctionArgs(obj);
 ClearHelperVarsNotOwned(obj);
 %<STAGE_ALGORITHM>
-% Variables for warmup stage
-cp_max = value(TrainingStageParamsSection_max_CP);
-% Starting total center poke duration:
-starting_cp = value(TrainingStageParamsSection_starting_CP) + value(ParamsSection_SettlingIn_time);
-% number of warm-up trials
-n_trial_warmup = value(TrainingStageParamsSection_warm_up_trials);
-prestim_min = value(TrainingStageParamsSection_min_prestim);
-prestim_max = value(TrainingStageParamsSection_max_prestim);
-prestim_time = value(TrainingStageParamsSection_min_prestim);
-a1_time = value(TrainingStageParamsSection_stim_dur);
-a1_time_min = value(TrainingStageParamsSection_stim_dur);
-a1_time_max = value(TrainingStageParamsSection_stim_dur + 0.1);
-prego_min = value(TrainingStageParamsSection_min_prego);
-prego_max = value(TrainingStageParamsSection_max_prego);
-prego_time = value(TrainingStageParamsSection_min_prego);
+% Read all timing parameters from TrainingStageParamsSection
+cp_max          = value(TrainingStageParamsSection_max_CP);
+starting_cp     = value(TrainingStageParamsSection_starting_CP) + value(ParamsSection_SettlingIn_time);
+n_trial_warmup  = value(TrainingStageParamsSection_warm_up_trials);
+prestim_min     = value(TrainingStageParamsSection_min_prestim);
+prestim_max     = value(TrainingStageParamsSection_max_prestim);
+% FIX: was value(TrainingStageParamsSection_stim_dur + 0.1) — invalid value() call
+a1_time         = value(TrainingStageParamsSection_stim_dur);
+a1_time_min     = value(TrainingStageParamsSection_stim_dur);
+a1_time_max     = value(TrainingStageParamsSection_stim_dur) + 0.1;
+prego_min       = value(TrainingStageParamsSection_min_prego);
+prego_max       = value(TrainingStageParamsSection_max_prego);
+settling_in     = value(ParamsSection_SettlingIn_time);
+init_CP_duration = value(ParamsSection_init_CP_duration);
+min_prego_buffer = 0.05;
+
+% Randomisation flags
 warmup_completed = 0;
-warm_up_on = 1;
+warm_up_on    = 1;
 random_prestim = 1;
-random_prego = 1;
-random_A1 = 0;
+random_prego  = 1;
+random_A1     = 0;  % A1 duration is fixed, only its location varies
 
 stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
 if stage_no ~= value(ParamsSection_training_stage)
     ParamsSection_training_stage.value = stage_no;
     callback(ParamsSection_training_stage);
+    ParamsSection(obj, 'Changed_Training_Stage');
 end
 
-% Warm Up If starting a new session
+% --- CP warmup ramp ---
 if warm_up_on == 1
     if n_done_trials == 0
-        ParamsSection_CP_duration.value = value(ParamsSection_init_CP_duration);
+        ParamsSection_CP_duration.value = init_CP_duration;
         warmup_completed = 0;
     elseif n_done_trials == 1
         ParamsSection_CP_duration.value = starting_cp;
     else
-        if value(ParamsSection_CP_duration) <= cp_max  % warm up stage
+        if value(ParamsSection_CP_duration) < cp_max
             if ~violation_history(end) && ~timeout_history(end)
-                increment = (cp_max - value(ParamsSection_init_CP_duration))/ (n_trial_warmup - 1);
+                increment = (cp_max - init_CP_duration) / (n_trial_warmup - 1);
                 ParamsSection_CP_duration.value = value(ParamsSection_CP_duration) + increment;
-                % Check if the values are within the required range
-                if value(ParamsSection_CP_duration) < starting_cp
-                    ParamsSection_CP_duration.value = starting_cp;
-                end
+                ParamsSection_CP_duration.value = max(value(ParamsSection_CP_duration), starting_cp);
                 if value(ParamsSection_CP_duration) >= cp_max
                     ParamsSection_CP_duration.value = cp_max;
                     warmup_completed = 1;
                 end
             end
+        else
+            warmup_completed = 1;
         end
     end
 else
     warmup_completed = 1;
 end
 
+% --- Timing sub-components via param_time_within_range ---
+% CP is recalculated from the drawn components so that it exactly equals
+% SettlingIn + PreStim + A1 + prego (trial length genuinely varies).
 if n_done_trials >= 1
-    cp_length = value(ParamsSection_CP_duration) - value(ParamsSection_SettlingIn_time);
-    [ParamsSection_PreStim_time.value ,ParamsSection_A1_time.value,ParamsSection_time_bet_aud1_gocue.value] = param_time_within_range(warmup_completed,...
-        cp_length,prestim_min,prestim_max, random_prestim, prestim_time,...
-        a1_time_min,a1_time_max, random_A1, a1_time,prego_min,prego_max, random_prego, prego_time);
+    cp_available = value(ParamsSection_CP_duration) - settling_in;
+
+    [prestim, A1, prego] = param_time_within_range(warmup_completed, ...
+        cp_available, ...
+        prestim_min, prestim_max, random_prestim, value(TrainingStageParamsSection_min_prestim), ...
+        a1_time_min, a1_time_max, random_A1, a1_time, ...
+        prego_min, prego_max, random_prego, value(TrainingStageParamsSection_min_prego));
+
+    % Safety clamp: ensure nothing is negative
+    prestim = max(prestim, 0);
+    A1      = max(A1, 0);
+    prego   = max(prego, min_prego_buffer);
+
+    % Recompute CP to be exactly consistent with drawn components
+    ParamsSection_PreStim_time.value            = prestim;
+    ParamsSection_A1_time.value                 = A1;
+    ParamsSection_time_bet_aud1_gocue.value     = prego;
+    ParamsSection_CP_duration.value             = settling_in + prestim + A1 + prego;
 
     callback(ParamsSection_PreStim_time);
     callback(ParamsSection_A1_time);
     callback(ParamsSection_time_bet_aud1_gocue);
-    ParamsSection_CP_duration.value = value(ParamsSection_SettlingIn_time) + value(ParamsSection_PreStim_time) + value(ParamsSection_A1_time) + value(ParamsSection_time_bet_aud1_gocue);
 end
 callback(ParamsSection_CP_duration);
 
@@ -1167,11 +1218,14 @@ GetSoloFunctionArgs(obj);
 ClearHelperVarsNotOwned(obj);
 clear('ans');
 %<COMPLETION_TEST>
-stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
-
-if value(PerformanceSummarySection_stage_7_TrialsValid) > value(TrainingStageParamsSection_total_trials)
-    if value(SessionPerformanceSection_violation_recent) < value(TrainingStageParamsSection_recent_violation) && value(SessionPerformanceSection_timeout_recent) < value(TrainingStageParamsSection_recent_timeout) && ...
-        value(SessionPerformanceSection_violation_stage) < value(TrainingStageParamsSection_stage_violation)
+% FIX: was missing ParamsSection_use_auto_train guard — stage would
+% auto-advance even when the user had manual control enabled.
+if ParamsSection_use_auto_train
+    stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
+    if value(PerformanceSummarySection_stage_7_TrialsValid) > value(TrainingStageParamsSection_total_trials) && ...
+            value(SessionPerformanceSection_violation_recent) < value(TrainingStageParamsSection_recent_violation) && ...
+            value(SessionPerformanceSection_timeout_recent) < value(TrainingStageParamsSection_recent_timeout) && ...
+            value(SessionPerformanceSection_violation_stage) < value(TrainingStageParamsSection_stage_violation)
         ParamsSection_training_stage.value = stage_no + 1;
         callback(ParamsSection_training_stage);
         ParamsSection(obj, 'Changed_Training_Stage');
@@ -1202,7 +1256,6 @@ end
 %<TRAINING_STAGE>
     case 'User Setting'
 
-
 if helper_vars_eval
 GetSoloFunctionArgs(obj);
 ClearHelperVarsNotOwned(obj);
@@ -1217,32 +1270,39 @@ if stage_algorithm_eval
 GetSoloFunctionArgs(obj);
 ClearHelperVarsNotOwned(obj);
 %<STAGE_ALGORITHM>
-% Variables for warmup stage
-cp_max = 3;
-n_trial_warmup = 20;
-starting_cp = 0.5;
-warmup_completed = 0;
-warm_up_on = value(ParamsSection_warmup_on);
-random_prestim = value(ParamsSection_random_PreStim_time);
-random_prego = value(ParamsSection_random_prego_time);
-random_A1 = value(ParamsSection_random_A1_time);
-prestim_min = value(ParamsSection_PreStim_time_Min);
-prestim_max = value(ParamsSection_PreStim_time_Max);
-prestim_time = value(ParamsSection_PreStim_time);
-prego_min = value(ParamsSection_time_bet_aud1_gocue_Min);
-prego_max = value(ParamsSection_time_bet_aud1_gocue_Max);
-prego_time = value(ParamsSection_time_bet_aud1_gocue);
-a1_time = value(ParamsSection_A1_time);
-a1_time_min = value(ParamsSection_A1_time_Min);
-a1_time_max = value(ParamsSection_A1_time_Max);
+% FIX: All warmup envelope parameters now read from TrainingStageParamsSection
+% case 8 (no hardcoded values). Timing sub-components read from ParamsSection
+% user knobs, exactly as before — this stage is fully user-controlled.
+cp_max          = value(TrainingStageParamsSection_max_CP);
+n_trial_warmup  = value(TrainingStageParamsSection_warm_up_trials);
+starting_cp     = value(TrainingStageParamsSection_starting_CP) + value(ParamsSection_SettlingIn_time);
+settling_in     = value(ParamsSection_SettlingIn_time);
+min_prego_buffer = 0.05;
+
+% All timing sub-component parameters come from user-editable ParamsSection knobs
+warm_up_on      = value(ParamsSection_warmup_on);
+random_prestim  = value(ParamsSection_random_PreStim_time);
+random_prego    = value(ParamsSection_random_prego_time);
+random_A1       = value(ParamsSection_random_A1_time);
+prestim_min     = value(ParamsSection_PreStim_time_Min);
+prestim_max     = value(ParamsSection_PreStim_time_Max);
+prestim_time    = value(ParamsSection_PreStim_time);
+prego_min       = value(ParamsSection_time_bet_aud1_gocue_Min);
+prego_max       = value(ParamsSection_time_bet_aud1_gocue_Max);
+prego_time      = value(ParamsSection_time_bet_aud1_gocue);
+a1_time         = value(ParamsSection_A1_time);
+a1_time_min     = value(ParamsSection_A1_time_Min);
+a1_time_max     = value(ParamsSection_A1_time_Max);
 
 stage_no = value(SessionDefinition_CURRENT_ACTIVE_STAGE);
 if stage_no ~= value(ParamsSection_training_stage)
     ParamsSection_training_stage.value = stage_no;
     callback(ParamsSection_training_stage);
+    ParamsSection(obj, 'Changed_Training_Stage');
 end
 
-% Warm Up If starting a new session
+% --- Optional warmup ramp at session open ---
+warmup_completed = 0;
 if warm_up_on == 1
     if n_done_trials == 0
         ParamsSection_CP_duration.value = value(ParamsSection_init_CP_duration);
@@ -1250,57 +1310,58 @@ if warm_up_on == 1
     elseif n_done_trials == 1
         ParamsSection_CP_duration.value = starting_cp;
     else
-        if value(ParamsSection_CP_duration) <= cp_max  % warm up stage
+        if value(ParamsSection_CP_duration) < cp_max
             if ~violation_history(end) && ~timeout_history(end)
-                increment = (cp_max - value(ParamsSection_init_CP_duration))/ (n_trial_warmup - 1);
+                increment = (cp_max - value(ParamsSection_init_CP_duration)) / (n_trial_warmup - 1);
                 ParamsSection_CP_duration.value = value(ParamsSection_CP_duration) + increment;
-                % Check if the values are within the required range
-                if value(ParamsSection_CP_duration) < starting_cp
-                    ParamsSection_CP_duration.value = starting_cp;
-                end
+                ParamsSection_CP_duration.value = max(value(ParamsSection_CP_duration), starting_cp);
                 if value(ParamsSection_CP_duration) >= cp_max
                     ParamsSection_CP_duration.value = cp_max;
                     warmup_completed = 1;
                 end
             end
+        else
+            warmup_completed = 1;
         end
     end
 else
     warmup_completed = 1;
 end
 
+% --- Timing sub-components via param_time_within_range ---
 if n_done_trials >= 1
-    cp_length = value(ParamsSection_CP_duration) - value(ParamsSection_SettlingIn_time);
-    [ParamsSection_PreStim_time.value ,ParamsSection_A1_time.value,ParamsSection_time_bet_aud1_gocue.value] = param_time_within_range(warmup_completed,...
-        cp_length,prestim_min,prestim_max, random_prestim, prestim_time,...
-        a1_time_min,a1_time_max, random_A1, a1_time,prego_min,prego_max, random_prego, prego_time);
+    cp_available = value(ParamsSection_CP_duration) - settling_in;
+
+    [prestim, A1, prego] = param_time_within_range(warmup_completed, ...
+        cp_available, ...
+        prestim_min, prestim_max, random_prestim, prestim_time, ...
+        a1_time_min, a1_time_max, random_A1, a1_time, ...
+        prego_min, prego_max, random_prego, prego_time);
+
+    % Safety clamp: nothing negative, prego has a floor
+    prestim = max(prestim, 0);
+    A1      = max(A1, 0);
+    prego   = max(prego, min_prego_buffer);
+
+    ParamsSection_PreStim_time.value            = prestim;
+    ParamsSection_A1_time.value                 = A1;
+    ParamsSection_time_bet_aud1_gocue.value     = prego;
+    % Recompute CP to be exactly consistent with drawn components
+    ParamsSection_CP_duration.value             = settling_in + prestim + A1 + prego;
 
     callback(ParamsSection_PreStim_time);
     callback(ParamsSection_A1_time);
     callback(ParamsSection_time_bet_aud1_gocue);
-    ParamsSection_CP_duration.value = value(ParamsSection_SettlingIn_time) + value(ParamsSection_PreStim_time) + value(ParamsSection_A1_time) + value(ParamsSection_time_bet_aud1_gocue);
 end
 callback(ParamsSection_CP_duration);
 
 if n_done_trials > 0
 
     if n_done_trials == 1
-        PerformanceSummarySection_stage_1_TrialsToday.value = 0;
-        callback(PerformanceSummarySection_stage_1_TrialsToday);
-        PerformanceSummarySection_stage_2_TrialsToday.value = 0;
-        callback(PerformanceSummarySection_stage_2_TrialsToday);
-        PerformanceSummarySection_stage_3_TrialsToday.value = 0;
-        callback(PerformanceSummarySection_stage_3_TrialsToday);
-        PerformanceSummarySection_stage_4_TrialsToday.value = 0;
-        callback(PerformanceSummarySection_stage_4_TrialsToday);
-        PerformanceSummarySection_stage_5_TrialsToday.value = 0;
-        callback(PerformanceSummarySection_stage_5_TrialsToday);
-        PerformanceSummarySection_stage_6_TrialsToday.value = 0;
-        callback(PerformanceSummarySection_stage_6_TrialsToday);
-        PerformanceSummarySection_stage_7_TrialsToday.value = 0;
-        callback(PerformanceSummarySection_stage_7_TrialsToday);
-        PerformanceSummarySection_stage_8_TrialsToday.value = 0;
-        callback(PerformanceSummarySection_stage_8_TrialsToday);
+        for k = 1:8
+            eval(sprintf('PerformanceSummarySection_stage_%d_TrialsToday.value = 0;', k));
+            eval(sprintf('callback(PerformanceSummarySection_stage_%d_TrialsToday);', k));
+        end
     end
 
     % Updating Disp Values for Training_Peformance_Summary
@@ -1313,36 +1374,36 @@ if n_done_trials > 0
     end
 
     callback(PerformanceSummarySection_stage_8_Trials);
-    callback(PerformanceSummarySection_stage_8_TrialsToday)
+    callback(PerformanceSummarySection_stage_8_TrialsToday);
     callback(PerformanceSummarySection_stage_8_ViolationRate);
     callback(PerformanceSummarySection_stage_8_TimeoutRate);
     callback(PerformanceSummarySection_stage_8_TrialsValid);
   
-  % Updating Disp Values for SessionPerformanceSection
-  SessionPerformanceSection_ntrials.value = n_done_trials;
-  SessionPerformanceSection_violation_percent.value = numel(find(violation_history))/n_done_trials;
-  SessionPerformanceSection_timeout_percent.value = numel(find(timeout_history))/n_done_trials;
-  if n_done_trials >= 20
-      SessionPerformanceSection_violation_recent.value = numel(find(violation_history(end-19:end)))/20;
-      SessionPerformanceSection_timeout_recent.value = numel(find(timeout_history(end-19:end)))/20;
-  else
-      SessionPerformanceSection_timeout_recent.value = nan;
-      SessionPerformanceSection_violation_recent.value = nan;
-  end
-  SessionPerformanceSection_violation_stage.value = value(PerformanceSummarySection_stage_8_ViolationRate);
-  SessionPerformanceSection_ntrials_stage.value = value(PerformanceSummarySection_stage_8_Trials);
-  SessionPerformanceSection_ntrials_stage_today.value = value(PerformanceSummarySection_stage_8_TrialsToday);
-  SessionPerformanceSection_timeout_stage.value = value(PerformanceSummarySection_stage_8_TimeoutRate);
+    % Updating Disp Values for SessionPerformanceSection
+    SessionPerformanceSection_ntrials.value = n_done_trials;
+    SessionPerformanceSection_violation_percent.value = numel(find(violation_history)) / n_done_trials;
+    SessionPerformanceSection_timeout_percent.value = numel(find(timeout_history)) / n_done_trials;
+    if n_done_trials >= 20
+        SessionPerformanceSection_violation_recent.value = numel(find(violation_history(end-19:end))) / 20;
+        SessionPerformanceSection_timeout_recent.value = numel(find(timeout_history(end-19:end))) / 20;
+    else
+        SessionPerformanceSection_timeout_recent.value = nan;
+        SessionPerformanceSection_violation_recent.value = nan;
+    end
+    SessionPerformanceSection_violation_stage.value = value(PerformanceSummarySection_stage_8_ViolationRate);
+    SessionPerformanceSection_ntrials_stage.value = value(PerformanceSummarySection_stage_8_Trials);
+    SessionPerformanceSection_ntrials_stage_today.value = value(PerformanceSummarySection_stage_8_TrialsToday);
+    SessionPerformanceSection_timeout_stage.value = value(PerformanceSummarySection_stage_8_TimeoutRate);
 
-  callback(SessionPerformanceSection_ntrials);
-  callback(SessionPerformanceSection_ntrials_stage);
-  callback(SessionPerformanceSection_ntrials_stage_today)
-  callback(SessionPerformanceSection_violation_percent);
-  callback(SessionPerformanceSection_timeout_percent);
-  callback(SessionPerformanceSection_violation_recent);
-  callback(SessionPerformanceSection_timeout_recent);
-  callback(SessionPerformanceSection_violation_stage);
-  callback(SessionPerformanceSection_timeout_stage);
+    callback(SessionPerformanceSection_ntrials);
+    callback(SessionPerformanceSection_ntrials_stage);
+    callback(SessionPerformanceSection_ntrials_stage_today);
+    callback(SessionPerformanceSection_violation_percent);
+    callback(SessionPerformanceSection_timeout_percent);
+    callback(SessionPerformanceSection_violation_recent);
+    callback(SessionPerformanceSection_timeout_recent);
+    callback(SessionPerformanceSection_violation_stage);
+    callback(SessionPerformanceSection_timeout_stage);
 end
 
 %</STAGE_ALGORITHM>
@@ -1355,7 +1416,7 @@ GetSoloFunctionArgs(obj);
 ClearHelperVarsNotOwned(obj);
 clear('ans');
 %<COMPLETION_TEST>
-
+% No auto-completion for User Setting stage (intentional)
 %</COMPLETION_TEST>
 if exist('ans', 'var')
 varargout{1}=logical(ans); clear('ans');
@@ -1384,92 +1445,117 @@ end
 
 %<HELPER_FUNCTIONS>
 
-function [prestim,A1,prego] = param_time_within_range(not_fixed_length,cp_length,range_min_prestim,range_max_prestim, is_random_prestim, provided_time_prestim,...
-    range_min_A1,range_max_A1, is_random_A1, provided_time_A1,range_min_prego,range_max_prego, is_random_prego, provided_time_prego)
+function [prestim, A1, prego] = param_time_within_range(not_fixed_length, cp_length, ...
+    range_min_prestim, range_max_prestim, is_random_prestim, provided_time_prestim, ...
+    range_min_A1, range_max_A1, is_random_A1, provided_time_A1, ...
+    range_min_prego, range_max_prego, is_random_prego, provided_time_prego)
+%PARAM_TIME_WITHIN_RANGE  Draw prestim / A1 / prego times that fit inside cp_length.
+%
+%   The hard constraint is:  prestim + A1 + prego == cp_length
+%   with each component >= its minimum.  prego is always computed last
+%   as the remainder so the three values always sum correctly and are
+%   never negative.
+%
+%   not_fixed_length == 0  →  warmup phase (CP is still short and growing)
+%   not_fixed_length == 1  →  steady-state phase (full user-specified ranges)
 
-if not_fixed_length == 0 % warm up stage where cp length is increasing
-% then calculate the range/typical value
+MIN_COMPONENT = 0.01;   % absolute floor for any single component (s)
+MIN_PREGO     = 0.05;   % safety buffer before go-cue (s)
+
+if not_fixed_length == 0
+    % ---- Warmup: CP is short; use conservative proportional values ----
     if cp_length <= 0.3
-        prestim = 0.1;
-        A1 = 0.1;
-        prego = 0.1;
+        prestim = MIN_COMPONENT;
+        A1      = MIN_COMPONENT;
+        prego   = max(cp_length - prestim - A1, MIN_PREGO);
+        % If even that is too tight, compress prestim and A1 equally
+        if prego < MIN_PREGO
+            share   = (cp_length - MIN_PREGO) / 2;
+            prestim = max(share, 0);
+            A1      = max(share, 0);
+            prego   = MIN_PREGO;
+        end
     else
-        range_size = round(0.3 * cp_length,1);
-        if range_size > 0.4
-            step_size = 0.1;
+        range_size = round(0.3 * cp_length, 1);
+        step_size  = 0.01 + 0.09 * (range_size > 0.4);  % 0.01 or 0.1
+        timerange  = MIN_COMPONENT : step_size : range_size;
+        if isempty(timerange); timerange = MIN_COMPONENT; end
+
+        if is_random_prestim
+            prestim = timerange(randi([1, numel(timerange)], 1, 1));
         else
-            step_size = 0.01;
+            prestim = min(provided_time_prestim, range_size);
+            prestim = max(prestim, MIN_COMPONENT);
         end
 
-        timerange = 0.1:step_size:range_size;
-
-        if is_random_prestim == 1
-            prestim = timerange(randi([1, numel(timerange)],1,1));
+        if is_random_A1
+            A1 = timerange(randi([1, numel(timerange)], 1, 1));
         else
-            if provided_time_prestim <= range_size
-                prestim = provided_time_prestim;
-            else
-                prestim = range_size;
-            end
-
+            A1 = min(provided_time_A1, range_size);
+            A1 = max(A1, MIN_COMPONENT);
         end
 
-        if is_random_A1 == 1
-            A1 = timerange(randi([1, numel(timerange)],1,1));
-        else
-            if provided_time_A1 <= range_size
-                A1 = provided_time_A1;
-            else
-                A1 = range_size;
-            end
-        end
-
+        % FIX: prego is the remainder; clamp so it never goes negative
         prego = cp_length - prestim - A1;
-
+        if prego < MIN_PREGO
+            % Trim prestim first, then A1, to recover the headroom
+            deficit = MIN_PREGO - prego;
+            trim    = min(prestim - MIN_COMPONENT, deficit);
+            prestim = prestim - trim;
+            deficit = deficit - trim;
+            if deficit > 0
+                trim = min(A1 - MIN_COMPONENT, deficit);
+                A1   = A1 - trim;
+            end
+            prego = max(cp_length - prestim - A1, MIN_PREGO);
+        end
     end
 
 else
+    % ---- Steady-state: draw from full user-specified ranges ----
 
-    if is_random_prestim == 1
-        range_size_prestim = range_max_prestim - range_min_prestim;
-        if range_size_prestim > 0.4
-            step_size_prestim = 0.1;
-        else
-            step_size_prestim = 0.01;
-        end
-        time_range_prestim = range_min_prestim:step_size_prestim:range_max_prestim;
-        prestim = time_range_prestim(randi([1, numel(time_range_prestim)],1,1));
+    if is_random_prestim
+        step  = 0.01 + 0.09 * ((range_max_prestim - range_min_prestim) > 0.4);
+        trange = range_min_prestim : step : range_max_prestim;
+        if isempty(trange); trange = range_min_prestim; end
+        prestim = trange(randi([1, numel(trange)], 1, 1));
     else
         prestim = provided_time_prestim;
     end
+    prestim = max(prestim, MIN_COMPONENT);
 
-    if is_random_A1 == 1
-        range_size_A1 = range_max_A1 - range_min_A1;
-        if range_size_A1 > 0.4
-            step_size_A1 = 0.1;
-        else
-            step_size_A1 = 0.01;
-        end
-        time_range_A1 = range_min_A1:step_size_A1:range_max_A1;
-        A1 = time_range_A1(randi([1, numel(time_range_A1)],1,1));
+    if is_random_A1
+        step  = 0.01 + 0.09 * ((range_max_A1 - range_min_A1) > 0.4);
+        trange = range_min_A1 : step : range_max_A1;
+        if isempty(trange); trange = range_min_A1; end
+        A1 = trange(randi([1, numel(trange)], 1, 1));
     else
         A1 = provided_time_A1;
     end
+    A1 = max(A1, MIN_COMPONENT);
 
-    if is_random_prego == 1
-        range_size_prego = range_max_prego - range_min_prego;
-        if range_size_prego > 0.4
-            step_size_prego = 0.1;
-        else
-            step_size_prego = 0.01;
-        end
-        time_range_prego = range_min_prego:step_size_prego:range_max_prego;
-        prego = time_range_prego(randi([1, numel(time_range_prego)],1,1));
+    if is_random_prego
+        step  = 0.01 + 0.09 * ((range_max_prego - range_min_prego) > 0.4);
+        trange = range_min_prego : step : range_max_prego;
+        if isempty(trange); trange = range_min_prego; end
+        prego = trange(randi([1, numel(trange)], 1, 1));
     else
         prego = provided_time_prego;
     end
+    prego = max(prego, MIN_PREGO);
 
+    % FIX: if the drawn combination exceeds cp_length, trim prego first,
+    % then prestim, so the mandatory A1 duration is always preserved.
+    total = prestim + A1 + prego;
+    if total > cp_length
+        prego   = max(cp_length - prestim - A1, MIN_PREGO);
+        total   = prestim + A1 + prego;
+        if total > cp_length
+            prestim = max(cp_length - A1 - prego, MIN_COMPONENT);
+        end
+    end
 end
+
 end
 
 
