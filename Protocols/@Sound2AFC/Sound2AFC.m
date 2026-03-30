@@ -183,7 +183,7 @@ function obj = create_sounds(obj)
     t = (0:1/target_sample_rate:duration);
     t = t(1:end-1);
     carrier = sin(2*pi*12000*t);
-    modulation = 1 + 0.5*sin(2*pi*8*t);  % 0.5 is modulation depth (0-1)
+    modulation = sin(2*pi*8*t); 
     waveform = volume * modulation .* carrier;
     waveform = [waveform; waveform];  % Both speakers for feedback
 
