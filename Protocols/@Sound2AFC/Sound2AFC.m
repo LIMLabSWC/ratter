@@ -72,6 +72,9 @@ switch action
     case 'update'
         PokesPlotSection(obj, 'update');
 
+    case 'reload_sounds'
+        obj = load_stim_sounds(obj);
+
     case 'end_session'
         % TO DO Make and send summary
 
@@ -140,60 +143,56 @@ end
 
 function obj = create_sounds(obj)
     GetSoloFunctionArgs(obj);
-
     SoundManagerSection(obj, 'init');
+    obj = load_stim_sounds(obj);
+end
+
+function obj = load_stim_sounds(obj)
+    GetSoloFunctionArgs(obj);
+
     target_sample_rate = SoundManagerSection(obj, 'get_sample_rate');
 
-    % Sound labels are fixed: A, B, C, D
+    % Reload stimulus sounds A, B, C, D from current GUI config
     labels = {'A', 'B', 'C', 'D'};
+    loop_flag = 0;
 
-    % Create sounds based on configuration for each label (A, B, C, D)
     for i = 1:length(labels)
         label = labels{i};
-
-        % Get configuration for this sounds
         config = SoundConfigSection(obj, 'get_sound_config', label);
 
-        % Load audio file
-        loop_flag = 0;
         [audio_data, orig_rate] = audioread(config.file);
 
-        % Convert to mono if stereo
         if size(audio_data, 2) == 2
             audio_data = mean(audio_data, 2);
         end
 
-        % Resample to target rate using interpolation (no Signal Toolbox needed)
         if orig_rate ~= target_sample_rate
             orig_time = (0:length(audio_data)-1) / orig_rate;
             target_time = (0:1/target_sample_rate:orig_time(end));
             audio_data = interp1(orig_time, audio_data, target_time, 'linear');
-            audio_data = audio_data(:);  % Ensure column vector
+            audio_data = audio_data(:);
         end
 
-        stereo_waveform = .1*[audio_data'; audio_data'];  % Both speakers
-
-        % Declare the sound with the label as its name
+        stereo_waveform = .1*[audio_data'; audio_data'];
         SoundManagerSection(obj, 'declare_new_sound', label, stereo_waveform, loop_flag);
     end
 
-    % Define the correct sound (reward feedback)
-    duration = .5;  % seconds
+    % Correct feedback sound
+    duration = .5;
     volume = .1;
     t = (0:1/target_sample_rate:duration);
     t = t(1:end-1);
     carrier = sin(2*pi*12000*t);
-    modulation = sin(2*pi*8*t); 
+    modulation = sin(2*pi*8*t);
     waveform = volume * modulation .* carrier;
-    waveform = [waveform; waveform];  % Both speakers for feedback
-
+    waveform = [waveform; waveform];
     SoundManagerSection(obj, 'declare_new_sound', 'correct', waveform, loop_flag);
 
-    % Define the error sound
-    duration = 0.25;  % seconds
+    % Error sound
+    duration = 0.25;
     n_samples = round(target_sample_rate * duration);
     waveform = 0.01 * randn(1, n_samples);
-    waveform = [waveform; waveform];  % Both speakers for error
+    waveform = [waveform; waveform];
     SoundManagerSection(obj, 'declare_new_sound', 'error', waveform, loop_flag);
 
     SoundManagerSection(obj, 'send_not_yet_uploaded_sounds');
