@@ -120,7 +120,7 @@ function create_gui(obj)
         next_row(y, 1);
         [x, y] = SoundConfigSection(obj, 'init', x, y);
 
-        % Column 2: PokesPlot
+        % Column 1: PokesPlot
         next_row(y, 1);
         [x, y] = PokesPlotSection(obj, 'init', x, y, struct('states',  state_colors()));
         PokesPlotSection(obj, 'set_alignon', 'wait_for_center_poke(1,1)');
@@ -131,6 +131,10 @@ function create_gui(obj)
         figpos = get(value(myfig), 'Position');
         HeaderParam(obj, 'prot_title', ['Sound2AFC: ' expmtr ', ' rname], ...
             x, y, 'position', [10 figpos(4)-25, 600 20]);
+
+        y = 5; 
+        next_column(x);
+        [x,y] = WaterValvesSection(obj, 'init', x, y, 'streak_gui',1);
         
 end
 
@@ -242,25 +246,37 @@ function [sma, prep_next_trial_states] = build_sma(obj, trial_params)
     right1led   = bSettings('get', 'DIOLINES', 'right1led');
     left1led   = bSettings('get', 'DIOLINES', 'left1led');
 
-    light_correct_port = true;
+    light_correct_port = false;
     iti_min = 3;
     iti_max = 8;
     iti_dur = iti_min + rand()*(iti_max-iti_min);
     pre_stim_cpoke_dur = .1;
     post_stim_cpoke_dur = .3;
     choice_timer = 45;
-    
+    [LeftWValveTime, RightWValveTime] = WaterValvesSection(obj, 'get_water_times');
+    fprintf('The left and right water valve times are: %.2f, %.2f', ...
+        LeftWValveTime, RightWValveTime)
+
+    err_timer = 2;
+
     sound_name = trial_params.sound_name;
     correct_side = trial_params.correct_side;
     port_mapping = trial_params.port_mapping;
 
     % Determine if this is a random trial
     is_random = strcmp(port_mapping, 'random');
+
+    if light_correct_port
+        wait_for_choice_led = correct_side_led;
+    else
+        wait_for_choice_led = 0;
+    end
     
     correct_side_led = '';
     % Set up inputs and outputs based on correct side
     switch correct_side
         case 'left'
+            drink_timer_1 = LeftWValveTime;
             if light_correct_port
                 correct_side_led = left1led;
             end
@@ -276,6 +292,7 @@ function [sma, prep_next_trial_states] = build_sma(obj, trial_params)
                 error_state = 'right_error';
             end
         case 'right'
+            drink_timer_1 = RightWValveTime;
             if light_correct_port
                 correct_side_led = right1led;
             end
@@ -328,11 +345,10 @@ function [sma, prep_next_trial_states] = build_sma(obj, trial_params)
     sma = add_state(sma, 'name', 'wait_for_choice', 'self_timer', choice_timer, ...
         'input_to_statechange', {correct_in, correct_state; ...
         error_in, error_state; 'Tup', 'ITI'},...
-        'output_actions', {'DOut', correct_side_led});
+        'output_actions', {'DOut', wait_for_choice_led});
 
     % deliver the outcome
-    drink_timer_1 = 2;
-    err_timer = 2;
+    
 
     sma = add_state(sma, 'name', correct_state, 'self_timer', drink_timer_1, ...
         'output_actions', {'DOut', rew_dout, 'SoundOut', rew_snd_id},...
