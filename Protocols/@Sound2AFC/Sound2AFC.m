@@ -53,10 +53,16 @@ switch action
         % Define the sounds to use in this task
         obj = create_sounds(obj);
 
+        % Define performance trackers
+        SoloParamHandle(obj, 'hit_history', 'value', []);
+        SoloParamHandle(obj, 'previous_sides', 'value', []);
+        DeclareGlobals(obj, 'rw_args', {'hit_history', 'previous_sides'});
+
         % Need to prepare the first trial to present
         Sound2AFC(obj, 'prepare_next_trial')
 
     case 'prepare_next_trial'
+
         % Decide which kind of trial to present
         trial_params = get_trial_params(obj);
 
@@ -68,6 +74,10 @@ switch action
 
     case 'trial_completed'
         PokesPlotSection(obj, 'trial_completed');
+
+        % trial_outcome = (rows(parsed_events.states.left_reward) + ...
+        %     rows(parsed_events.states.right_reward))>0;
+        % hit_history.value = [hit_history(1:n_done_trials-1) trial_outcome];
 
     case 'update'
         PokesPlotSection(obj, 'update');

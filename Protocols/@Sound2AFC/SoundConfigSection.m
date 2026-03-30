@@ -38,8 +38,8 @@ switch action
         % Define defaults for each sound
         defaults = struct();
         defaults.A = struct('name', 'bus', 'weight', 0.5, 'port', 'left');
-        defaults.B = struct('name', 'leafblower', 'weight', 0.5, 'port', 'right');
-        defaults.C = struct('name', 'storm', 'weight', 0, 'port', 'random');
+        defaults.B = struct('name', 'leafblower', 'weight', 0, 'port', 'random');
+        defaults.C = struct('name', 'storm', 'weight', .5, 'port', 'right');
         defaults.D = struct('name', 'crowd', 'weight', 0, 'port', 'random');
 
         % Create GUI elements for each sound label
@@ -83,8 +83,10 @@ switch action
         end
 
         % Add normalized probability display
-        DispParam(obj, 'normalized_probs_display', 'A:0.25 B:0.25 C:0.25 D:0.25', x, y, ...
-            'label', 'Normalized');
+        DispParam(obj, 'normalized_probs_display', ...
+            'A:0.25 B:0.25 C:0.25 D:0.25', x, y, ...
+            'label', 'Normalized', 'labelpos', 'top', ...
+            'position', [x, y, 200, 40]);
         next_row(y, 1.5);
 
         % Initialize normalized probabilities
