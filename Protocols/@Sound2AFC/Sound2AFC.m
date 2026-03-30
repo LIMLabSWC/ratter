@@ -243,11 +243,13 @@ function [sma, prep_next_trial_states] = build_sma(obj, trial_params)
     left1led   = bSettings('get', 'DIOLINES', 'left1led');
 
     light_correct_port = true;
-
+    iti_min = 3;
+    iti_max = 8;
+    iti_dur = iti_min + rand()*(iti_max-iti_min);
     pre_stim_cpoke_dur = .1;
     post_stim_cpoke_dur = .3;
     choice_timer = 45;
-    cpoke_viol_state = 'check_next_trial_ready';
+    cpoke_viol_state = 'ITI';
     
     sound_name = trial_params.sound_name;
     correct_side = trial_params.correct_side;
@@ -321,7 +323,7 @@ function [sma, prep_next_trial_states] = build_sma(obj, trial_params)
     % wait for a choice
     sma = add_state(sma, 'name', 'wait_for_choice', 'self_timer', choice_timer, ...
         'input_to_statechange', {correct_in, correct_state; ...
-        error_in, error_state; 'Tup', 'check_next_trial_ready'},...
+        error_in, error_state; 'Tup', 'ITI'},...
         'output_actions', {'DOut', correct_side_led});
 
     % deliver the outcome
@@ -330,11 +332,14 @@ function [sma, prep_next_trial_states] = build_sma(obj, trial_params)
 
     sma = add_state(sma, 'name', correct_state, 'self_timer', drink_timer_1, ...
         'output_actions', {'DOut', rew_dout, 'SoundOut', rew_snd_id},...
-        'input_to_statechange', {'Tup', 'check_next_trial_ready'});
+        'input_to_statechange', {'Tup', 'ITI'});
 
     sma = add_state(sma, 'name', error_state, 'self_timer', err_timer, ...
         'output_actions', {'SoundOut', err_snd_id}, ...
-        'input_to_statechange', {'Tup', 'check_next_trial_ready'});
+        'input_to_statechange', {'Tup', 'ITI'});
+
+    sma = add_state(sma, 'name', 'ITI', 'self_timer', iti_dur, ...
+        'input_to_statechange', {'Tup', 'check_next_trial_ready'})
     
 end
 
