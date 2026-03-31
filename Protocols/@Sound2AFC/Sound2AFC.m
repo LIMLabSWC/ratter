@@ -66,7 +66,7 @@ switch action
         Sound2AFC(obj, 'prepare_next_trial')
 
     case 'prepare_next_trial'
-        SessionDefinition(obj, 'next_trial')
+        SessionDefinition(obj, 'next_trial');
         trial_params = get_trial_params(obj);
         current_trial_params.value = trial_params;
 
@@ -161,9 +161,10 @@ function create_gui(obj)
             'OnString', 'Light: ON', 'OffString', 'Light: OFF');
         next_row(y);
         
-        DeclareGlobals(obj, 'ro_args', {'use_light_guides'});
+        DeclareGlobals(obj, 'rw_args', {'use_light_guides'});
 
         SessionDefinition(obj, 'init', x, y, value(myfig));
+        SessionDefinition(obj, 'set_old_style_parsing_flag', 0);
 end
 
 function obj = create_sounds(obj)
