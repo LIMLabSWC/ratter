@@ -153,12 +153,12 @@ end
 
 function obj = create_sounds(obj)
     GetSoloFunctionArgs(obj);
-    SoundManagerSection(obj, 'init');
     obj = load_stim_sounds(obj);
 end
 
 function obj = load_stim_sounds(obj)
     GetSoloFunctionArgs(obj);
+    SoundManagerSection(obj, 'init');
 
     target_sample_rate = SoundManagerSection(obj, 'get_sample_rate');
 
@@ -274,12 +274,6 @@ function [sma, prep_next_trial_states] = build_sma(obj, trial_params)
 
     % Determine if this is a random trial
     is_random = strcmp(port_mapping, 'random');
-
-    if light_correct_port
-        wait_for_choice_led = correct_side_led;
-    else
-        wait_for_choice_led = 0;
-    end
     
     correct_side_led = '';
     % Set up inputs and outputs based on correct side
@@ -318,6 +312,12 @@ function [sma, prep_next_trial_states] = build_sma(obj, trial_params)
             end
         otherwise
             error('Don''t know how to handle correct_side: %s', correct_side)
+    end
+
+    if light_correct_port
+        wait_for_choice_led = correct_side_led;
+    else
+        wait_for_choice_led = 0;
     end
 
     stim_id = SoundManagerSection(obj, 'get_sound_id', sound_name);
