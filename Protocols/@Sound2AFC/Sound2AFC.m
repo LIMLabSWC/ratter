@@ -153,11 +153,13 @@ end
 
 function obj = create_sounds(obj)
     GetSoloFunctionArgs(obj);
+
     obj = load_stim_sounds(obj);
 end
 
 function obj = load_stim_sounds(obj)
     GetSoloFunctionArgs(obj);
+    
     SoundManagerSection(obj, 'init');
 
     target_sample_rate = SoundManagerSection(obj, 'get_sample_rate');
