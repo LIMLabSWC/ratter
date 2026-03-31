@@ -11,7 +11,7 @@ function [obj] = Sound2AFC(varargin)
 
 % This is old MATLAB oop syntax to create an instance of the class with the name from this file (mfilename) e.g., Sound2AFC
 % It can use methods available in all of the other referenced functions, e.g., pokesplot
-obj = class(struct, mfilename, pokesplot, saveload, sessionmodel, soundmanager, soundui, antibias, ...
+obj = class(struct, mfilename, pokesplot, saveload, sessionmodel2, soundmanager, soundui, antibias, ...
   water, distribui, punishui, comments, soundtable, sqlsummary);
 
 % If there are no input arguments, return this empty instance of the class
@@ -47,37 +47,40 @@ GetSoloFunctionArgs(obj);
 
 switch action
     case 'init'
+        hackvar = 10; 
+        SoloFunctionAddVars('SessionModel', 'ro_args', 'hackvar');
+        % Trial outcome tracking
+        SoloParamHandle(obj, 'hit_history',    'value', []);   % 1=hit, 0=error, NaN=violation/timeout
+        SoloParamHandle(obj, 'previous_sides', 'value', []);   % 'l' or 'r' per trial
+        SoloParamHandle(obj, 'trial_params_history', 'value', {});  % struct per trial: sound_name, correct_side, port_mapping
+        SoloParamHandle(obj, 'current_trial_params', 'value', struct());
+        DeclareGlobals(obj, 'rw_args', {'hit_history', 'previous_sides', 'trial_params_history', 'current_trial_params'});
+
         % Build the GUI and set up solo param handle variables
         create_gui(obj);
 
         % Define the sounds to use in this task
         obj = create_sounds(obj);
 
-        % Define performance trackers
-        SoloParamHandle(obj, 'hit_history', 'value', []);
-        SoloParamHandle(obj, 'previous_sides', 'value', []);
-        DeclareGlobals(obj, 'rw_args', {'hit_history', 'previous_sides'});
-
         % Need to prepare the first trial to present
         Sound2AFC(obj, 'prepare_next_trial')
 
     case 'prepare_next_trial'
-
-        % Decide which kind of trial to present
         trial_params = get_trial_params(obj);
+        current_trial_params.value = trial_params;
 
-        % Make the state machine for this trial
         [sma, prep_next_trial_states] = build_sma(obj, trial_params);
-
-        % Send the sma to RTLinux using dispatcher
         dispatcher('send_assembler', sma, prep_next_trial_states);
 
     case 'trial_completed'
         PokesPlotSection(obj, 'trial_completed');
 
-        % trial_outcome = (rows(parsed_events.states.left_reward) + ...
-        %     rows(parsed_events.states.right_reward))>0;
-        % hit_history.value = [hit_history(1:n_done_trials-1) trial_outcome];
+        tp  = value(current_trial_params);
+        hit = outcome_from_parsed_events(parsed_events.states);
+
+        hit_history.value        = [value(hit_history),    hit];
+        previous_sides.value     = [value(previous_sides), tp.correct_side(1)];  % 'l' or 'r'
+        trial_params_history.value = [value(trial_params_history), {tp}];
 
     case 'update'
         PokesPlotSection(obj, 'update');
@@ -86,11 +89,14 @@ switch action
         obj = load_stim_sounds(obj);
 
     case 'end_session'
-        % TO DO Make and send summary
+        prot_title.value = [value(prot_title), '  End: ', datestr(now, 'HH:MM')];
 
     case 'pre_saving_settings'
-        % 
-        
+        pd.hits  = hit_history(:);
+        pd.sides = previous_sides(:);
+        pd.trial_params = trial_params_history(:);
+        sendsummary(obj, 'protocol_data', pd);
+
 
     case 'close'
         PokesPlotSection(obj, 'close');
@@ -145,10 +151,18 @@ function create_gui(obj)
         HeaderParam(obj, 'prot_title', ['Sound2AFC: ' expmtr ', ' rname], ...
             x, y, 'position', [10 figpos(4)-25, 600 20]);
 
-        y = 5; 
+        y = 5;
         next_column(x);
         [x,y] = WaterValvesSection(obj, 'init', x, y, 'streak_gui',1);
+
+        next_row(y, 1);
+        ToggleParam(obj, 'use_light_guides', 0, x, y, 'label', 'Light correct port', ...
+            'OnString', 'Light: ON', 'OffString', 'Light: OFF');
+        next_row(y);
         
+        DeclareGlobals(obj, 'ro_args', {'use_light_guides'});
+
+        SessionDefinition(obj, 'init', x, y, f);
 end
 
 function obj = create_sounds(obj)
@@ -251,13 +265,14 @@ end
 
 
 function [sma, prep_next_trial_states] = build_sma(obj, trial_params)
+    GetSoloFunctionArgs(obj);
     global left1water;
     global right1water;
-    center1led   = bSettings('get', 'DIOLINES', 'center1led');
-    right1led   = bSettings('get', 'DIOLINES', 'right1led');
+    center1led = bSettings('get', 'DIOLINES', 'center1led');
+    right1led  = bSettings('get', 'DIOLINES', 'right1led');
     left1led   = bSettings('get', 'DIOLINES', 'left1led');
 
-    light_correct_port = false;
+    light_correct_port = value(use_light_guides);
     iti_min = 3;
     iti_max = 8;
     iti_dur = iti_min + rand()*(iti_max-iti_min);
@@ -372,6 +387,27 @@ function [sma, prep_next_trial_states] = build_sma(obj, trial_params)
     sma = add_state(sma, 'name', 'ITI', 'self_timer', iti_dur, ...
         'input_to_statechange', {'Tup', 'check_next_trial_ready'})
     
+end
+
+function hit = outcome_from_parsed_events(states)
+% Returns 1 (hit), 0 (error), or NaN (violation/timeout) based on which
+% terminal state was entered during the trial.
+    reward_states = {'left_reward', 'right_reward', 'left_random_reward', 'right_random_reward'};
+    error_states  = {'left_error',  'right_error',  'left_random_error',  'right_random_error'};
+
+    for i = 1:length(reward_states)
+        if isfield(states, reward_states{i}) && rows(states.(reward_states{i})) > 0
+            hit = 1;
+            return
+        end
+    end
+    for i = 1:length(error_states)
+        if isfield(states, error_states{i}) && rows(states.(error_states{i})) > 0
+            hit = 0;
+            return
+        end
+    end
+    hit = NaN;  % violation or timeout — no choice was made
 end
 
 function sc = state_colors()

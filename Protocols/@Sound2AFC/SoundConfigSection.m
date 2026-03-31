@@ -25,8 +25,9 @@ switch action
         ), 'save_with_settings', 0);
 
         % Available sound names
+        sound_names = fieldnames(value(sound_name_to_file_map));
         SoloParamHandle(obj, 'available_sound_names', 'value', ...
-            {'bus', 'storm', 'leafblower', 'crowd'}, 'save_with_settings', 0);
+            sound_names, 'save_with_settings', 0);
 
         % Create fixed sound labels
         SoloParamHandle(obj, 'sound_labels', 'value', {'A', 'B', 'C', 'D'}, 'save_with_settings', 0);
@@ -37,10 +38,10 @@ switch action
 
         % Define defaults for each sound
         defaults = struct();
-        defaults.A = struct('name', 'bus', 'weight', 0.5, 'port', 'left');
-        defaults.B = struct('name', 'leafblower', 'weight', 0, 'port', 'random');
-        defaults.C = struct('name', 'storm', 'weight', .5, 'port', 'right');
-        defaults.D = struct('name', 'crowd', 'weight', 0, 'port', 'random');
+        defaults.A = struct('name', sound_names{1}, 'weight', 0.5, 'port', 'left');
+        defaults.B = struct('name', sound_names{2}, 'weight', 0, 'port', 'random');
+        defaults.C = struct('name', sound_names{3}, 'weight', .5, 'port', 'right');
+        defaults.D = struct('name', sound_names{4}, 'weight', 0, 'port', 'random');
 
         % Create GUI elements for each sound label
         labels = value(sound_labels);
