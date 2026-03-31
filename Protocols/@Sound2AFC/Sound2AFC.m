@@ -11,7 +11,7 @@ function [obj] = Sound2AFC(varargin)
 
 % This is old MATLAB oop syntax to create an instance of the class with the name from this file (mfilename) e.g., Sound2AFC
 % It can use methods available in all of the other referenced functions, e.g., pokesplot
-obj = class(struct, mfilename, pokesplot2, saveload, sessionmodel2, soundmanager, soundui, antibias, ...
+obj = class(struct, mfilename, pokesplot2, saveload, sessionmodel, soundmanager, soundui, antibias, ...
   water, distribui, punishui, comments, soundtable, sqlsummary);
 
 % If there are no input arguments, return this empty instance of the class
