@@ -63,6 +63,7 @@ function state = RealTimeAnalysis(action, state, data, handles, config, varargin
 %                       For 'evaluate', this is a struct array with performance metrics:
 %                           .start_trial
 %                           .end_trial
+%                           .valid_trials
 %                           .distribution_type
 %                           .calculated_boundary
 %                           .total_hit_percent
@@ -294,11 +295,11 @@ function state = RealTimeAnalysis(action, state, data, handles, config, varargin
             % =================================================================
             case 'evaluate'
                 if numel(varargin) < 1, error('Evaluate action requires a cell array of contexts.'); end
-                contexts = varargin{1};
+                contexts = varargin{2};
                 if ~iscell(contexts) || isempty(contexts), error('Contexts must be a non-empty cell array of [start, end] pairs.'); end
                 
                 num_contexts = numel(contexts);
-                results = struct('start_trial', [], 'end_trial', [], 'distribution_type', [], 'calculated_boundary', [], 'total_hit_percent', [], 'total_violations_percent', [], 'right_correct_percent', [], 'left_correct_percent', []);
+                results = struct('start_trial', [], 'end_trial', [], 'valid_trials', [], 'distribution_type', [], 'calculated_boundary', [], 'total_hit_percent', [], 'total_violations_percent', [], 'right_correct_percent', [], 'left_correct_percent', []);
                 results = repmat(results, 1, num_contexts);
 
                 for i = 1:num_contexts
@@ -333,6 +334,7 @@ function state = RealTimeAnalysis(action, state, data, handles, config, varargin
                     
                     results(i).start_trial = start_idx;
                     results(i).end_trial = end_idx;
+                    results(i).valid_trials = sum(valid_mask);
                     results(i).distribution_type = getDistributionType(data, indices, current_rule);
                     results(i).calculated_boundary = fitParams(1);
                     results(i).total_hit_percent = 100 * mean(hit_fit);
@@ -879,37 +881,40 @@ function state = RealTimeAnalysis(action, state, data, handles, config, varargin
         % Determines the distribution type based on the rule and the
         % distributions for left and right sides within the given indices.
         
-        dist_left_cell = unique(data.full_dist_left(indices));
-        dist_right_cell = unique(data.full_dist_right(indices));
+        % dist_left_cell = unique(data.full_dist_left(indices));
+        % dist_right_cell = unique(data.full_dist_right(indices));
+        % 
+        % dist_left = dist_left_cell{1};
+        % dist_right = dist_right_cell{1};
         
-        dist_left = dist_left_cell{1};
-        dist_right = dist_right_cell{1};
+        dist_left = char(mode(categorical(data.full_dist_left(indices))));
+        dist_right = char(mode(categorical(data.full_dist_right(indices))));
 
         hard_dists = {'exponential', 'half-normal', 'sinusoidal'};
         
-        if strcmp(dist_left, dist_right)
+        if strcmpi(dist_left, dist_right)
             dist_type = dist_left;
             return;
         end
         
-        is_left_hard = ismember(dist_left, hard_dists);
-        is_right_hard = ismember(dist_right, hard_dists);
+        is_left_hard = ismember(lower(dist_left), hard_dists);
+        is_right_hard = ismember(lower(dist_right), hard_dists);
         
         if contains(string(rule), 'Right', 'IgnoreCase', true) % High stimulus values correspond to Right
             if is_right_hard && ~is_left_hard
-                dist_type = 'hard high';
+                dist_type = 'Hard B';
             elseif ~is_right_hard && is_left_hard
-                dist_type = 'hard low';
+                dist_type = 'Hard A';
             else
-                dist_type = 'mixed';
+                dist_type = 'unknown';
             end
         else % High stimulus values correspond to Left
             if is_left_hard && ~is_right_hard
-                dist_type = 'hard high';
+                dist_type = 'Hard B';
             elseif ~is_left_hard && is_right_hard
-                dist_type = 'hard low';
+                dist_type = 'Hard A';
             else
-                dist_type = 'mixed';
+                dist_type = 'unknown';
             end
         end
     end

@@ -413,7 +413,8 @@ switch action
 
                     psych_result{1,n_context}.start_trial = trial_start;
                     psych_result{1,n_context}.end_trial = trial_end;
-                    psych_result{1,n_context}.distribution_type = char(unique(category_distribution));
+                    psych_result{1,n_context}.valid_trials = -1;
+                    psych_result{1,n_context}.distribution_type = '';
                     psych_result{1,n_context}.calculated_boundary = nan;
                     psych_result{1,n_context}.total_hit_percent = -1;
                     psych_result{1,n_context}.total_violations_percent =  -1;
@@ -426,7 +427,7 @@ switch action
                 psych_result = RealTimeAnalysis('evaluate', state, data, handles, config, flags, context_trials);
 
             catch
-                fprintf(2, 'Error calculating correct pokes\n');
+                fprintf(2, 'Error calculating context values\n');
                 disp(ME.message);
                 disp(ME.stack);
             end

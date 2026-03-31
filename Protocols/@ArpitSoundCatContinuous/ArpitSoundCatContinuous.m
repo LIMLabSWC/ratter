@@ -256,9 +256,21 @@ switch action
     SessionDefinition(obj, 'run_eod_logic_without_saving');
 
     % Sending Summary Statistics to SQL Database
-    %perf = PsychometricSection(obj, 'evaluate');
+    try
+        perf = PsychometricSection(obj, 'evaluate');
+    catch
+        perf{1,1}.start_trial = trial_start;
+        perf{1,1}.end_trial = trial_end;
+        perf{1,1}.valid_trials = -1;
+        perf{1,1}.distribution_type = '';
+        perf{1,1}.calculated_boundary = nan;
+        perf{1,1}.total_hit_percent = -1;
+        perf{1,1}.total_violations_percent =  -1;
+        perf{1,1}.right_correct_percent = -1;
+        perf{1,1}.left_correct_percent = -1;
+    end
     
-    % SoundCatContextSwitchSummary(obj,'protocol_data',perf);  
+    SoundCatContextSwitchSummary(obj,'protocol_data',perf);  
       
       %% otherwise
     otherwise
