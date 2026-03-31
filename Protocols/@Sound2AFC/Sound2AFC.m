@@ -11,7 +11,7 @@ function [obj] = Sound2AFC(varargin)
 
 % This is old MATLAB oop syntax to create an instance of the class with the name from this file (mfilename) e.g., Sound2AFC
 % It can use methods available in all of the other referenced functions, e.g., pokesplot
-obj = class(struct, mfilename, pokesplot, saveload, sessionmodel2, soundmanager, soundui, antibias, ...
+obj = class(struct, mfilename, pokesplot2, saveload, sessionmodel2, soundmanager, soundui, antibias, ...
   water, distribui, punishui, comments, soundtable, sqlsummary);
 
 % If there are no input arguments, return this empty instance of the class
@@ -74,6 +74,7 @@ switch action
         dispatcher('send_assembler', sma, prep_next_trial_states);
 
     case 'trial_completed'
+        Sound2AFC(obj, 'update');
         PokesPlotSection(obj, 'trial_completed');
 
         tp  = value(current_trial_params);
@@ -164,7 +165,7 @@ function create_gui(obj)
         DeclareGlobals(obj, 'rw_args', {'use_light_guides'});
 
         SessionDefinition(obj, 'init', x, y, value(myfig));
-        SessionDefinition(obj, 'set_old_style_parsing_flag', 0);
+        
 end
 
 function obj = create_sounds(obj)
