@@ -1,56 +1,66 @@
 % [sma] = add_ephys_trial_indicator(sma, trialnum, ...)
 %
-% Sends a binary trial number signal on a DIO line for synchronisation with
-% neural recording systems (e.g. Neuropixels via Open Ephys or SpikeGLX).
+% Sends a binary trial number signal on a DIO line at the START of each
+% trial for synchronisation with Neuropixels recordings via Open Ephys or
+% SpikeGLX.
 %
-% Replacement for add_trialnum_indicator with two fixes:
+% DESIGN:
+%   This function must be called BEFORE any add_state calls in
+%   prepare_next_trial. It appends 16 states (1 sync + 15 binary bits)
+%   directly into user state space (positions 40-55), immediately before
+%   wait_for_cpoke. state_0 already points to position 40 via the
+%   full_trial_structure framework, so the trialnum sequence fires
+%   automatically at trial start with no state_0 manipulation needed.
 %
-%   FIX 1 - Jump target:
-%     Original hardcoded jump target of 40 is correct for this BControl/Bpod
-%     implementation (full_trial_structure always places user states at 40).
-%     Previous version incorrectly used orig_current_state (= 59, the next
-%     empty slot) which jumped beyond the state table causing trial crashes.
-%     This version reads the correct target dynamically from state_0's Tup
-%     transition before redirecting it, so it is robust to any framework.
+%   Trial flow:
+%     state_0 (pos 40) → trialnum states (pos 40-55) → wait_for_cpoke (pos 56) → ...
 %
-%   FIX 2 - Last state row index:
-%     Previous version used sma.current_state to find the last added trialnum
-%     state. This is unreliable because current_state behaviour (last added vs
-%     next empty) differs across BControl versions and caused the wrong row to
-%     be modified. This version uses length(preamble) + nbits + 1 which is
-%     always the exact row of the last added state.
+%   This is fundamentally different from add_trialnum_indicator which
+%   inserted states at framework positions 1-16. Bpod does not execute
+%   DOut actions for framework states, so those pulses were never sent.
+%   This version inserts states in user space where Bpod executes DOut.
 %
-% Signal format on DIO line:
-%   Preamble : one or more HIGH bits (sync marker), default [1]
-%   15-bit binary representation of trialnum, MSB first
-%   Total states added : length(preamble) + 15  (default = 16)
-%   Total signal at 5ms/state : 80ms
+% DUMMY STATE NOTE:
+%   No dummy/padding states are needed. This function always adds exactly
+%   length(preamble) + 15 states (default = 16) unconditionally, so there
+%   is no branch-dependent count mismatch. All subsequent user states
+%   (wait_for_cpoke onwards) are simply shifted up by 16 positions, which
+%   is handled automatically by add_state.
 %
 % USAGE:
-%   sma = add_ephys_trial_indicator(sma, trialnum)
-%   sma = add_ephys_trial_indicator(sma, trialnum, 'time_per_state', 5e-3)
-%   sma = add_ephys_trial_indicator(sma, trialnum, 'preamble', [1 1])
-%   sma = add_ephys_trial_indicator(sma, trialnum, 'DIOLINE', 512)
+%   % Must be called BEFORE any add_state calls in prepare_next_trial:
+%   sma = add_ephys_trial_indicator(sma, n_done_trials+1, 'time_per_state', 5e-3);
+%   sma = add_state(sma, 'name', 'wait_for_cpoke', ...);
+%   ...
 %
 % REQUIRED ARGUMENTS:
-%   sma        StateMachineAssembler with full_trial_structure
-%   trialnum   Positive integer (max 32767 = 2^15 - 1)
+%   sma        StateMachineAssembler with full_trial_structure, no user
+%              states added yet (current_state must equal first user slot)
+%   trialnum   Positive integer to encode (max 32767 = 2^15 - 1)
 %
 % OPTIONAL ARGUMENTS:
-%   'time_per_state'          Seconds per bit state. Default 800e-6.
-%                             Recommended 5e-3 for reliable Neuropixels detection.
-%   'preamble'                Numeric vector before trialnum bits.
+%   'time_per_state'          Seconds per bit state. Default 5e-3 (5ms).
+%                             Total burst = 16 x 5ms = 80ms.
+%                             Minimum reliable value for Neuropixels: 1e-3.
+%   'preamble'                Numeric vector of HIGH/LOW before trialnum bits.
 %                             Default [1] (single HIGH sync pulse).
-%   'indicator_states_name'   Name for added states. Default 'sending_trialnum'.
-%   'DIOLINE'                 DIO line bitmask. Default 'from_settings'.
+%   'indicator_states_name'   Name for the first added state only.
+%                             Default 'sending_trialnum'.
+%   'DIOLINE'                 DIO bitmask. Default 'from_settings' reads
+%                             DIOLINES; trialnum_indicator from bSettings.
+%
+% RETURNS:
+%   sma   Updated SMA with trialnum states appended at current position.
+%         current_state is advanced by length(preamble)+15 (= 16 default).
 %
 % Written by Arpit, based on add_trialnum_indicator by Carlos Brody.
+% Key fix: states inserted in user space (40+) not framework space (1-16).
 
 function [sma] = add_ephys_trial_indicator(sma, trialnum, varargin)
 
     %% Parse arguments
     pairs = { ...
-        'time_per_state',        800e-6              ; ...
+        'time_per_state',        5e-3                ; ...
         'preamble',              [1]                 ; ...
         'indicator_states_name', 'sending_trialnum'  ; ...
         'DIOLINE',               'from_settings'     ; ...
@@ -91,34 +101,32 @@ function [sma] = add_ephys_trial_indicator(sma, trialnum, varargin)
         DIOLINE = 0;
     end
 
-    %% Find the Tup column index in sma.states
-    TupCol = find(strcmp('Tup', sma.input_map(:,1)));
-    TupCol = sma.input_map{TupCol, 2};
-
-    %% FIX 1: Read first user state from state_0 BEFORE redirecting it
-    % state_0 (row 1 of sma.states) Tup transition always points to the
-    % first user state. For this BControl/Bpod framework that is state 40
-    % (wait_for_cpoke). Reading it here means no hardcoding needed.
-    first_user_state = sma.states{1, TupCol};
-
-    % Guard against corrupted state_0 — should always be 40 for this framework
-    if ~isnumeric(first_user_state) || first_user_state < 2
-        error(['add_ephys_trial_indicator: state_0 Tup = %s, expected numeric >= 2. ' ...
-            'Was add_ephys_trial_indicator called twice on the same SMA?'], ...
-            num2str(first_user_state));
+    %% Guard: must be called before any user states are added
+    % current_state should equal the first user slot (40 in this framework).
+    % If it is higher, user states have already been added and the trialnum
+    % sequence will not fire at trial start.
+    expected_first_user_state = 40;  % full_trial_structure constant for this framework
+    if sma.current_state ~= expected_first_user_state
+        warning(['add_ephys_trial_indicator: current_state = %d, expected %d. ' ...
+                 'This function should be called before any add_state calls. ' ...
+                 'Trialnum states will not fire at trial start.'], ...
+                 sma.current_state, expected_first_user_state);
     end
 
-    fprintf('[add_ephys_trial_indicator] Trial %d | first_user_state=%d | DIOLINE=%d | n_states=%d\n', ...
-        trialnum, first_user_state, DIOLINE, length(preamble) + nbits);
+    % fprintf('[add_ephys_trial_indicator] Trial %d | pos=%d | DIOLINE=%d | n_states=%d | %.0fms/state\n', ...
+    %     trialnum, sma.current_state, DIOLINE, length(preamble)+nbits, time_per_state*1000);
 
-    %% Save current_state and redirect to slot 1 to insert trialnum states
-    orig_current_state = sma.current_state;
-    sma.current_state = 1;
+    %% Build binary string for trialnum (15 bits, MSB first)
+    trialnum_bin = dec2bin(trialnum);
+    trialnum_bin = [repmat('0', 1, nbits - length(trialnum_bin)) trialnum_bin];
 
-    %% Add preamble states (sync pulses)
+    %% Add preamble states
+    % These are appended at current_state (= 40) in user space.
+    % Bpod executes DOut here — this is what was missing before.
     for i = 1:length(preamble)
         dout = preamble(i);
         if i == 1
+            % First state is named for identification in state_name_list
             sma = add_state(sma, 'name', indicator_states_name, ...
                 'self_timer', time_per_state, ...
                 'input_to_statechange', {'Tup', 'current_state+1'}, ...
@@ -131,10 +139,7 @@ function [sma] = add_ephys_trial_indicator(sma, trialnum, varargin)
         end
     end
 
-    %% Add 15 binary bit states encoding trialnum MSB first
-    trialnum_bin = dec2bin(trialnum);
-    trialnum_bin = [repmat('0', 1, nbits - length(trialnum_bin)) trialnum_bin];
-
+    %% Add 15 binary bit states (MSB first)
     for i = 1:nbits
         dout = str2double(trialnum_bin(i));
         sma = add_state(sma, ...
@@ -143,24 +148,12 @@ function [sma] = add_ephys_trial_indicator(sma, trialnum, varargin)
             'output_actions', {'DOut', sma.default_DOut + dout * DIOLINE});
     end
 
-    %% FIX 2: Set last trialnum state to jump to first_user_state
-    % Deterministic row index: 1 preamble + 15 bits = 16 states starting at
-    % row 2 (state 1). Last state is at row 1 + length(preamble) + nbits.
-    % Adding 1 for MATLAB 1-based indexing of sma.states.
-    % This does NOT rely on sma.current_state which is unreliable here.
-    last_trialnum_row = 1 + length(preamble) + nbits;  % = 17 with default preamble
-    sma.states{last_trialnum_row, TupCol} = first_user_state;
-    fprintf('[add_ephys_trial_indicator] Row %d (last trialnum state) Tup set to %d.\n', ...
-        last_trialnum_row, first_user_state);
+    % After this, current_state = 56 (= 40 + 16).
+    % The next add_state call (wait_for_cpoke) will land at position 56.
+    % current_state+1 on the last trialnum state naturally falls into
+    % wait_for_cpoke — no manual Tup fix needed.
 
-    %% Redirect state_0 to trialnum sequence start (state 1)
-    all_input_cols = cell2mat(sma.input_map(:,2))';
-    for i = 1:length(all_input_cols)
-        sma.states{1, all_input_cols(i)} = 1;
-    end
-    fprintf('[add_ephys_trial_indicator] State_0 redirected to 1 (was %d).\n', first_user_state);
-
-    %% Restore current_state
-    sma.current_state = orig_current_state;
+    % fprintf('[add_ephys_trial_indicator] Done. wait_for_cpoke will be at pos %d.\n', ...
+    %     sma.current_state);
 
 end
