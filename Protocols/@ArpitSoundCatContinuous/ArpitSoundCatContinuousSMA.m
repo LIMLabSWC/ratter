@@ -120,8 +120,9 @@ switch action
         if strcmpi(value(StimLine),'Ephys')  && ~isnan(trigephys)
             sma = add_scheduled_wave(sma, 'name', 'EphysTrig', 'preamble', 0, 'sustain', ...
                 0.4, 'DOut',  trigephys, 'loop', 0); %for Ephys
+            
             % Lets add the first state to be ephys trial num indicator
-            sma = add_ephys_trial_indicator(sma, n_done_trials+1, 'time_per_state', 10e-3, 'DIOLINE', trigephys);
+            sma = add_ephys_trial_indicator(sma, n_done_trials+1, 'time_per_state', 5e-3, 'DIOLINE', trigephys);
         else
             sma = add_scheduled_wave(sma, 'name', 'EphysTrig', 'preamble', 0, 'sustain', 0); %dummy wave.
         end
