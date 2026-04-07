@@ -29,16 +29,16 @@ switch action
         DispParam(obj, 'Context2_trialStart', 1,x,y, 'position', [x, y, 100 20],'label','t_start','TooltipString','2nd context started at this trial');
         DispParam(obj, 'Context2_trialEnd', 1,x,y, 'position', [x + 101, y, 100 20],'label','t_end','TooltipString','2nd context ended at this trial');
         next_row(y);
-        DispParam(obj, 'Context2_Dist', Category_Dist, x,y,'label','Context2_Distr','TooltipString','stim distribution for 2nd context');    	
+        DispParam(obj, 'Context2_Dist', Category_Dist, x,y,'label','Context2_Distr','TooltipString','stim distribution for 2nd context');
         make_invisible(Context2_Dist); make_invisible(Context2_trialStart);make_invisible(Context2_trialEnd);
         next_row(y);
 
         % Context 3
         DispParam(obj, 'Context1_trialStart', 1,x,y, 'position', [x, y, 100 20],'label','Trial_start','TooltipString','1st context started at this trial');
-        DispParam(obj, 'Context1_trialEnd', 1,x,y, 'position', [x +  101, y, 100 20],'label','Trial_end','TooltipString','1st context ended at this trial');       
+        DispParam(obj, 'Context1_trialEnd', 1,x,y, 'position', [x +  101, y, 100 20],'label','Trial_end','TooltipString','1st context ended at this trial');
         next_row(y);
         DispParam(obj, 'Context1_Dist', Category_Dist, x,y,'label','Context1_Distr','TooltipString','stim distribution for 1st context');
-    	next_row(y);
+        next_row(y);
 
         PushbuttonParam(obj, 'Switch_Distr', x, y, 'label', 'Change Stim Distribution','TooltipString', 'Change the context by switching distribution');
         set_callback(Switch_Distr, {mfilename, 'PushButton_Distribution_Switch'}); %#ok<NODEF> (Defined just above)
@@ -70,105 +70,106 @@ switch action
         t = table('Size', [0, numel(vars)], 'VariableTypes', vars_type, 'VariableNames', vars);
 
 
-    % --- GUI Figure and Component Handles ---
+        % --- GUI Figure and Component Handles ---
 
-    % Main analysis figure (web-based uifigure)
-    SoloParamHandle(obj, 'myfig', 'value', figure('closerequestfcn', [mfilename '(' class(obj) ', ''hide'');'],...
-         'Name', 'Real-Time Analysis', 'Units', 'normalized','Position', [0.3, 0.1, 0.6, 0.8],'Visible', 'off'), 'saveable', false);
+        % Main analysis figure (web-based uifigure)
+        SoloParamHandle(obj, 'myfig', 'value', figure('closerequestfcn', [mfilename '(' class(obj) ', ''hide'');'],...
+            'Name', 'Real-Time Analysis', 'Units', 'normalized','Position', [0.3, 0.1, 0.6, 0.8],'Visible', 'off'), 'saveable', false);
 
-    % --- pre-Define Controls for the Bottom Panel later we will arrange it into panel. This is because if not done before it 
-    % removes all the previous created axes panel. ---
+        % --- pre-Define Controls for the Bottom Panel later we will arrange it into panel. This is because if not done before it
+        % removes all the previous created axes panel. ---
 
-    % Edit Boxes
-    NumeditParam(obj, 'Plot_Trial_Start', 1, 1, 1,'TooltipString', 'Start trial for custom plot');
-    NumeditParam(obj, 'Plot_Trial_End', 30, 1, 1, 'TooltipString', 'End trial for custom plot');
-    % Push Buttons
-    ToggleParam(obj, 'Show_Table_Toggle', 0, 1, 1, 'OnString', 'Table Shown', 'OffString', 'Show Table');
-    PushbuttonParam(obj, 'Plot_Custom_Button', 1, 1, 'label', 'Plot Custom Range');
-    PushbuttonParam(obj, 'Plot_Context_Button', 1, 1, 'label', 'Plot Context');
+        % Edit Boxes
+        NumeditParam(obj, 'Plot_Trial_Start', 1, 1, 1,'TooltipString', 'Start trial for custom plot');
+        NumeditParam(obj, 'Plot_Trial_End', 30, 1, 1, 'TooltipString', 'End trial for custom plot');
+        % Push Buttons
+        ToggleParam(obj, 'Show_Table_Toggle', 0, 1, 1, 'OnString', 'Table Shown', 'OffString', 'Show Table');
+        PushbuttonParam(obj, 'Plot_Custom_Button', 1, 1, 'label', 'Plot Custom Range');
+        PushbuttonParam(obj, 'Plot_Context_Button', 1, 1, 'label', 'Plot Context');
 
-    % --- Create Panels for Layout ---
-    % Top panel for live plots
-    hndl_live_plots_panel = uipanel('Parent', value(myfig), 'Title', 'Live Update Plots', ...
-        'Units', 'normalized', 'Position', [0.05, 0.55, 0.9, 0.43]);
+        % --- Create Panels for Layout ---
+        % Top panel for live plots
+        hndl_live_plots_panel = uipanel('Parent', value(myfig), 'Title', 'Live Update Plots', ...
+            'Units', 'normalized', 'Position', [0.05, 0.55, 0.9, 0.43]);
 
-    % Middle panel for custom plots
-    hndl_custom_plots_panel = uipanel('Parent', value(myfig), 'Title', 'Custom Range Plots', ...
-        'Units', 'normalized', 'Position', [0.05, 0.2, 0.9, 0.33]);
+        % Middle panel for custom plots
+        hndl_custom_plots_panel = uipanel('Parent', value(myfig), 'Title', 'Custom Range Plots', ...
+            'Units', 'normalized', 'Position', [0.05, 0.2, 0.9, 0.33]);
 
-    % Bottom panel for controls
-    hndl_controls_panel = uipanel('Parent', value(myfig), 'Title', 'Controls', ...
-        'Units', 'normalized', 'Position', [0.05, 0.02, 0.9, 0.16]);
+        % Bottom panel for controls
+        hndl_controls_panel = uipanel('Parent', value(myfig), 'Title', 'Controls', ...
+            'Units', 'normalized', 'Position', [0.05, 0.02, 0.9, 0.16]);
 
-    % --- Define the 6 Axes and store in a struct ---
-    axes_h.live_psych = axes('Parent', hndl_live_plots_panel, 'Units', 'normalized', 'Position', [0.06, 0.1, 0.28, 0.8]);
-    title(axes_h.live_psych, 'Live Psychometric'); ylabel(axes_h.live_psych, 'P(Right)');
+        % --- Define the 6 Axes and store in a struct ---
+        axes_h.live_psych = axes('Parent', hndl_live_plots_panel, 'Units', 'normalized', 'Position', [0.06, 0.1, 0.28, 0.8]);
+        title(axes_h.live_psych, 'Live Psychometric'); ylabel(axes_h.live_psych, 'P(Right)');
 
-    axes_h.live_hitrate = axes('Parent', hndl_live_plots_panel, 'Units', 'normalized', 'Position', [0.38, 0.1, 0.28, 0.8]);
-    title(axes_h.live_hitrate, 'Live Hit Rate'); xlabel(axes_h.live_hitrate, 'Block');
+        axes_h.live_hitrate = axes('Parent', hndl_live_plots_panel, 'Units', 'normalized', 'Position', [0.38, 0.1, 0.28, 0.8]);
+        title(axes_h.live_hitrate, 'Live Hit Rate'); xlabel(axes_h.live_hitrate, 'Block');
 
-    axes_h.live_stim = axes('Parent', hndl_live_plots_panel, 'Units', 'normalized', 'Position', [0.7, 0.1, 0.28, 0.8]);
-    title(axes_h.live_stim, 'Live Stimulus Dist.');
+        axes_h.live_stim = axes('Parent', hndl_live_plots_panel, 'Units', 'normalized', 'Position', [0.7, 0.1, 0.28, 0.8]);
+        title(axes_h.live_stim, 'Live Stimulus Dist.');
 
-    axes_h.custom_psych = axes('Parent', hndl_custom_plots_panel, 'Units', 'normalized', 'Position', [0.06, 0.1, 0.28, 0.8]);
-    title(axes_h.custom_psych, 'Custom Psychometric'); ylabel(axes_h.custom_psych, 'P(Right)');
+        axes_h.custom_psych = axes('Parent', hndl_custom_plots_panel, 'Units', 'normalized', 'Position', [0.06, 0.1, 0.28, 0.8]);
+        title(axes_h.custom_psych, 'Custom Psychometric'); ylabel(axes_h.custom_psych, 'P(Right)');
 
-    axes_h.custom_hitrate = axes('Parent', hndl_custom_plots_panel, 'Units', 'normalized', 'Position', [0.38, 0.1, 0.28, 0.8]);
-    title(axes_h.custom_hitrate, 'Custom Hit Rate');
+        axes_h.custom_hitrate = axes('Parent', hndl_custom_plots_panel, 'Units', 'normalized', 'Position', [0.38, 0.1, 0.28, 0.8]);
+        title(axes_h.custom_hitrate, 'Custom Hit Rate');
 
-    axes_h.custom_stim = axes('Parent', hndl_custom_plots_panel, 'Units', 'normalized', 'Position', [0.7, 0.1, 0.28, 0.8]);
-    title(axes_h.custom_stim, 'Custom Stimulus Dist.');
+        axes_h.custom_stim = axes('Parent', hndl_custom_plots_panel, 'Units', 'normalized', 'Position', [0.7, 0.1, 0.28, 0.8]);
+        title(axes_h.custom_stim, 'Custom Stimulus Dist.');
 
-    % Store the entire struct of handles in a single SoloParamHandle
-    SoloParamHandle(obj, 'PlotAxes', 'value', axes_h, 'saveable', false);
+        % Store the entire struct of handles in a single SoloParamHandle
+        SoloParamHandle(obj, 'PlotAxes', 'value', axes_h, 'saveable', false);
 
-    % --- Arrange Controls in the Bottom Panel ---
+        % --- Arrange Controls in the Bottom Panel ---
 
-    % Left Column: Show Table Toggle
-    set(get_ghandle(Show_Table_Toggle), 'Parent', hndl_controls_panel, 'Units', 'normalized', 'Position', [0.03, 0.25, 0.18, 0.5]);
+        % Left Column: Show Table Toggle
+        set(get_ghandle(Show_Table_Toggle), 'Parent', hndl_controls_panel, 'Units', 'normalized', 'Position', [0.03, 0.25, 0.18, 0.5]);
 
-    % Center Column: Custom Trial Plotting
-    uicontrol('Parent', hndl_controls_panel, 'Style','text', 'String','Start Trial', 'Units','normalized', 'Position',[0.25, 0.7, 0.1, 0.2]);
-    set(get_ghandle(Plot_Trial_Start), 'Parent', hndl_controls_panel, 'Units', 'normalized', 'Position', [0.35, 0.65, 0.1, 0.3]);
-    delete(get_lhandle(Plot_Trial_Start)); % remove bcontrol label
-    uicontrol('Parent', hndl_controls_panel, 'Style','text', 'String','End Trial', 'Units','normalized', 'Position',[0.47, 0.7, 0.1, 0.2]);
-    set(get_ghandle(Plot_Trial_End), 'Parent', hndl_controls_panel, 'Units', 'normalized', 'Position', [0.57, 0.65, 0.1, 0.3]);
-    delete(get_lhandle(Plot_Trial_End)); % remove bcontrol label
-    set(get_ghandle(Plot_Custom_Button), 'Parent', hndl_controls_panel, 'Units', 'normalized', 'Position', [0.35, 0.15, 0.22, 0.4]);
+        % Center Column: Custom Trial Plotting
+        uicontrol('Parent', hndl_controls_panel, 'Style','text', 'String','Start Trial', 'Units','normalized', 'Position',[0.25, 0.7, 0.1, 0.2]);
+        set(get_ghandle(Plot_Trial_Start), 'Parent', hndl_controls_panel, 'Units', 'normalized', 'Position', [0.35, 0.65, 0.1, 0.3]);
+        delete(get_lhandle(Plot_Trial_Start)); % remove bcontrol label
+        uicontrol('Parent', hndl_controls_panel, 'Style','text', 'String','End Trial', 'Units','normalized', 'Position',[0.47, 0.7, 0.1, 0.2]);
+        set(get_ghandle(Plot_Trial_End), 'Parent', hndl_controls_panel, 'Units', 'normalized', 'Position', [0.57, 0.65, 0.1, 0.3]);
+        delete(get_lhandle(Plot_Trial_End)); % remove bcontrol label
+        set(get_ghandle(Plot_Custom_Button), 'Parent', hndl_controls_panel, 'Units', 'normalized', 'Position', [0.35, 0.15, 0.22, 0.4]);
 
-    % Right Column: Context Plot Button
-    set(get_ghandle(Plot_Context_Button), 'Parent', hndl_controls_panel, 'Units', 'normalized', 'Position', [0.68, 0.25, 0.18, 0.5]);
+        % Right Column: Context Plot Button
+        set(get_ghandle(Plot_Context_Button), 'Parent', hndl_controls_panel, 'Units', 'normalized', 'Position', [0.68, 0.25, 0.18, 0.5]);
 
-    % Far Right Column: Live Update Checkboxes
-    SoloParamHandle(obj, 'Update_Psychometric', 'value', uicontrol('Parent', hndl_controls_panel, 'Style', 'checkbox', 'Units', 'normalized', 'String', 'Psych', 'Value', 1, 'Position', [0.9, 0.65, 0.08, 0.3]),'saveable', false);
-    SoloParamHandle(obj, 'Update_HitRate', 'value', uicontrol('Parent', hndl_controls_panel, 'Style', 'checkbox', 'Units', 'normalized', 'String', 'HitRate', 'Value', 1, 'Position', [0.9, 0.35, 0.08, 0.3]),'saveable', false);
-    SoloParamHandle(obj, 'Update_Stimulus', 'value', uicontrol('Parent', hndl_controls_panel, 'Style', 'checkbox', 'Units', 'normalized', 'String', 'Stim', 'Value', 1, 'Position', [0.9, 0.05, 0.08, 0.3]),'saveable', false);
+        % Far Right Column: Live Update Checkboxes
+        SoloParamHandle(obj, 'Update_Psychometric', 'value', uicontrol('Parent', hndl_controls_panel, 'Style', 'checkbox', 'Units', 'normalized', 'String', 'Psych', 'Value', 1, 'Position', [0.9, 0.65, 0.08, 0.3]),'saveable', false);
+        SoloParamHandle(obj, 'Update_HitRate', 'value', uicontrol('Parent', hndl_controls_panel, 'Style', 'checkbox', 'Units', 'normalized', 'String', 'HitRate', 'Value', 1, 'Position', [0.9, 0.35, 0.08, 0.3]),'saveable', false);
+        SoloParamHandle(obj, 'Update_Stimulus', 'value', uicontrol('Parent', hndl_controls_panel, 'Style', 'checkbox', 'Units', 'normalized', 'String', 'Stim', 'Value', 1, 'Position', [0.9, 0.05, 0.08, 0.3]),'saveable', false);
 
-    % --- Set Callbacks ---
-    set_callback(Show_Table_Toggle, {mfilename, 'show_hide_table'});
-    set_callback(Plot_Custom_Button, {mfilename, 'PushButton_SelectedTrial'});
-    set_callback(Plot_Context_Button, {mfilename, 'PushButton_Context'}); % To be defined later
+        % --- Set Callbacks ---
+        set_callback(Show_Table_Toggle, {mfilename, 'show_hide_table'});
+        set_callback(Plot_Custom_Button, {mfilename, 'PushButton_SelectedTrial'});
+        set_callback(Plot_Context_Button, {mfilename, 'PushButton_Context'}); % To be defined later
 
-    % --- Separate, Initially Invisible Figure for the Table ---
+        % --- Separate, Initially Invisible Figure for the Table ---
 
-    SoloParamHandle(obj, 'myfig_table', 'value', uifigure('closerequestfcn', [mfilename '(' class(obj) ', ''hide_table'');'],...
-             'Name', 'Psychometric Summary Table', 'Units', 'normalized','Visible', 'off','Position', [0.1, 0.2, 0.4, 0.6]), 'saveable', false);
+        SoloParamHandle(obj, 'myfig_table', 'value', uifigure('closerequestfcn', [mfilename '(' class(obj) ', ''hide_table'');'],...
+            'Name', 'Psychometric Summary Table', 'Units', 'normalized','Visible', 'off','Position', [0.1, 0.2, 0.4, 0.6]), 'saveable', false);
 
-    SoloParamHandle(obj, 'uit', 'value', uitable(value(myfig_table), 'Data', t, ...
-        'Units', 'normalized', 'Position', [0.02 0.02 0.96 0.96], ...
-        'ColumnEditable', [true, false, false, false, false, false, false, false, false, false, false, false], ...
-        'CellEditCallback',@(src, evt) PsychometricSection(obj, 'check_box_table', src, evt)), ... % end of uitable definition
-        'saveable', true);
+        SoloParamHandle(obj, 'uit', 'value', uitable(value(myfig_table), 'Data', t, ...
+            'Units', 'normalized', 'Position', [0.02 0.02 0.96 0.96], ...
+            'ColumnEditable', [true, false, false, false, false, false, false, false, false, false, false, false], ...
+            'CellEditCallback',@(src, evt) PsychometricSection(obj, 'check_box_table', src, evt)), ... % end of uitable definition
+            'saveable', true);
 
+        SoloFunctionAddVars('SideSection', 'rw_args', ...
+            {'Switch_Distr'});
 
-    % Returning the x , y position for the main callback GUI
+        % Returning the x , y position for the main callback GUI
         varargout{1} = oldx;
         varargout{2} = oldy;
 
-
-    %% Calculate Parameters
+        %% Calculate Parameters
     case 'Calculate_Params'
-        
+
         try
             % figure out if psychometric, change the sides from ascii 'l' or 'r' to 0 and 1
             sides = zeros(size(previous_sides));
@@ -192,8 +193,8 @@ switch action
             config.debug = false;
 
             state = value(states_value);
-            
-            % make the table_row of same size as table rows           
+
+            % make the table_row of same size as table rows
             required_length = height(handles.ui_table.Data); % Get the required length from the table height
             % Case 1: The field doesn't exist yet. Initialize it.
             if ~isfield(state, 'table_row_editable')
@@ -213,7 +214,7 @@ switch action
             end
             % Optional: Ensure it's a column vector for consistency
             state.table_row_editable = state.table_row_editable(:);
-            
+
             % psychometric, hit rate and stim correct/incorrect histogram to be plotted or not
             psych_obj = value(Update_Psychometric);
             flags.psych = logical(psych_obj.Value);
@@ -230,7 +231,7 @@ switch action
             varargout{4} = config;
             varargout{5} = flags;
 
-        catch 
+        catch
             varargout{1} = [];
             varargout{2} = [];
             varargout{3} = [];
@@ -238,76 +239,112 @@ switch action
             varargout{5} = [];
         end
 
-    
-     %% Other actions  
+
+        %% Other actions
+
+    case 'Stimuli_State_changed'
+
+        if strcmpi(Stimuli_State,'Full')
+            enable(Switch_Distr); enable(PsychometricShow);
+        else
+            disable(Switch_Distr); disable(PsychometricShow);
+        end
 
     case 'PushButton_Distribution_Switch'
 
-        % eval(sprintf('present_context_dist = value(Context%i_Dist)',value(thiscontext)));
-        eval(sprintf('present_context_start = value(Context%i_trialStart);',value(thiscontext)));
-        eval(sprintf('present_context_end = value(Context%i_trialEnd);',value(thiscontext)));
-        
-        if ~strcmpi(Category_Dist,'Uniform') && present_context_end > present_context_start
-            
-            if value(thiscontext) < 3 % & ~strcmpi(present_context_dist,Category_Dist)
-                thiscontext.value = value(thiscontext) + 1;
-                eval(sprintf('Context%i_Dist.value = Category_Dist;',value(thiscontext)));
-                eval(sprintf('Context%i_trialStart.value = n_done_trials + 1;',value(thiscontext)));
-                eval(sprintf('Context%i_trialEnd.value = n_done_trials + 1;',value(thiscontext)));
-                eval(sprintf('make_visible(Context%i_Dist);',value(thiscontext)));
-                eval(sprintf('make_visible(Context%i_trialStart);',value(thiscontext)));
-                eval(sprintf('make_visible(Context%i_trialEnd);',value(thiscontext)));
-            end
+        if strcmpi(Stimuli_State,'Full')
+            % --- Confirmation Dialog ---
+            % Display a dialog box to ask the user for confirmation before proceeding.
+            % 'questdlg' creates a dialog with a question, title, and button options.
+            choice = questdlg('Are you sure you want to switch the distribution?', ...
+                'Confirm Action', ...
+                'Yes', 'No', 'No'); % The last 'No' sets it as the default button.
 
-            if strcmpi(Category_Dist,'Hard A')
-                StimulusSection(obj,'Pushbutton_SwitchDistribution','Hard B');
-            elseif strcmpi(Category_Dist,'Hard B')
-                StimulusSection(obj,'Pushbutton_SwitchDistribution','Hard A');
-            end
-            
-            % Also update the table and make changes to plot
-            [state, data, handles, config, flags] = PsychometricSection(obj,'Calculate_Params');
-            % Calling the function to update the table and plot
-            state = RealTimeAnalysis('context_switch', state, data, handles, config, flags);
-            states_value.value = state;
-        end
-         
-    case 'StimSection_Distribution_Switch'
-        
-        eval(sprintf('present_context_start = value(Context%i_trialStart);',value(thiscontext)));
-        eval(sprintf('present_context_end = value(Context%i_trialEnd);',value(thiscontext)));
-        
-        if present_context_end > present_context_start
-            if value(thiscontext) < 3 % & ~strcmpi(present_context_dist,Category_Dist)
-                thiscontext.value = value(thiscontext) + 1;
-                eval(sprintf('Context%i_Dist.value = Category_Dist;',value(thiscontext)));
-                eval(sprintf('Context%i_trialStart.value = n_done_trials + 1;',value(thiscontext)));
-                eval(sprintf('Context%i_trialEnd.value = n_done_trials + 1;',value(thiscontext)));
-                eval(sprintf('make_visible(Context%i_Dist);',value(thiscontext)));
-                eval(sprintf('make_visible(Context%i_trialStart);',value(thiscontext)));
-                eval(sprintf('make_visible(Context%i_trialEnd);',value(thiscontext)));
+            % --- Handle User's Response ---
+            % The code proceeds only if the user clicks the 'Yes' button.
+            % The strcmp function compares the 'choice' variable with 'Yes'.
+            if strcmp(choice, 'Yes')
 
-                % Firstly make sure that at least 20 trials happened in this
-                % context if so then update the table and make changes to plot
-                if present_context_end - present_context_start >= 20
+                % --- Original Code Execution ---
+                % This is your original code, which will run after confirmation.
+
+                % eval(sprintf('present_context_dist = value(Context%i_Dist)',value(thiscontext)));
+                eval(sprintf('present_context_start = value(Context%i_trialStart);',value(thiscontext)));
+                eval(sprintf('present_context_end = value(Context%i_trialEnd);',value(thiscontext)));
+
+                if ~strcmpi(Category_Dist,'Uniform') && present_context_end > present_context_start
+
+                    if value(thiscontext) < 3 % & ~strcmpi(present_context_dist,Category_Dist)
+                        thiscontext.value = value(thiscontext) + 1;
+                        eval(sprintf('Context%i_Dist.value = Category_Dist;',value(thiscontext)));
+                        eval(sprintf('Context%i_trialStart.value = n_done_trials + 1;',value(thiscontext)));
+                        eval(sprintf('Context%i_trialEnd.value = n_done_trials + 1;',value(thiscontext)));
+                        eval(sprintf('make_visible(Context%i_Dist);',value(thiscontext)));
+                        eval(sprintf('make_visible(Context%i_trialStart);',value(thiscontext)));
+                        eval(sprintf('make_visible(Context%i_trialEnd);',value(thiscontext)));
+                    end
+                    if strcmpi(Category_Dist,'Hard A')
+                        StimulusSection(obj,'Pushbutton_SwitchDistribution','Hard B');
+                    elseif strcmpi(Category_Dist,'Hard B')
+                        StimulusSection(obj,'Pushbutton_SwitchDistribution','Hard A');
+                    end
+
+                    % Also update the table and make changes to plot
                     [state, data, handles, config, flags] = PsychometricSection(obj,'Calculate_Params');
                     % Calling the function to update the table and plot
                     state = RealTimeAnalysis('context_switch', state, data, handles, config, flags);
                     states_value.value = state;
                 end
+
+            end % This 'end' closes the 'if strcmp(choice, 'Yes')' block.
+            % If the user clicks 'No' or closes the dialog, the code inside the if-block is skipped.
+        end
+
+    case 'StimSection_Distribution_Switch'
+
+        if strcmpi(Stimuli_State,'Full')
+
+            eval(sprintf('present_context_start = value(Context%i_trialStart);',value(thiscontext)));
+            eval(sprintf('present_context_end = value(Context%i_trialEnd);',value(thiscontext)));
+
+            if present_context_end > present_context_start
+                if value(thiscontext) < 3 % & ~strcmpi(present_context_dist,Category_Dist)
+                    thiscontext.value = value(thiscontext) + 1;
+                    eval(sprintf('Context%i_Dist.value = Category_Dist;',value(thiscontext)));
+                    eval(sprintf('Context%i_trialStart.value = n_done_trials + 1;',value(thiscontext)));
+                    eval(sprintf('Context%i_trialEnd.value = n_done_trials + 1;',value(thiscontext)));
+                    eval(sprintf('make_visible(Context%i_Dist);',value(thiscontext)));
+                    eval(sprintf('make_visible(Context%i_trialStart);',value(thiscontext)));
+                    eval(sprintf('make_visible(Context%i_trialEnd);',value(thiscontext)));
+
+                    % Firstly make sure that at least 20 trials happened in this
+                    % context if so then update the table and make changes to plot
+                    if present_context_end - present_context_start >= 20
+                        [state, data, handles, config, flags] = PsychometricSection(obj,'Calculate_Params');
+                        % Calling the function to update the table and plot
+                        state = RealTimeAnalysis('context_switch', state, data, handles, config, flags);
+                        states_value.value = state;
+                    end
+                end
+            else
+                eval(sprintf('Context%i_Dist.value = Category_Dist;',value(thiscontext)));
             end
-        else
-            eval(sprintf('Context%i_Dist.value = Category_Dist;',value(thiscontext)));
+
         end
 
     case 'PushButton_SelectedTrial'
+
+        if strcmpi(Stimuli_State,'Full')
             [state, data, handles, config, flags] = PsychometricSection(obj,'Calculate_Params');
             % Calling the function to update the table and plot
             state = RealTimeAnalysis('custom', state, data, handles, config, flags,value(Plot_Trial_Start),value(Plot_Trial_End));
             states_value.value = state;
+        end
 
     case 'PushButton_Context'
-            [state, data, handles, config, flags] = PsychometricSection(obj,'Calculate_Params');            
+
+        if strcmpi(Stimuli_State,'Full')
+            [state, data, handles, config, flags] = PsychometricSection(obj,'Calculate_Params');
             % create a cell array containing the start and end of each context
             context_trials = cell(1,value(thiscontext));
             contexts_name = cell(1,value(thiscontext));
@@ -321,13 +358,14 @@ switch action
             % Calling the function to update the table and plot
             state = RealTimeAnalysis('context', state, data, handles, config, flags, context_trials,contexts_name);
             states_value.value = state;
+        end
 
-    case 'reload_after_crash'    
+    case 'reload_after_crash'
         % make sure that the context values are visible
         for n_contexts = 1:value(thiscontext)
-                eval(sprintf('make_visible(Context%i_Dist);',n_contexts));
-                eval(sprintf('make_visible(Context%i_trialStart);',n_contexts));
-                eval(sprintf('make_visible(Context%i_trialEnd);',n_contexts));
+            eval(sprintf('make_visible(Context%i_Dist);',n_contexts));
+            eval(sprintf('make_visible(Context%i_trialStart);',n_contexts));
+            eval(sprintf('make_visible(Context%i_trialEnd);',n_contexts));
         end
         % set the fig value for uitable as we didn't save the table
         ui_table_handle = value(uit);
@@ -338,10 +376,10 @@ switch action
         end
         uit.value = ui_table_handle;
 
-    %% update after each trial    
+        %% update after each trial
     case 'update'
         % update the trial end for this context
-        if n_done_trials > 1
+        if n_done_trials > 1 && strcmpi(Stimuli_State,'Full')
             eval(sprintf('Context%i_trialEnd.value = n_done_trials;',value(thiscontext)));
             [state, data, handles, config, flags] = PsychometricSection(obj,'Calculate_Params');
             % Calling the function to update the table and plot
@@ -349,20 +387,20 @@ switch action
             states_value.value = state;
         end
 
-    %% update the figure if user opened the figure window    
+        %% update the figure if user opened the figure window
     case 'update_plot'
         % if n_done_trials > 1
         %     PsychometricSection(obj, 'reload_after_crash');
         % end
-        if n_done_trials > 30
-                [state, data, handles, config, flags] = PsychometricSection(obj,'Calculate_Params');
-                % Calling the function to update the table and plot
-                state = RealTimeAnalysis('redraw', state, data, handles, config, flags);
-                states_value.value = state;
+        if n_done_trials > 30  && strcmpi(Stimuli_State,'Full')
+            [state, data, handles, config, flags] = PsychometricSection(obj,'Calculate_Params');
+            % Calling the function to update the table and plot
+            state = RealTimeAnalysis('redraw', state, data, handles, config, flags);
+            states_value.value = state;
         end
 
     case 'evaluate'
-        if n_done_trials > 1
+        if n_done_trials > 1  && strcmpi(Stimuli_State,'Full')
             try
                 % create a cell array containing the start and end of each context
                 context_trials = cell(1,value(thiscontext));
@@ -375,7 +413,8 @@ switch action
 
                     psych_result{1,n_context}.start_trial = trial_start;
                     psych_result{1,n_context}.end_trial = trial_end;
-                    psych_result{1,n_context}.distribution_type = char(unique(category_distribution));
+                    psych_result{1,n_context}.valid_trials = -1;
+                    psych_result{1,n_context}.distribution_type = '';
                     psych_result{1,n_context}.calculated_boundary = nan;
                     psych_result{1,n_context}.total_hit_percent = -1;
                     psych_result{1,n_context}.total_violations_percent =  -1;
@@ -388,7 +427,7 @@ switch action
                 psych_result = RealTimeAnalysis('evaluate', state, data, handles, config, flags, context_trials);
 
             catch
-                fprintf(2, 'Error calculating correct pokes\n');
+                fprintf(2, 'Error calculating context values\n');
                 disp(ME.message);
                 disp(ME.stack);
             end
@@ -396,8 +435,8 @@ switch action
         end
 
         varargout{1} = psych_result;
-   
-   %% cases related to figure handles
+
+        %% cases related to figure handles
 
     case 'check_box_table'
         try
@@ -447,12 +486,12 @@ switch action
         set(value(myfig), 'Visible', 'off');
         set(value(myfig_table), 'Visible', 'off');
 
-    %% Case Show_hide main psychometric GUI
+        %% Case Show_hide main psychometric GUI
     case 'show_hide'
         if PsychometricShow == 1
             set(value(myfig), 'Visible', 'on');
-            
-            % Update the plot for live update           
+
+            % Update the plot for live update
             PsychometricSection(obj,'update_plot');
 
             if Show_Table_Toggle == 1
@@ -465,17 +504,17 @@ switch action
             set(value(myfig_table), 'Visible', 'off');
         end
 
-    %% case for table toggle
+        %% case for table toggle
     case 'show_hide_table'
         if Show_Table_Toggle == 1
             set(value(myfig_table), 'Visible', 'on');
         else
-            set(value(myfig_table), 'Visible', 'off'); 
+            set(value(myfig_table), 'Visible', 'off');
         end
 
     case 'hide_table'
-            Show_Table_Toggle.value = 0;
-            set(value(myfig_table), 'Visible', 'off'); 
+        Show_Table_Toggle.value = 0;
+        set(value(myfig_table), 'Visible', 'off');
 end
 
 end

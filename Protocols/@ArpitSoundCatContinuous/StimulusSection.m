@@ -56,7 +56,7 @@ switch action
             '\n''S1>S_boundary Right'' means if Aud1 < Aud_boundry then reward will be delivered from the left water spout and if Aud1 > Aud_boundry then water comes from right\n']));
         
         next_row(y, 1);next_row(y, 1);
-        NumeditParam(obj,'P_centre_region',0.25,x,y,'label','P_centre','TooltipString','probability for choosing stim near boundary. 0 = same probability as the rest, 1 = only choose from centre');
+        NumeditParam(obj,'P_centre_region',0,x,y,'label','P_centre','TooltipString','probability for choosing stim near boundary. 0 = same probability as the rest, 1 = only choose from centre');
         next_row(y);
         NumeditParam(obj,'centre_region_width',0.1,x,y,'label','Centre Width','TooltipString','total width around boundary to be considered as central region');
         next_row(y);next_row(y);
@@ -72,7 +72,7 @@ switch action
     	next_row(y);
         NumeditParam(obj, 'sigma_Left', 0.15, x,y,'label','σ Left','TooltipString','sigma value for normal/half normal distribution or decay rate for exponential for the left side distribution');
         next_row(y);
-        NumeditParam(obj, 'sigma_range_Left', 1, x,y,'label','3σ Left','TooltipString',sprintf(['\n A way to reduce the range and increase more distribution towards mean\n', ...
+        NumeditParam(obj, 'sigma_range_Left', 1, x,y,'label','Left Range','TooltipString',sprintf(['\n A way to reduce the range and increase more distribution towards mean\n', ...
            '\n''signifying 3 Sigma (99.7%%) value for the left side distribution, \n',...
            '\n''A value b/w range [0.2 - 1] is acceptable.']));
     	set_callback(sigma_range_Left, {mfilename, 'Cal_Sigma'});
@@ -89,7 +89,7 @@ switch action
     	next_row(y);
         NumeditParam(obj, 'sigma_Right', 0.15, x,y,'label','σ Right','TooltipString','sigma value for normal/half normal distribution or decay rate for exponential for the left side distribution');
         next_row(y);
-        NumeditParam(obj, 'sigma_range_Right', 1, x,y,'label','3σ Right','TooltipString',sprintf(['\n A way to reduce the range and increase more distribution towards mean\n', ...
+        NumeditParam(obj, 'sigma_range_Right', 1, x,y,'label','Right Range','TooltipString',sprintf(['\n A way to reduce the range and increase more distribution towards mean\n', ...
             '\n''signifying 3 Sigma (99.7 %%) value for the right side distribution, \n',...
             '\n''A value b/w range [0.2 - 1] is acceptable.']));
     	set_callback(sigma_range_Right, {mfilename, 'Cal_Sigma'});
@@ -149,6 +149,8 @@ switch action
         set_callback(frequency_categorization, {mfilename, 'FrequencyCategorization'});
         make_invisible(maxF1);make_invisible(minF1);make_invisible(A1_freq);make_invisible(volumeF1);
         next_row(y);
+        NumeditParam(obj,'FixedStim',0.028,x,y,'label','FixedStimValue','TooltipString','Value of fixed Stim mean of either frequency/amplitude or user defined value');
+        next_row(y);
         
         % Axes for Plotting
         hndl_uipanelplotaxes = uipanel('Units', 'normalized');
@@ -198,8 +200,10 @@ switch action
         SoloParamHandle(obj, 'plot_h', 'value', struct(), 'saveable', false); % Initialize output
 
         % Plot the Distribution
-        StimulusSection(obj,'plot_stim_distribution');
-        set(value(myfig), 'visible', 'off');
+        if strcmpi(Stimuli_State,'Full')
+            StimulusSection(obj,'plot_stim_distribution');
+            set(value(myfig), 'visible', 'off');
+        end
 
         x=oldx; y=oldy;
         figure(parentfig);
@@ -210,7 +214,9 @@ switch action
         varargout{2} = y;
 
     case 'prepare_next_trial'
-        if stimuli_on
+        
+        if ~strcmpi(Stimuli_State,'No Sound') % either distribution or fixed sound
+            
             StimulusSection(obj,'pick_current_stimulus');
             srate=SoundManagerSection(obj,'get_sample_rate');
             Fs=srate;
@@ -234,7 +240,7 @@ switch action
                 AUD1 = RW;                
             else
                 % produce noise pattern
-                A1_length = round(A1_time * srate);
+                A1_length = floor(T * srate);
                 A1_sigma.value = value(thisstim);
                 A1 = value(thisstimlog(n_done_trials+1));
                 [rawA1, rawA2, normA1, normA2]=noisestim(1,1,T,value(fcut),Fs,value(filter_type));
@@ -254,7 +260,7 @@ switch action
                 
                 % Update the stim histogram and show chosen stimuli
 
-                if value(StimulusShow) == 1 % only run if the figure window is open
+                if value(StimulusShow) == 1 & strcmpi(Stimuli_State,'Full') % only run if the figure window is open and we have full distrubution
 
                     stim_values = value(thisstimlog);
                     stim_present = stim_values(n_done_trials);
@@ -297,86 +303,95 @@ switch action
 
         %% Case pick_current_stimulus
     case 'pick_current_stimulus'
-        if frequency_categorization
-            stim_min_log = log(value(minF1));
-            stim_max_log = log(value(maxF1));
-        else
-            stim_min_log = log(value(minS1));
-            stim_max_log = log(value(maxS1));
-        end
+
+        if strcmpi(Stimuli_State,'Full') % only run here if user selected full distribution
+            
+            if frequency_categorization
+                stim_min_log = log(value(minF1));
+                stim_max_log = log(value(maxF1));
+            else
+                stim_min_log = log(value(minS1));
+                stim_max_log = log(value(maxS1));
+            end
 
             dist_sigma_left_multiplier = value(sigma_Left) * value(sigma_range_Left);
             dist_sigma_right_multiplier = value(sigma_Right) * value(sigma_range_Right);
 
-    % The left-right side according the animal is not the same as left-right of
-    % stim distribution because it depends upon the Rule whether Stim should be
-    % considered left/right (below/up of boundary) based upon this rule.
-    % Changing animals side reference to stimuli reference depending upon Rule
-    % Even the setting in StimulusSection is based upon side not on the
-    % basis of whether left or right of boundary
+            % The left-right side according the animal is not the same as left-right of
+            % stim distribution because it depends upon the Rule whether Stim should be
+            % considered left/right (below/up of boundary) based upon this rule.
+            % Changing animals side reference to stimuli reference depending upon Rule
+            % Even the setting in StimulusSection is based upon side not on the
+            % basis of whether left or right of boundary
 
-        if strcmp(Rule,'S1>S_boundary Left') % side left is right to stim boundary
-            if strcmpi(ThisTrial, 'LEFT')
-                stim_side = 'right';
-            else
-                stim_side = 'left';
+            if strcmp(Rule,'S1>S_boundary Left') % side left is right to stim boundary
+                if strcmpi(ThisTrial, 'LEFT')
+                    stim_side = 'right';
+                else
+                    stim_side = 'left';
+                end
+                dist_left = value(Prob_Dist_Right);
+                dist_right = value(Prob_Dist_Left);
+                range_percent_left = value(sigma_range_Right) * 100;
+                range_percent_right = value(sigma_range_Left) * 100;
+                dist_mean_left  = value(mean_Right);
+                dist_mean_right  = value(mean_Left);
+                dist_sigma_left = dist_sigma_right_multiplier * (value(boundary) - stim_min_log);
+                dist_sigma_right = dist_sigma_left_multiplier * (stim_max_log - value(boundary));
+                exp_decay_left = value(sigma_Right);
+                exp_decay_right = value(sigma_Left);
+
+            else % the rule is S1>S_boundary Right
+                if strcmpi(ThisTrial, 'LEFT')
+                    stim_side = 'left';
+                else
+                    stim_side = 'right';
+                end
+                dist_right = value(Prob_Dist_Right);
+                dist_left = value(Prob_Dist_Left);
+                range_percent_right = value(sigma_range_Right) * 100;
+                range_percent_left = value(sigma_range_Left) * 100;
+                dist_mean_right  = value(mean_Right);
+                dist_mean_left  = value(mean_Left);
+                dist_sigma_left = dist_sigma_left_multiplier * (value(boundary) - stim_min_log);
+                dist_sigma_right = dist_sigma_right_multiplier * (stim_max_log - value(boundary));
+                exp_decay_left = value(sigma_Left);
+                exp_decay_right = value(sigma_Right);
             end
-            dist_left = value(Prob_Dist_Right);
-            dist_right = value(Prob_Dist_Left);
-            range_percent_left = value(sigma_range_Right) * 100;
-            range_percent_right = value(sigma_range_Left) * 100;
-            dist_mean_left  = value(mean_Right);
-            dist_mean_right  = value(mean_Left);
-            dist_sigma_left = dist_sigma_right_multiplier * (value(boundary) - stim_min_log);
-            dist_sigma_right = dist_sigma_left_multiplier * (stim_max_log - value(boundary));
-            exp_decay_left = value(sigma_Right);
-            exp_decay_right = value(sigma_Left);
 
-        else % the rule is S1>S_boundary Right
-            if strcmpi(ThisTrial, 'LEFT')
-                stim_side = 'left';
-            else
-                stim_side = 'right';
+            if ~exist('LeftProb','var')
+                LeftProb = SideSection(obj,'get_left_prob');
             end
-            dist_right = value(Prob_Dist_Right);
-            dist_left = value(Prob_Dist_Left);
-            range_percent_right = value(sigma_range_Right) * 100;
-            range_percent_left = value(sigma_range_Left) * 100;
-            dist_mean_right  = value(mean_Right);
-            dist_mean_left  = value(mean_Left);
-            dist_sigma_left = dist_sigma_left_multiplier * (value(boundary) - stim_min_log);
-            dist_sigma_right = dist_sigma_right_multiplier * (stim_max_log - value(boundary));
-            exp_decay_left = value(sigma_Left);
-            exp_decay_right = value(sigma_Right);
-        end
 
-        if ~exist('LeftProb','var')
-            LeftProb = SideSection(obj,'get_left_prob');
-        end
+            % Generate a single sample, explicitly chosen side 'left'
+            [stim_i_log,~,~] = CreateSamples_from_Distribution(...
+                'Mode', 'generate_single_sample', ...
+                'chosen_side', stim_side, ... % Force pick from chosen side
+                'left_edge_value', stim_min_log,...
+                'boundary_value', value(boundary),...
+                'right_edge_value', stim_max_log,...
+                'left_probability', LeftProb, ... % These still define the overall PDF, but this pick is forced chosen side
+                'right_probability', 1 - LeftProb, ...
+                'left_dist_type', dist_left, ...
+                'decay_rate_magnitude_left', exp_decay_left,...
+                'normal_mean_left', dist_mean_left,...
+                'normal_std_dev_left', dist_sigma_left,...
+                'half_normal_std_dev_left', dist_sigma_left,...
+                'range_percentage_left',range_percent_left , ...
+                'right_dist_type', dist_right, ...
+                'decay_rate_magnitude_right', exp_decay_right,...
+                'normal_mean_right', dist_mean_right,...
+                'normal_std_dev_right', dist_sigma_right,...
+                'half_normal_std_dev_right', dist_sigma_right,...
+                'range_percentage_right',range_percent_right, ...
+                'P_central_region', value(P_centre_region), 'central_region_width', value(centre_region_width) ...
+                );
 
-       % Generate a single sample, explicitly chosen side 'left'
-       [stim_i_log,~,~] = CreateSamples_from_Distribution(...
-           'Mode', 'generate_single_sample', ...
-           'chosen_side', stim_side, ... % Force pick from chosen side
-           'left_edge_value', stim_min_log,...
-           'boundary_value', value(boundary),...
-           'right_edge_value', stim_max_log,...
-           'left_probability', LeftProb, ... % These still define the overall PDF, but this pick is forced chosen side
-           'right_probability', 1 - LeftProb, ...
-           'left_dist_type', dist_left, ...
-           'decay_rate_magnitude_left', exp_decay_left,...
-           'normal_mean_left', dist_mean_left,...
-           'normal_std_dev_left', dist_sigma_left,...
-           'half_normal_std_dev_left', dist_sigma_left,...
-           'range_percentage_left',range_percent_left , ...
-           'right_dist_type', dist_right, ...
-           'decay_rate_magnitude_right', exp_decay_right,...
-           'normal_mean_right', dist_mean_right,...
-           'normal_std_dev_right', dist_sigma_right,...
-           'half_normal_std_dev_right', dist_sigma_right,...
-           'range_percentage_right',range_percent_right, ...
-           'P_central_region', value(P_centre_region), 'central_region_width', value(centre_region_width) ...
-           );
+        else % its a Fixed Stimuli
+
+            stim_i_log = log(value(FixedStim));
+
+        end
 
         thisstim.value=exp(stim_i_log);
         thisstimlog(n_done_trials+1) = stim_i_log;
@@ -696,15 +711,19 @@ switch action
         if frequency_categorization == 1
             make_visible(maxF1);make_visible(minF1);make_visible(A1_freq);make_visible(volumeF1);
             make_invisible(maxS1);make_invisible(minS1);make_invisible(A1_sigma);
-            make_invisible(fcut);make_invisible(lfreq);make_invisible(hfreq); make_invisible(filter_type);           
+            make_invisible(fcut);make_invisible(lfreq);make_invisible(hfreq); make_invisible(filter_type);
+            FixedStim.value = (value(maxF1) + value(minF1))/2;
         else
             make_visible(maxS1);make_visible(minS1);make_visible(A1_sigma);
             make_visible(fcut);make_visible(lfreq);make_visible(hfreq); make_visible(filter_type);
-            make_invisible(maxF1);make_invisible(minF1);make_invisible(A1_freq); make_invisible(volumeF1);          
+            make_invisible(maxF1);make_invisible(minF1);make_invisible(A1_freq); make_invisible(volumeF1);
+            FixedStim.value = (value(maxS1) + value(minS1))/2;
         end
 
-        StimulusSection(obj,'Cal_Boundary'); % update the boundary
-        StimulusSection(obj,'plot_stim_distribution');
+        if strcmpi(Stimuli_State,'Full')
+            StimulusSection(obj,'Cal_Boundary'); % update the boundary
+            StimulusSection(obj,'plot_stim_distribution');
+        end
 
     %% Case get_stimuli
     % case 'get_stimuli'
@@ -714,46 +733,56 @@ switch action
 
     case 'Distribution_Switch'
 
-        switch value(Category_Dist)
+        if strcmpi(Stimuli_State,'Full')
+            
+            switch value(Category_Dist)
 
-            case 'Uniform'
-                Prob_Dist_Right.value = 'Uniform';
-                make_invisible(sigma_Right);
-                Prob_Dist_Left.value = 'Uniform';
-                make_invisible(sigma_Left);
-
-            case 'Hard A'
-                if strcmp(Rule,'S1>S_boundary Right')
+                case 'Uniform'
                     Prob_Dist_Right.value = 'Uniform';
                     make_invisible(sigma_Right);
-                    Prob_Dist_Left.value = 'Exponential';
-                    sigma_Left.value = 2.153;
-                    make_visible(sigma_Left);
-                else
-                    Prob_Dist_Right.value = 'Exponential';
-                    sigma_Right.value = 2.153;
-                    make_visible(sigma_Right);
                     Prob_Dist_Left.value = 'Uniform';
                     make_invisible(sigma_Left);
-                end
 
-            case 'Hard B'
-                if strcmp(Rule,'S1>S_boundary Right')
-                    Prob_Dist_Left.value = 'Uniform';
-                    make_invisible(sigma_Left);
-                    Prob_Dist_Right.value = 'Exponential';
-                    make_visible(sigma_Right);
-                    sigma_Right.value = 2.153;
-                else
-                    Prob_Dist_Left.value = 'Exponential';
-                    make_visible(sigma_Left);
-                    sigma_Left.value = 2.153;
-                    Prob_Dist_Right.value = 'Uniform';
-                    make_invisible(sigma_Right);
-                end
+                case 'Hard A'
+                    if strcmp(Rule,'S1>S_boundary Right')
+                        Prob_Dist_Right.value = 'Uniform';
+                        make_invisible(sigma_Right);
+                        Prob_Dist_Left.value = 'Exponential';
+                        sigma_Left.value = 2.153;
+                        make_visible(sigma_Left);
+                    else
+                        Prob_Dist_Right.value = 'Exponential';
+                        sigma_Right.value = 2.153;
+                        make_visible(sigma_Right);
+                        Prob_Dist_Left.value = 'Uniform';
+                        make_invisible(sigma_Left);
+                    end
+
+                case 'Hard B'
+                    if strcmp(Rule,'S1>S_boundary Right')
+                        Prob_Dist_Left.value = 'Uniform';
+                        make_invisible(sigma_Left);
+                        Prob_Dist_Right.value = 'Exponential';
+                        make_visible(sigma_Right);
+                        sigma_Right.value = 2.153;
+                    else
+                        Prob_Dist_Left.value = 'Exponential';
+                        make_visible(sigma_Left);
+                        sigma_Left.value = 2.153;
+                        Prob_Dist_Right.value = 'Uniform';
+                        make_invisible(sigma_Right);
+                    end
+            end
+
+            % Checking if the distribution changed from previous value and then
+            % only run the following script
+            category_dist_history = get_history(Category_Dist);
+            if n_done_trials == 0 || strcmpi(category_dist_history{n_done_trials},value(Category_Dist)) ~= 1
+                StimulusSection(obj,'plot_stim_distribution');
+                PsychometricSection(obj,'StimSection_Distribution_Switch');
+            end
+
         end
-        StimulusSection(obj,'plot_stim_distribution');
-        PsychometricSection(obj,'StimSection_Distribution_Switch');
 
     case 'Pushbutton_SwitchDistribution'
         dist = varargin{1};
@@ -777,20 +806,52 @@ switch action
             'fullname', ['^' mfilename]);
 
     case 'update_stimulus_history'
+        
         ps  = value(stimulus_history);
         ps1 = value(stimulus_distribution_history);
         ps2 = value(stimulus_right_distribution_history);
         ps3 = value(stimulus_left_distribution_history);
         
-        ps(n_done_trials)=value(thisstimlog(n_done_trials));
-        ps1{n_done_trials}=value(Category_Dist);
-        ps2{n_done_trials}=value(Prob_Dist_Right);
-        ps3{n_done_trials}=value(Prob_Dist_Left);
+        if strcmpi(Stimuli_State,'Full') % values when using full distribution
+            ps(n_done_trials)=value(thisstimlog(n_done_trials));
+            ps1{n_done_trials}=value(Category_Dist);
+            ps2{n_done_trials}=value(Prob_Dist_Right);
+            ps3{n_done_trials}=value(Prob_Dist_Left);
         
+        elseif strcmpi(Stimuli_State,'Fixed Stimuli')
+            ps(n_done_trials)=value(thisstimlog(n_done_trials));
+            ps1{n_done_trials}='Fixed Stimuli';
+            ps2{n_done_trials}='Fixed Stimuli';
+            ps3{n_done_trials}='Fixed Stimuli';
+        end
+
         stimulus_history.value=ps;
         stimulus_distribution_history.value = ps1;
         stimulus_right_distribution_history.value = ps2;
         stimulus_left_distribution_history.value = ps3;
+
+    case 'Stimuli_State_change'
+        make_invisible(FixedStim);
+        if strcmpi(Stimuli_State,'Full')
+            make_visible(plot_h);
+            enable(Rule); enable(P_centre_region); enable(centre_region_width); enable(Prob_Dist_Left); enable(Prob_Dist_Right);
+            enable(sigma_Left); enable(sigma_range_Left); enable(sigma_Right); enable(sigma_range_Right); enable(Category_Dist); enable(plot_stim_dist);
+        else
+            make_invisible(plot_h);
+            disable(Rule); disable(P_centre_region); disable(centre_region_width); disable(Prob_Dist_Left); disable(Prob_Dist_Right);
+            disable(sigma_Left); disable(sigma_range_Left); disable(sigma_Right); disable(sigma_range_Right); disable(Category_Dist); disable(plot_stim_dist);
+        end
+
+        if strcmpi(Stimuli_State,'Fixed Stimuli') 
+            make_visible(FixedStim);
+
+            if frequency_categorization == 1
+                FixedStim.value = (value(maxF1) + value(minF1))/2;
+            else
+                FixedStim.value = (value(maxS1) + value(minS1))/2;
+            end
+            
+        end
 
     %% Case hide
     case 'hide'

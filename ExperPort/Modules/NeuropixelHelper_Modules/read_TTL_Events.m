@@ -17,7 +17,7 @@ clear; clc; close all;
 % ttl_folder_path = ['C:\Ephys_Experiment_Data\sound_cat_rat\rawdata\sub-002_id-LP12_expmtr-lida\ses-01_date-20250707T151043_dtype-ephys\ephys\2025-07-07_15-11-36\Record Node 101\experiment1\recording2...' ...
     % '\events\Neuropix-PXI-100.ProbeA\TTL'];
 
-    ttl_folder_path = ['C:\Ephys_Experiment_Data\sound_cat_rat\rawdata\sub-003_id-LP12_expmtr-lida\ses-20_date-20250812T124748_dtype-ephys\ephys\2025-08-12_12-58-23\Record Node 101\experiment1\recording1\events\Neuropix-PXI-100.ProbeA-LFP\TTL'];
+    ttl_folder_path = ['C:\Ephys_Experiment_Data\sound_cat_rat\rawdata\sub-007_id-AR05_expmtr-arpit\ses-18_date-20260316T122816_dtype-ephys\ephys\2026-03-16_12-33-19\Record Node 101\experiment1\recording1\events\Neuropix-PXI-100.ProbeA\TTL'];
 % 2. Define which TTL channel you want to analyze.
 %    (e.g., channel 1, 2, 3, etc.)
 channel_to_analyze = 1;

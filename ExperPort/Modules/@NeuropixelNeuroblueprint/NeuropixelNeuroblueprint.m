@@ -20,18 +20,14 @@ function [obj, varargout] = NeuropixelNeuroblueprint(varargin)
 % USAGE:
 %   gui_obj = NeuropixelNeuroblueprintGUI();
 %
-
 %% Boilerplate for class definition and action handling
 obj = class(struct, mfilename);
 varargout = {};
-
-
 % Display usage help when function is called directly
 if nargin==0 || (nargin==1 && ischar(varargin{1}) && strcmp(varargin{1}, 'empty')) 
    display_usage_help(); 
    return;
 end
-
 if isa(varargin{1}, mfilename)
     if length(varargin) < 2 || ~ischar(varargin{2})
         error(['If called with a "%s" object as first arg, a second arg, a ' ...
@@ -44,13 +40,10 @@ else
     action = varargin{1}; 
     varargin = varargin(2:end);
 end
-
 if ~ischar(action)
     error('The action parameter must be a string'); 
 end
-
 GetSoloFunctionArgs(obj);
-
 %% Main Action Router
 switch action
     % =========================================================================
@@ -71,14 +64,13 @@ switch action
         SoloParamHandle(obj, 'behavState', 'value', 'Run');
         SoloParamHandle(obj, 'ephysState', 'value', 'Run');
         SoloParamHandle(obj, 'is_running', 'value', 0);
-        SoloParamHandle(obj, 'recording_software', 'value', 'OpenEphys'); % 'OpenEphys' or 'SpikeGLX'
+        SoloParamHandle(obj, 'recording_software', 'value', 'SpikeGLX'); % 'OpenEphys' or 'SpikeGLX'
         SoloParamHandle(obj, 'recording_controller', 'value', []); % Will hold OE or SpikeGLX controller
         SoloParamHandle(obj, 'behav_obj', 'value', []);
         SoloParamHandle(obj, 'blinking_timer', 'value', []);
         SoloParamHandle(obj, 'current_params', 'value', []);
         SoloParamHandle(obj, 'session_base_path', 'value', '');
-        SoloParamHandle(obj, 'probe_settings', 'value', struct('version', '2.0', 'reference', 'Tip', 'bank', 0, 'imro_path', ''));
-        SoloParamHandle(obj, 'probe_gui_handles', 'value', []);
+        SoloParamHandle(obj, 'session_info_list', 'value', []); % Holds parsed info from folders
         
         % Create stopping timer for behavior
         scr = timer;
@@ -94,7 +86,6 @@ switch action
                         'Position', [0.1, 0.1, 0.7, 0.85],...
                         'Color', [0.94, 0.94, 0.94], ...
                         'CloseRequestFcn', {@(h,e) feval(mfilename, obj, 'close')});
-
         % --- UI Creation ---
         handles = struct();
         
@@ -105,73 +96,62 @@ switch action
         % Panel 0: Recording Software Selection
         p0 = uipanel('Title', '0. Recording Software', 'FontSize', 12, 'FontWeight', 'bold', 'BorderType', 'etchedin', 'BorderWidth', 1, 'Units', 'normalized', 'Position', [0.02, 0.88, 0.6, 0.09]);
         handles.software_group = uibuttongroup(p0, 'Title', '', 'BorderType', 'none', 'Units', 'normalized', 'Position', [0.05, 0.1, 0.9, 0.8], 'SelectionChangedFcn', {@(h,e) feval(mfilename, obj, 'recording_software_callback')});
-        uicontrol(handles.software_group, 'Style', 'radiobutton', 'String', 'Open Ephys', 'Units', 'normalized', 'Position', [0.1, 0.3, 0.4, 0.4], 'Tag', 'OpenEphys', 'FontSize', 10);
-        uicontrol(handles.software_group, 'Style', 'radiobutton', 'String', 'SpikeGLX', 'Units', 'normalized', 'Position', [0.5, 0.3, 0.4, 0.4], 'Tag', 'SpikeGLX', 'FontSize', 10);
-
+        uicontrol(handles.software_group, 'Style', 'radiobutton', 'String', 'SpikeGLX', 'Units', 'normalized', 'Position', [0.1, 0.3, 0.4, 0.4], 'Tag', 'SpikeGLX', 'FontSize', 10);
+        uicontrol(handles.software_group, 'Style', 'radiobutton', 'String', 'Open Ephys', 'Units', 'normalized', 'Position', [0.5, 0.3, 0.4, 0.4], 'Tag', 'OpenEphys', 'FontSize', 10);
+        
         % Panel 1: Behavior
-       p1 = uipanel('Title', '1. Behavior', 'FontSize', 12, 'FontWeight', 'bold', 'BorderType', 'etchedin', 'BorderWidth', 1, 'Units', 'normalized', 'Position', [0.02, 0.74, 0.6, 0.13]);
+        p1 = uipanel('Title', '1. Behavior', 'FontSize', 12, 'FontWeight', 'bold', 'BorderType', 'etchedin', 'BorderWidth', 1, 'Units', 'normalized', 'Position', [0.02, 0.74, 0.6, 0.13]);
         uicontrol(p1, 'Style', 'text', 'String', 'Protocol Name:', 'Units', 'normalized', 'Position', [0.05, 0.7, 0.22, 0.25], 'HorizontalAlignment', 'right');
         handles.protocol_edit = uicontrol(p1, 'Style', 'edit', 'String', 'ArpitSoundCatContinuous', 'Units', 'normalized', 'Position', [0.3, 0.7, 0.45, 0.25]);
         handles.manual_test = uicontrol(p1, 'Style', 'checkbox', 'String', 'Manual Test', 'Value', 1, 'Units', 'normalized', 'Position', [0.78, 0.7, 0.2, 0.25]);
         uicontrol(p1, 'Style', 'text', 'String', 'Experimenter:', 'Units', 'normalized', 'Position', [0.02, 0.4, 0.2, 0.25], 'HorizontalAlignment', 'right');
-        handles.exp_edit = uicontrol(p1, 'Style', 'edit', 'String', 'lida', 'Units', 'normalized', 'Position', [0.23, 0.4, 0.25, 0.25], 'Callback', {@(h,e) feval(mfilename, obj, 'update_subject_id')});        
+        handles.exp_popup = uicontrol(p1, 'Style', 'popupmenu', 'String', {'-'}, 'Units', 'normalized', 'Position', [0.23, 0.4, 0.25, 0.25], 'Callback', {@(h,e) feval(mfilename, obj, 'populate_and_filter_lists', 'filter')});
         uicontrol(p1, 'Style', 'text', 'String', 'Rat Name:', 'Units', 'normalized', 'Position', [0.50, 0.4, 0.18, 0.25], 'HorizontalAlignment', 'right');
-        handles.rat_name_edit = uicontrol(p1, 'Style', 'edit', 'String', 'LP12', 'Units', 'normalized', 'Position', [0.69, 0.4, 0.30, 0.25], 'Callback', {@(h,e) feval(mfilename, obj, 'update_subject_id')});
+        handles.rat_name_popup = uicontrol(p1, 'Style', 'popupmenu', 'String', {'-'}, 'Units', 'normalized', 'Position', [0.69, 0.4, 0.30, 0.25], 'Callback', {@(h,e) feval(mfilename, obj, 'populate_and_filter_lists', 'filter')});
         uicontrol(p1, 'Style', 'text', 'String', 'Distribution:', 'Units', 'normalized', 'Position', [0.02, 0.1, 0.18, 0.25], 'HorizontalAlignment', 'right');
-        handles.distribution_popup = uicontrol(p1, 'Style', 'popupmenu', ...
-            'String', {'random', 'Uniform', 'Hard A', 'Hard B'}, ...
-            'Units', 'normalized', ...
-            'Position', [0.21, 0.1, 0.35, 0.25]);
+        handles.distribution_popup = uicontrol(p1, 'Style', 'popupmenu', 'String', {'random', 'Uniform', 'Hard A', 'Hard B'}, 'Units', 'normalized', 'Position', [0.21, 0.1, 0.35, 0.25]);
         uicontrol(p1, 'Style', 'text', 'String', 'Path:', 'Units', 'normalized', 'Position', [0.58, 0.1, 0.1, 0.25], 'HorizontalAlignment', 'right');
-        handles.behav_edit = uicontrol(p1, 'Style', 'edit', 'String', 'C:\ratter', 'Units', 'normalized', 'Position', [0.69, 0.1, 0.30, 0.25]);% 
-        
+        handles.behav_edit = uicontrol(p1, 'Style', 'edit', 'String', 'C:\ratter', 'Units', 'normalized', 'Position', [0.69, 0.1, 0.30, 0.25]);
         
         % Panel 2: NeuroBlueprint Format
         p2 = uipanel('Title', '2. NeuroBlueprint Format', 'FontSize', 12, 'FontWeight', 'bold', 'BorderType', 'etchedin', 'BorderWidth', 1, 'Units', 'normalized', 'Position', [0.02, 0.42, 0.6, 0.31]);
         uicontrol(p2, 'Style', 'text', 'String', 'Project Name:', 'Units', 'normalized', 'Position', [0.01, 0.85, 0.28, 0.1], 'HorizontalAlignment', 'right');
-        handles.proj_edit = uicontrol(p2, 'Style', 'edit', 'String', 'sound_cat_rat', 'Units', 'normalized', 'Position', [0.3, 0.85, 0.65, 0.12]);
+        handles.proj_edit = uicontrol(p2, 'Style', 'edit', 'String', 'sound_cat_rat', 'Units', 'normalized', 'Position', [0.3, 0.85, 0.65, 0.12], 'Callback', {@(h,e) feval(mfilename, obj, 'populate_and_filter_lists', 'rescan')});
         uicontrol(p2, 'Style', 'text', 'String', 'Subject ID:', 'Units', 'normalized', 'Position', [0.01, 0.7, 0.28, 0.1], 'HorizontalAlignment', 'right');
-        handles.sub_edit = uicontrol(p2, 'Style', 'edit', 'String', '000', 'Units', 'normalized', 'Position', [0.3, 0.7, 0.65, 0.12]);
+        handles.sub_popup = uicontrol(p2, 'Style', 'popupmenu', 'String', {'-'}, 'Units', 'normalized', 'Position', [0.3, 0.7, 0.3, 0.12], 'Enable', 'inactive');
+        uicontrol(p2, 'Style', 'text', 'String', 'Session ID:', 'Units', 'normalized', 'Position', [0.61, 0.7, 0.2, 0.1], 'HorizontalAlignment', 'right');
+        handles.session_popup = uicontrol(p2, 'Style', 'popupmenu', 'String', {'-'}, 'Units', 'normalized', 'Position', [0.82, 0.7, 0.15, 0.12]);
         uicontrol(p2, 'Style', 'text', 'String', 'Local Path:', 'Units', 'normalized', 'Position', [0.01, 0.55, 0.28, 0.1], 'HorizontalAlignment', 'right');
-        handles.local_edit = uicontrol(p2, 'Style', 'edit', 'String', 'C:\Ephys_Experiment_Data', 'Units', 'normalized', 'Position', [0.3, 0.55, 0.5, 0.12]);
+        handles.local_edit = uicontrol(p2, 'Style', 'edit', 'String', 'C:\Ephys_Experiment_Data', 'Units', 'normalized', 'Position', [0.3, 0.55, 0.5, 0.12], 'Callback', {@(h,e) feval(mfilename, obj, 'populate_and_filter_lists', 'rescan')});
         handles.local_browse = uicontrol(p2, 'Style', 'pushbutton', 'String', 'Browse...', 'Units', 'normalized', 'Position', [0.81, 0.55, 0.16, 0.13], 'Callback', {@(h,e) feval(mfilename, obj, 'browse_path', 'local')});
         uicontrol(p2, 'Style', 'text', 'String', 'Central Path:', 'Units', 'normalized', 'Position', [0.01, 0.4, 0.28, 0.1], 'HorizontalAlignment', 'right');
-        handles.central_edit = uicontrol(p2, 'Style', 'edit', 'String', 'Z:\_projects', 'Units', 'normalized', 'Position', [0.3, 0.4, 0.5, 0.12]);
+        handles.central_edit = uicontrol(p2, 'Style', 'edit', 'String', 'Z:\_projects', 'Units', 'normalized', 'Position', [0.3, 0.4, 0.5, 0.12], 'Callback', {@(h,e) feval(mfilename, obj, 'populate_and_filter_lists', 'rescan')});
         handles.central_browse = uicontrol(p2, 'Style', 'pushbutton', 'String', 'Browse...', 'Units', 'normalized', 'Position', [0.81, 0.4, 0.16, 0.13], 'Callback', {@(h,e) feval(mfilename, obj, 'browse_path', 'central')});
         uicontrol(p2, 'Style', 'text', 'String', 'Subfolders to Create:', 'Units', 'normalized', 'Position', [0.05, 0.2, 0.9, 0.1], 'HorizontalAlignment', 'left');
         handles.cb_ephys = uicontrol(p2, 'Style', 'checkbox', 'String', 'ephys', 'Value', 1, 'Units', 'normalized', 'Position', [0.05, 0.05, 0.2, 0.15]);
         handles.cb_behav = uicontrol(p2, 'Style', 'checkbox', 'String', 'behav', 'Value', 1, 'Units', 'normalized', 'Position', [0.28, 0.05, 0.2, 0.15]);
-        handles.cb_anat = uicontrol(p2, 'Style', 'checkbox', 'String', 'anat', 'Value', 1, 'Units', 'normalized', 'Position', [0.51, 0.05, 0.2, 0.15]);
+        handles.cb_anat = uicontrol(p2, 'Style', 'checkbox', 'String', 'anat', 'Value', 0, 'Units', 'normalized', 'Position', [0.51, 0.05, 0.2, 0.15]);
         handles.cb_funcimg = uicontrol(p2, 'Style', 'checkbox', 'String', 'funcimg', 'Value', 0, 'Units', 'normalized', 'Position', [0.74, 0.05, 0.25, 0.15]);
         
-        % Panel 3: Pre/Post-Experiment Sampling
-        p3 = uipanel('Title', '3. Pre/Post-Experiment Sampling', 'FontSize', 12, 'FontWeight', 'bold', 'BorderType', 'etchedin', 'BorderWidth', 1, 'Units', 'normalized', 'Position', [0.02, 0.28, 0.6, 0.12]);
-        uicontrol(p3, 'Style', 'text', 'String', 'Duration/Bank (s):', 'Units', 'normalized', 'Position', [0.01, 0.6, 0.25, 0.25], 'HorizontalAlignment', 'right');
-        handles.sample_duration = uicontrol(p3, 'Style', 'edit', 'String', '60', 'Units', 'normalized', 'Position', [0.27, 0.6, 0.1, 0.3]);
-        handles.target_display = uicontrol(p3, 'Style', 'text', 'String', 'Target: Bank 0', 'Units', 'normalized', 'Position', [0.38, 0.6, 0.3, 0.25], 'HorizontalAlignment', 'right', 'FontWeight', 'bold');
-        handles.probe_button = uicontrol(p3, 'Style', 'pushbutton', 'String', 'Probe Setting', 'Units', 'normalized', 'Position', [0.7, 0.55, 0.28, 0.4], 'FontSize', 10, 'Callback', {@(h,e) feval(mfilename, obj, 'open_probe_gui')});
-        handles.sample_button = uicontrol(p3, 'Style', 'pushbutton', 'String', 'Start Sample Recording', 'Units', 'normalized', 'Position', [0.05, 0.1, 0.9, 0.4], 'FontSize', 12, 'FontWeight', 'bold', 'BackgroundColor', [0.8, 0.7, 1], 'Callback', {@(h,e) feval(mfilename, obj, 'sample_recording_wrapper')});
-        
-        % Panel 4: Recording Settings
-        p4 = uipanel('Title', '4. Recording Settings', 'FontSize', 12, 'FontWeight', 'bold', 'BorderType', 'etchedin', 'BorderWidth', 1, 'Units', 'normalized', 'Position', [0.02, 0.15, 0.6, 0.11]);
+        % Panel 3: Recording Settings
+        p4 = uipanel('Title', '3. Recording Settings', 'FontSize', 12, 'FontWeight', 'bold', 'BorderType', 'etchedin', 'BorderWidth', 1, 'Units', 'normalized', 'Position', [0.02, 0.15, 0.6, 0.11]);
         handles.settings_panel = p4;
         
         % Open Ephys Settings (initially visible)
-        handles.oe_ip_label = uicontrol(p4, 'Style', 'text', 'String', 'GUI IP:', 'Units', 'normalized', 'Position', [0.01, 0.3, 0.15, 0.4], 'HorizontalAlignment', 'right');
-        handles.oe_ip_edit = uicontrol(p4, 'Style', 'edit', 'String', '127.0.0.1', 'Units', 'normalized', 'Position', [0.17, 0.25, 0.15, 0.5]);
-        handles.oe_proc_label = uicontrol(p4, 'Style', 'text', 'String', 'Proc ID:', 'Units', 'normalized', 'Position', [0.33, 0.3, 0.15, 0.4], 'HorizontalAlignment', 'right');
-        handles.oe_proc_edit = uicontrol(p4, 'Style', 'edit', 'String', '100', 'Units', 'normalized', 'Position', [0.49, 0.25, 0.15, 0.5]);
-        handles.oe_rec_label = uicontrol(p4, 'Style', 'text', 'String', 'Rec ID:', 'Units', 'normalized', 'Position', [0.65, 0.3, 0.15, 0.4], 'HorizontalAlignment', 'right');
-        handles.oe_rec_edit = uicontrol(p4, 'Style', 'edit', 'String', '101', 'Units', 'normalized', 'Position', [0.81, 0.25, 0.15, 0.5]);
+        handles.oe_ip_label = uicontrol(p4, 'Style', 'text', 'String', 'GUI IP:', 'Units', 'normalized', 'Position', [0.01, 0.3, 0.15, 0.4], 'HorizontalAlignment', 'right', 'Visible', 'off');
+        handles.oe_ip_edit = uicontrol(p4, 'Style', 'edit', 'String', '127.0.0.1', 'Units', 'normalized', 'Position', [0.17, 0.25, 0.15, 0.5], 'Visible', 'off');
+        handles.oe_proc_label = uicontrol(p4, 'Style', 'text', 'String', 'Proc ID:', 'Units', 'normalized', 'Position', [0.33, 0.3, 0.15, 0.4], 'HorizontalAlignment', 'right', 'Visible', 'off');
+        handles.oe_proc_edit = uicontrol(p4, 'Style', 'edit', 'String', '100', 'Units', 'normalized', 'Position', [0.49, 0.25, 0.15, 0.5], 'Visible', 'off');
+        handles.oe_rec_label = uicontrol(p4, 'Style', 'text', 'String', 'Rec ID:', 'Units', 'normalized', 'Position', [0.65, 0.3, 0.15, 0.4], 'HorizontalAlignment', 'right', 'Visible', 'off');
+        handles.oe_rec_edit = uicontrol(p4, 'Style', 'edit', 'String', '101', 'Units', 'normalized', 'Position', [0.81, 0.25, 0.15, 0.5], 'Visible', 'off');
         
         % SpikeGLX Settings (initially hidden)
-        handles.sglx_host_label = uicontrol(p4, 'Style', 'text', 'String', 'Host IP:', 'Units', 'normalized', 'Position', [0.01, 0.3, 0.15, 0.4], 'HorizontalAlignment', 'right', 'Visible', 'off');
-        handles.sglx_host_edit = uicontrol(p4, 'Style', 'edit', 'String', 'localhost', 'Units', 'normalized', 'Position', [0.17, 0.25, 0.15, 0.5], 'Visible', 'off');
-        handles.sglx_port_label = uicontrol(p4, 'Style', 'text', 'String', 'Port:', 'Units', 'normalized', 'Position', [0.33, 0.3, 0.15, 0.4], 'HorizontalAlignment', 'right', 'Visible', 'off');
-        handles.sglx_port_edit = uicontrol(p4, 'Style', 'edit', 'String', '4142', 'Units', 'normalized', 'Position', [0.49, 0.25, 0.15, 0.5], 'Visible', 'off');
-        handles.sglx_probe_label = uicontrol(p4, 'Style', 'text', 'String', 'Probe Idx:', 'Units', 'normalized', 'Position', [0.65, 0.3, 0.15, 0.4], 'HorizontalAlignment', 'right', 'Visible', 'off');
-        handles.sglx_probe_edit = uicontrol(p4, 'Style', 'edit', 'String', '0', 'Units', 'normalized', 'Position', [0.81, 0.25, 0.15, 0.5], 'Visible', 'off');
-
+        handles.sglx_host_label = uicontrol(p4, 'Style', 'text', 'String', 'Host IP:', 'Units', 'normalized', 'Position', [0.01, 0.3, 0.15, 0.4], 'HorizontalAlignment', 'right');
+        handles.sglx_host_edit = uicontrol(p4, 'Style', 'edit', 'String', 'localhost', 'Units', 'normalized', 'Position', [0.17, 0.25, 0.15, 0.5]);
+        handles.sglx_port_label = uicontrol(p4, 'Style', 'text', 'String', 'Port:', 'Units', 'normalized', 'Position', [0.33, 0.3, 0.15, 0.4], 'HorizontalAlignment', 'right');
+        handles.sglx_port_edit = uicontrol(p4, 'Style', 'edit', 'String', '4142', 'Units', 'normalized', 'Position', [0.49, 0.25, 0.15, 0.5]);
+        handles.sglx_probe_label = uicontrol(p4, 'Style', 'text', 'String', 'Probe Idx:', 'Units', 'normalized', 'Position', [0.65, 0.3, 0.15, 0.4], 'HorizontalAlignment', 'right');
+        handles.sglx_probe_edit = uicontrol(p4, 'Style', 'edit', 'String', '0', 'Units', 'normalized', 'Position', [0.81, 0.25, 0.15, 0.5]);
         % --- Control Buttons Panel ---
         p5 = uipanel('Title', 'Controls', 'FontSize', 12, 'FontWeight', 'bold', 'BorderType', 'etchedin', 'BorderWidth', 1, 'Units', 'normalized', 'Position', [0.02, 0.02, 0.6, 0.11]);
         handles.control_button = uicontrol(p5, 'Style', 'pushbutton', 'String', 'Load', 'Units', 'normalized', 'FontSize', 14, 'FontWeight', 'bold', 'Position', [0.02, 0.1, 0.3, 0.8], 'BackgroundColor', [0.2, 0.6, 0.8], 'Callback', {@(h,e) feval(mfilename, obj, 'main_control_callback')});
@@ -179,10 +159,9 @@ switch action
         handles.ephys_button = uicontrol(p5, 'Style', 'pushbutton', 'String', 'Run Ephys', 'Units', 'normalized', 'FontSize', 12, 'Position', [0.68, 0.1, 0.3, 0.8], 'BackgroundColor', [0.8, 0.6, 1], 'Callback', {@(h,e) feval(mfilename, obj, 'ephys_control_callback')});
         
         SoloParamHandle(obj, 'ui_handles', 'value', handles);
-        
-        feval(mfilename, obj, 'update_subject_id');
+        feval(mfilename, obj, 'recording_software_callback'); 
+        feval(mfilename, obj, 'populate_and_filter_lists', 'rescan');
         log_message(handles, 'GUI initialization complete.');
-
     % =========================================================================
     %       CASE MAIN_CONTROL_CALLBACK
     % =========================================================================
@@ -193,7 +172,6 @@ switch action
             case 'Stop', feval(mfilename, obj, 'stop_sequence');
             case 'PostExperiment', feval(mfilename, obj, 'reset_to_load_state');
         end
-
     % =========================================================================
     %       CASE RECORDING_SOFTWARE_CALLBACK
     % =========================================================================
@@ -221,18 +199,45 @@ switch action
         handles = value(ui_handles);
         log_message(handles, '--- LOAD sequence initiated ---');
         set(handles.control_button, 'Enable', 'off', 'String', 'Loading...');
-        set(handles.sample_button, 'Enable', 'off');
         
         try
             software = value(recording_software);
             params = get_all_parameters(handles,software);
+
+            % --- ADDED: Confirmation for overwriting existing session data ---
+            if ~strcmp(params.session_id, 'New')
+                % Construct path to check for existing data
+                subject_name_part = sprintf('sub-%s_id-%s_expmtr-%s', params.subject_id, params.rat_name, params.experimenter);
+                session_name_part = sprintf('ses-%s', params.session_id); % Assumes session_id is formatted '01', '02' etc.
+                base_path_part = fullfile(params.project_name, 'rawdata', subject_name_part, session_name_part);
+                
+                local_behav_path = fullfile(params.local_path, base_path_part, 'behav');
+                local_ephys_path = fullfile(params.local_path, base_path_part, 'ephys');
+                central_behav_path = fullfile(params.central_path, base_path_part, 'behav');
+                central_ephys_path = fullfile(params.central_path, base_path_part, 'ephys');
+                
+                data_exists = does_dir_have_data(local_behav_path) || does_dir_have_data(local_ephys_path) || ...
+                              does_dir_have_data(central_behav_path) || does_dir_have_data(central_ephys_path);
+                
+                if data_exists
+                    question = sprintf('Session %s for this subject already contains data. Continuing may result in data being overwritten. Are you sure you want to proceed?', params.session_id);
+                    answer = questdlg(question, 'Confirm Overwrite', 'Yes', 'No', 'No');
+                    if strcmp(answer, 'No')
+                        log_message(handles, 'Load sequence aborted by user to prevent overwriting data.');
+                        feval(mfilename, obj, 'reset_to_load_state');
+                        return; % Abort the load sequence
+                    end
+                end
+            end
+            % --- END ADDED SECTION ---
+
             if ~validate_all_inputs(params,handles,software)
                 feval(mfilename, obj, 'reset_to_load_state');
                 return; 
             end
             current_params.value = params;
             
-            [session_path, recording_save_path] = construct_session_paths(handles, params);
+            [session_path, ~] = construct_session_paths(handles, params);
             if isempty(session_path) || ~create_session_directories(handles, params, session_path)
                 feval(mfilename, obj, 'reset_to_load_state');
                 return;
@@ -247,18 +252,63 @@ switch action
             feval(mfilename, obj, 'reset_to_load_state');
             rethrow(ME);
         end
-
     case 'run_sequence'
         handles = value(ui_handles);
         params = value(current_params);
+        software = value(recording_software);
+        % Overwrite only the ephys connection fields with current GUI values
+        if strcmp(software, 'OpenEphys')
+            params.oe_gui_ip      = get(handles.oe_ip_edit,   'String');
+            params.oe_proc_node_id = get(handles.oe_proc_edit, 'String');
+            params.oe_rec_node_id  = get(handles.oe_rec_edit,  'String');
+        else
+            params.sglx_host_ip    = get(handles.sglx_host_edit,  'String');
+            params.sglx_port       = str2double(get(handles.sglx_port_edit, 'String'));
+            params.sglx_probe_index = str2double(get(handles.sglx_probe_edit, 'String'));
+        end
+        current_params.value = params; % save back so stop_sequence sees the same values
+
+        % --- ADDED: Pre-run checklist dialog ---
+        software = value(recording_software);
+        if strcmp(software, 'OpenEphys')
+            title = 'Open Ephys Pre-Run Checklist';
+            message = {
+                'Before continuing, please ensure the following in Open Ephys:', ...
+                '', ...
+                '1. Refresh the Neuropixel PXI module to ensure probes are detected.', ...
+                '2. Set the probe geometry (Bank, Reference, or IMRO) manually in the OE GUI.', ...
+                '3. Configure the sync slot and SMA settings manually in the OE GUI.', ...
+                '', ...
+                'NOTE: The file save directory will be set and verified automatically.' ...
+                };
+        else % SpikeGLX
+            title = 'SpikeGLX Pre-Run Checklist';
+            message = {
+                'Before continuing, please ensure the following in SpikeGLX:', ...
+                '', ...
+                '1. Press ''Detect'' to find the connected probes.', ...
+                '2. In Sync settings, set ''Square Wave Source'' to ''Disable sync waveform''.', ...
+                '3. Set the inputs for the ''imec PXI SMA slot''.', ...
+                '4. Select the correct IMRO file for the animal within SpikeGLX.',...
+                '', ...
+                'NOTE: The run name and directory will be set automatically by this program.'...
+            };
+        end
+        
+        answer = questdlg(message, title, 'Continue', 'Cancel', 'Continue');
+        
+        if ~strcmp(answer, 'Continue')
+            log_message(handles, 'Run sequence cancelled by user at pre-run checklist.');
+            return; % Abort the run sequence
+        end
+        % --- END ADDED SECTION ---
+
         log_message(handles, '--- RUN sequence initiated ---');
-        set(handles.sample_button, 'Enable', 'off');
         
         try
             if get(handles.cb_ephys, 'Value')
                  % Initialize the selected recording system
-                 recording_save_path = fullfile(params.local_path, value(session_base_path), 'ephys');
-                 feval(mfilename, obj, 'initialize_recording_system', params, recording_save_path);
+                 feval(mfilename, obj, 'initialize_recording_system', params);
                  if isempty(value(recording_controller))
                      feval(mfilename, obj, 'reset_to_load_state');
                      return;
@@ -277,11 +327,20 @@ switch action
             log_message(handles, '--- RUN sequence complete. Experiment is live. ---');
         
         catch ME
-            log_message(handles, sprintf('ERROR during run sequence: %s', ME.message));
             feval(mfilename, obj, 'stop_blinking');
-            rethrow(ME);
+            if strcmp(ME.identifier, 'SGLX:userAbort')
+                log_message(handles, sprintf(['Ephys start aborted: %s. ' ...
+                    'Behavior is still loaded. Fix the issue in SpikeGLX ' ...
+                    'and press Run again.'], ME.message));
+                set(handles.control_button, 'Enable', 'on', 'String', 'Run', ...
+                    'BackgroundColor', [0.4, 0.8, 0.4]);
+            else
+                log_message(handles, sprintf('ERROR during run sequence: %s', ME.message));
+                feval(mfilename, obj, 'reset_to_load_state');
+                rethrow(ME);
+            end
         end
-
+        
     case 'stop_sequence'
         handles = value(ui_handles);
         params = value(current_params);
@@ -296,64 +355,107 @@ switch action
                 feval(mfilename, obj, 'stop_electrophysiology_recording');
             end
             
-            log_message(handles, '--- Experiment finished. Post-session sampling available. ---');
+            log_message(handles, '--- Experiment finished. Data saved successfully. ---');
             currentState.value = 'PostExperiment';
             set(handles.control_button, 'String', 'Start New Experiment', 'BackgroundColor', [0.2, 0.8, 0.6]);
-            set(handles.sample_button, 'Enable', 'on');
         
         catch ME
             log_message(handles, sprintf('ERROR during stop sequence: %s', ME.message));
             rethrow(ME);
         end
-
     % =========================================================================
     %       SYSTEM INITIALIZATION & CONTROL
     % =========================================================================
+    
     case 'initialize_recording_system'
         params = varargin{1};
-        save_path = varargin{2};
         software = value(recording_software);
         handles = value(ui_handles);
-        
+
         try
             if strcmp(software, 'OpenEphys')
                 log_message(handles, 'Initializing Open Ephys controller...');
                 controller = OpenEphysHTTPServer(params.oe_gui_ip, 37497);
                 if isempty(controller), error('Failed to create Open Ephys controller'); end
+                recording_controller.value = controller;
+                log_message(handles, 'Open Ephys controller initialized successfully.');
+
+                % Query and log actual Record Node IDs so user can verify GUI settings
+                try
+                    rec_info = controller.getRecordingInfo();
+                    if isfield(rec_info, 'record_nodes') && ~isempty(rec_info.record_nodes)
+                        found_ids = [rec_info.record_nodes.node_id];
+                        for i = 1:numel(rec_info.record_nodes)
+                            log_message(handles, sprintf('Found Record Node ID: %d | Current save path: %s', ...
+                                rec_info.record_nodes(i).node_id, ...
+                                rec_info.record_nodes(i).parent_directory));
+                        end
+                        if ~ismember(str2double(params.oe_rec_node_id), found_ids)
+                            auto_id = found_ids(1); % Use first found node if entered ID is wrong
+                            log_message(handles, sprintf(['WARNING: Rec ID "%s" not found in signal chain. ' ...
+                                'Auto-correcting to %d and updating GUI.'], params.oe_rec_node_id, auto_id));
+                            params.oe_rec_node_id = num2str(auto_id);
+                            current_params.value = params; % Push corrected ID back so set_recording_path sees it
+                            set(handles.oe_rec_edit, 'String', num2str(auto_id)); % Update GUI field
+                        end
+                    else
+                        log_message(handles, 'WARNING: No Record Nodes found in OE signal chain. Data will NOT be saved.');
+                    end
+                catch ME_query
+                    log_message(handles, sprintf('WARNING: Could not query OE Record Nodes: %s', ME_query.message));
+                end
+
             else % SpikeGLX
                 log_message(handles, 'Initializing SpikeGLX controller...');
                 controller = SpikeGL(params.sglx_host_ip, params.sglx_port);
-                % if ~controller.IsConnected(), error('Failed to connect to SpikeGLX'); end
+                recording_controller.value = controller;
+                log_message(handles, 'SpikeGLX controller initialized successfully.');
             end
-            recording_controller.value = controller;
-            log_message(handles, sprintf('%s controller initialized successfully.', software));
-            
-            % Set initial recording path
-            feval(mfilename, obj, 'set_recording_path', save_path);
-            
+
         catch ME
             log_message(handles, sprintf('Failed to initialize %s: %s', software, ME.message));
             recording_controller.value = [];
             rethrow(ME);
         end
-    
+
     case 'set_recording_path'
         save_path = varargin{1};
         software = value(recording_software);
         controller = value(recording_controller);
         params = value(current_params);
         handles = value(ui_handles);
-
         if isempty(controller), return; end
-        
+
         try
             if strcmp(software, 'OpenEphys')
+                % setRecordPath internally uses node-specific /api/recording/<nodeId>
                 controller.setRecordPath(params.oe_rec_node_id, save_path);
+
+                % Verify using SDK method
+                pause(0.5);
+                rec_info = controller.getRecordingInfo();
+                actual_path = '';
+                if isfield(rec_info, 'record_nodes')
+                    for i = 1:numel(rec_info.record_nodes)
+                        if rec_info.record_nodes(i).node_id == str2double(params.oe_rec_node_id)
+                            actual_path = rec_info.record_nodes(i).parent_directory;
+                        end
+                    end
+                end
+                if strcmp(actual_path, save_path)
+                    log_message(handles, sprintf('OE recording path confirmed: %s', save_path));
+                else
+                    error(['OE path mismatch after set attempt. Requested: %s | Got: "%s". ' ...
+                        'Recording path was NOT applied — aborting to prevent data loss.'], ...
+                        save_path, actual_path);
+                end
+
             else % SpikeGLX
-                controller = SetDataDir( controller, 0, save_path);
+                controller = SetDataDir(controller, 0, save_path);
                 recording_controller.value = controller;
+                log_message(handles, sprintf('SpikeGLX recording path set to: %s', save_path));
             end
-            log_message(handles, sprintf('Recording path set to: %s', save_path));
+
         catch ME
             log_message(handles, sprintf('Failed to set recording path: %s', ME.message));
             rethrow(ME);
@@ -364,45 +466,114 @@ switch action
         software = value(recording_software);
         controller = value(recording_controller);
         handles = value(ui_handles);
-
         if isempty(controller), error('Recording controller not initialized'); end
-        
+
         try
-            probe_settings_struct = value(probe_settings);
-            feval(mfilename, obj, 'apply_probe_configuration', probe_settings_struct);
-            
+            % Set and verify recording path before starting
             main_ephys_path = fullfile(params.local_path, value(session_base_path), 'ephys');
             feval(mfilename, obj, 'set_recording_path', main_ephys_path);
-            
+
             if strcmp(software, 'OpenEphys')
-                log_message(handles, 'Starting Open Ephys acquisition and recording...');
-                controller.acquire(); pause(1);
+                log_message(handles, 'Starting Open Ephys acquisition...');
+                controller.acquire();
+                pause(2); % Allow acquisition to stabilise before recording
+                log_message(handles, 'Starting Open Ephys recording...');
                 controller.record();
+
             else % SpikeGLX
                 log_message(handles, 'Starting SpikeGLX recording...');
                 run_name = sprintf('experiment_%s', datestr(now, 'yyyymmdd_HHMMSS'));
-                boolval = IsInitialized( controller);
+                boolval = IsInitialized(controller);
                 if boolval
-                    spikeglx_params = GetParams( controller );
-                    controller = SetRunName(controller,run_name); % setting run name
-                    controller = StartRun(controller); % starting acquisition
-                    pause(2);
-                    
-                    runningval = false;
-                    while  ~runningval % waiting for acquisition to start
-                        runningval = IsRunning( controller );
-                        if runningval
-                            controller = SetRecordingEnable( controller, 1 ); % Start Recording
+                    automated_ok = false;
+                    try
+                        controller = SetRunName(controller, run_name);
+                        log_message(handles, sprintf('SpikeGLX run name set to: %s', run_name));
+                        controller = StartRun(controller);
+                        pause(2);
+                        runningval = false;
+                        while ~runningval
+                            runningval = IsRunning(controller);
+                            if runningval
+                                controller = SetRecordingEnable(controller, 1);
+                            end
                         end
+                        automated_ok = true;
+                    catch ME_sglx
+                        log_message(handles, sprintf(['SpikeGLX automated start failed: %s. ' ...
+                            'Falling back to manual mode.'], ME_sglx.message));
                     end
+
+                    if ~automated_ok
+                        expected_save_dir = fullfile(params.local_path, value(session_base_path), 'ephys');
+                        manual_msg = {
+                            'SpikeGLX could not be controlled automatically.', ...
+                            '', ...
+                            'Please do the following manually in SpikeGLX:', ...
+                            '  1. Press the RUN button to start acquisition.', ...
+                            '  2. Ensure recording (saving) is enabled.', ...
+                            '  3. Confirm the save directory is set to:', ...
+                            sprintf('     %s', expected_save_dir), ...
+                            '', ...
+                            'Press OK once acquisition and recording are live.'
+                            };
+                        answer = questdlg(manual_msg, 'Manual SpikeGLX Start Required', ...
+                            'OK - Recording is live', 'Abort', 'OK - Recording is live');
+
+                        if ~strcmp(answer, 'OK - Recording is live')
+                            error('SGLX:userAbort', 'SpikeGLX manual start aborted by user.');
+                        end
+
+                        log_message(handles, 'Verifying SpikeGLX state after manual start...');
+                        pause(1);
+                        if ~IsRunning(controller)
+                            error('SGLX:userAbort', ['SpikeGLX does not appear to be running. ' ...
+                                'Please check SpikeGLX and press Run again.']);
+                        end
+                        if ~IsSaving(controller)
+                            log_message(handles, ['WARNING: SpikeGLX is running but recording ' ...
+                                '(saving) does not appear to be enabled. ' ...
+                                'Data may not be saved — check SpikeGLX.']);
+                        end
+
+                        try
+                            actual_dir = GetDataDir(controller, 0);
+                            if strcmp(normalize_path(strtrim(actual_dir)), normalize_path(strtrim(expected_save_dir)))
+                                log_message(handles, sprintf('SpikeGLX save directory confirmed: %s', actual_dir));
+                            else
+                                log_message(handles, sprintf(['WARNING: SpikeGLX save directory mismatch. ' ...
+                                    'Expected: %s | Got: %s'], normalize_path(expected_save_dir), normalize_path(actual_dir)));
+                                dir_answer = questdlg( ...
+                                    sprintf('Save directory mismatch!\n\nExpected:\n%s\n\nActual:\n%s\n\nFix the path in SpikeGLX and press Run again, or continue anyway.', ...
+                                    normalize_path(expected_save_dir), normalize_path(actual_dir)), ...
+                                    'Save Directory Mismatch', ...
+                                    'Continue Anyway', 'Abort', 'Abort');
+                                if ~strcmp(dir_answer, 'Continue Anyway')
+                                    error('SGLX:userAbort', ...
+                                        'Aborted due to SpikeGLX save directory mismatch.');
+                                end
+                            end
+                        catch ME_dir
+                            if strcmp(ME_dir.identifier, 'SGLX:userAbort')
+                                rethrow(ME_dir);
+                            end
+                            log_message(handles, sprintf(['Could not verify SpikeGLX save directory: %s. ' ...
+                                'Proceeding with caution.'], ME_dir.message));
+                        end
+
+                        log_message(handles, 'Manual SpikeGLX start confirmed. Continuing...');
+                    end
+
                     recording_controller.value = controller;
+                else
+                    error('SpikeGLX is not initialized. Cannot start recording.');
                 end
             end
-            
+
             log_message(handles, 'Electrophysiology recording is LIVE.');
             ephysState.value = 'Stop';
             set(handles.ephys_button, 'String', 'Stop Ephys', 'BackgroundColor', [1 0.6 0.6]);
-            
+
         catch ME
             log_message(handles, sprintf('Failed to start recording: %s', ME.message));
             rethrow(ME);
@@ -413,7 +584,7 @@ switch action
         controller = value(recording_controller);
         handles = value(ui_handles);
         if isempty(controller), return; end
-        
+
         try
             if strcmp(software, 'OpenEphys')
                 log_message(handles, 'Stopping Open Ephys recording...');
@@ -439,7 +610,6 @@ switch action
             log_message(handles, sprintf('Failed to stop recording: %s', ME.message));
             rethrow(ME);
         end
-
     case 'initialize_behavior_system'
         params = value(current_params);
         handles = value(ui_handles);
@@ -471,7 +641,6 @@ switch action
             errordlg(['Failed to start behavior protocol. Check logs. Error: ' ME.message], 'Behavior System Error');
             rethrow(ME);
         end
-
     case 'stop_behavioral_protocol'
         params = varargin{1};
         behav_save_dir = varargin{2};
@@ -487,17 +656,13 @@ switch action
         end
      
     case 'manual_test_stopping'
-
         handles = value(ui_handles);
         log_message(handles, 'Manual rig test complete. Cleaning up...');
         dispatcher(value(behav_obj), 'Stop');
-
         %Let's pause until we know dispatcher is done running
         set(value(stopping_complete_timer), 'TimerFcn', {@(h,e) feval(mfilename, obj, 'manual_test_stopped')});
         start(value(stopping_complete_timer));
-
     case 'manual_test_stopped'
-
         if value(stopping_process_completed) %This is provided by RunningSection
             stop(value(stopping_complete_timer)); %Stop looping.
             dispatcher('set_protocol', '');
@@ -516,7 +681,11 @@ switch action
             log_message(handles, '--- LOAD sequence complete. Ready to run. ---');
             currentState.value = 'Run';
             set(handles.control_button, 'Enable', 'on', 'String', 'Run', 'BackgroundColor', [0.4, 0.8, 0.4]);
-            set(handles.sample_button, 'Enable', 'on');
+            
+            % --- ADDED: Confirmation dialog after successful load ---
+            msgbox('Behavior settings loaded successfully. The system is now ready to run.', 'Load Complete', 'help');
+            % --- END ADDED SECTION ---
+            
         catch ME
             log_message(handles, ['FATAL ERROR loading main protocol: ' ME.message]);
             errordlg(['Failed to load main protocol. Error: ' ME.message], 'Behavior System Error');
@@ -541,11 +710,25 @@ switch action
     case 'run_ephys_individually'
         params = value(current_params);
         handles = value(ui_handles);
+        software = value(recording_software);
+
+        % Re-read ephys connection fields fresh from GUI, same as run_sequence
+        if strcmp(software, 'OpenEphys')
+            params.oe_gui_ip       = get(handles.oe_ip_edit,   'String');
+            params.oe_proc_node_id = get(handles.oe_proc_edit, 'String');
+            params.oe_rec_node_id  = get(handles.oe_rec_edit,  'String');
+        else
+            params.sglx_host_ip    = get(handles.sglx_host_edit,  'String');
+            params.sglx_port       = str2double(get(handles.sglx_port_edit, 'String'));
+            params.sglx_probe_index = str2double(get(handles.sglx_probe_edit, 'String'));
+        end
+        current_params.value = params;
+
         log_message(handles, '--- Starting Ephys Recording Individually ---');
         set(handles.ephys_button, 'Enable', 'off');
         try
             if isempty(value(recording_controller))
-                feval(mfilename, obj, 'initialize_recording_system', params, '');
+                feval(mfilename, obj, 'initialize_recording_system', params);
             end
             feval(mfilename, obj, 'start_electrophysiology_recording', params);
         catch ME
@@ -563,7 +746,6 @@ switch action
             log_message(handles, sprintf('ERROR stopping ephys: %s', ME.message));
         end
         set(handles.ephys_button, 'Enable', 'on');
-
     % =========================================================================
     %       BEHAVIOR CONTROL ACTIONS
     % =========================================================================
@@ -623,7 +805,6 @@ switch action
                    feval(protocol_name, protobj, 'set_setting_params', ratname, experimenter, sfile, char(datetime('now')), video_save_dir);
                    if ~dispatcher('is_running'), pop_history(class(protobj), 'include_non_gui', 1); feval(protocol_name, protobj, 'prepare_next_trial'); end                   
                end
-
            case 'load_run'
                 set(handles.behav_button, 'Enable', 'off');
                 log_message(handles, '--- STARTING BEHAV PROTOCOL ---');
@@ -633,7 +814,6 @@ switch action
                 feval(mfilename, obj, 'behav_control', 'run', params.protocol_name);
                 log_message(handles, '--- START COMPLETE: Behavior protocol started ---');
                 set(handles.behav_button, 'Enable', 'on');
-
            case 'run'
                 protocol_name = args{1}; protobj = eval(protocol_name);
                 log_message(handles, 'Starting video recording via protocol...');
@@ -658,7 +838,6 @@ switch action
                 dispatcher(value(behav_obj), 'Stop');
                 set(value(stopping_complete_timer), 'Period', 0.8,'TimerFcn', {@(h,e) feval(mfilename, obj, 'behav_control','end_continued',protocol_name, root_dir, behav_copy_dir)});
                 start(value(stopping_complete_timer));
-
             case 'end_continued'
                 if value(stopping_process_completed) % This is provided by RunningSection
                     protocol_name = args{1}; root_dir = args{2}; destination_path = args{3};
@@ -690,7 +869,6 @@ switch action
                     feval(mfilename, obj, 'save_log_file');
                     set(handles.behav_button, 'Enable', 'on');
                 end
-
            case 'manual_test'
                log_message(handles, 'Loading manual rig test protocol...');
                dispatcher('set_protocol', 'Rigtest_singletrial');
@@ -699,7 +877,6 @@ switch action
                is_running.value = 1;
                log_message(handles, 'Starting manual rig test. Please complete the one-trial test.');
                dispatcher(value(behav_obj), 'Run');
-
            case 'create_svn_data_dir'
                 experimenter = args{1}; ratname = args{2}; behav_dir = args{3}; dir_name = args{4};
                 dirCurrent = cd;
@@ -711,7 +888,6 @@ switch action
                 if ~isfolder(rat_path), cd(exp_path); mkdir(ratname); system(['svn add ' ratname]); end
                 cd(dirCurrent);
                 log_message(handles, ['Created SVN directory structure for ' ratname]);
-
             case 'send_empty_state_machine'
                 state_machine_server = bSettings('get', 'RIGS', 'state_machine_server');
                 server_slot = bSettings('get', 'RIGS', 'server_slot'); if isnan(server_slot), server_slot = 0; end
@@ -728,217 +904,15 @@ switch action
         % handles = feval(mfilename, obj, 'get_ui_handles');
         handles = value(ui_handles);
         if ~strcmp(value(currentState), 'Stop') || isempty(value(behav_obj)), return; end
-
         log_message(handles, '!!! CRASH DETECTED: Behavior system is not running. Attempting recovery...');
         try
             feval(mfilename, obj, 'behav_control', 'crashed');
-
         catch ME
             log_message(handles, sprintf('FATAL: Recovery attempt failed: %s', ME.message));
             getReport(ME, 'extended', 'hyperlinks', 'on');
             errordlg('Automatic recovery failed. Please stop the experiment manually.', 'Recovery Failed');
         end
-    % =========================================================================
-    %       SAMPLE EPHYS RECORDINGS   
-    % =========================================================================
-    case 'sample_recording_wrapper'
-        if strcmp(value(currentState), 'PostExperiment')
-            feval(mfilename, obj, 'sample_recording', 'post_session');
-        else
-            feval(mfilename, obj, 'sample_recording', 'pre_session');
-        end
-        
-    case 'sample_recording'
-        prefix = varargin{1};
-        handles = value(ui_handles);
-        log_message(handles, ['--- ' upper(prefix) ' SAMPLE RECORDING INITIATED ---']);
-        set([handles.sample_button, handles.control_button], 'Enable', 'off', 'String', 'Sampling...');
-        drawnow;
-        
-        try
-            software = value(recording_software);
-            params = get_all_parameters(handles,software);
-            if isempty(value(recording_controller))
-                feval(mfilename, obj, 'initialize_recording_system', params, '');
-            end
-            
-            if isempty(value(session_base_path))
-                [session_path, ~] = construct_session_paths(handles, params);
-                if isempty(session_path) || ~create_session_directories(handles, params, session_path)
-                    error('Failed to create session directories');
-                end
-                session_base_path.value = session_path;
-            end
-            
-            sample_dir_name = sprintf('%s_sample_recording', prefix);
-            sample_save_path = fullfile(params.local_path, value(session_base_path), 'ephys', sample_dir_name);
-            if ~exist(sample_save_path, 'dir'), mkdir(sample_save_path); end
-            
-            software = value(recording_software);
-            if strcmp(software, 'OpenEphys')
-                feval(mfilename, obj, 'execute_openephys_sampling', sample_save_path);
-            else
-                feval(mfilename, obj, 'execute_spikeglx_sampling', sample_save_path);
-            end
-            log_message(handles, '--- SAMPLE RECORDING COMPLETE ---');
-            
-        catch ME
-            log_message(handles, sprintf('ERROR during sample recording: %s', ME.message));
-            rethrow(ME);
-        end
-        
-        % Reset button states
-        if strcmp(value(currentState), 'PostExperiment')
-            set(handles.control_button, 'Enable', 'on', 'String', 'Start New Experiment');
-            feval(mfilename, obj, 'save_log_file');
-        else
-            set(handles.control_button, 'Enable', 'on', 'String', 'Load');
-        end
-        set(handles.sample_button, 'Enable', 'on', 'String', 'Start Sample Recording');
-        
-    case 'execute_openephys_sampling'
-        save_path = varargin{1};
-        controller = value(recording_controller);
-        params = value(current_params);
-        handles = value(ui_handles);
-        probe_settings_struct = value(probe_settings);
-        duration = str2double(get(handles.sample_duration, 'String'));
-        
-        controller.setParameters(params.oe_proc_node_id, 0, 'Reference', probe_settings_struct.reference);
-        if strcmp(probe_settings_struct.version, '1.0'), num_banks = 3; else, num_banks = 4; end
-        
-        for bank = 0:(num_banks - 1)
-            log_message(handles, sprintf('Recording OE Bank %d for %d seconds...', bank, duration));
-            controller.setParameters(params.oe_proc_node_id, 0, 'bank', bank); pause(1);
-            controller.setRecordPath(params.oe_rec_node_id, save_path); pause(1);
-            controller.acquire(duration); pause(1);
-            controller.record(duration);
-            controller.idle();
-            log_message(handles, sprintf('Finished recording Bank %d.', bank)); pause(1);
-        end
-        
-        if ~isempty(probe_settings_struct.imro_path)
-            controller.config(params.oe_proc_node_id, ['LOADIMRO ' probe_settings_struct.imro_path]);
-        else
-            controller.setParameters(params.oe_proc_node_id, 0, 'bank', probe_settings_struct.bank);
-        end
-        
-    case 'execute_spikeglx_sampling'
-        save_path = varargin{1};
-        controller = value(recording_controller);
-        handles = value(ui_handles);
-        probe_settings_struct = value(probe_settings);
-        duration = str2double(get(handles.sample_duration, 'String'));
-        
-        controller.SetDataDir(save_path);
-        if strcmp(probe_settings_struct.version, '1.0'), num_banks = 3; else, num_banks = 4; end
-        
-        for bank = 0:(num_banks - 1)
-            log_message(handles, sprintf('Recording SGLX Bank %d for %d seconds...', bank, duration));
-            % Bank selection for SpikeGLX depends on specific API calls for channel selection, not a simple 'bank' parameter
-            % This is a placeholder for more complex channel/bank setting logic.
-            % For now, we record with the currently active map.
-            
-            run_name = sprintf('sample_bank_%d_%s', bank, datestr(now, 'yyyymmdd_HHMMSS'));
-            controller.SetRunName(run_name);
-            controller.StartRun();
-            pause(duration);
-            controller.StopRun();
-            log_message(handles, sprintf('Finished recording Bank %d.', bank)); pause(1);
-        end
-        
-    % =========================================================================
-    %       PROBE GUI AND SETTINGS
-    % =========================================================================
-    case 'open_probe_gui' 
-        handles = value(ui_handles);
-        log_message(handles, 'Opening probe settings GUI...');
-        probe_fig = figure('Name', 'Neuropixel Probe Settings', 'Position', [300 300 450 300], ...
-            'MenuBar', 'none', 'ToolBar', 'none', 'NumberTitle', 'off', 'Resize', 'off');
-        p_handles = struct();
-        p_handles.version_group = uibuttongroup(probe_fig, 'Title', 'Probe Version', 'Position', [0.05 0.75 0.9 0.2]);
-        uicontrol(p_handles.version_group, 'Style', 'radiobutton', 'String', 'NP 1.0 (3 Banks)', 'Position', [10 5 150 25], 'Tag', '1.0');
-        uicontrol(p_handles.version_group, 'Style', 'radiobutton', 'String', 'NP 2.0 (4 Banks)', 'Position', [200 5 150 25], 'Tag', '2.0');
-        p_handles.ref_group = uibuttongroup(probe_fig, 'Title', 'Reference', 'Position', [0.05 0.5 0.4 0.2]);
-        uicontrol(p_handles.ref_group, 'Style', 'radiobutton', 'String', 'Tip', 'Position', [10 5 80 25], 'Tag', 'Tip');
-        uicontrol(p_handles.ref_group, 'Style', 'radiobutton', 'String', 'External', 'Position', [100 5 80 25], 'Tag', 'External');
-        p_handles.bank_panel = uipanel(probe_fig, 'Title', 'Target Bank', 'Position', [0.5 0.5 0.45 0.2]);
-        uicontrol(p_handles.bank_panel, 'Style', 'text', 'String', 'Bank:', 'Position', [10 5 40 20]);
-        p_handles.bank_edit = uicontrol(p_handles.bank_panel, 'Style', 'edit', 'String', '0', 'Position', [60 5 50 25]);
-        uicontrol(probe_fig, 'Style', 'text', 'String', 'IMRO File:', 'Position', [20 120 60 20]);
-        p_handles.imro_text = uicontrol(probe_fig, 'Style', 'text', 'String', 'None selected', 'Position', [90 120 280 20], 'HorizontalAlignment', 'left');
-        uicontrol(probe_fig, 'Style', 'pushbutton', 'String', 'Browse...', 'Position', [20 85 100 30], 'Callback', {@(h,e) feval(mfilename, obj, 'browse_imro', p_handles)});
-        uicontrol(probe_fig, 'Style', 'pushbutton', 'String', 'Clear IMRO', 'Position', [130 85 100 30], 'Callback', {@(h,e) feval(mfilename, obj, 'clear_imro', p_handles)});
-        uicontrol(probe_fig, 'Style', 'pushbutton', 'String', 'Apply & Close', 'Position', [250 25 180 30], 'FontWeight', 'bold', 'Callback', {@(h,e) feval(mfilename, obj, 'apply_probe_settings', p_handles)});
-        probe_gui_handles.value = p_handles;
-        
-    case 'browse_imro'
-        p_handles = varargin{1};
-        [file, path] = uigetfile('*.imro', 'Select IMRO File');
-        if isequal(file, 0) || isequal(path, 0), return;
-        else
-            full_path = fullfile(path, file);
-            set(p_handles.imro_text, 'String', full_path);
-            set(findobj(p_handles.bank_panel, '-property', 'Enable'), 'Enable', 'off');
-        end
     
-    case 'clear_imro'
-        p_handles = varargin{1};
-        set(p_handles.imro_text, 'String', 'None selected');
-        set(findobj(p_handles.bank_panel, '-property', 'Enable'), 'Enable', 'on');
-        
-    case 'apply_probe_settings'
-        p_handles = varargin{1};
-        handles = value(ui_handles);
-        settings.version = get(get(p_handles.version_group, 'SelectedObject'), 'Tag');
-        settings.reference = get(get(p_handles.ref_group, 'SelectedObject'), 'Tag');
-        settings.bank = str2double(get(p_handles.bank_edit, 'String'));
-        settings.imro_path = get(p_handles.imro_text, 'String');
-        if strcmp(settings.imro_path, 'None selected'), settings.imro_path = ''; end
-        probe_settings.value = settings;
-        if ~isempty(settings.imro_path)
-            set(handles.target_display, 'String', 'Target: IMRO File');
-        else
-            set(handles.target_display, 'String', ['Target: Bank ' num2str(settings.bank)]);
-        end
-        log_message(handles, 'Probe settings saved.');
-        close(p_handles.ref_group.Parent);
-        probe_gui_handles.value = [];
-        
-    case 'apply_probe_configuration'
-        probe_settings = varargin{1};
-        software = value(recording_software);
-        controller = value(recording_controller);
-        params = value(current_params);
-        handles = value(ui_handles);
-        if isempty(controller), return; end
-        
-        try
-            if strcmp(software, 'OpenEphys')
-                log_message(handles, sprintf('Setting OE reference to: %s', probe_settings.reference));
-                controller.setParameters(params.oe_proc_node_id, 0, 'Reference', probe_settings.reference);
-                if ~isempty(probe_settings.imro_path)
-                    log_message(handles, sprintf('Loading IMRO file: %s', probe_settings.imro_path));
-                    controller.config(params.oe_proc_node_id, ['LOADIMRO ' probe_settings.imro_path]);
-                else
-                    log_message(handles, sprintf('Setting bank to: %d', probe_settings.bank));
-                    controller.setParameters(params.oe_proc_node_id, 0, 'bank', probe_settings.bank);
-                end
-            else % SpikeGLX
-                % SpikeGLX probe configuration (e.g., reference, channel map) is more complex
-                % and typically handled by setting parameters or loading a meta file.
-                % This is a placeholder for those more complex API calls.
-                log_message(handles, 'Applying SpikeGLX probe settings (via meta file or API)...');
-                if ~isempty(probe_settings.imro_path)
-                    log_message(handles, 'Note: For SpikeGLX, ensure IMRO settings are loaded within the SpikeGLX GUI and save as part of the meta file.');
-                end
-            end
-            log_message(handles, 'Probe configuration applied successfully.');
-        catch ME
-            log_message(handles, sprintf('Failed to apply probe settings: %s', ME.message));
-            rethrow(ME);
-        end
-        
     % =========================================================================
     %       UTILITY & OTHER ACTIONS
     % =========================================================================
@@ -948,28 +922,135 @@ switch action
         log_message(handles, ['Opening browse dialog for ' type ' path...']);
         folder_path = uigetdir;
         if folder_path ~= 0
-            if strcmp(type, 'local'), set(handles.local_edit, 'String', folder_path);
-            elseif strcmp(type, 'central'), set(handles.central_edit, 'String', folder_path);
-            elseif strcmp(type, 'behav'), set(handles.behav_edit, 'String', folder_path);
+            if strcmp(type, 'local')
+                set(handles.local_edit, 'String', folder_path);
+                feval(mfilename, obj, 'populate_and_filter_lists', 'rescan');
+            elseif strcmp(type, 'central')
+                set(handles.central_edit, 'String', folder_path);
+                feval(mfilename, obj, 'populate_and_filter_lists', 'rescan');
+            elseif strcmp(type, 'behav')
+                set(handles.behav_edit, 'String', folder_path);
             end
             log_message(handles, [type ' path set.']);
         else, log_message(handles, 'Path selection cancelled.'); end
-
-    case 'update_subject_id'
+        
+    case 'populate_and_filter_lists'
+        trigger_type = varargin{1}; % 'rescan' or 'filter'
         handles = value(ui_handles);
-        software = value(recording_software);
-        params = get_all_parameters(handles,software);
-        if isempty(params.local_path) || isempty(params.central_path) || isempty(params.project_name) || isempty(params.rat_name)
+        
+        % --- Step 1: Scan directories if needed ---
+        if strcmp(trigger_type, 'rescan')
+            log_message(handles, 'Scanning directories for session info...');
+            local_path = get(handles.local_edit, 'String');
+            central_path = get(handles.central_edit, 'String');
+            project_name = get(handles.proj_edit, 'String');
+            
+            all_info = struct('folder_name', {}, 'subject_id', {}, 'rat_name', {}, 'experimenter', {});
+            if ~isempty(local_path) && exist(local_path, 'dir')
+                all_info = [all_info; scan_for_info(fullfile(local_path, project_name, 'rawdata'))];
+            end
+            if ~isempty(central_path) && exist(central_path, 'dir')
+                all_info = [all_info; scan_for_info(fullfile(central_path, project_name, 'rawdata'))];
+            end
+            
+            if ~isempty(all_info)
+                keys = cell(numel(all_info), 1);
+                for i = 1:numel(all_info)
+                    keys{i} = sprintf('%s|%s|%s', all_info(i).subject_id, all_info(i).rat_name, all_info(i).experimenter);
+                end
+                [~, ia] = unique(keys, 'stable');
+                session_info_list.value = all_info(ia);
+                log_message(handles, sprintf('Found %d unique subjects.', numel(value(session_info_list))));
+            else
+                session_info_list.value = [];
+                log_message(handles, 'No valid subject folders found.');
+            end
+            
+            % Initial population of just the experimenter list
+            exp_options = unique([{value(session_info_list).experimenter}]);
+            update_popup(handles.exp_popup, exp_options, '-');
+            update_popup(handles.rat_name_popup, {}, '-');
+            set(handles.sub_popup, 'String', {'-'}, 'Value', 1);
+            set(handles.session_popup, 'String', {'-'}, 'Value', 1, 'Enable', 'off');
             return;
         end
-        max_local_id = find_max_subject_id(params.local_path, params.project_name, params.rat_name);
-        max_central_id = find_max_subject_id(params.central_path, params.project_name, params.rat_name);
-        final_id = max(max_local_id, max_central_id);
-        if final_id > 0
-            log_message(handles, ['Found existing Subject ID: ' num2str(final_id) '. Populating field.']);
-            set(handles.sub_edit, 'String', sprintf('%03d', final_id));
-        else
-            log_message(handles, 'No existing Subject ID found for this rat. Please enter a new ID.');
+        
+        % --- Step 2: Filter Logic triggered by user interaction ---
+        full_list = value(session_info_list);
+        source_handle = gcbo;
+        
+        % Get current selections, handling 'Add New...' dialogs
+        [exp_selection, exp_updated] = get_and_handle_new(handles.exp_popup, 'New Experimenter');
+        if exp_updated % New exp added, reset everything below it
+            update_popup(handles.rat_name_popup, {}, '-');
+            set(handles.sub_popup, 'String', {'-'}, 'Value', 1);
+            set(handles.session_popup, 'String', {'-'}, 'Value', 1, 'Enable', 'off');
+            return;
+        end
+        
+        if source_handle == handles.exp_popup
+            if ~strcmp(exp_selection, '-')
+                filtered_by_exp = full_list(strcmpi({full_list.experimenter}, exp_selection));
+                rat_options = unique([{filtered_by_exp.rat_name}]);
+                update_popup(handles.rat_name_popup, rat_options, '-');
+            else
+                update_popup(handles.rat_name_popup, {}, '-');
+            end
+            set(handles.sub_popup, 'String', {'-'}, 'Value', 1);
+            set(handles.session_popup, 'String', {'-'}, 'Value', 1, 'Enable', 'off');
+            return;
+        end
+        
+        [rat_selection, rat_updated] = get_and_handle_new(handles.rat_name_popup, 'New Rat Name');
+        
+        if source_handle == handles.rat_name_popup
+            if ~strcmp(rat_selection, '-')
+                subject_entry = full_list(strcmpi({full_list.experimenter}, exp_selection) & strcmpi({full_list.rat_name}, rat_selection));
+                
+                if ~isempty(subject_entry) % Existing pair
+                    sub_id = subject_entry(1).subject_id;
+                    set(handles.sub_popup, 'String', {sub_id}, 'Value', 1);
+                elseif rat_updated % New Rat for this Experimenter
+                    max_id = 0;
+                    if ~isempty(full_list)
+                        all_ids = str2double({full_list.subject_id});
+                        if ~all(isnan(all_ids)), max_id = max(all_ids(~isnan(all_ids))); end
+                    end
+                    sub_id = sprintf('%03d', max_id + 1);
+                    set(handles.sub_popup, 'String', {sub_id}, 'Value', 1);
+                else
+                    sub_id = '-';
+                    set(handles.sub_popup, 'String', {'-'}, 'Value', 1);
+                end
+                
+                % Populate Session list
+                if ~strcmp(sub_id, '-')
+                    local_path = get(handles.local_edit, 'String');
+                    central_path = get(handles.central_edit, 'String');
+                    project_name = get(handles.proj_edit, 'String');
+                    subject_folder = sprintf('sub-%s_id-%s_expmtr-%s', sub_id, rat_selection, exp_selection);
+                    session_numbers = [];
+                    path1 = fullfile(local_path, project_name, 'rawdata', subject_folder);
+                    if exist(path1, 'dir'), session_numbers = [session_numbers, find_session_numbers(path1)]; end
+                    path2 = fullfile(central_path, project_name, 'rawdata', subject_folder);
+                    if exist(path2, 'dir'), session_numbers = [session_numbers, find_session_numbers(path2)]; end
+                    
+                    unique_sessions = unique(session_numbers);
+                    if ~isempty(unique_sessions)
+                        sorted_sessions = sort(unique_sessions, 'descend');
+                        last_three = sorted_sessions(1:min(3, end));
+                        session_strings = arrayfun(@(x) sprintf('%02d', x), sort(last_three), 'UniformOutput', false);
+                        set(handles.session_popup, 'String', [{'New'}, session_strings], 'Value', 1, 'Enable', 'on');
+                    else
+                        set(handles.session_popup, 'String', {'New'}, 'Value', 1, 'Enable', 'on');
+                    end
+                else
+                     set(handles.session_popup, 'String', {'-'}, 'Value', 1, 'Enable', 'off');
+                end
+            else % rat set to '-'
+                set(handles.sub_popup, 'String', {'-'}, 'Value', 1);
+                set(handles.session_popup, 'String', {'-'}, 'Value', 1, 'Enable', 'off');
+            end
         end
         
     case 'save_log_file'
@@ -994,20 +1075,17 @@ switch action
         catch ME
             log_message(handles, ['ERROR: Could not save log file. Details: ' ME.message]);
         end
-
     case 'reset_to_load_state'
         handles = value(ui_handles);
         currentState.value = 'Load';
         behavState.value = 'Run';
         ephysState.value = 'Run';
         set(handles.control_button, 'Enable', 'on', 'String', 'Load', 'BackgroundColor', [0.2, 0.6, 0.8]);
-        set(handles.sample_button, 'Enable', 'on');
         recording_controller.value = [];
         behav_obj.value = [];
         current_params.value = [];
         session_base_path.value = '';
         log_message(handles, 'GUI reset to load state.');
-
     case 'close'        
         try
             feval(mfilename, obj, 'stop_blinking');
@@ -1025,7 +1103,6 @@ switch action
             delete_sphandle('owner', ['^@' mfilename '$']);
             obj = [];
         end
-
     case 'is_running'
         if exist('is_running','var') == 1
             obj = logical(value(is_running));
@@ -1037,7 +1114,6 @@ switch action
         handles = value(ui_handles);
         blinking_timer.value = timer('ExecutionMode', 'fixedRate', 'Period', 0.5, 'TimerFcn', {@toggle_button_color, handles.control_button});
         start(value(blinking_timer));
-
     case 'stop_blinking'
         handles = value(ui_handles);
         if ~isempty(value(blinking_timer)) && isvalid(value(blinking_timer))
@@ -1046,25 +1122,34 @@ switch action
             blinking_timer.value = [];
         end
         set(handles.control_button, 'BackgroundColor', [1, 0.4, 0.4]);
-
     otherwise
         error('Unknown action: %s', action);
 end
 return;
-
 %% =======================================================================
 %  PARAMETER AND VALIDATION FUNCTIONS
 %  =======================================================================
 function params = get_all_parameters(handles,software)
     params.protocol_name = get(handles.protocol_edit, 'String');
     params.do_manual_test = get(handles.manual_test, 'Value');
-    params.experimenter = get(handles.exp_edit, 'String');
-    params.rat_name = get(handles.rat_name_edit, 'String');
+    
+    % Get values from popup menus
+    exp_items = get(handles.exp_popup, 'String');
+    params.experimenter = exp_items{get(handles.exp_popup, 'Value')};
+    
+    rat_items = get(handles.rat_name_popup, 'String');
+    params.rat_name = rat_items{get(handles.rat_name_popup, 'Value')};
+    
+    sub_items = get(handles.sub_popup, 'String');
+    params.subject_id = sub_items{get(handles.sub_popup, 'Value')};
+    
+    ses_items = get(handles.session_popup, 'String');
+    params.session_id = ses_items{get(handles.session_popup, 'Value')};
+    
     popup_string = get(handles.distribution_popup,'String');
     params.stim_distribution = popup_string{get(handles.distribution_popup,'Value')};
     params.behav_path = get(handles.behav_edit, 'String');
     params.project_name = get(handles.proj_edit, 'String');
-    params.subject_id = get(handles.sub_edit, 'String');
     params.local_path = get(handles.local_edit, 'String');
     params.central_path = get(handles.central_edit, 'String');
     
@@ -1077,13 +1162,13 @@ function params = get_all_parameters(handles,software)
         params.sglx_port = str2double(get(handles.sglx_port_edit, 'String'));
         params.sglx_probe_index = str2double(get(handles.sglx_probe_edit, 'String'));
     end
-
 function is_valid = validate_all_inputs(params,handles,software)
     is_valid = false;
-    required_fields = {'protocol_name', 'rat_name', 'behav_path', 'project_name', 'subject_id', 'local_path'};
+    required_fields = {'protocol_name', 'rat_name', 'behav_path', 'project_name', 'subject_id', 'local_path', 'session_id'};
     for i = 1:length(required_fields)
-        if ~isfield(params, required_fields{i}) || isempty(params.(required_fields{i}))
-            msg = sprintf('Field "%s" cannot be empty.', strrep(required_fields{i}, '_', ' '));
+        field_val = params.(required_fields{i});
+        if ~isfield(params, required_fields{i}) || isempty(field_val) || strcmp(field_val, '-')
+            msg = sprintf('Field "%s" must have a valid selection before loading.', strrep(required_fields{i}, '_', ' '));
             log_message(handles, sprintf('ERROR: %s', msg)); errordlg(msg, 'Input Error');
             return;
         end
@@ -1107,12 +1192,11 @@ function is_valid = validate_all_inputs(params,handles,software)
         end
     end
     is_valid = true;
-
 %% =======================================================================
 %  PATH AND DIRECTORY FUNCTIONS
 %  =======================================================================
 function [session_base, recording_path] = construct_session_paths(handles, params)
-    if isempty(params.experimenter)
+    if isempty(params.experimenter) || strcmp(params.experimenter, '-')
         subject_name = sprintf('sub-%s_id-%s', params.subject_id, params.rat_name);
     else
         subject_name = sprintf('sub-%s_id-%s_expmtr-%s', params.subject_id, params.rat_name, params.experimenter);
@@ -1120,14 +1204,20 @@ function [session_base, recording_path] = construct_session_paths(handles, param
     subject_base_path = fullfile(params.project_name, 'rawdata', subject_name);
     local_subject_dir = fullfile(params.local_path, subject_base_path);
     central_subject_dir = fullfile(params.central_path, subject_base_path);
-    new_ses_num = max(find_max_session_number(local_subject_dir), find_max_session_number(central_subject_dir)) + 1;
-    log_message(handles, sprintf('Last session found: %d. Creating new session: %d.', new_ses_num - 1, new_ses_num));
+    
+    if strcmp(params.session_id, 'New')
+        new_ses_num = max(find_max_session_number(local_subject_dir), find_max_session_number(central_subject_dir)) + 1;
+        log_message(handles, sprintf('Last session found: %d. Creating new session: %d.', new_ses_num - 1, new_ses_num));
+    else
+        new_ses_num = str2double(params.session_id);
+        log_message(handles, sprintf('Using existing session number: %d.', new_ses_num));
+    end
+    
     session_datetime_str = char(datetime('now', 'Format', 'yyyyMMdd''T''HHmmss'));
     session_folder_name = sprintf('ses-%02d_date-%s_dtype-ephys', new_ses_num, session_datetime_str);
     session_base = fullfile(subject_base_path, session_folder_name);
     recording_path = fullfile(params.local_path, session_base, 'ephys');
     log_message(handles, ['New session path determined: ' session_base]);
-
 function max_ses = find_max_session_number(base_path)
     max_ses = 0; if ~exist(base_path, 'dir'), return; end
     dir_contents = dir(fullfile(base_path, 'ses-*'));
@@ -1140,7 +1230,6 @@ function max_ses = find_max_session_number(base_path)
         end
     end
     if ~isempty(session_numbers), max_ses = max(session_numbers); end
-
 function success = create_session_directories(handles, params,session_base_path)
     success = false;
     subfolders = {};
@@ -1161,25 +1250,88 @@ function success = create_session_directories(handles, params,session_base_path)
         log_message(handles, ['ERROR: ' msg]); errordlg(msg, 'Directory Error');
     end
 
-function max_id = find_max_subject_id(base_path, project, rat)
-    max_id = 0;
-    search_path = fullfile(base_path, project, 'rawdata');
-    if ~exist(search_path, 'dir'), return; end
-    dir_contents = dir(search_path);
-    if isempty(dir_contents), return; end
-    subject_ids = [];
-    pattern = sprintf('^sub-(\\d+)_id-%s', rat);
-    for i = 1:length(dir_contents)
-        if dir_contents(i).isdir
-            token = regexp(dir_contents(i).name, pattern, 'tokens');
-            if ~isempty(token), subject_ids(end+1) = str2double(token{1}{1}); end
-        end
-    end
-    if ~isempty(subject_ids), max_id = max(subject_ids); end
-
+function p = normalize_path(p)
+% Normalize path separators to be OS-independent
+% Converts all forward and back slashes to filesep,
+% then removes any trailing separator
+p = strrep(p, '\', filesep);
+p = strrep(p, '/', filesep);
+if ~isempty(p) && p(end) == filesep
+    p = p(1:end-1);
+end
 %% =======================================================================
 %  HELPER & UTILITY FUNCTIONS
 %  =======================================================================
+function info = scan_for_info(search_path)
+    info = struct('folder_name', {}, 'subject_id', {}, 'rat_name', {}, 'experimenter', {});
+    if ~exist(search_path, 'dir'), return; end
+    
+    dir_contents = dir(search_path);
+    if isempty(dir_contents), return; end
+    
+    pattern = '^sub-([^_]+)_id-([^_]+)_expmtr-([^_]+)$'; % More robust pattern
+    
+    for i = 1:length(dir_contents)
+        if dir_contents(i).isdir
+            folder_name = dir_contents(i).name;
+            tokens = regexp(folder_name, pattern, 'tokens');
+            
+            if ~isempty(tokens)
+                new_entry.folder_name = folder_name;
+                new_entry.subject_id = tokens{1}{1};
+                new_entry.rat_name = tokens{1}{2};
+                new_entry.experimenter = tokens{1}{3};
+                info(end+1, 1) = new_entry;
+            end
+        end
+    end
+function session_nums = find_session_numbers(subject_path)
+    session_nums = [];
+    if ~exist(subject_path, 'dir'), return; end
+    dir_contents = dir(fullfile(subject_path, 'ses-*'));
+    for i = 1:length(dir_contents)
+        if dir_contents(i).isdir
+            token = regexp(dir_contents(i).name, '^ses-(\d+)', 'tokens');
+            if ~isempty(token), session_nums(end+1) = str2double(token{1}{1}); end
+        end
+    end
+function update_popup(h, options, selection)
+    if isempty(options), options = {}; end
+    % --- MODIFIED: Removed 'All' from options ---
+    new_string = [{'-'}, unique(options), {'Add New...'}];
+    
+    % Find the index for the current selection in the new list
+    val = find(strcmp(new_string, selection), 1);
+    if isempty(val), val = 1; end % Default to first item '-' if not found
+    % --- END MODIFICATION ---
+    
+    set(h, 'String', new_string, 'Value', val);
+function [selection, updated] = get_and_handle_new(h, prompt_title)
+    updated = false;
+    items = get(h, 'String');
+    val = get(h, 'Value');
+    selection = items{val};
+    
+    if strcmp(selection, 'Add New...')
+        new_val_cell = inputdlg(['Enter new value for ' prompt_title], prompt_title, [1 50]);
+        if ~isempty(new_val_cell) && ~isempty(new_val_cell{1})
+            new_val = new_val_cell{1};
+            % Check if it already exists (case-insensitive)
+            existing_idx = find(strcmpi(items, new_val), 1);
+            if ~isempty(existing_idx)
+                set(h, 'Value', existing_idx);
+            else
+                items{end} = new_val; % Replace 'Add New...' with the new value
+                items{end+1} = 'Add New...'; % Add it back at the end
+                set(h, 'String', items, 'Value', numel(items)-1);
+            end
+            updated = true;
+            selection = new_val;
+        else
+            set(h, 'Value', 1); % Revert to first item '-' if cancelled
+            selection = '-';
+        end
+    end
 function log_message(handles,logStr)
     try
         if ~isfield(handles, 'log_box') || ~isvalid(handles.log_box), return; end
@@ -1192,14 +1344,21 @@ function log_message(handles,logStr)
     catch
         fprintf('%s: %s\n', char(datetime('now', 'Format', '[HH:mm:ss] ')), logStr);
     end
-
+% --- ADDED: Helper function to check for data in a directory ---
+function has_data = does_dir_have_data(path_to_check)
+    has_data = false;
+    if exist(path_to_check, 'dir')
+        dir_contents = dir(path_to_check);
+        % Check if there are more than 2 entries (i.e., more than '.' and '..')
+        if numel(dir_contents) > 2
+            has_data = true;
+        end
+    end
 function toggle_button_color(~, ~, button_handle)
     if ~isvalid(button_handle), return; end
     currentColor = get(button_handle, 'BackgroundColor');
     if isequal(currentColor, [1, 0.4, 0.4]), set(button_handle, 'BackgroundColor', [1, 0.7, 0.4]);
     else, set(button_handle, 'BackgroundColor', [1, 0.4, 0.4]); end
-
-
 function commit_to_svn(handles, file_path_data,file_path_settings, root_dir)
     
 if isempty(file_path_data), return; end
@@ -1220,7 +1379,6 @@ if isempty(file_path_data), return; end
     system(add_cmd_data);    
     commit_cmd_data = sprintf('svn ci --username="%s" --password="%s" -m "%s"', svn_user, svn_password, logmsg_data);
     [status, ~] = system(commit_cmd_data);
-
     cd(pname_settings);
     add_cmd_settings = char(strcat('svn add', {' '}, fname_settings, '.mat',{'@'}));
     system(add_cmd_settings);
@@ -1235,17 +1393,13 @@ if isempty(file_path_data), return; end
     end
     
     cd(fullfile(root_dir,'ExperPort'));
-
-
     %% =======================================================================
 %  DOCUMENTATION AND USAGE EXAMPLES
 %  =======================================================================
-
 function display_usage_help()
 % DISPLAY_USAGE_HELP - Display usage instructions and examples
 %
 % This function provides comprehensive usage documentation for the GUI
-
     fprintf('\n=== Neuropixels Recording & Behavior Controller Usage Guide ===\n\n');
     
     fprintf('1. INITIALIZATION:\n');
@@ -1255,17 +1409,10 @@ function display_usage_help()
     fprintf('   a) Select recording software (Open Ephys or SpikeGLX)\n');
     fprintf('   b) Configure behavior settings (protocol, experimenter, rat)\n');
     fprintf('   c) Set up NeuroBlueprint data paths\n');
-    fprintf('   d) Configure probe settings (version, reference, bank/IMRO)\n');
-    fprintf('   e) Set recording software connection parameters\n');
-    fprintf('   f) Click "Load" to initialize systems\n');
-    fprintf('   g) Click "Run" to start experiment\n');
-    fprintf('   h) Click "Stop" to end experiment and save data\n\n');
-    
-    fprintf('3. PROBE CONFIGURATION:\n');
-    fprintf('   - Supports Neuropixels 1.0 (3 banks) and 2.0 (4 banks)\n');
-    fprintf('   - Reference options: Tip or External\n');
-    fprintf('   - Bank selection: Manual bank number or IMRO file\n');
-    fprintf('   - Pre/post-session sampling across all banks\n\n');
+    fprintf('   d) Set recording software connection parameters\n');
+    fprintf('   e) Click "Load" to initialize systems\n');
+    fprintf('   f) Click "Run" to start experiment\n');
+    fprintf('   g) Click "Stop" to end experiment and save data\n\n');
     
     fprintf('4. DATA ORGANIZATION:\n');
     fprintf('   - Follows NeuroBlueprint format\n');
@@ -1291,4 +1438,3 @@ function display_usage_help()
     
     fprintf('For more information, see function documentation within the code.\n');
     fprintf('================================================================\n\n');
-

@@ -35,7 +35,12 @@ switch action
    
    %% init
    case 'init'
-    % dispatcher('set_trialnum_indicator_flag');
+
+    % Instead of sending the trialnum_indicator by dispatcher, 
+    % I will be sending it through my own sma as I can control the timing of
+    % the each bit pulse
+    dispatcher('unset_trialnum_indicator_flag');
+    
     hackvar = 10; SoloFunctionAddVars('SessionModel', 'ro_args', 'hackvar'); %#ok<NASGU>
     SoloParamHandle(obj, 'myfig', 'saveable', 0); myfig.value = figure;
 
@@ -91,14 +96,14 @@ switch action
 
     %% slow ramp up of water amount		
     %%the water volume is controlled by a 5-parameter logistic function: WaterAmount(t) = maxasymp + (minasymp/(1+(t/inflp)^slp).^assym)
-    NumeditParam(obj, 'maxasymp', 38, x,y,'label','maxasymp','TooltipString',...
+    NumeditParam(obj, 'maxasymp', 30, x,y,'label','maxasymp','TooltipString',...
         'the water volume is controlled by a 5-parameter logistic function: WaterAmount(trialnum) = maxasymp + (minasymp/(1+(trialnum/inflp)^slp).^assym)');
 	next_row(y);
 	NumeditParam(obj, 'slp', 3, x,y,'label','slp','TooltipString','Water Modulation: Slope of the logistic function');	
 	next_row(y);
 	NumeditParam(obj, 'inflp', 350, x,y,'label','inflp','TooltipString','Water Modulation: concentration at the inflection point');	
 	next_row(y);
-    NumeditParam(obj, 'minasymp', -21, x,y,'label','inflp','TooltipString','Water Modulation: minimum asymptote');	
+    NumeditParam(obj, 'minasymp', -13, x,y,'label','minasymp','TooltipString','Water Modulation: minimum asymptote');	
 	next_row(y);
     NumeditParam(obj, 'assym', 0.7, x,y,'label','assym','TooltipString','Water Modulation: asymmetry factor');	
 	next_row(y);
@@ -163,6 +168,7 @@ switch action
         SavingSection(obj,'set_setting_info',varargin{3},varargin{4});
         SavingSection(obj,'set_autosave_frequency',1); % saving setting every trial instead of 20
         BonsaiCameraInterface(obj,'set_video_filepath',varargin{5});
+        BonsaiCameraInterface(obj,'camera_connection');
 
     case 'set_stim_distribution'
 
@@ -250,9 +256,21 @@ switch action
     SessionDefinition(obj, 'run_eod_logic_without_saving');
 
     % Sending Summary Statistics to SQL Database
-    %perf = PsychometricSection(obj, 'evaluate');
+    try
+        perf = PsychometricSection(obj, 'evaluate');
+    catch
+        perf{1,1}.start_trial = trial_start;
+        perf{1,1}.end_trial = trial_end;
+        perf{1,1}.valid_trials = -1;
+        perf{1,1}.distribution_type = '';
+        perf{1,1}.calculated_boundary = nan;
+        perf{1,1}.total_hit_percent = -1;
+        perf{1,1}.total_violations_percent =  -1;
+        perf{1,1}.right_correct_percent = -1;
+        perf{1,1}.left_correct_percent = -1;
+    end
     
-    % SoundCatContextSwitchSummary(obj,'protocol_data',perf);  
+    SoundCatContextSwitchSummary(obj,'protocol_data',perf);  
       
       %% otherwise
     otherwise

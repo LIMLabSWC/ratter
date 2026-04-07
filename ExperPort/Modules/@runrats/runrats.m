@@ -116,7 +116,7 @@ switch action
         SoloParamHandle(obj,'myfig', 'value',fig);
         
         try
-            set(value(myfig), 'WindowStyle', 'modal');
+            set(value(myfig), 'WindowStyle', 'normal');
             pause(0.1);
             
         catch %#ok<CTCH>
@@ -1561,8 +1561,11 @@ switch action
             %if the protocol has a pre_saving_settings section, call it
             try
                 feval(value(CurrProtocol),protobj,'pre_saving_settings');
-            catch %#ok<CTCH>
-                disp('Protocol does not appeat to have a pre_saving_settings')
+            catch ME  % full stack trace %#ok<CTCH>
+                disp('pre_saving_settings failed with error:');
+                disp(ME.message);
+                disp(ME.getReport()); 
+                disp('Protocol does not appear to have a pre_saving_settings')
             end
 
 
@@ -1817,11 +1820,118 @@ switch action
 
         dispatcher('set_protocol','');
 
-        % Loading the protocol and setting file
-        runrats(obj,'load_protocol')
+        %Relaod the protocol
+        runrats(obj,'reload_protocol')
 
         % Running the protocol
         runrats(obj,'run')
+
+    case 'reload_protocol'
+        %Let's make sure we have the most up-to-date settings
+        runrats(obj,'update_rat',0);
+
+        set(get_ghandle(Multi),'String','Loading...','BackgroundColor', [0.8 0.8 0.6],'Fontsize',30);
+        StatusBar.value='Loading protocol and settings.  Please be patient!';
+        pause(0.1);
+
+        %Let's get the protocol for the rat and load it
+        CurrProtocol.value = getProtocol(value(ExpMenu),value(RatMenu)); %#ok<NODEF>
+        try
+            dispatcher(value(dispobj),'set_protocol',value(CurrProtocol)); %#ok<NODEF>
+        catch %#ok<CTCH>
+            StatusBar.value = ['Failed to load ',value(CurrProtocol),' for ',value(RatMenu)];
+            runrats(obj,'enable_all');
+            set(get_ghandle(Multi),'string','Load Protocol','BackgroundColor',[1,1,0.4],'FontSize',24);
+            InLiveLoop.value = 1;
+
+            %Let's notify the experimenter that the load failed, pause to
+            %let the tech see the note, then go back to live loop
+            runrats(obj,'email_experimenter','protocol fail');
+
+            runrats(obj,'updatelog','failload protocol');
+
+            pause(10);
+            runrats(obj,'live_loop');
+            return;
+        end
+
+        rath=get_sphandle('name','ratname','owner',value(CurrProtocol));
+        exph=get_sphandle('name','experimenter','owner',value(CurrProtocol));
+        rath{1}.value=value(RatMenu); %#ok<NASGU>
+        exph{1}.value=value(ExpMenu); %#ok<NASGU>
+
+        sfile = '';
+
+        try
+            try
+                protobj = eval(value(CurrProtocol));
+                today_date = char(datetime('now', 'format', 'yyMMdd'));
+                temp_data_dir = fullfile('C:\ratter', 'SoloData', 'Data', value(ExpMenu), value(RatMenu));
+                temp_data_file = sprintf('data_@%s_%s_%s_%s_ASV.mat', value(CurrProtocol), value(ExpMenu), value(RatMenu), today_date);
+
+                if isfile(fullfile(temp_data_dir, temp_data_file))
+                    dispatcher('runstart_disable');
+                    load_soloparamvalues(value(RatMenu), 'experimenter', value(ExpMenu), ...
+                        'owner', class(protobj), 'interactive', 0, ...
+                        'data_file', fullfile(temp_data_dir, temp_data_file));
+                    dispatcher('runstart_enable');
+                end
+
+            catch ME_inner
+                fprintf('=== Data Load failed, trying to load settings ===\n');
+                disp(ME_inner.getReport());  % <-- shows real error from ASV load block
+
+                [out, sfile] = load_solouiparamvalues(value(RatMenu), 'experimenter', value(ExpMenu), ...
+                    'owner', class(protobj), 'interactive', 0);
+                settings_file_sph.value = sfile;
+                settings_file_load_time.value = now;
+            end
+
+            if ~dispatcher('is_running')
+                pop_history(class(protobj), 'include_non_gui', 1);
+                feval(value(CurrProtocol), protobj, 'prepare_next_trial');
+            end
+
+        catch ME_outer
+            fprintf('=== Loading Failed ===\n');
+            disp(ME_outer.getReport());  % <-- shows real error from settings load or prepare_next_trial
+
+            StatusBar.value = 'Failed to load Settings file.';
+            runrats(obj, 'enable_all');
+            set(get_ghandle(Multi), 'string', 'Load Protocol', 'BackgroundColor', [1,1,0.4], 'FontSize', 24);
+            InLiveLoop.value = 1;
+            runrats(obj, 'email_experimenter', 'settings fail');
+            runrats(obj, 'updatelog', 'failload settings');
+            pause(10);
+            runrats(obj, 'live_loop');
+            return;
+        end
+
+        set(get_ghandle(Multi),'String',['Run: ',value(RatMenu)],'BackgroundColor',[0.3,1,0.3],'Fontsize',32);
+        
+        if ~isempty(sfile)
+            [pname, fname, ext] = fileparts(sfile);
+            StatusBar.value = ['Using settings file: ', fname];
+        else
+            StatusBar.value = 'Using ASV data file.';
+        end
+
+        if value(phys)==1
+            create_phys_session(eval(value(CurrProtocol)))
+        end
+
+        runrats(obj,'enable_all');
+        figure(value(myfig));
+        InLiveLoop.value = 0;
+
+        %Check to see if the experimenter wants to enable the safety before
+        if contains(value(SafetyMode),'B') %#ok<NODEF>
+            set(get_ghandle(Multi),'enable','off');
+            set(get_ghandle(Safety),'visible','on','string',value(Instructions)); %#ok<NODEF>
+        else
+            set(get_ghandle(Multi),'enable','on');
+            set(get_ghandle(Safety),'visible','off','string','');
+        end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     case 'crash_cleanup'

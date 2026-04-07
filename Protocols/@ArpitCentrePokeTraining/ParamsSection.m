@@ -88,16 +88,22 @@ switch action
 		set_callback(time_go_cue, {mfilename, 'new_time_go_cue'});
 		next_row(y);
 		DispParam(obj, 'Total_CP_duration', CP_duration+time_go_cue, x, y,'save_with_settings', 1, 'TooltipString', 'Total expected(rat can poke out anytime after Go cue onset) nose in center port time, in secs. Sum of CP_duration and Go Cue duration'); %#ok<*NODEF>
-		
         next_row(y);
         ToggleParam(obj, 'Go_Sound', 0, x, y, 'OnString', 'Play Reward Sound', 'OffString', 'No Reward Sound','TooltipString', ...
 			'If 1 (black), sound is played for intial 2 stages of light chasing; if 0 (brown), leave sound off');
         next_row(y);
-        ToggleParam(obj, 'stimuli_on', 0, x,y,...
-        'OnString', 'Use Stimuli',...
-        'OffString', 'Fixed Sound',...
-        'TooltipString', sprintf('If on (black) then it enables training with stimuli else using a fixed sound from Stage 5'));
+        MenuParam(obj, 'Stimuli_State', {'Full','Discrete Stimuli','Fixed'}, ...
+            'Full', x, y, 'label','Stimuli State', 'labelfraction', 0.35, 'TooltipString', sprintf(['\n Different Options for Stimuli Sound.\n', ...
+            '\n''If its full all the stimuli will be presented, Fixed is a single sound \n',...
+            '\n''and Discrete is when instead of full we provide discrete number of stimuli']));
         next_row(y);
+
+        % ToggleParam(obj, 'stimuli_on', 0, x,y,...
+        % 'OnString', 'Use Stimuli',...
+        % 'OffString', 'Fixed Sound',...
+        % 'TooltipString', sprintf('If on (black) then it enables training with stimuli else using a fixed sound from Stage 5'));
+        % next_row(y);
+
         ToggleParam(obj, 'warmup_on', 1, x,y,...
 			'OnString', 'Warmup ON',...
 			'OffString', 'Warmup OFF',...
@@ -158,7 +164,7 @@ switch action
 		
 		next_row(y);
 		SoloFunctionAddVars('ArpitCentrePokeTrainingSMA', 'ro_args', ...
-			{'CP_duration';'SideLed_duration'; 'stimuli_on';...
+			{'CP_duration';'SideLed_duration'; 'Stimuli_State';...
 			'RewardCollection_duration';'training_stage'; ...
 			'legal_cbreak' ; 'SettlingIn_time'; 'time_go_cue'; ...
             'A1_time';'time_bet_aud1_gocue' ; 'PreStim_time';
@@ -170,7 +176,7 @@ switch action
 			{'training_stage'});
 
         SoloFunctionAddVars('StimulusSection', 'ro_args', ...
-			{'training_stage';'stimuli_on';'ThisTrial';'A1_time';...
+			{'training_stage';'Stimuli_State';'ThisTrial';'A1_time';...
             'time_bet_aud1_gocue' ;'PreStim_time'});
         
         SoloFunctionAddVars('TrainingStageParamsSection', 'ro_args', ...
@@ -373,31 +379,75 @@ switch action
 
         %% Choose Side for the Next Trial
         
-        if ~isinf(MaxSame) && length(previous_sides) > MaxSame && ...
-                all(previous_sides(n_done_trials-MaxSame+1:n_done_trials) == previous_sides(n_done_trials)) %#ok<NODEF>
-            if previous_sides(end)=='l'
-                ThisTrial.value = 'RIGHT';
-            else
-                ThisTrial.value = 'LEFT';
-            end
+        % ---------------------------------------------------------------
+        % Determine whether adaptive antibias should be active this trial
+        % Conditions: training_stage >= 6
+        % ---------------------------------------------------------------
+        use_antibias = value(training_stage) >= 6 && ...
+               ~strcmpi(value(Stimuli_State), 'Fixed');
 
-            if previous_sides(end)=='r'
-                ThisTrial.value = 'LEFT';
+        % Tau only meaningful for stage 6+; scale with stage for future flexibility
+        tau = 30; % trials, exponential kernel decay constant
+
+        % ---------------------------------------------------------------
+        % Update antibias estimate using completed trial's outcome
+        % (only on valid — non-violation, non-timeout — trials)
+        % ---------------------------------------------------------------
+        if use_antibias && n_done_trials > 0
+
+            if ~was_viol && ~was_timeout
+                % Strip NaN (violation/timeout) trials from both histories
+                nan_mask = isnan(hit_history(1:n_done_trials));
+                nonan_hit_history    = hit_history(1:n_done_trials);
+                nonan_previous_sides = previous_sides(1:n_done_trials);
+                nonan_hit_history(nan_mask)    = [];
+                nonan_previous_sides(nan_mask) = [];
+
+                % Need at least 5 valid trials before antibias is meaningful
+                if length(nonan_hit_history) >= 5
+                    [antibias_left_prob, ~, ~] = calculate_adaptive_antibias( ...
+                        nonan_hit_history(:),nonan_previous_sides(:), ...
+                        value(LeftProb), ...   % user-set prior as baseline
+                        tau);
+                else
+                    antibias_left_prob = value(LeftProb); % fall back to flat prior
+                end
             else
+                % Violation or timeout: don't update, carry forward last probability
+                antibias_left_prob = value(LeftProb);
+            end
+        else
+            % Not in antibias mode: use user-set LeftProb directly
+            antibias_left_prob = value(LeftProb);
+        end
+
+        % ---------------------------------------------------------------
+        % Choose next trial side
+        % Priority 1: MaxSame override (always applies regardless of antibias)
+        % Priority 2: Antibias-weighted random draw (or flat LeftProb)
+        % ---------------------------------------------------------------
+        if ~isinf(value(MaxSame)) && ...
+                length(previous_sides) > value(MaxSame) && ...
+                all(previous_sides(n_done_trials - value(MaxSame) + 1 : n_done_trials) == ...
+                previous_sides(n_done_trials))
+
+            % Force a side-switch after MaxSame consecutive same-side trials
+            if previous_sides(end) == 'l'
                 ThisTrial.value = 'RIGHT';
+            else
+                ThisTrial.value = 'LEFT';
             end
 
         else
-
-            if (rand(1)<=LeftProb)
-                ThisTrial.value='LEFT';
-
+            % Normal draw — uses antibias probability when active,
+            % flat LeftProb otherwise (antibias_left_prob == LeftProb in that case)
+            if rand(1) <= antibias_left_prob
+                ThisTrial.value = 'LEFT';
             else
-                ThisTrial.value='RIGHT';
+                ThisTrial.value = 'RIGHT';
             end
 
         end
-        
        				
 % 		%% Do the anti-bias with changing reward delivery
 % 		% reset anti-bias

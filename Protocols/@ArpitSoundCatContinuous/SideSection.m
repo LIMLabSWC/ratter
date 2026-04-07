@@ -169,12 +169,23 @@ switch action
 		next_row(y); next_row(y);
 
         % Toggle Buttons To Control Parameters       
-        ToggleParam(obj, 'stimuli_on', 1, x,y,...
-        'OnString', 'Stimuli ON',...
-        'OffString', 'Stimuli OFF',...
-        'TooltipString', sprintf('If on (black) then it enables training with stimuli else using a fixed sound from Stage 5'));
+        % ToggleParam(obj, 'stimuli_on', 1, x,y,...
+        % 'OnString', 'Stimuli ON',...
+        % 'OffString', 'Stimuli OFF',...
+        % 'TooltipString', sprintf('If on (black) then it enables training with stimuli else using a fixed sound from Stage 5'));
+        % next_row(y);
+         
+        MenuParam(obj, 'Stimuli_State', {'Full','Fixed Stimuli','No Sound'}, ...
+            'Full', x, y, 'label','Stimuli State', 'labelfraction', 0.35, 'TooltipString', sprintf(['\n Different Options for Stimuli Sound.\n', ...
+            '\n''If its full all the stimuli will be presented, Fixed is a single sound \n',...
+            '\n''and No is when no sound is presented']));
+        set_callback(Stimuli_State,{mfilename,'stim_state_change'});
         next_row(y);next_row(y);
-        
+
+        SoloFunctionAddVars('StimulusSection', 'ro_args', ...
+			{'ThisTrial';'Stimuli_State';'A1_time';'time_bet_aud1_gocue' ; ...
+			'PreStim_time';'LeftProb'});
+
         %% Sound and Stimulus Section
         [x, y] = SoundSection(obj,'init',x,y);
         [x, y] = StimulusSection(obj,'init',x,y); next_row(y);
@@ -182,6 +193,14 @@ switch action
         next_column(x);
 		y=5;
 		
+        ToggleParam(obj, 'control_active', 0, x,y,...
+			'OnString', 'Buttons Deative',...
+			'OffString', 'Buttons Active',...
+			'TooltipString', sprintf(['If on (Yellow) then the user can change parameters.\n',...
+            'This is to prevent any unwanted button press']));     
+        set_callback(control_active, {mfilename, 'User_Control'});
+        next_row(y);
+
         % Toggle for WarmUp 
         ToggleParam(obj, 'warmup_on', 0, x,y,...
 			'OnString', 'Warmup ON',...
@@ -211,25 +230,40 @@ switch action
 			'legal_cbreak' ; 'LED_during_legal_cbreak' ; ...
             'SettlingIn_time' ; 'LED_during_settling_legal_cbreak' ; ...
 			'time_go_cue';'timeout_iti'; ...
-            'stimuli_on';'A1_time';'time_bet_aud1_gocue' ; ...
+            'Stimuli_State';'A1_time';'time_bet_aud1_gocue' ; ...
 			'PreStim_time';'warmup_on';'time_go_cue'; ...
 			'drink_time';'reward_delay';'left_wtr_mult';...
 			'right_wtr_mult';'antibias_wtr_mult';...
-			'reward_type';'secondhit_delay';'error_iti';'violation_iti'});
-
-        SoloFunctionAddVars('StimulusSection', 'ro_args', ...
-			{'ThisTrial';'stimuli_on';'A1_time';'time_bet_aud1_gocue' ; ...
-			'PreStim_time';'LeftProb'});
+			'reward_type';'secondhit_delay';'error_iti';'violation_iti'});        
 
         SoloFunctionAddVars('StimulatorSection', 'ro_args', ...
 			{'A1_time';'time_bet_aud1_gocue';'time_go_cue'; ...
 			'PreStim_time';'CP_duration';'Total_CP_duration'});
         
+        SoloFunctionAddVars('PsychometricSection', 'ro_args',{'Stimuli_State'});
+        
         %   History of hit/miss:
         SoloParamHandle(obj, 'deltaf_history',      'value', []);
 		SoloParamHandle(obj, 'previous_parameters', 'value', []);
 
-		
+    case 'stim_state_change'
+
+         StimulusSection(obj,'Stimuli_State_change');
+         PsychometricSection(obj,'Stimuli_State_changed');
+
+
+    case 'User_Control'
+
+        if value(control_active) == 0
+            disable(antibias_LRprob); disable(stimuli_on);  disable(Switch_Distr); disable(antibias_wtr_mult);
+            disable(random_PreStim_time); disable(random_A1_time); disable(random_prego_time);
+            disable(warmup_on); disable(increase_CP_training);
+        else
+            enable(antibias_LRprob); enable(stimuli_on); enable(Switch_Distr); enable(antibias_wtr_mult);
+            enable(random_PreStim_time); enable(random_A1_time); enable(random_prego_time);
+            enable(warmup_on); enable(increase_CP_training);
+        end
+
 	case 'new_leftprob'
 		AntibiasSection(obj, 'update_biashitfrac', value(LeftProb));
 		
@@ -511,7 +545,12 @@ switch action
     case 'get_water_amount'
 
         %% Calculate the water amount for each side valve
-        WaterAmount=maxasymp + (minasymp./(1+(n_done_trials/inflp).^slp).^assym);
+        try
+            trials_use = max(1,numel(find(~isnan(value(hit_history))))); 
+        catch
+            trials_use = n_done_trials;
+        end
+        WaterAmount=maxasymp + (minasymp./(1+(trials_use/inflp).^slp).^assym); % using valid trials only instead of total trials
         %         WaterValvesSection(obj, 'set_water_amounts', WaterAmount, WaterAmount);
         %         [LeftWValveTime RightWValveTime] = WaterValvesSection(obj, 'get_water_times');
         WValveTimes = GetValveTimes(WaterAmount, [2 3]);
