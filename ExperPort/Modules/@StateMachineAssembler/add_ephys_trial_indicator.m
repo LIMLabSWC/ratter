@@ -169,31 +169,30 @@
 % trial for synchronisation with Neuropixels recordings (Open Ephys/SpikeGLX).
 %
 % IMPLEMENTATION:
-%   Uses scheduled waves (not state DOut output_actions) to generate DIO
-%   pulses. This is necessary because Bpod does not reliably execute DOut
-%   output_actions from state transitions in this BControl implementation.
-%   Scheduled waves use a separate direct hardware path — the same mechanism
-%   used by the working 400ms EphysTrig pulse.
+%   Uses scheduled waves triggered simultaneously from a single state.
+%   Consecutive HIGH bits are merged into a single longer wave to minimise
+%   wave count. This is critical because Bpod supports a limited number of
+%   scheduled waves per trial (16-20 depending on hardware version).
 %
-%   One scheduled wave is added per HIGH bit in the trialnum sequence.
-%   Each wave has a staggered preamble so pulses fire sequentially:
-%     bit 0 (sync):  preamble=0,             sustain=time_per_state
-%     bit 1:         preamble=time_per_state, sustain=time_per_state (if HIGH)
-%     bit 2:         preamble=2*time_per_state, ...
-%   All waves are triggered simultaneously from a single state at trial start.
+%   Example - Trial 510 = 000000111111110 (7 consecutive HIGHs at slots 9-15):
+%     Without merging: 8 waves (1 sync + 7 individual bit waves)
+%     With merging:    2 waves (1 sync + 1 merged wave covering slots 9-15)
 %
-%   LOW bits produce no pulse. The decoder uses timing (position within the
-%   80ms window) to determine bit value: pulse present = 1, absent = 0.
+%   Worst case wave count after merging = number of separate HIGH runs + 1 sync
+%   e.g. trial 21845 = 101010101010101 = 8 runs → 9 waves maximum
 %
 % SIGNAL FORMAT:
-%   Slot 0  : always HIGH (sync/preamble marker)
-%   Slots 1-15 : 15-bit binary encoding of trialnum, MSB first
-%   Total duration : 16 x time_per_state (default 16 x 5ms = 80ms)
+%   Slot 1      : always HIGH (sync/preamble marker)
+%   Slots 2-16  : 15-bit binary encoding of trialnum, MSB first
+%   Total duration : 16 x time_per_state (default 16 x 50ms = 800ms)
+%
+%   Decoder uses pulse onset time to determine start slot and pulse
+%   duration to determine how many consecutive HIGH slots the pulse covers.
 %
 % CALL ORDER — must be called BEFORE any add_state calls:
 %   sma = StateMachineAssembler('full_trial_structure','use_happenings',1);
 %   % ... add_scheduled_wave calls ...
-%   sma = add_ephys_trial_indicator(sma, n_done_trials+1, 'time_per_state', 5e-3);
+%   sma = add_ephys_trial_indicator(sma, n_done_trials+1, 'time_per_state', 50e-3);
 %   sma = add_state(sma, 'name', 'wait_for_cpoke', ...);
 %
 % REQUIRED ARGUMENTS:
@@ -201,30 +200,27 @@
 %   trialnum   Positive integer (max 32767 = 2^15-1)
 %
 % OPTIONAL ARGUMENTS:
-%   'time_per_state'   Seconds per bit slot. Default 5e-3 (5ms).
-%                      Total burst = 16 x time_per_state = 80ms default.
-%                      Minimum reliable for Neuropixels detection: 1e-3.
-%   'preamble'         Number of sync pulses before trialnum bits.
-%                      Default 1. Increase for more robust sync detection.
-%   'wave_name_prefix' Prefix for scheduled wave names.
-%                      Default 'tni' (trial number indicator).
-%   'state_name'       Name of the single triggering state.
-%                      Default 'send_trialnum'.
-%   'DIOLINE'          DIO bitmask. Default 'from_settings' reads
-%                      DIOLINES; trialnum_indicator from bSettings.
+%   'time_per_state'   Seconds per bit slot. Default 50e-3 (50ms).
+%                      Total burst = 16 x 50ms = 800ms default.
+%                      Must be long enough for Neuropixels to detect reliably.
+%                      Minimum recommended: 5e-3 (5ms).
+%   'preamble'         Number of sync slots before data bits. Default 1.
+%   'wave_name_prefix' Prefix for scheduled wave names. Default 'tni'.
+%   'state_name'       Name of the triggering state. Default 'send_trialnum'.
+%   'DIOLINE'          DIO bitmask. Default 'from_settings'.
 %
 % Written by Arpit, based on add_trialnum_indicator concept by Carlos Brody.
-% Key fix: scheduled waves instead of state DOut output_actions.
+% Key optimisation: consecutive HIGH bits merged into single longer waves.
 
 function [sma] = add_ephys_trial_indicator(sma, trialnum, varargin)
 
     %% Parse arguments
     pairs = { ...
-        'time_per_state',  5e-3         ; ...
-        'preamble',        1            ; ...
-        'wave_name_prefix','tni'        ; ...
-        'state_name',      'send_trialnum' ; ...
-        'DIOLINE',         'from_settings' ; ...
+        'time_per_state',  50e-3            ; ...
+        'preamble',        1                ; ...
+        'wave_name_prefix','tni'            ; ...
+        'state_name',      'send_trialnum'  ; ...
+        'DIOLINE',         'from_settings'  ; ...
     };
     parseargs(varargin, pairs);
 
@@ -233,7 +229,7 @@ function [sma] = add_ephys_trial_indicator(sma, trialnum, varargin)
         error('add_ephys_trial_indicator: Need at least sma and trialnum.');
     end
     if ~is_full_trial_structure(sma)
-        error(['add_ephys_trial_indicator: Requires full_trial_structure flag.']);
+        error('add_ephys_trial_indicator: Requires full_trial_structure flag.');
     end
     if ~isnumeric(trialnum) || trialnum < 1 || trialnum ~= floor(trialnum)
         error('add_ephys_trial_indicator: trialnum must be a positive integer.');
@@ -260,61 +256,113 @@ function [sma] = add_ephys_trial_indicator(sma, trialnum, varargin)
         DIOLINE = 0;
     end
 
-    %% Build binary string (15 bits MSB first)
-    trialnum_bin = dec2bin(trialnum);
-    trialnum_bin = [repmat('0', 1, nbits - length(trialnum_bin)) trialnum_bin];
-
-    %% Build full bit sequence: preamble HIGH bits + 15 trialnum bits
-    % preamble is always HIGH, trialnum bits are 0 or 1
+    %% Build full bit sequence: preamble HIGH bits + 15 data bits
+    trialnum_bin  = dec2bin(trialnum);
+    trialnum_bin  = [repmat('0', 1, nbits - length(trialnum_bin)) trialnum_bin];
     preamble_bits = ones(1, preamble);
-    data_bits = arrayfun(@(c) str2double(c), trialnum_bin);
-    all_bits = [preamble_bits, data_bits];  % length = preamble + 15
+    data_bits     = arrayfun(@(c) str2double(c), trialnum_bin);
+    all_bits      = [preamble_bits, data_bits];  % length = preamble + 15
 
-    total_slots = length(all_bits);
+    total_slots   = length(all_bits);
     total_duration = total_slots * time_per_state;
 
-    % fprintf('[add_ephys_trial_indicator] Trial %d | DIOLINE=%d | %d slots | %.0fms total\n', ...
-    %     trialnum, DIOLINE, total_slots, total_duration * 1000);
+    % fprintf('[add_ephys_trial_indicator] Trial %d | DIOLINE=%d | %d slots | %.0fms/slot | %.0fms total\n', ...
+    %     trialnum, DIOLINE, total_slots, time_per_state*1000, total_duration*1000);
     % fprintf('[add_ephys_trial_indicator] Bits: %s\n', num2str(all_bits));
 
-    %% Add one scheduled wave per HIGH bit
-    % Each wave fires at its slot's start time (staggered preamble)
-    % and stays HIGH for exactly one slot duration
-    wave_names_to_trigger = {};
+    %% Find runs of consecutive HIGH bits and merge into single waves
+    % This minimises wave count: worst case = number of separate HIGH runs + 0
+    % (preamble is always the first run)
+    waves_to_add = [];  % struct array: preamble_time, sustain_time, wave_name
 
-    for slot = 1:total_slots
+    slot = 1;
+    run_count = 0;
+    while slot <= total_slots
         if all_bits(slot) == 1
-            wave_name = sprintf('%s_%02d', wave_name_prefix, slot);
-            slot_preamble = (slot - 1) * time_per_state;
+            % Start of a HIGH run — find how long it lasts
+            run_start = slot;
+            run_length = 0;
+            while slot <= total_slots && all_bits(slot) == 1
+                run_length = run_length + 1;
+                slot = slot + 1;
+            end
+            run_count = run_count + 1;
 
-            sma = add_scheduled_wave(sma, ...
-                'name',    wave_name, ...
-                'preamble', slot_preamble, ...
-                'sustain',  time_per_state, ...
-                'DOut',     DIOLINE, ...
-                'loop',     0);
+            % One wave covers the entire run
+            wave_preamble = (run_start - 1) * time_per_state;
+            wave_sustain  = run_length * time_per_state;
+            wave_name     = sprintf('%s_r%02d', wave_name_prefix, run_count);
 
-            wave_names_to_trigger{end+1} = wave_name; %#ok<AGROW>
-            % fprintf('[add_ephys_trial_indicator] Wave %s: preamble=%.0fms HIGH\n', ...
-            %     wave_name, slot_preamble*1000);
+            waves_to_add(end+1).wave_name     = wave_name;   %#ok<AGROW>
+            waves_to_add(end).wave_preamble   = wave_preamble;
+            waves_to_add(end).wave_sustain    = wave_sustain;
+            waves_to_add(end).run_start_slot  = run_start;
+            waves_to_add(end).run_length      = run_length;
+
+            % fprintf('[add_ephys_trial_indicator] Wave %s: slots %d-%d | preamble=%.0fms | sustain=%.0fms\n', ...
+            %     wave_name, run_start, run_start+run_length-1, ...
+            %     wave_preamble*1000, wave_sustain*1000);
         else
-            % fprintf('[add_ephys_trial_indicator] Slot %02d: LOW (no wave)\n', slot);
+            % fprintf('[add_ephys_trial_indicator] Slot %02d: LOW\n', slot);
+            slot = slot + 1;
         end
     end
 
-    %% Build trigger string: 'tni_01+tni_03+tni_05+...'
-    trigger_string = strjoin(wave_names_to_trigger, '+');
+    % fprintf('[add_ephys_trial_indicator] Total waves needed: %d\n', length(waves_to_add));
+
+    %% Check wave count against Bpod limit
+    n_existing_waves = size(sma.sched_waves, 1);
+    n_new_waves      = length(waves_to_add);
+    n_total_waves    = n_existing_waves + n_new_waves;
+    bpod_wave_limit  = 16;  % Bpod state machine r2 supports 20 scheduled waves
+
+    % fprintf('[add_ephys_trial_indicator] Existing waves: %d | New: %d | Total: %d / %d\n', ...
+    %     n_existing_waves, n_new_waves, n_total_waves, bpod_wave_limit);
+
+    if n_total_waves > bpod_wave_limit
+        warning(['[add_ephys_trial_indicator] Trial %d requires %d waves but only %d slots available ' ...
+            '(%d existing + %d new = %d > %d limit). ' ...
+            'Skipping trialnum indicator for this trial. ' ...
+            'Use EphysTrig 400ms pulse for trial boundary detection instead.'], ...
+            trialnum, n_new_waves, bpod_wave_limit - n_existing_waves, ...
+            n_existing_waves, n_new_waves, n_total_waves, bpod_wave_limit);
+
+        % Add a single dummy state so state count stays consistent
+        % wait_for_cpoke still lands at same position every trial
+        sma = add_state(sma, 'name', state_name, ...
+            'self_timer', 0.001, ...
+            'input_to_statechange', {'Tup', 'current_state+1'});
+
+        % fprintf('[add_ephys_trial_indicator] Dummy state added. wait_for_cpoke at %d.\n', ...
+        %     sma.current_state);
+        return;
+    end
+
+    %% Add scheduled waves
+    wave_names_to_trigger = {};
+    for w = 1:length(waves_to_add)
+        sma = add_scheduled_wave(sma, ...
+            'name',     waves_to_add(w).wave_name, ...
+            'preamble', waves_to_add(w).wave_preamble, ...
+            'sustain',  waves_to_add(w).wave_sustain, ...
+            'DOut',     DIOLINE, ...
+            'loop',     0);
+        wave_names_to_trigger{end+1} = waves_to_add(w).wave_name; %#ok<AGROW>
+    end
+
+    %% Build trigger string
+    trigger_string = wave_names_to_trigger{1};
+    for k = 2:length(wave_names_to_trigger)
+        trigger_string = [trigger_string '+' wave_names_to_trigger{k}]; %#ok<AGROW>
+    end
 
     % fprintf('[add_ephys_trial_indicator] Trigger string: %s\n', trigger_string);
 
     %% Add single triggering state
-    % Self-timer covers full burst duration + small margin
     sma = add_state(sma, 'name', state_name, ...
         'self_timer', total_duration + 0.001, ...
         'output_actions', {'SchedWaveTrig', trigger_string}, ...
         'input_to_statechange', {'Tup', 'current_state+1'});
-
-    % After this, current_state+1 naturally falls into wait_for_cpoke
 
     % fprintf('[add_ephys_trial_indicator] Done. Triggering state at pos %d, wait_for_cpoke at %d.\n', ...
     %     sma.current_state - 1, sma.current_state);
