@@ -15,15 +15,13 @@ switch action
 		SoloParamHandle(obj, 'my_gui_info', 'value', [x y double(gcf)], 'saveable', 0);
 		y0 = y;
  
-        [x, y] = AntibiasSectionAthena(obj,     'init', x, y);
-		       
-        
+        [x, y] = AntibiasSection(obj,     'init', x, y);
+		              
         ToggleParam(obj, 'antibias_LRprob', 0, x,y,...
 			'OnString', 'AB_Prob ON',...
 			'OffString', 'AB_Prob OFF',...
 			'TooltipString', sprintf(['If on (Yellow) then it enables the AntiBias algorithm\n'...
 			'based on changing the probablity of Left vs Right']));
-
 		next_row(y);
 		NumeditParam(obj, 'LeftProb', 0.5, x, y); next_row(y);
 		set_callback(LeftProb, {mfilename, 'new_leftprob'});
@@ -32,122 +30,6 @@ switch action
 			'response is on the same side. Overrides antibias. Thus, for\n' ...
 			'example, if MaxSame=5 and there have been 5 Left trials, the\n' ...
 			'next trial is guaranteed to be Right'])); next_row(y);
-		
-		DispParam(obj, 'ThisTrial', 'LEFT', x, y); next_row(y);
-		SoloParamHandle(obj, 'previous_sides', 'value', []);
-		DeclareGlobals(obj, 'ro_args', 'previous_sides');
-		SubheaderParam(obj, 'title', 'Sides Section', x, y);
-		next_row(y, 1.5);
-        %% slow ramp up of water amount		
-    %%the water volume is controlled by a 5-parameter logistic function: WaterAmount(t) = maxasymp + (minasymp/(1+(t/inflp)^slp).^assym)
-    NumeditParam(obj, 'maxasymp', 38, x,y,'label','maxasymp','TooltipString',...
-        'the water volume is controlled by a 5-parameter logistic function: WaterAmount(trialnum) = maxasymp + (minasymp/(1+(trialnum/inflp)^slp).^assym)');
-	next_row(y);
-	NumeditParam(obj, 'slp', 3, x,y,'label','slp','TooltipString','Water Modulation: Slope of the logistic function');	
-	next_row(y);
-	NumeditParam(obj, 'inflp', 350, x,y,'label','inflp','TooltipString','Water Modulation: concentration at the inflection point');	
-	next_row(y);
-    NumeditParam(obj, 'minasymp', -21, x,y,'label','inflp','TooltipString','Water Modulation: minimum asymptote');	
-	next_row(y);
-    NumeditParam(obj, 'assym', 0.7, x,y,'label','assym','TooltipString','Water Modulation: asymmetry factor');	
-	next_row(y);
-	DispParam(obj, 'trial_1', 0, x, y, 'TooltipString', 'uL on first trial');
-	next_row(y);
-	DispParam(obj, 'trial_150', 0, x, y, 'TooltipString', 'uL on trial 150');
-	next_row(y);
-	DispParam(obj, 'trial_300', 0, x, y, 'TooltipString', 'uL on trial 300');
-	next_row(y);
-	set_callback({maxasymp;slp;inflp;minasymp;assym}, {mfilename, 'change_water_modulation_params'});
-	feval(mfilename, obj, 'change_water_modulation_params');
-
-		next_column(x); y = 5;
-		NumeditParam(obj, 'RewardCollection_duration', 10, x,y,'label','RewardCollection_duration','TooltipString','Wait until rat collects the reward');
-		next_row(y);
-		NumeditParam(obj, 'CenterLed_duration', 200, x,y,'label','Central LED duration','TooltipString','Duration of Center Led');
-		next_row(y);
-		NumeditParam(obj, 'SideLed_duration', 0.5, x,y,'label','Side LED duration','TooltipString','Duration of SideLed');
-		next_row(y);
-		NumeditParam(obj, 'legal_cbreak', 0.1, x,y, 'position', [x, y, 175 20], 'TooltipString','Time in sec for which it is ok to be outside the center port before a violation occurs.');
-		ToggleParam(obj, 'LED_during_legal_cbreak', 1, x, y, 'OnString', 'LED ON LcB', 'OffString', 'LED off LcB', ...
-			'position', [x+180 y 20 20], 'TooltipString', ...
-			'If 1 (black), turn center port LED back on during legal_cbreak; if 0 (brown), leave LED off');
-         next_row(y);
-		NumeditParam(obj, 'SettlingIn_time', 0.2, x,y, 'position', [x, y, 175 20], 'TooltipString','Initial settling period during which "legal cbreak period" can be longer than the usual "legal_cbreak"');
-        next_row(y);
-		NumeditParam(obj, 'settling_legal_cbreak', 0.1, x,y, 'position', [x, y, 175 20], 'TooltipString','Time in sec for which it is ok during the "SettlingIn_time" to be outside the center port before a violation occurs.');
-		ToggleParam(obj, 'LED_during_settling_legal_cbreak', 0, x, y, 'OnString', 'LED ON SetLcB', 'OffString', 'LED OFF setLcB', ...
-			'position', [x+180 y 20 20], 'TooltipString', ...
-			'If 1 (black), turn center port LED back on during settling_legal_cbreak; if 0 (brown), leave LED off');
-		next_row(y);
-		MenuParam(obj, 'side_lights' ,{'none','both','correct side','anti side'},1, x,y,'label','Side Lights','TooltipString','Controls the side LEDs during wait_for_spoke');
-		next_row(y);
-
-		
-        NumeditParam(obj, 'A1_time', 0.4, x,y,'label','AUD1 on Time','TooltipString','Duration of first stimulus');
-        next_row(y);
-        set_callback(A1_time, {mfilename, 'new_CP_duration'});
-        NumeditParam(obj, 'PreStim_time', 0.20, x,y,'label','Pre-Stim NIC time','TooltipString','Time in NIC before starting the stimulus');
-        next_row(y);
-        set_callback(PreStim_time, {mfilename, 'new_CP_duration'});
-        NumeditParam(obj, 'time_bet_aud1_gocue', 0, x,y,'label','A1-GoCue time','TooltipString','time between the end of the stimulus and the go cue ');
-        next_row(y);
-        set_callback(time_bet_aud1_gocue, {mfilename, 'new_CP_duration'});
-        DispParam(obj, 'init_CP_duration', 0.01, x,y,'label','init_CP duration','TooltipString','Duration of Nose in Central Poke before Go cue starts (see Total_CP_duration)');
-    	next_row(y);
-        DispParam(obj, 'CP_duration', PreStim_time+A1_time+time_bet_aud1_gocue, x,y,'label','CP duration','TooltipString','Duration of Nose in Central Poke before Go cue starts (see Total_CP_duration)');
-		set_callback(CP_duration, {mfilename, 'new_CP_duration'});
-		next_row(y);
-		NumeditParam(obj, 'time_go_cue' ,0, x,y,'label','Go Cue Duration','TooltipString','duration of go cue (see Total_CP_duration)');
-		set_callback(time_go_cue, {mfilename, 'new_time_go_cue'});
-		next_row(y);
-		DispParam(obj, 'Total_CP_duration', CP_duration+time_go_cue, x, y, 'TooltipString', 'Total nose in center port time, in secs. Sum of CP_duration and Go Cue duration'); %#ok<*NODEF>
-		next_row(y);
-        ToggleParam(obj, 'warmup_on', 1, x,y,...
-			'OnString', 'Warmup ON',...
-			'OffString', 'Warmup OFF',...
-			'TooltipString', sprintf(['If on (Yellow) then it applies the initial warming up phase, during which the\n',...
-            'CP_duration starts small and gradually grows to last_session_max_cp_duration']));
-        next_row(y);
-	% to modify it for widefield imagine
-        NumeditParam(obj,'imaging',0,x,y,'label','Scope Trigger');
-        next_row(y);
-        NumeditParam(obj, 'reward_delay', 0.01, x,y,'label','Reward Delay','TooltipString','Delay between side poke and reward delivery');
-		next_row(y);
-		NumeditParam(obj, 'reward_duration', 0.1, x,y,'label','Reward Duration','TooltipString','Duration of reward sound');
-		next_row(y);
-		NumeditParam(obj, 'drink_time', 1, x,y,'label','Drink Time','TooltipString','waits to finish water delivery');
-		next_row(y);
-		NumeditParam(obj, 'error_iti', 5, x,y,'label','Error Timeout','TooltipString','ITI on error trials');
-		next_row(y);
-		NumeditParam(obj, 'violation_iti', 1, x,y,'label','Violation Timeout','TooltipString','Center poke violation duration');
-        next_row(y);
-        MenuParam(obj, 'reward_type', {'Always','DelayedReward', 'NoReward'}, ...
-            'Always', x, y, 'labelfraction', 0.35, 'TooltipString', sprintf(['\nThis menu is to determine the Reward delivery on wrong-hit trials\n',...
-            '\nIf ''Always'': reward will be available on each trial no matter which side rat goes first\n',...
-            '\n If rat pokes first on the wrong side, then reward will be delivered with a delay (if DelayedReward) or not delivered at all (if NoReward)']));
-        set_callback(reward_type, {mfilename, 'new_reward_type'});
-		next_row(y);
-        NumeditParam(obj,'secondhit_delay',0,x,y,'label','SecondHit Delay','TooltipString','Reward will be delayed with this amount if reward_type=DelayedReward');
-
-        next_row(y);
-        ToggleParam(obj, 'random_A1_time', 0, x,y,...
-        'OnString', 'random A1_time ON',...
-        'OffString', 'random A1_time OFF',...
-        'TooltipString', sprintf('If on (black) then it enables the random sampling of A1_time'));
-        next_row(y);
-        ToggleParam(obj, 'random_prego_time', 0, x,y,...
-        'OnString', 'random prego_time ON',...
-        'OffString', 'random prego_time OFF',...
-        'TooltipString', sprintf('If on (black) then it enables the random sampling of time between the end of the stimulus and the go cue'));
-    
-        next_column(x);
-		y=5;
-		NumeditParam(obj,'trials_in_stage',1,x,y,'label','Trial Counter');
-		next_row(y);
-		NumeditParam(obj,'training_stage',1,x,y,'label','Training Stage');
-		next_row(y);
-		ToggleParam(obj,'use_training',0,x,y,'OnString','Using Autotrain','OffString','Manual Settings');
-		
         next_row(y);
 		NumeditParam(obj, 'ntrial_correct_bias', 0, x, y, ...
 			'TooltipString', 'antibias starts from trial=ntrial_correct_bias');
@@ -165,83 +47,278 @@ switch action
 			'TooltipString', 'all right reward times are multiplied by this number');
 		next_row(y);
 		ToggleParam(obj, 'antibias_wtr_mult', 0, x,y,...
-			'OnString', 'AB ON',...
-			'OffString', 'AB OFF',...
+			'OnString', 'AB_Water ON',...
+			'OffString', 'AB_Water OFF',...
 			'TooltipString', sprintf(['If on (black) then it disables the wtr_mult entries\n'...
-			'and uses hitfrac to adjust the water times']));
+			'and uses hitfrac to adjust the water times']));		
+		next_row(y);		
+		DispParam(obj, 'ThisTrial', 'LEFT', x, y); next_row(y);
 		
-		next_row(y);
-        ToggleParam(obj, 'stimuli_on', 1, x,y,...
-			'OnString', 'Stimuli ON',...
-			'OffString', 'Stimuli OFF',...
-			'TooltipString', sprintf('If on (black) then it disable the presentation of sound stimuli during nose poke'));
-        set_callback(stimuli_on, {mfilename, 'new_CP_duration'});
+        SubheaderParam(obj, 'title', 'Sides Section', x, y);next_row(y);
 
+        %% Stimulator Section
+        [x, y] = StimulatorSection(obj, 'init', x, y); next_row(y, 1.3);
+        %%
+        SoloParamHandle(obj, 'previous_sides', 'value', []);
+		DeclareGlobals(obj, 'ro_args', 'previous_sides');
+		
+        next_row(y, 1.5);  
+		next_column(x); y = 5;
+        
+        % Reward Collection
+        MenuParam(obj, 'reward_type', {'Always','DelayedReward', 'NoReward'}, ...
+            'Always', x, y, 'labelfraction', 0.35, 'TooltipString', sprintf(['\nThis menu is to determine the Reward delivery on wrong-hit trials\n',...
+            '\nIf ''Always'': reward will be available on each trial no matter which side rat goes first\n',...
+            '\n If rat pokes first on the wrong side, then reward will be delivered with a delay (if DelayedReward) or not delivered at all (if NoReward)']));
+        set_callback(reward_type, {mfilename, 'new_reward_type'});
 		next_row(y);
-		SoloFunctionAddVars('SoundCatSMA', 'ro_args', ...
-			{'CP_duration';'SideLed_duration';'CenterLed_duration';'side_lights' ; ...
-			'RewardCollection_duration';'training_stage'; ...
-			'legal_cbreak' ; 'LED_during_legal_cbreak' ; ...
-            'SettlingIn_time';'settling_legal_cbreak' ; 'LED_during_settling_legal_cbreak' ; ...
-			'time_go_cue'; ...
-            'stimuli_on';'A1_time';'time_bet_aud1_gocue' ; ...
-			'PreStim_time';'warmup_on'
-			'drink_time';'reward_delay';'reward_duration';'left_wtr_mult';...
-			'right_wtr_mult';'antibias_wtr_mult';...
-			'reward_type';'secondhit_delay';'error_iti';'violation_iti';'imaging'});
+        NumeditParam(obj,'secondhit_delay',0,x,y,'label','SecondHit Delay','TooltipString','Reward will be delayed with this amount if reward_type=DelayedReward');
+        next_row(y);
+		NumeditParam(obj, 'RewardCollection_duration', 10, x,y,'label','RColl_dur','TooltipString','Wait until rat collects the reward');
+		next_row(y);	
+		NumeditParam(obj, 'SideLed_duration', 0.5, x,y,'label','Side LED duration','TooltipString','Duration of SideLed');
+        next_row(y);
+		MenuParam(obj, 'side_lights' ,{'none','both','correct side','anti side'},1, x,y,'label','Side Lights','TooltipString','Controls the side LEDs during wait_for_spoke');
+		next_row(y);
+        NumeditParam(obj, 'reward_delay', 0.01, x,y,'label','Reward Delay','TooltipString','Delay between side poke and reward delivery');
+		next_row(y);
+		NumeditParam(obj, 'drink_time', 1, x,y,'label','Drink Time','TooltipString','waits to finish water delivery');
+		next_row(y);
+		NumeditParam(obj, 'error_iti', 3, x,y,'label','Error Timeout','TooltipString','ITI on error trials(valid only for NoReward Condition)');
+		next_row(y);
+
+        % Centre Poke
+        NumeditParam(obj, 'CenterLed_duration', 200, x,y,'label','C_LED dur','TooltipString','Duration of poke before Timeout');
+		next_row(y);
+		NumeditParam(obj, 'violation_iti', 1, x,y,'label','Violation Timeout','TooltipString','Center poke violation duration');
+		next_row(y);
+        NumeditParam(obj, 'timeout_iti', 1, x,y,'label','Timeout ITI','TooltipString','ITI on timeout trials');
+		next_row(y);
+        NumeditParam(obj, 'legal_cbreak', 0.1, x,y, 'position', [x, y, 175 20], 'TooltipString','Time in sec for which it is ok to be outside the center port before a violation occurs.');
+		ToggleParam(obj, 'LED_during_legal_cbreak', 1, x, y, 'OnString', 'LED ON LcB', 'OffString', 'LED off LcB', ...
+			'position', [x+180 y 20 20], 'TooltipString', ...
+			'If 1 (black), turn center port LED back on during legal_cbreak; if 0 (brown), leave LED off');
+         next_row(y);
+		NumeditParam(obj, 'SettlingIn_time', 0.2, x,y, 'position', [x, y, 175 20], 'TooltipString','Initial settling period during which "legal cbreak period" can be longer than the usual "legal_cbreak"');
+        ToggleParam(obj, 'LED_during_settling_legal_cbreak', 0, x, y, 'OnString', 'LED ON SetLcB', 'OffString', 'LED OFF setLcB', ...
+			'position', [x+180 y 20 20], 'TooltipString', ...
+			'If 1 (black), turn center port LED back on during settling_legal_cbreak; if 0 (brown), leave LED off');
+		next_row(y);
+
+		% PreStim
+        NumeditParam(obj, 'PreStim_time_Min', 0.20, x,y,'label','Pre-Stim Min','TooltipString','Min Time in NIC before starting the stimulus');
+        set_callback(PreStim_time_Min, {mfilename, 'new_CP_duration'});
+        next_row(y);
+        NumeditParam(obj, 'PreStim_time', 0.20,x,y, 'position', [x, y, 175 20],'label','Pre-Stim time','TooltipString','Actual Time in NIC before starting the stimulus');
+        set_callback(PreStim_time, {mfilename, 'new_CP_duration'});
+        % Toggle Buttons To Control Parameters 
+        ToggleParam(obj, 'random_PreStim_time', 1, x,y, 'position',[x+180 y 20 20],...
+        'OnString', 'random PreStim_time ON',...
+        'OffString', 'random PreStim_time OFF',...
+        'TooltipString', sprintf('If on (black) then it enables the random time between the user given range'));
+        set_callback(random_PreStim_time, {mfilename, 'new_CP_duration'});
+        next_row(y);
+        NumeditParam(obj, 'PreStim_time_Max', 1, x,y,'label','Pre-Stim Max','TooltipString','Max Time in NIC before starting the stimulus');
+        set_callback(PreStim_time_Max, {mfilename, 'new_CP_duration'});
+        next_row(y);
+        % A1 Time
+        NumeditParam(obj, 'A1_time_Min', 0.1, x,y,'label','Min time AUD1','TooltipString','Min value to select the Duration of fixed stimulus');
+        set_callback(A1_time_Min, {mfilename, 'new_CP_duration'});
+        next_row(y);
+        NumeditParam(obj, 'A1_time', 0.4,x,y, 'position', [x, y, 175 20],'label','AUD1 Time','TooltipString','Actual Duration of fixed stimulus');
+        set_callback(A1_time, {mfilename, 'new_CP_duration'});
+        % Toggle Buttons To Control Parameters 
+        ToggleParam(obj, 'random_A1_time', 1, x,y, 'position',[x+180 y 20 20],...
+        'OnString', 'random A1_time ON',...
+        'OffString', 'random A1_time OFF',...
+        'TooltipString', sprintf('If on (black) then it enables the random sampling of A1_time'));
+        set_callback(random_A1_time, {mfilename, 'new_CP_duration'});
+        next_row(y);
+        NumeditParam(obj, 'A1_time_Max', 0.4, x,y,'label','Max time AUD1','TooltipString','Max value to select the Duration of fixed stimulus');
+        set_callback(A1_time_Max, {mfilename, 'new_CP_duration'});
+        next_row(y);
+        % Time b/w stim and Go Cue
+        NumeditParam(obj, 'time_bet_aud1_gocue_Min', 0.2, x,y,'label','Min A1-GoCue time','TooltipString','Min time between the end of the stimulus and the go cue ');
+        set_callback(time_bet_aud1_gocue_Min, {mfilename, 'new_CP_duration'});
+        next_row(y);
+        NumeditParam(obj, 'time_bet_aud1_gocue', 0.4,x,y, 'position', [x, y, 175 20],'label','A1-GoCue time','TooltipString','Actual time between the end of the stimulus and the go cue ');
+        set_callback(time_bet_aud1_gocue, {mfilename, 'new_CP_duration'});
+        % Toggle Buttons To Control Parameters 
+        ToggleParam(obj, 'random_prego_time', 1,  x,y, 'position',[x+180 y 20 20],...
+        'OnString', 'random prego_time ON',...
+        'OffString', 'random prego_time OFF',...
+        'TooltipString', sprintf('If on (black) then it enables the random sampling of time between the end of the stimulus and the go cue'));
+        set_callback(random_prego_time, {mfilename, 'new_CP_duration'});
+        next_row(y);
+        NumeditParam(obj, 'time_bet_aud1_gocue_Max', 1, x,y,'label','Max A1-GoCue time','TooltipString','Max time between the end of the stimulus and the go cue ');
+        set_callback(time_bet_aud1_gocue_Max, {mfilename, 'new_CP_duration'});
+        next_row(y);
+        set_callback(time_bet_aud1_gocue, {mfilename, 'new_CP_duration'});
+
+
+        DispParam(obj, 'init_CP_duration', 0.01, x,y,'label','init_CP duration','TooltipString','Duration of Nose in Central Poke before Go cue starts (see Total_CP_duration)');
+    	next_row(y);
+        DispParam(obj, 'CP_duration', PreStim_time+A1_time+time_bet_aud1_gocue, x,y,'label','CP duration','TooltipString','Duration of Nose in Central Poke before Go cue starts (see Total_CP_duration)');
+		set_callback(CP_duration, {mfilename, 'new_CP_duration'});
+		next_row(y);
+		NumeditParam(obj, 'time_go_cue' ,0.2, x,y,'label','Go Cue Duration','TooltipString','duration of go cue (see Total_CP_duration)');
+		set_callback(time_go_cue, {mfilename, 'new_time_go_cue'});
+		next_row(y);
+		DispParam(obj, 'Total_CP_duration', CP_duration+time_go_cue, x, y, 'TooltipString', 'Total nose in center port time, in secs. Sum of CP_duration and Go Cue duration'); %#ok<*NODEF>
+		next_row(y); next_row(y);
+
+        % Toggle Buttons To Control Parameters       
+        % ToggleParam(obj, 'stimuli_on', 1, x,y,...
+        % 'OnString', 'Stimuli ON',...
+        % 'OffString', 'Stimuli OFF',...
+        % 'TooltipString', sprintf('If on (black) then it enables training with stimuli else using a fixed sound from Stage 5'));
+        % next_row(y);
+         
+        MenuParam(obj, 'Stimuli_State', {'Full','Fixed Stimuli','No Sound'}, ...
+            'Full', x, y, 'label','Stimuli State', 'labelfraction', 0.35, 'TooltipString', sprintf(['\n Different Options for Stimuli Sound.\n', ...
+            '\n''If its full all the stimuli will be presented, Fixed is a single sound \n',...
+            '\n''and No is when no sound is presented']));
+        set_callback(Stimuli_State,{mfilename,'stim_state_change'});
+        next_row(y);next_row(y);
 
         SoloFunctionAddVars('StimulusSection', 'ro_args', ...
-			{'ThisTrial';'A1_time';'time_bet_aud1_gocue' ; ...
-			'PreStim_time'});
+			{'ThisTrial';'Stimuli_State';'A1_time';'time_bet_aud1_gocue' ; ...
+			'PreStim_time';'LeftProb'});
+
+        %% Sound and Stimulus Section
+        [x, y] = SoundSection(obj,'init',x,y);
+        [x, y] = StimulusSection(obj,'init',x,y); next_row(y);
+        
+        next_column(x);
+		y=5;
+		
+        ToggleParam(obj, 'control_active', 0, x,y,...
+			'OnString', 'Buttons Deative',...
+			'OffString', 'Buttons Active',...
+			'TooltipString', sprintf(['If on (Yellow) then the user can change parameters.\n',...
+            'This is to prevent any unwanted button press']));     
+        set_callback(control_active, {mfilename, 'User_Control'});
+        next_row(y);
+
+        % Toggle for WarmUp 
+        ToggleParam(obj, 'warmup_on', 0, x,y,...
+			'OnString', 'Warmup ON',...
+			'OffString', 'Warmup OFF',...
+			'TooltipString', sprintf(['If on (Yellow) then it applies the initial warming up phase, during which the\n',...
+            'CP_duration starts small and gradually grows to last_session_max_cp_duration. Used during training']));        
+        next_row(y);
+
+        % Training for Centre Poke Increase 
+		ToggleParam(obj,'increase_CP_training',0,x,y,'OnString','Training Increasing CP','OffString','No Training');
+		set_callback(increase_CP_training, {mfilename, 'CP_training'});
+        next_row(y);       
+        NumeditParam(obj, 'cp_start' ,0.5, x,y,'label','CPDur_Start','TooltipString','CP start time during training');
+        next_row(y);
+        NumeditParam(obj, 'cp_end' ,2, x,y,'label','CPDur_End','TooltipString','CP end time during training');
+        next_row(y);
+        NumeditParam(obj, 'fraction_increase' ,0.001, x,y,'label','Frac_Increment','TooltipString','fraction CP added');
+        next_row(y);
+        NumeditParam(obj, 'cp_reached' ,value(cp_start), x,y,'label','CPDur_Reached','TooltipString','CP dur reached in last session');
+        next_row(y);
+        make_invisible(cp_start); make_invisible(cp_end); make_invisible(fraction_increase);make_invisible(cp_reached);
+
+
+		SoloFunctionAddVars('ArpitSoundCatContinuousSMA', 'ro_args', ...
+			{'CP_duration';'SideLed_duration';'CenterLed_duration';'side_lights' ; ...
+			'RewardCollection_duration'; ...
+			'legal_cbreak' ; 'LED_during_legal_cbreak' ; ...
+            'SettlingIn_time' ; 'LED_during_settling_legal_cbreak' ; ...
+			'time_go_cue';'timeout_iti'; ...
+            'Stimuli_State';'A1_time';'time_bet_aud1_gocue' ; ...
+			'PreStim_time';'warmup_on';'time_go_cue'; ...
+			'drink_time';'reward_delay';'left_wtr_mult';...
+			'right_wtr_mult';'antibias_wtr_mult';...
+			'reward_type';'secondhit_delay';'error_iti';'violation_iti'});        
+
         SoloFunctionAddVars('StimulatorSection', 'ro_args', ...
 			{'A1_time';'time_bet_aud1_gocue';'time_go_cue'; ...
 			'PreStim_time';'CP_duration';'Total_CP_duration'});
         
+        SoloFunctionAddVars('PsychometricSection', 'ro_args',{'Stimuli_State'});
+        
         %   History of hit/miss:
         SoloParamHandle(obj, 'deltaf_history',      'value', []);
-      
-		SoloFunctionAddVars('OverallPerformanceSection', 'ro_args', ...
-			{'training_stage'});
-			
-    	SoloFunctionAddVars('SoundCatSMA', 'ro_args', ...
-			{'maxasymp';'slp';'inflp';'minasymp';'assym'});
-		
 		SoloParamHandle(obj, 'previous_parameters', 'value', []);
 
+    case 'stim_state_change'
 
-          %% change_water_modulation_params
-   case 'change_water_modulation_params',
-	   display_guys = [1 150 300];
-	   for i=1:numel(display_guys),
-		   t = display_guys(i);
-	   
-		   myvar = eval(sprintf('trial_%d', t));
-		   myvar.value = maxasymp + (minasymp/(1+(t/inflp)^slp).^assym);
-	   end;
+         StimulusSection(obj,'Stimuli_State_change');
+         PsychometricSection(obj,'Stimuli_State_changed');
 
-		
+
+    case 'User_Control'
+
+        if value(control_active) == 0
+            disable(antibias_LRprob); disable(stimuli_on);  disable(Switch_Distr); disable(antibias_wtr_mult);
+            disable(random_PreStim_time); disable(random_A1_time); disable(random_prego_time);
+            disable(warmup_on); disable(increase_CP_training);
+        else
+            enable(antibias_LRprob); enable(stimuli_on); enable(Switch_Distr); enable(antibias_wtr_mult);
+            enable(random_PreStim_time); enable(random_A1_time); enable(random_prego_time);
+            enable(warmup_on); enable(increase_CP_training);
+        end
+
 	case 'new_leftprob'
-		AntibiasSectionAthena(obj, 'update_biashitfrac', value(LeftProb));
+		AntibiasSection(obj, 'update_biashitfrac', value(LeftProb));
 		
 		
 	case 'new_CP_duration' 
-        if stimuli_on == 0
-            PreStim_time.value=0;
-            A1_time.value=0;
-            time_bet_aud1_gocue.value=0;
-            disable(PreStim_time);
-            disable(A1_time);
-            disable(time_bet_aud1_gocue);
+
+        if random_PreStim_time == 1
+            make_visible(PreStim_time_Min); make_visible(PreStim_time_Max);
         else
-            enable(PreStim_time);
-            enable(A1_time);
-            enable(time_bet_aud1_gocue);
+            make_invisible(PreStim_time_Min); make_invisible(PreStim_time_Max);
         end
-        CP_duration.value=PreStim_time + A1_time + time_bet_aud1_gocue;
-		Total_CP_duration.value = CP_duration + time_go_cue; %#ok<*NASGU>
+
+        if random_A1_time == 1
+            make_visible(A1_time_Min); make_visible(A1_time_Max);
+        else
+            make_invisible(A1_time_Min); make_invisible(A1_time_Max);
+        end
+
+        if random_prego_time == 1
+            make_visible(time_bet_aud1_gocue_Min);make_visible(time_bet_aud1_gocue_Max);
+        else
+            make_invisible(time_bet_aud1_gocue_Min);make_invisible(time_bet_aud1_gocue_Max);
+        end
+
+
+        if random_PreStim_time == 1 && (value(PreStim_time) < value(PreStim_time_Min) || value(PreStim_time) > value(PreStim_time_Max))
+            PreStim_time.value = value(PreStim_time_Min);
+        else
+            PreStim_time.value = value(PreStim_time);
+        end
+
+        if random_A1_time == 1 && (value(A1_time) < value(A1_time_Min) || value(A1_time) > value(A1_time_Max))
+            A1_time.value = value(A1_time_Min);
+        else
+            A1_time.value = value(A1_time);
+        end
+
+        if random_prego_time == 1 && (value(time_bet_aud1_gocue) < value(time_bet_aud1_gocue_Min) || value(time_bet_aud1_gocue) > value(time_bet_aud1_gocue_Max))
+            time_bet_aud1_gocue.value = value(time_bet_aud1_gocue_Min);
+        else
+            time_bet_aud1_gocue.value = value(time_bet_aud1_gocue);
+        end
+
+        CP_duration.value= value(SettlingIn_time) + value(PreStim_time) + value(A1_time) + value(time_bet_aud1_gocue);
+		Total_CP_duration.value = value(CP_duration) + value(time_go_cue); %#ok<*NASGU> 
+
+    case 'CP_training'
+
+        if increase_CP_training
+             make_visible(cp_start); make_visible(cp_end); make_visible(fraction_increase);make_visible(cp_reached);
+        else
+             make_invisible(cp_start); make_invisible(cp_end); make_invisible(fraction_increase);make_invisible(cp_reached);
+        end
 
 	case 'new_time_go_cue'
-		Total_CP_duration.value = CP_duration + time_go_cue;
+		Total_CP_duration.value = value(CP_duration) + value(time_go_cue);
 		SoundInterface(obj, 'set', 'GoSound', 'Dur1', value(time_go_cue));
         
     case 'new_reward_type'
@@ -252,182 +329,201 @@ switch action
             disable(secondhit_delay)
             
         end
-		
-        
+		        
 	case 'prepare_next_trial'
-		
-		
-		switch value(training_stage)
-			case 0                 %% learning the reward sound association -left or right led on -> poke -> sound+reward
-				settling_time.value=0.01;
-				delay_time.value=0;
-				allow_nic_breaks.value=1;
-				side_lights.value=3;
-				trials_in_stage.value=0;
-				reward_delay.value=0.01;
-				left_prob.value=0.5;
-				right_prob.value=0.5;
-				time_go_cue.value=0.200;
-				reward_duration=0.200;
-				
-				
-			case 1                  %%  center led on -> poke in the center -> go cue -> reward light and sound
-                %what A1_time and time before go cue?
-                if random_A1_time
-                    A1_times = [0.2, 0.4];
-                    randomix = randi(length(A1_times), 1);
-                    A1_time.value = A1_times(randomix);
+
+        %% Calculate the CP Params Time
+
+        % Warm Up If starting a new session irrespective of training
+        if warmup_on == 1 && n_done_trials <= 10 % warm up trials
+            if increase_CP_training == 1 %% Training to increase CP
+                last_CP = value(cp_reached);
+            else
+                last_CP = 3;
+            end
+            if value(SettlingIn_time) + value(legal_cbreak) < 0.5
+                cp_min = 0.5;
+            else
+                cp_min = value(SettlingIn_time) + value(legal_cbreak);
+            end
+
+            fixed_CP_length = 1;
+            if n_done_trials == 0
+                CP_duration.value = value(init_CP_duration);
+            elseif n_done_trials > 0 && n_done_trials <= 10 % warm up trials
+                cp_delta = (last_CP - value(init_CP_duration)) / 10;
+                CP_duration.value = value(init_CP_duration) + cp_delta * n_done_trials;
+                if value(CP_duration) < cp_min
+                    CP_duration.value = cp_min;
                 end
-                
-                if random_prego_time
-                    prego_times = [0.2, 0.4, 0.6, 0.8, 1];
-                    randomixx = randi(length(prego_times), 1);
-                    time_bet_aud1_gocue.value = prego_times(randomixx);
+            end
+            
+            cp_length = value(CP_duration) - value(SettlingIn_time);
+
+        else % Non Warmup Trials with Increased CP Training
+            if increase_CP_training == 1 && value(CP_duration) <= value(cp_end)  %% Training to increase CP                
+                if ~violation_history(end) && ~timeout_history(end)
+                    increment = value(CP_duration) * value(fraction_increase);
+                    CP_duration.value = value(CP_duration) + increment;
+                    % Check if the values are within the required range
+                    if value(CP_duration) < value(cp_start)
+                        CP_duration.value = value(cp_start);
+                    end
+                    if value(CP_duration) >= value(cp_end)
+                        CP_duration.value = value(cp_end);
+                    end
                 end
-				settling_time.value=0.25;
-				delay_time.value=0;
-				allow_nic_breaks.value=1;
-				side_lights.value=3;
-				training_stage.value=1;
-				trials_in_stage.value=0;
-				reward_delay.value=0.01;
-				left_prob.value=0.5;
-				right_prob.value=0.5;
-                if n_done_trials <1 && warmup_on ==1
-                CP_duration.value=value(init_CP_duration);
-                else
-				CP_duration.value=PreStim_time + A1_time + time_bet_aud1_gocue;
-                end
-                Total_CP_duration.value = CP_duration + time_go_cue; %#ok<*NASGU>
-               
-                
-			case 3 % like stage 2, now passive exposure to the stimuli - reward comes anyway
-			case 4 %% now reward comes only if rat goes to the correct side
-				
-		end
-		
-		
+
+                fixed_CP_length = 1;
+                cp_length = value(CP_duration) - value(SettlingIn_time);
+
+            else % Usual Case During Experiment
+                fixed_CP_length = 0;
+                cp_length = 3; % doesn't matter as this wont be used
+            end
+        end
+       
+        % Calculate new values of Params
+        
+        if cp_length >= 0.3
+            [PreStim_time.value ,A1_time.value,time_bet_aud1_gocue.value] = Calculate_CentrePoke_Params(fixed_CP_length,...
+                cp_length,value(PreStim_time_Min),value(PreStim_time_Max), random_PreStim_time, value(PreStim_time),...
+                value(A1_time_Min),value(A1_time_Max), random_A1_time, value(A1_time),value(time_bet_aud1_gocue_Min),...
+                value(time_bet_aud1_gocue_Max),random_prego_time, value(time_bet_aud1_gocue));
+
+            CP_duration.value = value(SettlingIn_time) + value(PreStim_time) + value(A1_time) + value(time_bet_aud1_gocue);        
+        end
+
+        Total_CP_duration.value = value(CP_duration) + value(time_go_cue); %#ok<*NASGU>
+
 		%% update hit_history, previous_sides, etc
 		was_viol=false;
 		was_hit=false;
         was_timeout=false;
-		if n_done_trials>0
-			if ~isempty(parsed_events)
-				if isfield(parsed_events,'states')
-					if isfield(parsed_events.states,'timeout_state')
-						was_timeout=rows(parsed_events.states.timeout_state)>0;
+        if n_done_trials>0
+            if ~isempty(parsed_events)
+                if isfield(parsed_events,'states')
+                    if isfield(parsed_events.states,'timeout_state')
+                        was_timeout=rows(parsed_events.states.timeout_state)>0;
                     end
                     if isfield(parsed_events.states,'violation_state')
-						was_viol=rows(parsed_events.states.violation_state)>0;
-					end
-				end
-				
-			end
-			
-			violation_history.value=[violation_history(:); was_viol];
-			timeout_history.value=[timeout_history(:); was_timeout];
+                        was_viol=rows(parsed_events.states.violation_state)>0;
+                    end
+                end
 
-			SideSection(obj,'update_side_history');
-			
+            end
+            
+            vio_history = value(violation_history);
+            vio_history(n_done_trials) = was_viol;
+            violation_history.value= vio_history;
+            tout_history = value(timeout_history);
+            tout_history(n_done_trials) = was_timeout;
+            timeout_history.value= tout_history;
+
+            SideSection(obj,'update_side_history');
+
+            hit_his = value(hit_history);
 			if ~was_viol && ~was_timeout
 				%was_hit=rows(parsed_events.states.hit_state)>0;
                 was_hit=rows(parsed_events.states.second_hit_state)==0;
-				hit_history.value=[hit_history(:); was_hit];
-				
+				hit_his(n_done_trials) = was_hit;				
 			else
 				% There was a violation or timeout
-				hit_history.value=[hit_history(:); nan];
+				hit_his(n_done_trials) = nan;
 			end
-			
-			% Now calculate the deltaF and sides - this maybe interesting
-			% even in a violation or timeout case.
-			
-			fn=fieldnames(parsed_events.states);
-			led_states=find(strncmp('led',fn,3));
-			deltaF=0;
-			n_l=0;
-			n_r=0;
-			for lx=1:numel(led_states)
-				lind=led_states(lx);
-				if rows(parsed_events.states.(fn{lind}))>0
-					if fn{lind}(end)=='l'
-						deltaF=deltaF-1;
-						n_l=n_l+1;
-					elseif fn{lind}(end)=='r'
-						deltaF=deltaF+1;
-						n_r=n_r+1;
-					elseif fn{lind}(end)=='b'
-						n_l=n_l+1;
-						n_r=n_r+1;
-						
-					end
-				end
-				
-			end
+			hit_history.value = hit_his;
+            
+			% % Now calculate the deltaF and sides - this maybe interesting
+			% % even in a violation or timeout case.
+            % 
+			% fn=fieldnames(parsed_events.states);
+			% led_states=find(strncmp('led',fn,3));
+			% deltaF=0;
+			% n_l=0;
+			% n_r=0;
+			% for lx=1:numel(led_states)
+			% 	lind=led_states(lx);
+			% 	if rows(parsed_events.states.(fn{lind}))>0
+			% 		if fn{lind}(end)=='l'
+			% 			deltaF=deltaF-1;
+			% 			n_l=n_l+1;
+			% 		elseif fn{lind}(end)=='r'
+			% 			deltaF=deltaF+1;
+			% 			n_r=n_r+1;
+			% 		elseif fn{lind}(end)=='b'
+			% 			n_l=n_l+1;
+			% 			n_r=n_r+1;
+            % 
+			% 		end
+			% 	end
+            % 
+			% end
 			
 			% if deltaF>0 then a right poke is a hit
 			% if deltaF<0 then a left poke is a hit
 			
-			deltaf_history.value=[deltaf_history(:); deltaF];
+			% deltaf_history.value=[deltaf_history(:); deltaF];
 			
         end
 		
         if antibias_LRprob ==1
             if n_done_trials >ntrial_correct_bias && ~was_viol && ~was_timeout
-            nonan_hit_history=value(hit_history);
-            nonan_hit_history(isnan(nonan_hit_history))=[];
-            nonan_previous_sides=value(previous_sides);
-            nan_history=value(hit_history);
-            nonan_previous_sides(isnan(nan_history))=[];
-            AntibiasSectionAthena(obj, 'update', value(LeftProb), nonan_hit_history(:)',nonan_previous_sides(:)); % <~> Transposed hit history so that it is the expected column vector. (Antibias errors out otherwise.) 2007.09.05 01:39
+                nonan_hit_history=value(hit_history);
+                nonan_hit_history(isnan(nonan_hit_history))=[];
+                nonan_previous_sides=value(previous_sides);
+                nan_history=value(hit_history);
+                nonan_previous_sides(isnan(nan_history))=[];
+                AntibiasSection(obj, 'update', value(LeftProb), nonan_hit_history(:)',nonan_previous_sides(:)); % <~> Transposed hit history so that it is the expected column vector. (Antibias errors out otherwise.) 2007.09.05 01:39
             end
-		
-		
+
+
             if ~isinf(MaxSame) && length(previous_sides) > MaxSame && ...
-                    all(previous_sides(n_done_trials-MaxSame+1:n_done_trials) == previous_sides(n_done_trials)), %#ok<NODEF>
-                if previous_sides(end)=='l', ThisTrial.value = 'RIGHT';
-                else                         ThisTrial.value = 'LEFT';
-                end;
+                    all(previous_sides(n_done_trials-MaxSame+1:n_done_trials) == previous_sides(n_done_trials)) %#ok<NODEF>
+                if previous_sides(end)=='l'
+                    ThisTrial.value = 'RIGHT';
+                else
+                    ThisTrial.value = 'LEFT';
+                end
             else
-                choiceprobs = AntibiasSectionAthena(obj, 'get_posterior_probs');
-                if rand(1) <= choiceprobs(1),  ThisTrial.value = 'LEFT';
-                else                           ThisTrial.value = 'RIGHT';
-                end;
-            end;
-        
+                choiceprobs = AntibiasSection(obj, 'get_posterior_probs');
+                if rand(1) <= choiceprobs(1)
+                    ThisTrial.value = 'LEFT';
+                else
+                    ThisTrial.value = 'RIGHT';
+                end
+            end
+
         else
             if (rand(1)<=LeftProb)
                 ThisTrial.value='LEFT';
-			
+
             else
                 ThisTrial.value='RIGHT';
             end
 
         end
         
-        
+       %% Do the anti-bias with changing water vreward delivery
+		% reset anti-bias
 		
+        left_wtr_mult.value=1;
+		right_wtr_mult.value=1;
 		
-% 		%% Do the anti-bias with changing reward delivery
-% 		% reset anti-bias
-% 		left_wtr_mult.value=1;
-% 		right_wtr_mult.value=1;
-% 		if n_done_trials>ntrial_correct_bias && antibias_wtr_mult==1
-% 			hh=hit_history(n_done_trials-ntrial_correct_bias:n_done_trials);
-% 			ps=previous_sides(n_done_trials-ntrial_correct_bias:n_done_trials);
-% 			
-% 			right_hit=nanmean(hh(ps=='r'));
-% 			left_hit=nanmean(hh(ps=='l'));
-% 			
-% 			if abs(right_hit-left_hit)<right_left_diff
-% 				left_wtr_mult.value=1;
-% 				right_wtr_mult.value=1;
-% 			else
-% 				
-% 				left_wtr_mult.value=min(right_hit/left_hit,max_wtr_mult);
-% 				right_wtr_mult.value=min(left_hit/right_hit,max_wtr_mult);
-% 			end
-% 		end
+        % if n_done_trials>ntrial_correct_bias && antibias_wtr_mult==1
+		% 	hh=hit_history(n_done_trials-ntrial_correct_bias:n_done_trials);
+		% 	ps=previous_sides(n_done_trials-ntrial_correct_bias:n_done_trials);
+        % 
+		% 	right_hit=nanmean(hh(ps=='r'));
+		% 	left_hit=nanmean(hh(ps=='l'));
+        % 
+		% 	if abs(right_hit-left_hit)<right_left_diff
+		% 		left_wtr_mult.value=1;
+		% 		right_wtr_mult.value=1;
+        %     else
+		% 		left_wtr_mult.value=min(right_hit/left_hit,max_wtr_mult);
+		% 		right_wtr_mult.value=min(left_hit/right_hit,max_wtr_mult);
+		% 	end
+		% end
 		
 		
 
@@ -442,11 +538,31 @@ switch action
 %         assym=0.7;
 %         left_wtr_mult.value=maxasymp + (minasymp./(1+(n_done_trials/inflp).^slp).^assym);
 %         right_wtr_mult.value=maxasymp + (minasymp./(1+(n_done_trials/inflp).^slp).^assym);
-		x=left_wtr_mult+0;
-		y=right_wtr_mult+0;
-		
-	case 'get_previous_sides',
-		x = value(previous_sides); %#ok<NODEF>
+		x=value(left_wtr_mult);
+		y=value(right_wtr_mult);
+	
+    case 'get_water_amount'
+
+        %% Calculate the water amount for each side valve
+        try
+            trials_use = max(1,numel(find(~isnan(value(hit_history))))); 
+        catch
+            trials_use = n_done_trials;
+        end
+        WaterAmount=maxasymp + (minasymp./(1+(trials_use/inflp).^slp).^assym); % using valid trials only instead of total trials
+        %         WaterValvesSection(obj, 'set_water_amounts', WaterAmount, WaterAmount);
+        %         [LeftWValveTime RightWValveTime] = WaterValvesSection(obj, 'get_water_times');
+        WValveTimes = GetValveTimes(WaterAmount, [2 3]);
+        LeftWValveTime = WValveTimes(1);
+        RightWValveTime = WValveTimes(2);
+        % [LeftWMult, RightWMult] = ParamsSection(obj, 'get_water_mult');
+        LeftWMult=value(left_wtr_mult);
+		RightWMult=value(right_wtr_mult);
+        x=LeftWValveTime*LeftWMult;
+        y=RightWValveTime*RightWMult;
+
+    case 'get_previous_sides'
+        x = value(previous_sides); %#ok<NODEF>
 		
 	case 'get_left_prob'
 		x = value(LeftProb);
@@ -458,23 +574,24 @@ switch action
 		x = cell2mat(get_history(A1_time));
   
 	case 'update_side_history'
-		if strcmp(ThisTrial, 'LEFT')
-			ps=value(previous_sides);
-			ps(n_done_trials)='l';
-			previous_sides.value=ps;
-			
-		else
-			ps=value(previous_sides);
-			ps(n_done_trials)='r';
-			previous_sides.value=ps;
-		end;
+        
+        if strcmp(ThisTrial, 'LEFT')
+            ps=value(previous_sides);
+            ps(n_done_trials)='l';
+            previous_sides.value=ps;
+
+        else
+            ps=value(previous_sides);
+            ps(n_done_trials)='r';
+            previous_sides.value=ps;
+        end
 		
 	case 'get_current_side'
-		if strcmp(ThisTrial, 'LEFT')
-			x = 'l'; %#ok<NODEF>
-		else
-			x = 'r';
-		end;
+        if strcmp(ThisTrial, 'LEFT')
+            x = 'l'; %#ok<NODEF>
+        else
+            x = 'r';
+        end
 		
 		
 	case 'close'
@@ -483,7 +600,7 @@ switch action
 		delete_sphandle('owner', ['^@' class(obj) '$'], ...
 			'fullname', ['^' mfilename]);
 
-	case 'reinit',
+	case 'reinit'
 		currfig = double(gcf);
 		
 		% Get the original GUI position and figure:

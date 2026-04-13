@@ -6,7 +6,7 @@ function [obj] = ArpitCentrePokeTraining(varargin)
 % Default object is of our own class (mfilename);
 % we inherit only from Plugins
 
-obj = class(struct, mfilename, pokesplot2, saveload, sessionmodel2, soundmanager, soundui, ...
+obj = class(struct, mfilename, pokesplot2, saveload, sessionmodel2, soundmanager, soundui,antibias, ...
   water, distribui,comments, soundtable, sqlsummary, bonsaicamera);
 
 %---------------------------------------------------------------
@@ -158,7 +158,6 @@ switch action
 	set_callback({maxasymp;slp;inflp;minasymp;assym}, {mfilename, 'change_water_modulation_params'});
 	feval(mfilename, obj, 'change_water_modulation_params');
 	
-	%AthenaSMA changed to SoundCatSMA (From AthenaDelayComp)
     SoloFunctionAddVars('ParamsSection', 'ro_args', ...
 			{'maxasymp';'slp';'inflp';'minasymp';'assym'});
      
@@ -188,6 +187,21 @@ switch action
     
     [x, y] = BonsaiCameraInterface(obj,'init',x,y,name,expmtr,rname);
 
+    % Before the TrainingStageParamsSection, let's first check if
+    % the setting file exist for this rat and only load the training stage
+    % from there.
+    % Problem: Loading settings in later stages fails because the stage-dependent
+    % TrainingStageParamsSection's solohandles are not visible after initial setup.
+    % Solution: This section handles a specific scenario for loading setting files during initialization.
+    % Although also invoked in Runrats, calling it here is crucial. The
+    % TrainingStageParamsSection's parameters are initially set at stage 1 and are visible.
+    % However, they become stage-dependent. Subsequent stages lack visible solohandles for
+    % these parameters, preventing proper loading. This initialization provides a workaround
+    % to avoid significant changes required to load stage-specific solohandles and maintain
+    % broader compatibility.
+
+    set_training_stage_last_setting_file(name,expmtr,rname)
+
     next_column(x); y=5;
     [stage_fig_x,stage_fig_y] = TrainingStageParamsSection(obj, 'init', x, y);
     SoloParamHandle(obj, 'stage_fig_x', 'value', stage_fig_x);
@@ -201,11 +215,29 @@ switch action
     x=oldx; y=oldy;
     SessionDefinition(obj, 'init', x, y, value(myfig)); %#ok<NASGU>
     
-    %%
+    %%%
+    
+% Problem: Loading settings in later stages fails because the stage-dependent
+% TrainingStageParamsSection's solohandles are not visible after initial setup.
+% Solution: This section handles a specific scenario for loading setting files during initialization.
+% Although also invoked in Runrats, calling it here is crucial. The
+% TrainingStageParamsSection's parameters are initially set at stage 1 and are visible.
+% However, they become stage-dependent. Subsequent stages lack visible solohandles for
+% these parameters, preventing proper loading. This initialization provides a workaround
+% to avoid significant changes required to load stage-specific solohandles and maintain
+% broader compatibility.
+    
+%     try
+%         [~, ~]=load_solouiparamvalues(rname,'experimenter',expmtr,...
+%             'owner',name,'interactive',0);
+%     catch
+%     end
+     %%
     % feval(mfilename, obj, 'prepare_next_trial'); % Commented out because it is also run by Runrats(while loading the protocol)
           
     %%% 
 
+   
    %% change_water_modulation_params
    case 'change_water_modulation_params'
 	   display_guys = [1 150 300];
@@ -216,18 +248,23 @@ switch action
            myvar.value = maxasymp + (minasymp/(1+(t/inflp)^slp).^assym);
        end
 	
+   %% when user presses run on runrats then then is called
+    case 'start_recording'
+
+        BonsaiCameraInterface(obj,'record_start');
+
    %% prepare next trial
    case 'prepare_next_trial'
 
        ParamsSection(obj, 'prepare_next_trial');
 
-    % push_helper_vars_tosql(obj,n_completed_trials); 
+    % push_helper_vars_tosql(obj,n_done_trials); 
        
        SessionDefinition(obj, 'next_trial');
        
        StimulusSection(obj,'prepare_next_trial');
        SoundManagerSection(obj, 'send_not_yet_uploaded_sounds');
-       [sma, prepare_next_trial_states] = ArpitCentrePokeTrainingSMA(obj, 'prepare_next_trial');
+       [~, ~] = ArpitCentrePokeTrainingSMA(obj, 'prepare_next_trial');
 
     % Default behavior of following call is that every 20 trials, the data
     % gets saved, not interactive, no commit to CVS.
@@ -238,34 +275,27 @@ switch action
             CommentsSection(obj, 'append_date'); CommentsSection(obj, 'append_line', '');
        end
 
-       if n_done_trials==1
-            [expmtr, rname]=SavingSection(obj, 'get_info');
-            prot_title.value=[mfilename ' on rig ' get_hostname ' : ' expmtr ', ' rname  '.  Started at ' datestr(now, 'HH:MM')];
-       end
-      
-       try 
-           send_n_done_trials(obj,'update');
-       catch
-       end
-
    %% trial_completed
    case 'trial_completed'
     
        % Change the video trial  
         BonsaiCameraInterface(obj,'next_trial');
     
-    % Update the Metrics Calculated, Instead being Calculated in Session
-    % Definition and commented out
+    % Update the Metrics Calculated, Instead being Calculated in SessionDefinition and commented out
 
     % PerformanceSummarySection(obj,'evaluate');
     % SessionPerformanceSection(obj, 'evaluate');
+    
     % Do any updates in the protocol that need doing:
        feval(mfilename, 'update');
 
    %% update
    case 'update'
       % PokesPlotSection(obj, 'update');
-      
+      if n_done_trials==1
+            [expmtr, rname]=SavingSection(obj, 'get_info');
+            prot_title.value=[mfilename ' on rig ' get_hostname ' : ' expmtr ', ' rname  '.  Started at ' datestr(now, 'HH:MM')];
+       end
       
    %% close
    case 'close'
@@ -280,37 +310,43 @@ switch action
 
       
       %% end_session
-   case 'end_session'
-      prot_title.value = [value(prot_title) ', Ended at ' datestr(now, 'HH:MM')];
-      BonsaiCameraInterface(obj,'stop') % Stopping the cameras
-      
-      %% pre_saving_settings
-   case 'pre_saving_settings'
-    
-    StimulusSection(obj,'hide');   
-    SessionDefinition(obj, 'run_eod_logic_without_saving');
+    case 'end_session'
+        prot_title.value = [value(prot_title) ', Ended at ' datestr(now, 'HH:MM')];
+        BonsaiCameraInterface(obj,'stop') % Stopping the cameras
 
-    % Sending protocol data as structure is causing error in saving bdata,
-    % instead not sending it asif required can be taken from session data
-    sendsummary(obj);
-    
-    % perf    = SessionPerformanceSection(obj, 'evaluate');
-    % cp_durs = ParamsSection(obj, 'get_cp_history');
-    % [stim1dur] = ParamsSection(obj,'get_stimdur_history');
-    % pd.hits=hit_history(:);
-    % pd.sides=previous_sides(:);
-    % pd.viols=violation_history(:);
-    % pd.timeouts=timeout_history(:);
-    % pd.cp_durs=cp_durs(:);
-    % pd.stim1dur=stim1dur(:);
+        %% pre_saving_settings
+    case 'pre_saving_settings'
+
+        StimulusSection(obj,'hide');
+        SessionDefinition(obj, 'run_eod_logic_without_saving');
+
+        % Sending protocol data as structure is causing error in saving bdata,
+        % instead not sending it asif required can be taken from session data
+
+        % sendsummary(obj);
+
+        % Sending Summary Statistics to SQL Database
+
+        perf = struct([]);
+        perf = PerformanceSummarySection(obj, 'evaluate');
+        [perf.violation_percent,perf.timeout_percent] = SessionPerformanceSection(obj, 'evaluate');
+
+        [perf.stage_no,perf.CP_Duration]  = ParamsSection(obj,'get_stage');
+        stage_name_list = {'Familiarize with Reward Side Pokes','Timeout Rewarded Side Pokes'...
+            'Introduce Centre Poke','Introduce Violation for Centre Poke',...
+            'Introduce Stimuli Sound during Centre Poke','Vary Stimuli location during Centre Poke'...
+            'Variable Stimuli Go Cue location during Centre Poke','User Setting'};
+        perf.stage_name = stage_name_list{perf.stage_no};
+
+        perf.video_filepath = BonsaiCameraInterface(obj,'get_video_filepath');
+
+        CentrePoketrainingsummary(obj,'protocol_data',perf);
     
 % 	CommentsSection(obj, 'append_line', ...
 % 		sprintf(['ntrials = %d, violations = %.2f, timeouts=%.2f, hits = %.2f\n', ...
 % 		'pre-Go cue went from %.3f to %.3f  (delta=%.3f)\n', ...
 %         'Low = %.2f, High = %.2f'], ...
 % 		perf(1), perf(2), perf(3), perf(6), cp_durs(1), cp_durs(end), cp_durs(end)-cp_durs(1), classperf(1),classperf(2)));
-    
-    % sendsummary(obj,'protocol_data',pd);    
       
       %% otherwise
     otherwise

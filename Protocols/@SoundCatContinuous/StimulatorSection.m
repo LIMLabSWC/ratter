@@ -35,7 +35,7 @@ switch action
 %
 % ----------------------------------------------------------------
   
-  case 'init', 
+  case 'init' 
       %NumeditParam(obj,'LCB_onstim', 0,x,y,'position',[x     y 100 20],'labelfraction',0.6);
       %NumeditParam(obj,'LCB_nostim', 0,x,y,'position',[x+100 y 100 20],'labelfraction',0.6); next_row(y);
       %SoloParamHandle(obj,'LegalCBrk_temp', 'value',0);
@@ -46,7 +46,7 @@ switch action
       
       diolines = bSettings('get','DIOLINES', 'all');
       for i = 1:size(diolines,1); dionames{i} = diolines{i,1}; dionums(i) = diolines{i,2}; end %#ok<AGROW>
-      [dionums order] = sort(dionums);
+      [dionums,order] = sort(dionums);
       dionames2 = cell(0);
       for i = 1:length(dionums); if ~isnan(dionums(i)); dionames2{end+1} = dionames{order(i)}; end; end %#ok<AGROW>
       dionames2 = cell(0);
@@ -93,15 +93,15 @@ switch action
 %
 % -----------------------------------------------------------------------
 
-  case 'update_values',
+  case 'update_values'
             
 	  StimulatorSection(obj,'StimInterval');
-      sh = value(stimulator_history) %#ok<NODEF>
+      sh = value(stimulator_history); %#ok<NODEF>
       %if n_done_trials == 0 || sh(end) == 0
       %    LegalCBrk_temp.value = value(LegalCBrk); %#ok<NODEF>
       %end
       
-      if ~dispatcher('is_running');
+      if ~dispatcher('is_running')
           %dispatcher is not running, last stim_hist not used, lop it off
           sh = sh(1:end-1);
       end
@@ -126,7 +126,7 @@ switch action
 %
 % -----------------------------------------------------------------------
 
-  case 'prepare_next_trial',
+  case 'prepare_next_trial'
       sh = value(stimulator_history); %#ok<NODEF>
       
       sma = x;
@@ -135,8 +135,8 @@ switch action
       sf = value(StimFreq);   
       pw = value(PulseWidth);
       np = value(NumPulses);  
-      ss = value(StimStates)
-      sl = value(StimLines)
+      ss = value(StimStates);
+      sl = value(StimLines);
 
       if value(ShuffleValues) == 1
           sd = sd(ceil(rand(1) * length(sd)));
@@ -239,19 +239,19 @@ switch action
   %% Case StimInterval  
     case 'StimInterval'
         
-        if strcmp(StimInterval, 'WholeTrial');
+        if strcmp(StimInterval, 'WholeTrial')
             PulseWidth.value = Total_CP_duration*1000;
             StimFreq.value = 1000/PulseWidth;
             StartDelay.value = PreStim_time;
-        elseif strcmp(StimInterval, 'S1');
+        elseif strcmp(StimInterval, 'S1')
             PulseWidth.value = A1_time*1000;
             StimFreq.value = 1000/PulseWidth;
             StartDelay.value = PreStim_time;
-        elseif strcmp(StimInterval, 'DelayDur');
+        elseif strcmp(StimInterval, 'DelayDur')
             PulseWidth.value = time_bet_aud1_gocue*1000;
             StimFreq.value = 1000/PulseWidth;
             StartDelay.value = PreStim_time + A1_time;
-        elseif strcmp(StimInterval, 'GoCue');
+        elseif strcmp(StimInterval, 'GoCue')
             PulseWidth.value = time_go_cue*1000;
             StimFreq.value = 1000/PulseWidth;
             StartDelay.value = PreStim_time + A1_time + time_bet_aud1_gocue;
@@ -306,7 +306,7 @@ switch action
 %         REINIT
 %
 % -----------------------------------------------------------------------     
-  case 'reinit',
+  case 'reinit'
     currfig = double(gcf);
 
     % Delete all SoloParamHandles who belong to this object and whose
@@ -320,6 +320,6 @@ switch action
 
     % Restore the current figure:
     figure(currfig);
-end;
+end
 
 

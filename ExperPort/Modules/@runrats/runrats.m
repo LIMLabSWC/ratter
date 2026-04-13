@@ -45,14 +45,15 @@ switch action
         display('test');
         %If we are starting from a forced reboot from runrats itself we
         %need to make sure the do_on_reboot.bat file is set back to nothing
-        try %#ok<TRYNC>
-            p = pwd;
-            cd('\ratter\Rigscripts')
-
-            !del do_on_reboot.bat
-            !copy nothing.bat do_on_reboot.bat /Y
-            cd(p);
-        end
+        
+        % try %#ok<TRYNC>
+        %     p = pwd;
+        %     cd('\ratter\Rigscripts')
+        % 
+        %     !del do_on_reboot.bat
+        %     !copy nothing.bat do_on_reboot.bat /Y
+        %     cd(p);
+        % end
 
         %If a dispatcher is already open, let's close it so we don't ever have
         %more than 1
@@ -115,7 +116,7 @@ switch action
         SoloParamHandle(obj,'myfig', 'value',fig);
         
         try
-            set(myfig, 'WindowStyle', 'modal');
+            set(value(myfig), 'WindowStyle', 'normal');
             pause(0.1);
             
         catch %#ok<CTCH>
@@ -138,6 +139,7 @@ switch action
         SoloParamHandle(obj,'do_full_restart', 'value',1); %1 if we want to restart matlab between each session
         SoloParamHandle(obj,'SafetyMode',      'value',''); %empty for no safety, B for before, A for after
         SoloParamHandle(obj,'OptoPlugColor',   'value',[]); %figure handle for opto plug color panel
+        SoloParamHandle(obj,'Rerun_AfterCrash',   'value',1); % should load the previous protocol if runrats/dispatcher crashed
 
         if ~exist('phys','var'); SoloParamHandle(obj,'phys','value',0); end
 
@@ -146,9 +148,9 @@ switch action
         SoloParamHandle(obj,'schedDay','value',[]);
 
         % For Live Webcam Feed
-        SoloParamHandle(obj,'Camera_Fig_window','value',[]);
-        SoloParamHandle(obj,'Camera_Obj','value',[]);
-        SoloParamHandle(obj,'Camera_Image','value',[]);
+        % SoloParamHandle(obj,'Camera_Fig_window','value',[]);
+        % SoloParamHandle(obj,'Camera_Obj','value',[]);
+        % SoloParamHandle(obj,'Camera_Image','value',[]);
 
         %Let's make the menus
         try
@@ -295,7 +297,7 @@ switch action
         %prepare to load, let's do it.
         runrats(obj,'update_exprat');
         runrats(obj,'check_rig_flushed');
-        runrats(obj,'live_loop');
+        % runrats(obj,'live_loop');
 
 
     case 'send_empty_state_machine'
@@ -676,7 +678,7 @@ switch action
         end;
         cd(dirRat);
 
-        update_folder(pwd,'svn');
+        % update_folder(pwd,'svn');
 
         cd(dirCurrent);
         runrats(obj,'enable_all');
@@ -767,6 +769,7 @@ switch action
     case 'exp_rat_names'
         varargout{1} = value(ExpMenu);
         varargout{2} = value(RatMenu);
+        
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     case 'update_tech_instructions'
         %% update_tech_instructions
@@ -1055,11 +1058,18 @@ switch action
 
     case 'update_schedule'
         %% update_schedule
+        
         %Here we grab the current schedule for this rig
 
-        if ~isnan(value(RigID));
-            [rats slots] = bdata(['select ratname, timeslot from scheduler where date="',...
-                datestr(now,'yyyy-mm-dd'),'" and rig=',num2str(value(RigID))]);
+        % if ~isnan(value(RigID));
+        %     [rats slots] = bdata(['select ratname, timeslot from scheduler where date="',...
+        %         datestr(now,'yyyy-mm-dd'),'" and rig=',num2str(value(RigID))]);
+        % end
+
+        % Updated by Arpit - instead of taking the date, we will look for
+        % if the rats which are in training in scheduler table.
+        if ~isnan(value(RigID))
+            [rats,slots] = bdata(['select ratname, timeslot from scheduler where in_training="1" and rig=',num2str(value(RigID))]);
         end
 
         %Let's populate the 5 training sessions (changed by sharbat, with
@@ -1095,10 +1105,10 @@ switch action
 
         CS = value(CurrSession);
 
-        [ratSCH slots] = bdata(['select ratname, timeslot from scheduler where date="',...
+        [ratSCH, slots] = bdata(['select ratname, timeslot from scheduler where date="',...
             datestr(now,'yyyy-mm-dd'),'"']);
         ratSES = bdata(['select ratname from sessions where sessiondate="',datestr(now,'yyyy-mm-dd'),'"']);
-        [ratSS ST]  = bdata(['select ratname, starttime from sess_started where sessiondate="',...
+        [ratSS, ST]  = bdata(['select ratname, starttime from sess_started where sessiondate="',...
             datestr(now,'yyyy-mm-dd'),'"']);
 
         %Let's cycle through each of the 6 training sessions and see if the
@@ -1306,19 +1316,26 @@ switch action
         StatusBar.value='Loading protocol and settings.  Please be patient!';
         pause(0.1);
 
-        %Let's also make sure we have the most up-to-date code
-        CurrDir = pwd;
-        pname = bSettings('get','GENERAL','Main_Code_Directory');
-        if ~isempty(pname) && ischar(pname)
-            update_folder(pname,'svn');
-        end
+        %%%%%%%%%%%% ARPIT %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-        %And finally we make sure the protocols are up-to-date
-        pname = bSettings('get','GENERAL','Protocols_Directory');
-        if ~isempty(pname) && ischar(pname)
-            update_folder(pname,'svn');
-        end
-        cd(CurrDir);
+        % NOT REQUIRED AS INSTEAD OF SVN WE ARE USING GITHUB 
+
+        %Let's also make sure we have the most up-to-date code
+        
+        % CurrDir = pwd;
+        % pname = bSettings('get','GENERAL','Main_Code_Directory');
+        % if ~isempty(pname) && ischar(pname)
+        %     update_folder(pname,'svn');
+        % end
+        % 
+        % %And finally we make sure the protocols are up-to-date
+        % pname = bSettings('get','GENERAL','Protocols_Directory');
+        % if ~isempty(pname) && ischar(pname)
+        %     update_folder(pname,'svn');
+        % end
+        % cd(CurrDir);
+
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         %Let's get the protocol for the rat and load it
         CurrProtocol.value = getProtocol(value(ExpMenu),value(RatMenu)); %#ok<NODEF>
@@ -1425,7 +1442,7 @@ switch action
             sendstarttime(eval(value(CurrProtocol))); %#ok<NODEF>
         catch %#ok<CTCH>
             disp('ERROR: Failed to add the start time to the MySQL table.');
-        end;
+        end
 
         %Let's make everything unresponsive for 5 more seconds to prevent
         %double clicks from stopping the session
@@ -1439,7 +1456,7 @@ switch action
         %     disp('failed to start pi camera')
         % end
 
-        % If using USB Webcam, then try using it
+        % If using USB Webcam, then try using it instead using Bonsai
         % try
         %     disp('Connecting to USB HD Camera')
         %     webcam_connected = webcamlist;
@@ -1474,7 +1491,13 @@ switch action
             set(get_ghandle(Multi),'enable','on');
             set(get_ghandle(Safety),'visible','off','string','');
         end
+        
+        % Let start recording the videos by sending the command to protocol
+        % itself instead of the plugin bonsaicamera
+        protobj=eval(value(CurrProtocol));
+        feval(value(CurrProtocol), protobj, 'start_recording');
 
+        % Now ready to run with dispatcher
         dispatcher(value(dispobj),'Run'); %#ok<NODEF>
 
 
@@ -1537,8 +1560,11 @@ switch action
             %if the protocol has a pre_saving_settings section, call it
             try
                 feval(value(CurrProtocol),protobj,'pre_saving_settings');
-            catch %#ok<CTCH>
-                disp('Protocol does not appeat to have a pre_saving_settings')
+            catch ME  % full stack trace %#ok<CTCH>
+                disp('pre_saving_settings failed with error:');
+                disp(ME.message);
+                disp(ME.getReport()); 
+                disp('Protocol does not appear to have a pre_saving_settings')
             end
 
 
@@ -1583,7 +1609,7 @@ switch action
             %Let's reset the Multi button and hop back in the live loop
             set(get_ghandle(Multi),'ForegroundColor',[0,0,0],'BackgroundColor',...
                 [1,1,0.4],'string','Load Protocol','FontSize',24);
-            InLiveLoop.value = 1;
+            InLiveLoop.value = 0; % Changed by Arpit as the timer function is preventing 'flush' to run
             runrats(obj,'enable_all');
 
             %We need to turn RunRats back to live mode
@@ -1593,6 +1619,15 @@ switch action
             end
             set(get_ghandle(UpdateMode),'String','Live Update On','BackgroundColor',[0.6 1 0.6],'ForegroundColor',[0 0 0]);
 
+            %%%%%%%%%%%%%%Removing the part of full restart %%%%%%%%%%%%%%
+                    %%%%%%%%%%%%% ARPIT %%%%%%%%%%%%%%%%%%%%%
+
+            do_full_restart.value = 0;
+            p = bSettings('get','GENERAL','Main_Code_Directory');
+            cd(p);
+
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+           
             %Another option is to now kill MatLab completely and restart
             %runrats.  This ensures windows don't pile up, and code can get
             %updated before each session
@@ -1628,7 +1663,7 @@ switch action
             end
 
             %And now we hop back in the loop
-            runrats(obj,'live_loop');
+            % runrats(obj,'live_loop');
         end
 
 
@@ -1684,16 +1719,24 @@ switch action
         RunningSection(value(dispobj),'RunStop'); %#ok<NODEF>
         dispatcher('set_protocol','');
 
-        %Now we can email the rat's owner a crash report
+        %Now we can email the rat's owner a detailed crash report
         try %#ok<TRYNC>
+            error_message = lsterr.message;
+            error_message = strrep(error_message, '\', '\\');
+            error_message = strrep(error_message, '"', '\"');
             message = cell(0);
             message{end+1} = ['Rig ',num2str(value(RigID)),' crashed while running ',value(RatMenu),' at ',datestr(now,13)]; %#ok<NODEF>
             message{end+1} = '';
-            message{end+1} = lsterr.message;
+            message{end+1} = lsterr.identifier;            
+            message{end+1} = error_message;
+            file_path = lsterr.stack(1).file;
+            message{end+1} = strrep(file_path, '\', '\\');
+            message{end+1} = lsterr.stack(1).name;
+            message{end+1} = num2str(lsterr.stack(1).line);
             message{end+1} = '';
-
+            
             for i = 1:length(lsterr.stack)
-                message{end+1} = [lsterr.stack(i).name,' at ',num2str(lsterr.stack(i).line)]; %#ok<AGROW>
+                message{end+1} = ['Line ' num2str(lsterr.stack(i).line) ', File ' lsterr.stack(i).file ', Function ' lsterr.stack(i).name]; %#ok<AGROW>
             end
 
             IP = get_network_info;
@@ -1705,7 +1748,7 @@ switch action
 
             %setpref('Internet','SMTP_Server','brodyfs2.princeton.edu');
             %setpref('Internet','E_mail',['RunRats',datestr(now,'yymm'),'@Princeton.EDU']);
-            set_email_sender
+            % set_email_sender
 
             owner = bdata(['select contact from rats where ratname="',value(RatMenu),'"']);
             if ~isempty(owner)
@@ -1716,22 +1759,180 @@ switch action
 
                 for i = 1:length(cms)-1
                     exp = owner(cms(i)+1:cms(i+1)-1);
-                    sendmail([exp,'@princeton.edu'],[value(RatMenu),' Crashed'],message);
+                    % sendmail([exp,'@ucl.ac.uk'],[value(RatMenu),' Crashed'],message);
+                    gmail_SMTP([exp,'@ucl.ac.uk'],[value(RatMenu),' Crashed'],message);
                 end
             end
         end
 
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
+        %% Modified/Added by Arpit
+
         %Let's update the MySQL table to indicate a crash has happened
-        id = bdata(['select sessid from sess_started where ratname="',value(RatMenu),...
-            '" and was_ended=0 and sessiondate="',datestr(now,'yyyy-mm-dd'),'"']);
-        if ~isempty(id)
-            id = id(end);
-            bdata('call mark_crashed("{S}")',id);
+        %Since this sql table is missing, the same information can be 
+        % obtained from sess_started table where was_ended will stay 0. 
+        
+        % id = bdata(['select sessid from sess_started where ratname="',value(RatMenu),...
+        %     '" and was_ended=0 and sessiondate="',datestr(now,'yyyy-mm-dd'),'"']);
+        % if ~isempty(id)
+        %     id = id(end);
+        %     bdata('call mark_crashed("{S}")',id);       
+        % end
+
+        %% Lets try and rerun the protocol and only do it if the animal is training
+        try
+            is_rat_training = bdata(['select in_training from rats where experimenter="',value(ExpMenu),'" and ratname="', value(RatMenu),'"']);
+        catch
+            is_rat_training = 1; % if couldn't find then try rerun of the protocol
+        end
+
+        if value(Rerun_AfterCrash) == 1 && is_rat_training == 1
+                runrats(obj,'rerun');
         end
 
 
+    case 'rerun' % called in 'crash' and made by combining 'begin_load_protocol' , 'load_protocol' and 'run' 
 
+        InLiveLoop.value = 0;
+        runrats(obj,'disable_all');
 
+        set(get_ghandle(Multi),'string','Unloading...','fontsize',28);
+
+        x = '';
+        try x = dispatcher('get_protocol_object'); end %#ok<TRYNC>
+        if ~isempty(x)
+            %There was a protocol previously open. Let's not trust that
+            %their close section is working properly.
+            try  %#ok<TRYNC>
+                %rigscripts does not exist currently, try Protocols (ask
+                %Athena) -sharbat
+                p = bSettings('get','GENERAL','Main_Code_Directory');
+                p(strfind(p,'ExperPort'):end) = '';
+                p = [p,'Rigscripts'];
+                cd(p);
+                if ispc == 1
+                    system('restart_runrats.bat');
+                end
+            end
+        end
+
+        dispatcher('set_protocol','');
+
+        %Relaod the protocol
+        runrats(obj,'reload_protocol')
+
+        % Running the protocol
+        runrats(obj,'run')
+
+    case 'reload_protocol'
+        %Let's make sure we have the most up-to-date settings
+        runrats(obj,'update_rat',0);
+
+        set(get_ghandle(Multi),'String','Loading...','BackgroundColor', [0.8 0.8 0.6],'Fontsize',30);
+        StatusBar.value='Loading protocol and settings.  Please be patient!';
+        pause(0.1);
+
+        %Let's get the protocol for the rat and load it
+        CurrProtocol.value = getProtocol(value(ExpMenu),value(RatMenu)); %#ok<NODEF>
+        try
+            dispatcher(value(dispobj),'set_protocol',value(CurrProtocol)); %#ok<NODEF>
+        catch %#ok<CTCH>
+            StatusBar.value = ['Failed to load ',value(CurrProtocol),' for ',value(RatMenu)];
+            runrats(obj,'enable_all');
+            set(get_ghandle(Multi),'string','Load Protocol','BackgroundColor',[1,1,0.4],'FontSize',24);
+            InLiveLoop.value = 1;
+
+            %Let's notify the experimenter that the load failed, pause to
+            %let the tech see the note, then go back to live loop
+            runrats(obj,'email_experimenter','protocol fail');
+
+            runrats(obj,'updatelog','failload protocol');
+
+            pause(10);
+            runrats(obj,'live_loop');
+            return;
+        end
+
+        rath=get_sphandle('name','ratname','owner',value(CurrProtocol));
+        exph=get_sphandle('name','experimenter','owner',value(CurrProtocol));
+        rath{1}.value=value(RatMenu); %#ok<NASGU>
+        exph{1}.value=value(ExpMenu); %#ok<NASGU>
+
+        sfile = '';
+
+        try
+            try
+                protobj = eval(value(CurrProtocol));
+                today_date = char(datetime('now', 'format', 'yyMMdd'));
+                temp_data_dir = fullfile('C:\ratter', 'SoloData', 'Data', value(ExpMenu), value(RatMenu));
+                temp_data_file = sprintf('data_@%s_%s_%s_%s_ASV.mat', value(CurrProtocol), value(ExpMenu), value(RatMenu), today_date);
+
+                if isfile(fullfile(temp_data_dir, temp_data_file))
+                    dispatcher('runstart_disable');
+                    load_soloparamvalues(value(RatMenu), 'experimenter', value(ExpMenu), ...
+                        'owner', class(protobj), 'interactive', 0, ...
+                        'data_file', fullfile(temp_data_dir, temp_data_file));
+                    dispatcher('runstart_enable');
+                end
+
+            catch ME_inner
+                fprintf('=== Data Load failed, trying to load settings ===\n');
+                disp(ME_inner.getReport());  % <-- shows real error from ASV load block
+
+                [out, sfile] = load_solouiparamvalues(value(RatMenu), 'experimenter', value(ExpMenu), ...
+                    'owner', class(protobj), 'interactive', 0);
+                settings_file_sph.value = sfile;
+                settings_file_load_time.value = now;
+            end
+
+            if ~dispatcher('is_running')
+                pop_history(class(protobj), 'include_non_gui', 1);
+                feval(value(CurrProtocol), protobj, 'prepare_next_trial');
+            end
+
+        catch ME_outer
+            fprintf('=== Loading Failed ===\n');
+            disp(ME_outer.getReport());  % <-- shows real error from settings load or prepare_next_trial
+
+            StatusBar.value = 'Failed to load Settings file.';
+            runrats(obj, 'enable_all');
+            set(get_ghandle(Multi), 'string', 'Load Protocol', 'BackgroundColor', [1,1,0.4], 'FontSize', 24);
+            InLiveLoop.value = 1;
+            runrats(obj, 'email_experimenter', 'settings fail');
+            runrats(obj, 'updatelog', 'failload settings');
+            pause(10);
+            runrats(obj, 'live_loop');
+            return;
+        end
+
+        set(get_ghandle(Multi),'String',['Run: ',value(RatMenu)],'BackgroundColor',[0.3,1,0.3],'Fontsize',32);
+        
+        if ~isempty(sfile)
+            [pname, fname, ext] = fileparts(sfile);
+            StatusBar.value = ['Using settings file: ', fname];
+        else
+            StatusBar.value = 'Using ASV data file.';
+        end
+
+        if value(phys)==1
+            create_phys_session(eval(value(CurrProtocol)))
+        end
+
+        runrats(obj,'enable_all');
+        figure(value(myfig));
+        InLiveLoop.value = 0;
+
+        %Check to see if the experimenter wants to enable the safety before
+        if contains(value(SafetyMode),'B') %#ok<NODEF>
+            set(get_ghandle(Multi),'enable','off');
+            set(get_ghandle(Safety),'visible','on','string',value(Instructions)); %#ok<NODEF>
+        else
+            set(get_ghandle(Multi),'enable','on');
+            set(get_ghandle(Safety),'visible','off','string','');
+        end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     case 'crash_cleanup'
         %% crash_cleanup
         %The tech has acknowledged the crash. Let's jump back in the loop
@@ -1741,7 +1942,7 @@ switch action
             [1,1,0.4],'string','Load Protocol','FontSize',24);
 
         InLiveLoop.value = 1;
-        runrats(obj,'live_loop');
+        % runrats(obj,'live_loop');
 
     case 'updatelog'
 
@@ -1772,7 +1973,7 @@ switch action
         try %#ok<TRYNC>
             %setpref('Internet','SMTP_Server','brodyfs2.princeton.edu');
             %setpref('Internet','E_mail',['RunRats',datestr(now,'yymm'),'@Princeton.EDU']);
-            set_email_sender
+            % set_email_sender
 
             message{1} = ['Load failed for ',value(RatMenu)]; %#ok<NODEF>
             if strcmp(varargin{1},'no settings')
@@ -1800,7 +2001,8 @@ switch action
                 cms = find(contact == ',');
                 for i = 1:length(cms)-1
                     email = contact(cms(i)+1:cms(i+1)-1);
-                    sendmail([email,'@princeton.edu'],subject,message);
+                    % sendmail([email,'@princeton.edu'],subject,message);
+                    gmail_SMTP([email,'@ucl.ac.uk'],subject,message);
                 end
             end
         end
@@ -1808,7 +2010,7 @@ switch action
 
 
 
-    case 'is_running',
+    case 'is_running'
         %% is_running
         %If the Multi button exists, runrats has been loaded
         if exist('Multi','var'), obj = 1; else obj = 0; end
@@ -1834,30 +2036,7 @@ switch action
         else
             varargout{1} = '';
         end
-
-
-    case 'send_empty_state_machine'
-        %% send_empty_state_machine
-        %Sends an empty state matrix. This allows us to toggle DIO lines
-
-        state_machine_server = bSettings('get','RIGS','state_machine_server');
-
-        server_slot = bSettings('get','RIGS','server_slot');
-        if isnan(server_slot); server_slot = 0; end
-
-        card_slot = bSettings('get', 'RIGS', 'card_slot');
-        if isnan(card_slot); card_slot = 0; end
-
-        sm = BPodSM(state_machine_server, 3333,server_slot);
-        sm = Initialize(sm);
-
-        [inL outL] = MachinesSection(dispatcher,'determine_io_maps');
-
-        sma = StateMachineAssembler('full_trial_structure');
-        sma = add_state(sma,'name','vapid_state_in_vapid_matrix');
-
-        send(sma,sm,'run_trial_asap',0,'input_lines',inL,'dout_lines',outL,'sound_card_slot', int2str(card_slot));
-
+     
 
     case  'close'
         %% close
@@ -1889,7 +2068,7 @@ switch action
 
     otherwise
         warning('Unknown action " %s" !', action);%#ok<WNTAG>
-end;
+end
 
 return;
 
@@ -1919,7 +2098,7 @@ try %#ok<TRYNC>
             setdate{xi}=r(1:7); %#ok<AGROW>
         else % not a file we want, give it a really early date, 2000:
             setdate{xi}='000101a'; %#ok<AGROW>
-        end;
+        end
     end
 
     [srtdsets, sdi]=sort(setdate);
@@ -1958,7 +2137,7 @@ try
     if failed1 == 1 || failed2 == 1
         %setpref('Internet','SMTP_Server','brodyfs2.princeton.edu');
         %setpref('Internet','E_mail',['RunRats',datestr(now,'yymm'),'@Princeton.EDU']);
-        set_email_sender
+        % set_email_sender
 
         if pname(1)   ~= filesep; pname = [filesep,pname]; end
         if pname(end) ~= filesep; pname = [pname,filesep]; end
@@ -1993,7 +2172,8 @@ try
             cms = find(ctemp == ',');
             for i = 1:length(cms)-1
                 email = ctemp(cms(i)+1:cms(i+1)-1);
-                sendmail([email,'@princeton.edu'],['SVN Cleanup FAILED on Rig ',rig],message);
+                % sendmail([email,'@princeton.edu'],['SVN Cleanup FAILED on Rig ',rig],message);
+                gmail_SMTP([email,'@ucl.ac.uk'],['SVN Cleanup FAILED on Rig ',rig],message);
             end
         end
 
@@ -2019,7 +2199,8 @@ try
             cms = find(ctemp == ',');
             for i = 1:length(cms)-1
                 email = ctemp(cms(i)+1:cms(i+1)-1);
-                sendmail([email,'@ucl.ac.uk'],subject,message);
+                % sendmail([email,'@ucl.ac.uk'],subject,message); %
+                gmail_SMTP([email,'@ucl.ac.uk'],subject,message); % Using gmail instead of brody smtp
             end
         end
     end
@@ -2029,4 +2210,34 @@ end
 
 
 
+function gmail_SMTP(recipient_email,subject_line,email_body)
+
+smtp_server = 'smtp.gmail.com';
+smtp_port = '587'; % Use TLS
+email_address = 'behav.akramilab@gmail.com';
+email_password = 'fakc mdbw woef lqmq'; % IMPORTANT: this is set in setting of gmail
+
+% recipient_email = 'arpit.agarwal@ucl.ac.uk';
+% subject_line = 'Test Email from MATLAB via Gmail';
+% email_body = 'This email was sent using Gmail SMTP from MATLAB.';
+
+% --- Set MATLAB Email Preferences ---
+setpref('Internet','SMTP_Server',smtp_server);
+setpref('Internet','E_mail',email_address);
+setpref('Internet','SMTP_Username',email_address);
+setpref('Internet','SMTP_Password',email_password);
+
+% Set server properties
+props = java.lang.System.getProperties;
+props.setProperty('mail.smtp.auth','true');
+props.setProperty('mail.smtp.starttls.enable','true');
+props.setProperty('mail.smtp.port',smtp_port);
+
+% --- Send the Email ---
+try
+    sendmail(recipient_email, subject_line, email_body);
+    disp('Email sent successfully via Gmail SMTP.');
+catch ME
+    disp(['Error sending email: ' ME.message]);
+end
 
