@@ -94,7 +94,7 @@ switch action
         sma = StateMachineAssembler('full_trial_structure','use_happenings', 1);
 
         % scheduled wave for stimuli/fixed sound, based upon side
-        if stimuli_on
+        if strcmpi(Stimuli_State,'Fixed')
             sma = add_scheduled_wave(sma, 'name', 'stimplay', 'preamble', PreStim_time, ...
                 'sustain', sound_duration, 'sound_trig', A1_sound_id); % to play a sound before Go Cue
         else
@@ -243,6 +243,14 @@ switch action
                     'output_actions', {'DOut', center1led}, ...
                     'input_to_statechange', {'Cin','settling_in_state';'Tup','timeout_state'});
 
+                % Count states before the branch
+                states_before_branch = size(get_labels(sma), 1);
+
+                % Number of states the else-branch adds - update this if you ever
+                % add states to the else block (the assert below will tell you)
+                ELSE_BRANCH_N_STATES = 8;  % settle + 2 anon + legal_start + soft_cp + 2 anon + legal_end
+
+
                 %%%%%%%%%%%%% SETTLING IN STATE START %%%%%%%%%%%%%%%%%%%%
                 % Before progressing check if its still centre poking or pokes within legal c_break other wise its a violation
 
@@ -262,6 +270,14 @@ switch action
                     % directly to give reward
                     sma = add_state(sma,'self_timer',CP_duration,...
                         'input_to_statechange', {'CP_Duration_wave_In','side_led_wait_RewardCollection'; 'Cout','current_state - 1';'Tup','side_led_wait_RewardCollection'});
+
+                    % Auto-pad to match else-branch state count
+                    states_added_if = size(get_labels(sma), 1) - states_before_branch;
+                    n_padding = ELSE_BRANCH_N_STATES - states_added_if;
+                    for i = 1:n_padding
+                        sma = add_state(sma, 'self_timer', 0.001, ...
+                            'input_to_statechange', {'Tup', 'side_led_wait_RewardCollection'});
+                    end
 
                 else % the usual state machine
 
@@ -337,21 +353,57 @@ switch action
 
                 %%%%%%%%%%%%%%% REWARD COLLECTION STATE START %%%%%%%%%%%%%%%
 
-                sma = add_state(sma, 'name', 'side_led_wait_RewardCollection', 'self_timer', SideLed_duration + RewardCollection_duration, ...
-                    'output_actions', {'DOut', SideLight; 'SchedWaveTrig', 'reward_collection_dur+Go_Cue'}, ...
-                    'input_to_statechange',{HitEvent,'hit_state'; 'Tup','timeout_state'; ErrorEvent,'second_hit_state'});
+                if value(training_stage) >= 6 % 
+                    % which sarts as soon as the stage 6 starts, when side light no longer cues for rewarded side
 
-                sma = add_state(sma,'name','second_hit_state','self_timer',RewardCollection_duration,...
-                    'output_actions',{'DOut', SideLight},...
-                    'input_to_statechange',{'reward_collection_dur_In', 'timeout_state'; 'Tup','timeout_state'; HitEvent,'hit_state'});
+                    sma = add_state(sma, 'name', 'side_led_wait_RewardCollection', 'self_timer', SideLed_duration + RewardCollection_duration, ...
+                        'output_actions', {'DOut', SideLight * 0; 'SchedWaveTrig', 'reward_collection_dur+Go_Cue'}, ...
+                        'input_to_statechange',{HitEvent,'hit_state'; 'Tup','timeout_state'; ErrorEvent,'second_hit_state'});
 
-                sma = add_state(sma,'name','hit_state','self_timer',0.01,...
-                    'output_actions', {'SchedWaveTrig','reward_delivery'},...
-                    'input_to_statechange',{'Tup','drink_state'});
+                    if value(training_stage) == 6 % its always rewarded the second time if first time choice is wrong
 
-                sma = add_state(sma,'name','drink_state','self_timer',drink_time,...
-                    'input_to_statechange',{'Tup','preclean_up_state'});
+                        sma = add_state(sma,'name','second_hit_state','self_timer',RewardCollection_duration,...
+                            'output_actions',{'DOut', SideLight},...
+                            'input_to_statechange',{'reward_collection_dur_In', 'timeout_state'; 'Tup','timeout_state'; HitEvent,'hit_state'});
 
+                    else % for stage 7 and 8 the wrong choice leads to timeout of 3 seconds and no reward
+
+                        sma = add_state(sma,'name','second_hit_state','self_timer',2,...
+                            'output_actions',{'DOut', SideLight},...
+                            'input_to_statechange',{'Tup','current_state+1'});
+
+                        sma = add_state(sma,'self_timer',1,...
+                            'input_to_statechange',{'Tup','preclean_up_state'});
+
+                    end
+
+
+                else % usual case of passively listening to entire distribution or fixed stimuli with side light cuing for rewarded side
+
+                    sma = add_state(sma, 'name', 'side_led_wait_RewardCollection', 'self_timer', SideLed_duration + RewardCollection_duration, ...
+                        'output_actions', {'DOut', SideLight; 'SchedWaveTrig', 'reward_collection_dur+Go_Cue'}, ...
+                        'input_to_statechange',{HitEvent,'hit_state'; 'Tup','timeout_state'; ErrorEvent,'second_hit_state'});
+
+                    sma = add_state(sma,'name','second_hit_state','self_timer',RewardCollection_duration,...
+                        'output_actions',{'DOut', SideLight},...
+                        'input_to_statechange',{'reward_collection_dur_In', 'timeout_state'; 'Tup','timeout_state'; HitEvent,'hit_state'});
+
+                end
+
+                % States common for all stages
+
+                sma = add_state(sma, 'name', 'hit_state', 'self_timer', 0.01, ...
+                    'output_actions', {'SchedWaveTrig', 'reward_delivery'}, ...
+                    'input_to_statechange', {'Tup', 'drink_state'});
+
+                sma = add_state(sma, 'name', 'drink_state', 'self_timer', drink_time, ...
+                    'input_to_statechange', {'Tup', 'preclean_up_state'});
+
+
+                %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+                %%%%%%%%%% OTHER STATES %%%%%%%%%%%%%%%%
+               
                 % For Timeout
 
                 sma = add_state(sma,'name','timeout_state','self_timer',timeout_snd_duration,...

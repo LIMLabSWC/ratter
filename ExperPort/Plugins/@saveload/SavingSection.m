@@ -88,23 +88,25 @@ function [x, y, z] = SavingSection(obj, action, x, y, varargin)
       SoloParamHandle(obj, 'my_gui_info', 'value', [x y double(gcf)]);
       SoloParamHandle(obj, 'data_file', 'value', '');
       
-      %Sundeep Tuteja, 22nd December, 2009: Adding a SoloParamHandle called
-      %settings_file to store the full path to the currently loaded settings file.
+      %Arpit, 09th May, 2025: Getting the experimenter name and rat name
+      %from runrats instead of initializing it. This is required to create
+      %the folder to save video files. If it runss into error or runrat is
+      %not running then as a default it sets values as 'experimenter and
+      %'ratname'
+            
       try
           [~,experimenter_name, rat_name] = runrats('exp_rat_names');
           [~, settings_file_str] = runrats('get_settings_file_path');
+          [~, settings_file_load_time_num] = runrats('get_settings_file_load_time');
       catch %#ok<CTCH>
           settings_file_str = '';
           experimenter_name = 'experimenter';
           rat_name = 'ratname';
-      end
-      SoloParamHandle(obj, 'settings_file', 'value', settings_file_str);
-      try
-          [~, settings_file_load_time_num] = runrats('get_settings_file_load_time');
-      catch %#ok<CTCH>
           settings_file_load_time_num = 0;
       end
+      
       SoloParamHandle(obj, 'settings_file_load_time', 'value', settings_file_load_time_num);
+      SoloParamHandle(obj, 'settings_file', 'value', settings_file_str);
       
       EditParam(obj, 'experimenter', experimenter_name, x, y); next_row(y, 1.5);
       EditParam(obj, 'ratname', rat_name, x, y); next_row(y, 1.5);
@@ -174,7 +176,11 @@ function [x, y, z] = SavingSection(obj, action, x, y, varargin)
               warning('SAVELOAD:InvalidParam', 'Don''t know how to set "%s", not doing anything', parname);
       end;
       
-      
+       case 'get_set_filename'
+           x = value(settings_file);
+           y = [];
+           return;
+
       % ------------ CASE GET_ALL_INFO --------------------
       %Sundeep Tuteja, 22nd December, 2009: Adding a case to get
       %experimenter name, rat name, settings file loaded, if any, and data file. Case
@@ -206,8 +212,13 @@ function [x, y, z] = SavingSection(obj, action, x, y, varargin)
     case 'set_info',        % ------------ CASE SET_INFO --------------------
        ratname.value=y; %#ok<STRNU>
        experimenter.value=x; %#ok<STRNU> 
+       y =[];
        return;
     
+    case 'set_setting_info'       
+        settings_file.value = x;
+        settings_file_load_time.value = y;
+
     case 'savesets',       % ------------ CASE SAVESETS --------------------
       if     nargin == 3, varargin = {x}; 
       elseif nargin == 4, varargin = {x y};
@@ -264,7 +275,8 @@ function [x, y, z] = SavingSection(obj, action, x, y, varargin)
        case 'get_settings_file_load_time'
            [dummy, x1] = runrats('get_settings_file_load_time'); clear('dummy');
            x2 = value(settings_file_load_time);
-           x = max(x1, x2); settings_file_load_time.value = x;
+           x = max(double(x1), double(x2)); 
+           settings_file_load_time.value = x;
            y = [];
            z = [];
            return;

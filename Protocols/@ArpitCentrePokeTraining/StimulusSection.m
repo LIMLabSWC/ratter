@@ -112,7 +112,9 @@ switch action
         next_row(y);
     	NumeditParam(obj,'maxF1',10,x,y,'label','maxF1','TooltipString','max frequency value for AUD1');
         set_callback(maxF1, {mfilename, 'Cal_Boundary'});
-        next_row(y);   
+        next_row(y); 
+        NumeditParam(obj,'volumeF1',0.007,x,y,'label','VolumeF1','TooltipString','volume of tone for AUD1');
+        next_row(y);
         DispParam(obj, 'A1_freq', 0.01, x,y,'label','A1_freq','TooltipString','Sigma value for the first stimulus');
     	next_row(y);
     	DispParam(obj,'boundary',-3.9,x,y,'label','boundary(log)','TooltipString','decision boundary for categorisation (log)');
@@ -126,9 +128,17 @@ switch action
             'OffString', 'Amplitude(Noise)',...
             'TooltipString', sprintf('If on (black) then it enables the presentation of pure tones'));
         set_callback(frequency_categorization, {mfilename, 'FrequencyCategorization'});
-        make_invisible(maxF1);make_invisible(minF1);make_invisible(A1_freq);
-        next_row(y);
+        make_invisible(maxF1);make_invisible(minF1);make_invisible(A1_freq);make_invisible(volumeF1);
+        next_row(y);next_row(y);
         
+        % Handle showing Number of disrete Stimuli being selected
+        NumeditParam(obj,'NumberStimuli',1,x,y,'label','Discrete Stim','TooltipString','Number of discrete stimuli from each side');
+        next_row(y);
+        NumeditParam(obj,'ValidTrial_thisStimNumber',0,x,y,'label','Valid Trials','TooltipString','Total valid trials for this number of discrete stimuli from each side');
+        next_row(y);
+        NumeditParam(obj,'Performance_thisStimNumber',0,x,y,'label','Performance','TooltipString','Performance when this Number of discrete stimuli chosen');
+        next_row(y);
+
         % next_column(y)
         SoloParamHandle(obj, 'stim_dist_fig', 'value', figure('closerequestfcn', [mfilename '(' class(obj) ', ''hide'');'], 'MenuBar', 'none', ...
             'Name', 'StimulusPlot'), 'saveable', 0);
@@ -145,8 +155,22 @@ switch action
         figure(parentfig);
         
     case 'prepare_next_trial'
-        if value(training_stage) > 4 && stimuli_on
-            StimulusSection(obj,'pick_current_stimulus');
+        
+        if value(training_stage) > 4 & ~strcmpi(Stimuli_State,'Fixed')
+
+            % There are 3 cases for stimuli. It can be picked either from
+            % discrete, continuous or fixed sound
+            % Here we will choose between either of discrete and continuous
+            % and the fixed is set in the SoundManager Section
+
+            if strcmpi(Stimuli_State,'Full')
+                StimulusSection(obj,'pick_current_continuous_stimulus');
+
+            elseif strcmpi(Stimuli_State,'Discrete Stimuli')
+               StimulusSection(obj,'pick_current_discrete_stimulus');
+            
+            end
+
             srate=SoundManagerSection(obj,'get_sample_rate');
             Fs=srate;
             T=value(A1_time);
@@ -154,11 +178,11 @@ switch action
             if frequency_categorization
                 % produce the tone
                 A1_freq.value = value(thisstim);
-                A1 = value(thisstimlog(n_completed_trials+1));
+                A1 = value(thisstimlog(n_done_trials+1));
                 dur1 = A1_time*1000;
                 bal=0;
                 freq1=A1_freq*1000;
-                vol=0.001;
+                vol=value(volumeF1);
                 RVol=vol*min(1,(1+bal));
                 LVol=vol*min(1,(1-bal));
                 t=0:(1/srate):(dur1/1000);
@@ -170,10 +194,11 @@ switch action
             else
                 % produce noise pattern
                 A1_sigma.value = value(thisstim);
-                A1 = value(thisstimlog(n_completed_trials+1));
+                A1 = value(thisstimlog(n_done_trials+1));
                 [rawA1, rawA2, normA1, normA2]=noisestim(1,1,T,value(fcut),Fs,value(filter_type));
                 modulator=singlenoise(1,T,[value(lfreq) value(hfreq)],Fs,'BUTTER');
-                AUD1=normA1(1:A1_time*srate).*modulator(1:A1_time*srate).*A1_sigma;
+                idx_len = floor(T*srate);
+                AUD1=normA1(1:idx_len) .*modulator(1:idx_len) .*A1_sigma;
             end
 
             if ~isempty(AUD1)
@@ -182,24 +207,60 @@ switch action
 
             SoundManagerSection(obj, 'send_not_yet_uploaded_sounds');
 
-            % Plot current stimulus and move to saving stimulus history
-
-            % if value(thisstimlog(n_completed_trials+1)) > value(boundary)%value(numClass)
-            %     set(value(h1), 'YData', value(A1), 'color',[0.4 0.8 0.1],'markerfacecolor',[0.4 0.8 0.1]);
-            % else
-            %     set(value(h1), 'YData', value(A1), 'color',[0.8 0.4 0.1],'markerfacecolor',[0.8 0.4 0.1]);
-            % end
-
-            if n_completed_trials > 0
-                if ~violation_history(n_completed_trials) && ~timeout_history(n_completed_trials)
+            if n_done_trials > 0
+                if ~violation_history(n_done_trials) && ~timeout_history(n_done_trials)
                     StimulusSection(obj,'update_stimulus_history');
                 else
                     StimulusSection(obj,'update_stimulus_history_nan');
                 end
             end
         end
-        %% Case pick_current_stimulus
-    case 'pick_current_stimulus'
+
+    case 'update_discrete_performance'
+
+        window_size = 100;
+        current_stimuli = value(NumberStimuli);
+        if n_done_trials > 0
+            if ~isnan(hit_history(end))  % Trial is valid
+                ValidTrial_thisStimNumber.value = value(ValidTrial_thisStimNumber) + 1; % Increment valid trial count
+                % Get the current trial outcome (1 for correct, 0 for incorrect)
+                n = value(ValidTrial_thisStimNumber);
+                old_perf = value(Performance_thisStimNumber);
+                new_outcome = hit_history(end) * 100; % 100 or 0
+                if n < window_size
+                    % Phase 1: exact cumulative mean
+                    Performance_thisStimNumber.value = (old_perf * (n-1) + new_outcome) / n;
+                else
+                    % Phase 2: fixed-denominator incremental update
+                    % equivalent to EMA with alpha = 1/window_size
+                    Performance_thisStimNumber.value = old_perf + (new_outcome - old_perf) / window_size;
+                end
+            end
+
+            % Check whether to upgrade to higher discrete number or stay in this one
+            if value(Performance_thisStimNumber) > 80 && value(ValidTrial_thisStimNumber) > 400
+                if current_stimuli < 8
+                    % Define the discrete sequence of NumberStimuli values
+                    stimuli_sequence = [1, 2, 4, 8];
+                    % Find current position in sequence and move to next
+                    current_index = find(stimuli_sequence == current_stimuli, 1);
+                    next_index = current_index + 1;
+                    if next_index <= length(stimuli_sequence)
+                        % Update to next discrete value
+                        NumberStimuli.value = stimuli_sequence(next_index);
+                        Performance_thisStimNumber.value = 0;
+                        ValidTrial_thisStimNumber.value = 0;
+                    end
+                end
+            end
+        end
+
+
+   %% pick_current_dicrete_stimulus
+    case 'pick_current_discrete_stimulus'
+
+        StimulusSection(obj,'update_discrete_performance');
+        
         if frequency_categorization
             stim_min_log = log(value(minF1));
             stim_max_log = log(value(maxF1));
@@ -208,109 +269,168 @@ switch action
             stim_max_log = log(value(maxS1));
         end
 
-        if value(training_stage) == 4 % playing fixed sound during this stage
-            if (strcmpi(ThisTrial, 'LEFT') & strcmp(Rule,'S1>S_boundary Left')) | ...
-                    (strcmpi(ThisTrial, 'RIGHT') & strcmp(Rule,'S1>S_boundary Right'))
-                
-                stim_i_log = stim_min_log;
+        if (strcmpi(ThisTrial, 'LEFT') & strcmp(Rule,'S1>S_boundary Left')) | ...
+                (strcmpi(ThisTrial, 'RIGHT') & strcmp(Rule,'S1>S_boundary Right'))
+
+            edge_max = stim_max_log;
+            edge_min = value(boundary);
+            % edge_max is the non-boundary edge (away from boundary)
+            non_boundary_edge = edge_max;
+        else
+            edge_min = stim_min_log;
+            edge_max = value(boundary);
+            % edge_min is the non-boundary edge (away from boundary)
+            non_boundary_edge = edge_min;
+        end
+
+        % Generate discrete stimulus values based on NumberStimuli
+        num_stimuli = value(NumberStimuli);
+
+        if num_stimuli == 1
+            % Single stimulus: use non-boundary edge value
+            stim_i_log = non_boundary_edge;
+
+        elseif num_stimuli == 2
+            % Two values: non-boundary edge and middle
+            middle_log = (edge_min + edge_max) / 2;
+            stim_values = [non_boundary_edge, middle_log];
+            stim_i_log = stim_values(randi(length(stim_values)));
+
+        elseif num_stimuli == 4
+            % Four values: non-boundary edge, progressively moving toward boundary
+            middle_log = (edge_min + edge_max) / 2;
+
+            if non_boundary_edge == edge_max
+                % Moving from edge_max toward edge_min (boundary)
+                between1 = (middle_log + edge_max) / 2;  % between middle and edge_max
+                between2 = (edge_min + middle_log) / 2;  % between edge_min and middle
+                stim_values = [edge_max, between1, middle_log, between2];
             else
-                stim_i_log = stim_max_log;
+                % Moving from edge_min toward edge_max (boundary)
+                between1 = (edge_min + middle_log) / 2;  % between edge_min and middle
+                between2 = (middle_log + edge_max) / 2;  % between middle and edge_max
+                stim_values = [edge_min, between1, middle_log, between2];
             end
-         
-        else % will be playing stimuli from the distribution
+            stim_i_log = stim_values(randi(length(stim_values)));
 
-            if strcmpi(ThisTrial, 'LEFT')
-                dist_type  = value(Prob_Dist_Left);
-                dist_mean  = value(mean_Left);
-                dist_sigma = value(sigma_Left);
-                dist_range_multiplier = value(sigma_range_Left);
-                if strcmp(Rule,'S1>S_boundary Left')
-                    edge_max = stim_max_log;
-                    edge_min = value(boundary);
-                    edge_max = edge_min + dist_range_multiplier * (edge_max - edge_min);
-                else % the rule is S1>S_boundary Right
-                    edge_min = stim_min_log;
-                    edge_max = value(boundary);
-                    edge_min = edge_max - dist_range_multiplier * (edge_max - edge_min);
-                end
+        elseif num_stimuli == 8
+            % Eight values: progressively filling from non-boundary edge toward boundary
+            stim_values = linspace(non_boundary_edge, edge_min + edge_max - non_boundary_edge, num_stimuli);
+            stim_i_log = stim_values(randi(length(stim_values)));
 
-            else % trial is Right
-                dist_type  = value(Prob_Dist_Right);
-                dist_mean  = value(mean_Right);
-                dist_sigma = value(sigma_Right);
-                dist_range_multiplier = value(sigma_range_Right);
-                if strcmp(Rule,'S1>S_boundary Right')
-                    edge_max = stim_max_log;
-                    edge_min = value(boundary);
-                    edge_max = edge_min + dist_range_multiplier * (edge_max - edge_min);
-                else % the rule is S1>S_boundary Left
-                    edge_min = stim_min_log;
-                    edge_max = value(boundary);
-                    edge_min = edge_max - dist_range_multiplier * (edge_max - edge_min);
-                end
+        else
+            % General case: for any other NumberStimuli value
+            % Create evenly distributed values from non-boundary edge toward the other edge
+            other_edge = edge_min + edge_max - non_boundary_edge;
+            stim_values = linspace(non_boundary_edge, other_edge, num_stimuli);
+            stim_i_log = stim_values(randi(length(stim_values)));
+        end
+
+
+        thisstim.value=exp(stim_i_log);
+        thisstimlog(n_done_trials+1) = stim_i_log;
+
+        %% Case pick_current_stimulus
+    case 'pick_current_continuous_stimulus'
+        if frequency_categorization
+            stim_min_log = log(value(minF1));
+            stim_max_log = log(value(maxF1));
+        else
+            stim_min_log = log(value(minS1));
+            stim_max_log = log(value(maxS1));
+        end
+
+        if strcmpi(ThisTrial, 'LEFT')
+            dist_type  = value(Prob_Dist_Left);
+            dist_mean  = value(mean_Left);
+            dist_sigma = value(sigma_Left);
+            dist_range_multiplier = value(sigma_range_Left);
+            if strcmp(Rule,'S1>S_boundary Left')
+                edge_max = stim_max_log;
+                edge_min = value(boundary);
+                edge_max = edge_min + dist_range_multiplier * (edge_max - edge_min);
+            else % the rule is S1>S_boundary Right
+                edge_min = stim_min_log;
+                edge_max = value(boundary);
+                edge_min = edge_max - dist_range_multiplier * (edge_max - edge_min);
             end
 
-            % Create a Stimuli with the selected Distribution and Side
-            switch dist_type
-
-                case 'Uniform' % uniform distribution
-                    stim_i_log = random('Uniform',edge_min,edge_max);
-
-                case 'Exponential'
-
-                    lambda = 2.153 * (edge_max - edge_min); % In mice they are using 2.153 for normalized stim range [0 1]
-                    stim_i_log = edge_min - 1; % preinitialize for while loop
-                    while stim_i_log < edge_min || stim_i_log > edge_max
-                        U = rand(1);
-                        if edge_min == value(boundary) % exponentially decreasing
-                            stim_i_log = edge_min + (-(1/lambda)*log(U)); % the distribution would be between range [0 1], so added the edge_min
-                        else
-                            stim_i_log = edge_max - (-(1/lambda)*log(U));
-                        end
-                    end
-
-                case 'Anti Exponential'
-
-                    lambda = 2.153 * (edge_max - edge_min); % In mice they are using 2.153 for normalized stim range [0 1]
-                    stim_i_log = edge_min - 1; % preinitialize for while loop
-                    while stim_i_log < edge_min || stim_i_log > edge_max
-                        U = rand(1);
-                        if edge_min == value(boundary) % exponentially decreasing
-                            stim_i_log = edge_max - (-(1/lambda)*log(U)); % the distribution would be between range [0 1], so added the edge_min
-                        else
-                            stim_i_log = edge_min - ((1/lambda)*log(U));
-                        end
-                    end
-
-                case 'Half Normal'
-                    if edge_min == value(boundary)
-                        stim_i_log = random('Half Normal',dist_mean,dist_sigma);
-                        while stim_i_log < edge_min || stim_i_log > edge_max
-                            stim_i_log = random('Half Normal',dist_mean,dist_sigma);
-                        end
-                    else
-                        stim_i_log = CreateSamples_from_Distribution('normal',dist_mean,dist_sigma,edge_min,edge_max,1);
-                    end
-
-                case 'Anti Half Normal'
-
-                    stim_i_log = CreateSamples_from_Distribution('normal',dist_mean,dist_sigma,edge_min,edge_max,1);
-
-                case 'Normal'
-                    stim_i_log = random('Normal',dist_mean,dist_sigma);
-                    while stim_i_log < edge_min || stim_i_log > edge_max
-                        stim_i_log = random('Normal',dist_mean,dist_sigma);
-                    end
-
-                case 'Sinusoidal' | 'Anti Sinusoidal'
-
-                    stim_i_log = CreateSamples_from_Distribution('Sinusoidal',dist_mean,dist_sigma,edge_min,edge_max,1);
-
+        else % trial is Right
+            dist_type  = value(Prob_Dist_Right);
+            dist_mean  = value(mean_Right);
+            dist_sigma = value(sigma_Right);
+            dist_range_multiplier = value(sigma_range_Right);
+            if strcmp(Rule,'S1>S_boundary Right')
+                edge_max = stim_max_log;
+                edge_min = value(boundary);
+                edge_max = edge_min + dist_range_multiplier * (edge_max - edge_min);
+            else % the rule is S1>S_boundary Left
+                edge_min = stim_min_log;
+                edge_max = value(boundary);
+                edge_min = edge_max - dist_range_multiplier * (edge_max - edge_min);
             end
         end
 
+        % Create a Stimuli with the selected Distribution and Side
+        switch dist_type
+
+            case 'Uniform' % uniform distribution
+                stim_i_log = random('Uniform',edge_min,edge_max);
+
+            case 'Exponential'
+
+                lambda = 2.153 * (edge_max - edge_min); % In mice they are using 2.153 for normalized stim range [0 1]
+                stim_i_log = edge_min - 1; % preinitialize for while loop
+                while stim_i_log < edge_min || stim_i_log > edge_max
+                    U = rand(1);
+                    if edge_min == value(boundary) % exponentially decreasing
+                        stim_i_log = edge_min + (-(1/lambda)*log(U)); % the distribution would be between range [0 1], so added the edge_min
+                    else
+                        stim_i_log = edge_max - (-(1/lambda)*log(U));
+                    end
+                end
+
+            case 'Anti Exponential'
+
+                lambda = 2.153 * (edge_max - edge_min); % In mice they are using 2.153 for normalized stim range [0 1]
+                stim_i_log = edge_min - 1; % preinitialize for while loop
+                while stim_i_log < edge_min || stim_i_log > edge_max
+                    U = rand(1);
+                    if edge_min == value(boundary) % exponentially decreasing
+                        stim_i_log = edge_max - (-(1/lambda)*log(U)); % the distribution would be between range [0 1], so added the edge_min
+                    else
+                        stim_i_log = edge_min - ((1/lambda)*log(U));
+                    end
+                end
+
+            case 'Half Normal'
+                if edge_min == value(boundary)
+                    stim_i_log = random('Half Normal',dist_mean,dist_sigma);
+                    while stim_i_log < edge_min || stim_i_log > edge_max
+                        stim_i_log = random('Half Normal',dist_mean,dist_sigma);
+                    end
+                else
+                    stim_i_log = CreateSamples_from_Distribution('normal',dist_mean,dist_sigma,edge_min,edge_max,1);
+                end
+
+            case 'Anti Half Normal'
+
+                stim_i_log = CreateSamples_from_Distribution('normal',dist_mean,dist_sigma,edge_min,edge_max,1);
+
+            case 'Normal'
+                stim_i_log = random('Normal',dist_mean,dist_sigma);
+                while stim_i_log < edge_min || stim_i_log > edge_max
+                    stim_i_log = random('Normal',dist_mean,dist_sigma);
+                end
+
+            case {'Sinusoidal', 'Anti Sinusoidal'}
+
+                stim_i_log = CreateSamples_from_Distribution('Sinusoidal',dist_mean,dist_sigma,edge_min,edge_max,1);
+
+        end
+
         thisstim.value=exp(stim_i_log);
-        thisstimlog(n_completed_trials+1) = stim_i_log;
+        thisstimlog(n_done_trials+1) = stim_i_log;
 
         %% Case plot stimuli distribution
     case 'plot_stimuli'
@@ -515,19 +635,17 @@ switch action
     %% Case frequency ON
     case 'FrequencyCategorization'
         if frequency_categorization == 1
-            make_visible(maxF1);make_visible(minF1);make_visible(A1_freq);
+            make_visible(maxF1);make_visible(minF1);make_visible(A1_freq);make_visible(volumeF1);
             make_invisible(maxS1);make_invisible(minS1);make_invisible(A1_sigma);
-            make_invisible(fcut);make_invisible(lfreq);make_invisible(hfreq); make_invisible(filter_type);
-            StimulusSection(obj,'plot_stimuli');
+            make_invisible(fcut);make_invisible(lfreq);make_invisible(hfreq); make_invisible(filter_type);           
         else
             make_visible(maxS1);make_visible(minS1);make_visible(A1_sigma);
             make_visible(fcut);make_visible(lfreq);make_visible(hfreq); make_visible(filter_type);
-            make_invisible(maxF1);make_invisible(minF1);make_invisible(A1_freq);
-            StimulusSection(obj,'plot_stimuli');
+            make_invisible(maxF1);make_invisible(minF1);make_invisible(A1_freq); make_visible(volumeF1);          
         end
 
         StimulusSection(obj,'Cal_Boundary'); % update the boundary
-
+        StimulusSection(obj,'plot_stimuli');
 
     %% Case get_stimuli
     % case 'get_stimuli'
@@ -553,12 +671,12 @@ switch action
 
     case 'update_stimulus_history'
         ps=value(stimulus_history);
-        ps(n_completed_trials)=value(thisstimlog(n_completed_trials));
+        ps(n_done_trials)=value(thisstimlog(n_done_trials));
         stimulus_history.value=ps;
 
     case 'update_stimulus_history_nan'
         ps=value(stimulus_history);
-        ps(n_completed_trials)=value(thisstimlog(n_completed_trials));%nan;
+        ps(n_done_trials)=value(thisstimlog(n_done_trials));%nan;
         stimulus_history.value=ps;
 
     %% Case hide

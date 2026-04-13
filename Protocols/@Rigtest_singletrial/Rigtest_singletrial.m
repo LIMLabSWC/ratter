@@ -132,9 +132,7 @@ switch action,
     set(value(myfig), 'Name', name, 'Tag', name, ...
       'closerequestfcn', 'dispatcher(''close_protocol'')', 'MenuBar', 'none');
 
-
-
-    % At this point we have one SoloParamHandle, myfig
+        % At this point we have one SoloParamHandle, myfig
     % Let's put the figure where we want it and give it a reasonable size:
     set(value(myfig), 'Position', [485   144   300   400]);
 
@@ -148,25 +146,26 @@ switch action,
     next_row(y);
     
     DispParam(obj, 'nTrials', 0, x, y); next_row(y);
-    % For plotting with the pokesplot plugin, we need to tell it what
-    % colors to plot with:
-    my_state_colors = struct( ...
-      'wait_for_left',    [0.2 0.5 0.2], ...
-      'in_left',          [0.5 0.5 1],   ...
-      'in_center',        [0.5 1 0.5],   ...
-      'in_right',         [1 0.5 0.5],   ...
-      'state_0',                [1 1 1],       ...
-      'final_state',            [0.5 0 0],     ...
-      'check_next_trial_ready', [0.7 0.7 0.7]);
-    % In pokesplot, the poke colors have a default value, so we don't need
-    % to specify them, but here they are so you know how to change them.
-    my_poke_colors = struct( ...
-      'L',                  0.6*[1 0.66 0],    ...
-      'C',                      [0 0 0],       ...
-      'R',                  0.9*[1 0.66 0]);
     
-    [x, y] = PokesPlotSection(obj, 'init', x, y, ...
-      struct('states',  my_state_colors, 'pokes', my_poke_colors));
+    % % For plotting with the pokesplot plugin, we need to tell it what
+    % % colors to plot with:
+    % my_state_colors = struct( ...
+    %   'wait_for_left',    [0.2 0.5 0.2], ...
+    %   'in_left',          [0.5 0.5 1],   ...
+    %   'in_center',        [0.5 1 0.5],   ...
+    %   'in_right',         [1 0.5 0.5],   ...
+    %   'state_0',                [1 1 1],       ...
+    %   'final_state',            [0.5 0 0],     ...
+    %   'check_next_trial_ready', [0.7 0.7 0.7]);
+    % % In pokesplot, the poke colors have a default value, so we don't need
+    % % to specify them, but here they are so you know how to change them.
+    % my_poke_colors = struct( ...
+    %   'L',                  0.6*[1 0.66 0],    ...
+    %   'C',                      [0 0 0],       ...
+    %   'R',                  0.9*[1 0.66 0]);
+    % 
+    % [x, y] = PokesPlotSection(obj, 'init', x, y, ...
+    %   struct('states',  my_state_colors, 'pokes', my_poke_colors));
 
     next_row(y);
     SubheaderParam(obj, 'title', 'Poke in lights', x, y); next_row(y);
@@ -215,6 +214,16 @@ switch action,
     Rigtest_singletrial(obj, 'prepare_next_trial');
     
     
+  case 'set_callback'
+
+      if not(isempty(varargin))
+          callback_info = varargin{1};
+      else
+          callback_info = [];
+      end
+      SoloParamHandle(obj, 'ManualTestCompletionCallback', 'value', callback_info);
+
+    
     
   %---------------------------------------------------------------
   %          CASE PREPARE_NEXT_TRIAL
@@ -225,10 +234,39 @@ switch action,
     nTrials.value = n_done_trials;
     
     % <~> If we've completed our trial, tell RunRats that we're done.
-    if nTrials > 0 && runrats('is_running'), 
-		runrats('rigtest_singletrial_is_complete');
-        return;
-    end;
+    
+    %% Modified by Arpit to run without Runrats
+    % <~> If we've completed our trial, tell RunRats that we're done.
+    if n_done_trials > 0
+        
+        if nTrials > 0 && runrats('is_running')
+            runrats('rigtest_singletrial_is_complete');
+            return;
+
+        elseif nTrials > 0 && NeuropixelNeuroblueprint('is_running')
+           NeuropixelNeuroblueprint('manual_test_stopping');
+           return;
+
+        else % probably called by another function so need to stop the dispatcher from here itself
+            % Send a dummy state machine that does nothing and ends quickly.
+            % This prevents the protocol from running a second trial.
+           
+            % Find the callback handle created by the main GUI calling it.
+             h_callback = get_sphandle('owner', ['@' class(obj) '$'], 'name', 'ManualTestCompletionCallback');
+        
+             if ~isempty(h_callback)
+                 callback_info = value(h_callback{1});
+                 if ~isempty(callback_info) && isa(callback_info, 'cell') && numel(callback_info) == 2
+                     % Execute the callback: feval(function_handle, arguments...)
+                     % This directly calls 'continue_load_after_manual_test' in the main GUI.
+                     feval(callback_info{1}, callback_info{2});
+                 end
+             end
+
+            return; % IMPORTANT: Exit here to prevent building the real state machine again.
+        end
+    end
+
     % <~> end adaptation for single-trial use :P
 
     
@@ -326,9 +364,6 @@ switch action,
       'self_timer', 0.2, 'input_to_statechange', {'Tup', 'check_next_trial_ready'});
     dispatcher('send_assembler', sma, 'final_state');
 
-    % Defaul behavior of following call is that every 20 trials, the data
-    % gets saved, not interactive, no commit to CVS.
-%     SavingSection(obj, 'autosave_data');
     
   %---------------------------------------------------------------
   %          CASE TRIAL_COMPLETED
@@ -337,20 +372,20 @@ switch action,
     % Do any updates in the protocol that need doing:
     feval(mfilename, 'update');
     % And PokesPlot needs completing the trial:
-    PokesPlotSection(obj, 'trial_completed');
+    % PokesPlotSection(obj, 'trial_completed');
     
   %---------------------------------------------------------------
   %          CASE UPDATE
   %---------------------------------------------------------------
   case 'update'
-    PokesPlotSection(obj, 'update');
+    % PokesPlotSection(obj, 'update');
     
     
   %---------------------------------------------------------------
   %          CASE CLOSE
   %---------------------------------------------------------------
   case 'close'
-    PokesPlotSection(obj, 'close');
+    % PokesPlotSection(obj, 'close');
     if exist('myfig', 'var') && isa(myfig, 'SoloParamHandle') && ishandle(value(myfig)), %#ok<NODEF>
       delete(value(myfig));
     end;

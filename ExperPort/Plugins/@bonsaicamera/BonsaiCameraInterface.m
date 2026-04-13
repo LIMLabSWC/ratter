@@ -34,7 +34,9 @@
 % Switch-case structure:
 %
 % 'init'           : Initializes UI toggle, starts Bonsai workflow, sets up save directory and UDP sender.
-% 'camera_connection' : Sends OSC messages to start or stop the camera feed. Also sends the video path to Bonsai.
+% 'camera_connection' : Sends OSC messages to start or stop the camera feed.
+% 'record_start'   : creates the directory to save videos initially declared
+%                    in 'init' and then send the message to Bonsai to start recording.
 % 'next_trial'     : Sends a new video save path to Bonsai to separate trial recordings.
 % 'close'          : Stops the camera, deletes the UDP sender object, and terminates Bonsai and CMD processes.
 % 'stop'           : Sending OSC message to stop streaming and save last trial video
@@ -118,7 +120,7 @@ switch action
         runBonsaiWorkflow(bonsai_workflow_Path);        
         pause(5); % wait few seconds for software to open before continuing
 
-        %% STEP 2: DECLARING AND FOLDER LOCATION FOR SAVING THE VIDEOS
+        %% STEP 2: DECLARING FOLDER LOCATION FOR SAVING THE VIDEOS
 
         % The video files are saved in the folder format declared below
         % C:\RatterVideos\ExpName\RateName\Videos_Protocolname_ExpName_RatName_date
@@ -171,9 +173,14 @@ switch action
                 rat_name = varargin{5};
         end
 
+        
+        % Changing the Video file save location from C:\ratter_Videos to
+        % C:\ratter\training_videos
+        
+        % main_dir_video = [current_dir 'ratter_Videos'];
         current_dir = cd;
         ratter_dir = extractBefore(current_dir,'ratter');
-        main_dir_video = [ratter_dir 'ratter_Videos'];
+        main_dir_video = fullfile(ratter_dir, 'ratter','training_videos');
         date_str = regexprep(char(datetime('today','Format','yyyy-MM-dd')), '[^0-9]', '');
         video_foldername = sprintf('video_@%s_%s_%s_%s',protocol_name,experimenter_name,rat_name,date_str);
         rat_dir = sprintf('%s\\%s\\%s',main_dir_video,experimenter_name,rat_name);
@@ -190,7 +197,7 @@ switch action
         else
             video_save_dir = [video_save_dir char(97)];
         end
-        mkdir(video_save_dir);
+        % mkdir(video_save_dir);
         SoloParamHandle(obj, 'Video_Saving_Folder', 'value', video_save_dir);
         
         % --- Create UDP Port Object ---
@@ -215,27 +222,19 @@ switch action
         if CameraControl == 1 % User Selected to Reconnect & Restart the feed from the Camera 
 
             % Now that we have created the UPD connection, we can send commands
-        % over OSC. 
-        % Before starting the streaming of Camera, I need to send the
-        % file directory for saving the file otherwise Bonsai can run into
-        % error as it will try saving files in the predefined folder in
-        % bonsai and that can conflict with file already present there.
-
-            oscMsg_file_directory = createOSCMessage(recording_command_address, [value(Video_Saving_Folder) '\Trial.avi']);
-            % write(udpSender, oscMsg_file_directory, "uint8", bonsaiComputerIP,bonsaiUdpPort);
-
+            % over OSC. 
+         
             % OSC message to start the camera
             oscMsg_Camera_start = createOSCMessage(camera_command_address, startCommand);
             % the command to send message to Bonsai
             write(value(UDPSender), oscMsg_Camera_start, "uint8", bonsaiComputerIP,bonsaiUdpPort);
-
-            pause(3);
-            
+  
             % NOTE: Ideally I should start saving the trials once the experimenter presses
             % Run either on dispatcher or Runrats. But, I dont want to make the changes there
             % so would start recording as soon as the protocol is loaded and camera starts streaming
-
-            write(value(UDPSender), oscMsg_file_directory, "uint8", bonsaiComputerIP,bonsaiUdpPort);
+            %% Fixed in runrats
+            % pause(3);
+            % write(value(UDPSender), oscMsg_file_directory, "uint8", bonsaiComputerIP,bonsaiUdpPort);
 
         else % User Stopped the streaming and saving OF VIDEO
 
@@ -245,7 +244,26 @@ switch action
 
         end
 
-     
+    %% User pressed Run on runrats, so create the video direcctory folder and start recording
+    case 'record_start'
+
+        % create the folder to save the videos
+        if not(isfolder(value(Video_Saving_Folder)))
+            mkdir(value(Video_Saving_Folder));
+        end
+        pause(3);
+        % To be on safer side that the last streaming message reached lets
+        % resend it
+        % OSC message to start the camera
+        oscMsg_Camera_start = createOSCMessage(camera_command_address, startCommand);
+        % the command to send message to Bonsai
+        write(value(UDPSender), oscMsg_Camera_start, "uint8", bonsaiComputerIP,bonsaiUdpPort);
+        pause(2);
+        % Send the message to start recording
+        oscMsg_file_directory = createOSCMessage(recording_command_address,sprintf('%s\\BControlTrial%i_bonsaiTrial.avi',value(Video_Saving_Folder),n_done_trials+1));
+        write(value(UDPSender), oscMsg_file_directory, "uint8", bonsaiComputerIP,bonsaiUdpPort);
+
+
     case 'stop' % Stopping the streaming and saving last trial video
 
         % this stops saving and streaming of the camera
@@ -260,9 +278,18 @@ switch action
         % in this I send a command to bonsai so that it creates a new file
         % for each trial
 
-        oscMsg_file_directory = createOSCMessage(recording_command_address, [value(Video_Saving_Folder) '\Trial.avi']);
+        oscMsg_file_directory = createOSCMessage(recording_command_address,sprintf('%s\\BControlTrial%i_bonsaiTrial.avi',value(Video_Saving_Folder),n_done_trials+1));
         write(value(UDPSender), oscMsg_file_directory, "uint8", bonsaiComputerIP,bonsaiUdpPort);
     
+
+    case 'get_video_filepath'
+
+        varargout{1} = value(Video_Saving_Folder);
+
+    case 'set_video_filepath'
+
+       Video_Saving_Folder.value = varargin{1};
+
     %% close bonsai and command window
     case 'close'
             
