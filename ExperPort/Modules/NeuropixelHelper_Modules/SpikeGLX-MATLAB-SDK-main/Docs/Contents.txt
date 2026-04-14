@@ -1,0 +1,44 @@
+
+========
+Contents
+========
+
+API folder
+==========
+
+API contains a complete prebuilt set of API components:
+
+    + @SpikeGL             // place in client MATLAB project directory
+    + CalinsNetMex.mexw64  // place in client MATLAB project directory
+
+Build folder
+============
+
+Note: Building is optional: the API components are prebuilt.
+
+Build contains the sources and make(*.bat) file to generate CalinsNetMex.mexw64:
+
+    + CalinsNetMex.mexw64  // generated in API directory
+
+Demos folder
+============
+
+Tools demonstrating how to use the API.
+
+- JWave folder: This is a waveform you can play with the wp_XXX scripts. Copy these files into the _Waves folder at the top level of your SpikeGLX folder.
+
+- DemoRemoteAPI.m
+- LatencyTest.m
+- wp_ni_soft_start.m
+- wp_soft_start.m
+- wp_trig_start.m
+
+Docs folder
+===========
+
+- Contents.txt
+- GettingStarted.txt
+- Help.txt
+- WhatsNew.txt
+
+
