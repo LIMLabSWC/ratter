@@ -54,7 +54,8 @@ switch action
         SoloParamHandle(obj, 'previous_sides', 'value', []);   % 'l' or 'r' per trial
         SoloParamHandle(obj, 'trial_params_history', 'value', {});  % struct per trial: sound_name, correct_side, port_mapping
         SoloParamHandle(obj, 'current_trial_params', 'value', struct());
-        DeclareGlobals(obj, 'rw_args', {'hit_history', 'previous_sides', 'trial_params_history', 'current_trial_params'});
+        DeclareGlobals(obj, 'rw_args', {'hit_history', 'previous_sides', ...
+            'trial_params_history', 'current_trial_params'});
 
         % Build the GUI and set up solo param handle variables
         create_gui(obj);
@@ -63,26 +64,62 @@ switch action
         obj = create_sounds(obj);
 
         % Need to prepare the first trial to present
-        Sound2AFC(obj, 'prepare_next_trial')
+        Sound2AFC(obj, 'prepare_next_trial');
 
     case 'prepare_next_trial'
+        % Record trial params from this trial for accuracy analysis
+        prev_trial_params = value(current_trial_params);
+        if n_done_trials >= 1
+            hit = outcome_from_parsed_events(parsed_events.states);
+    
+            hit_history.value        = [value(hit_history),    hit];
+            previous_sides.value     = [value(previous_sides), prev_trial_params.correct_side(1)];  % 'l' or 'r'
+            trial_params_history.value = [value(trial_params_history), {prev_trial_params}];
+            
+            if prev_trial_params.correct_side(1) == 'l'
+                side_name = 'LEFT';
+            else
+                side_name = 'RIGHT';
+            end
+            
+            fprintf('\nTrial %i - %s trial: ',n_done_trials, side_name)
+            
+            if isnan(hit)
+                fprintf('INVALID\n') 
+            elseif (hit)
+                fprintf('HIT\n');
+            else
+                fprintf('ERROR\n');
+            end
+            hh = value(hit_history);
+            
+            left_trials = previous_sides == 'l';
+            right_trials = previous_sides == 'r';
+            n_valid_left = nansum(left_trials & ~isnan(hh));
+            n_valid_right = nansum(right_trials & ~isnan(hh));
+            n_left_hits = nansum(hh(left_trials));
+            n_right_hits = nansum(hh(right_trials));
+            left_acc = nanmean(hh(left_trials));
+            right_acc = nanmean(hh(right_trials));
+    
+            fprintf('Left trial accuracy: %.2f (%i/%i)\n', left_acc, n_left_hits, n_valid_left);
+            fprintf('Right trial accuracy: %.2f (%i/%i)\n', right_acc, n_right_hits, n_valid_right);
+        end
         SessionDefinition(obj, 'next_trial');
+        
+        % Update trial parameters
         trial_params = get_trial_params(obj);
         current_trial_params.value = trial_params;
 
         [sma, prep_next_trial_states] = build_sma(obj, trial_params);
         dispatcher('send_assembler', sma, prep_next_trial_states);
 
+
     case 'trial_completed'
         Sound2AFC(obj, 'update');
         PokesPlotSection(obj, 'trial_completed');
 
-        tp  = value(current_trial_params);
-        hit = outcome_from_parsed_events(parsed_events.states);
-
-        hit_history.value        = [value(hit_history),    hit];
-        previous_sides.value     = [value(previous_sides), tp.correct_side(1)];  % 'l' or 'r'
-        trial_params_history.value = [value(trial_params_history), {tp}];
+        
 
     case 'update'
         PokesPlotSection(obj, 'update');
@@ -144,7 +181,7 @@ function create_gui(obj)
         % Column 1: PokesPlot
         next_row(y, 1);
         [x, y] = PokesPlotSection(obj, 'init', x, y, struct('states',  state_colors()));
-        PokesPlotSection(obj, 'set_alignon', 'wait_for_center_poke(1,1)');
+        PokesPlotSection(obj, 'set_alignon', 'cpoke_pre_stim(1,1)');
         PokesPlotSection(obj, 'hide');
     
 
@@ -165,6 +202,7 @@ function create_gui(obj)
         DeclareGlobals(obj, 'rw_args', {'use_light_guides'});
 
         SessionDefinition(obj, 'init', x, y, value(myfig));
+
         
 end
 
@@ -187,7 +225,7 @@ function obj = load_stim_sounds(obj)
 
     for i = 1:length(labels)
         label = labels{i};
-        config = SoundConfigSection(obj, 'get_sound_config', label);
+        config = SoundConfigSection(obj, 'get_sound_config', label); 
 
         [audio_data, orig_rate] = audioread(config.file);
 
@@ -230,11 +268,28 @@ end
 
 function trial_params = get_trial_params(obj)
     GetSoloFunctionArgs(obj);
+    max_repeats = 4;
+    valid_trials = ~isnan(value(hit_history));
+    if sum(valid_trials) > max_repeats
+        tph = value(trial_params_history);
+        tph = [tph{:}];
+        prev_sounds =  vertcat(tph.sound_name);
+        prev_sound_repeats = prev_sounds == prev_sounds(end);
+        prev_sound_repeats = cumsum(prev_sound_repeats(end:-1:1));
+        allow_repeats = prev_sound_repeats(max_repeats) < max_repeats;
+    end
+    % valid_prev_sides = value(previous_sides);
+    % valid_prev_sides = valid_prev_sides();
+    % 
+    % max_repeats = 4;
+    % valid_repeats = cumsum(valid_prev_sides(end:-1:1) == valid_prev_sides(end-1));
+    % allow_repeat = valid_repeats(max_repeats) < max_repeats;
 
     % Get normalized probabilities
     probs = value(normalized_probs);
     labels = {'A', 'B', 'C', 'D'};
-
+    
+    
     % Select sound based on probabilities
     cumprobs = cumsum(probs);
     r = rand();
@@ -388,7 +443,7 @@ function [sma, prep_next_trial_states] = build_sma(obj, trial_params)
         'input_to_statechange', {'Tup', 'ITI'});
 
     sma = add_state(sma, 'name', 'ITI', 'self_timer', iti_dur, ...
-        'input_to_statechange', {'Tup', 'check_next_trial_ready'})
+        'input_to_statechange', {'Tup', 'check_next_trial_ready'});
     
 end
 
