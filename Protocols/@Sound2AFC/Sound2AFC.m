@@ -268,7 +268,7 @@ end
 
 function trial_params = get_trial_params(obj)
     GetSoloFunctionArgs(obj);
-    max_repeats = 4;
+    max_repeats = 2;
     valid_trials = ~isnan(value(hit_history));
     if sum(valid_trials) > max_repeats
         tph = value(trial_params_history);
@@ -287,8 +287,11 @@ function trial_params = get_trial_params(obj)
 
     % Get normalized probabilities
     probs = value(normalized_probs);
-    labels = {'A', 'B', 'C', 'D'};
     
+    labels = {'A', 'B', 'C', 'D'};
+    idx = find(strcmp(labels, prev_sounds{end}));
+    probs(idx) = 0;
+    probs = probs / sum(probs); 
     
     % Select sound based on probabilities
     cumprobs = cumsum(probs);
