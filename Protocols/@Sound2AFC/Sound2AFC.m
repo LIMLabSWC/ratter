@@ -114,7 +114,13 @@ switch action
         [sma, prep_next_trial_states] = build_sma(obj, trial_params);
         dispatcher('send_assembler', sma, prep_next_trial_states);
 
-
+        if trial_params.correct_side(1) == 'l'
+                side_name = 'LEFT';
+            else
+                side_name = 'RIGHT';
+            end
+            
+        fprintf('\nTrial %i - %s trial: ',n_done_trials+1, side_name)
     case 'trial_completed'
         Sound2AFC(obj, 'update');
         PokesPlotSection(obj, 'trial_completed');
@@ -196,10 +202,15 @@ function create_gui(obj)
 
         next_row(y, 1);
         ToggleParam(obj, 'use_light_guides', 0, x, y, 'label', 'Light correct port', ...
-            'OnString', 'Light: ON', 'OffString', 'Light: OFF');
+            'OnString', 'Guide Lights: ON', 'OffString', 'Guide Lights: OFF');
         next_row(y);
-        
-        DeclareGlobals(obj, 'rw_args', {'use_light_guides'});
+
+        next_row(y, 1);
+        ToggleParam(obj, 'punish_errors', 1, x, y, 'label', 'End trial after error', ...
+            'OnString', 'Punish errors', 'OffString', 'Forgive errors');
+        next_row(y);
+
+        DeclareGlobals(obj, 'rw_args', {'use_light_guides', 'punish_errors'});
 
         SessionDefinition(obj, 'init', x, y, value(myfig));
 
@@ -446,9 +457,14 @@ function [sma, prep_next_trial_states] = build_sma(obj, trial_params)
         'output_actions', {'DOut', rew_dout, 'SoundOut', rew_snd_id},...
         'input_to_statechange', {'Tup', 'ITI'});
 
-    sma = add_state(sma, 'name', error_state, 'self_timer', err_timer, ...
-        'output_actions', {'SoundOut', err_snd_id}, ...
-        'input_to_statechange', {'Tup', 'ITI'});
+    if value(punish_errors)
+        sma = add_state(sma, 'name', error_state, 'self_timer', err_timer, ...
+            'output_actions', {'SoundOut', err_snd_id}, ...
+            'input_to_statechange', {'Tup', 'ITI'});
+    else
+        sma = add_state(sma, 'name', error_state, 'self_timer', .001, ...
+            'input_to_statechange', {'Tup', 'wait_for_choice'});
+    end
 
     sma = add_state(sma, 'name', 'ITI', 'self_timer', iti_dur, ...
         'input_to_statechange', {'Tup', 'check_next_trial_ready'});
