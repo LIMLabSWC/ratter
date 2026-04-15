@@ -203,14 +203,20 @@ function create_gui(obj)
         next_row(y, 1);
         ToggleParam(obj, 'use_light_guides', 0, x, y, 'label', 'Light correct port', ...
             'OnString', 'Guide Lights: ON', 'OffString', 'Guide Lights: OFF');
-        next_row(y);
-
+        
         next_row(y, 1);
         ToggleParam(obj, 'punish_errors', 1, x, y, 'label', 'End trial after error', ...
             'OnString', 'Punish errors', 'OffString', 'Forgive errors');
+        
+        next_row(y, 1);
+        ToggleParam(obj, 'punish_fixation_breaks', 1, x, y, 'label', ...
+            'End trial after fixation break', ...
+            'OnString', 'Punish fixation break', ...
+            'OffString', 'Forgive fixation break');
         next_row(y);
 
-        DeclareGlobals(obj, 'rw_args', {'use_light_guides', 'punish_errors'});
+        DeclareGlobals(obj, 'rw_args', {'use_light_guides', ...
+            'punish_errors', 'punish_fixation_breaks'});
 
         SessionDefinition(obj, 'init', x, y, value(myfig));
 
@@ -252,7 +258,8 @@ function obj = load_stim_sounds(obj)
         end
 
         stereo_waveform = .1*[audio_data'; audio_data'];
-        SoundManagerSection(obj, 'declare_new_sound', label, stereo_waveform, loop_flag);
+        SoundManagerSection(obj, 'declare_new_sound', label, ...
+            stereo_waveform, loop_flag);
     end
 
     % Correct feedback sound
@@ -440,10 +447,15 @@ function [sma, prep_next_trial_states] = build_sma(obj, trial_params)
         'input_to_statechange',{'Cout', 'cpoke_violation', ...
         'Tup', 'wait_for_choice'});
 
+    if value(punish_fixation_breaks)
+        post_cpoke_viol_state = 'ITI';
+    else
+        post_cpoke_viol_state = 'wait_for_center_poke';
+    end
     sma = add_state(sma, 'name', 'cpoke_violation', 'self_timer', .001, ...
-        'input_to_statechange', {'Tup', 'ITI'}, ...
+        'input_to_statechange', {'Tup', post_cpoke_viol_state}, ...
         'output_actions', {'SoundOut', -stim_id});
-
+    
     % wait for a choice
     sma = add_state(sma, 'name', 'wait_for_choice', 'self_timer', choice_timer, ...
         'input_to_statechange', {correct_in, correct_state; ...
