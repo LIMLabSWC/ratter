@@ -123,7 +123,16 @@ switch action
         fprintf('\nTrial %i - %s trial: ',n_done_trials+1, side_name)
     case 'start_recording'
         BonsaiCameraInterface(obj, 'record_start');
+    
+    case 'set_setting_params' % special case used during ephys experiments when not using runrats
 
+        SavingSection(obj,'set','ratname', varargin{1});
+        SavingSection(obj,'set','experimenter',varargin{2});
+        SavingSection(obj,'set_setting_info',varargin{3},varargin{4});
+        % SavingSection(obj,'set_autosave_frequency',1); % saving setting every trial instead of 20
+        BonsaiCameraInterface(obj,'set_video_filepath',varargin{5});
+        BonsaiCameraInterface(obj,'camera_connection');
+    
     case 'trial_completed'
         Sound2AFC(obj, 'update');
         PokesPlotSection(obj, 'trial_completed');
@@ -133,6 +142,7 @@ switch action
 
     case 'update'
         PokesPlotSection(obj, 'update');
+        update_perf_plot(obj);
 
     case 'reload_sounds'
         obj = load_stim_sounds(obj);
@@ -227,6 +237,12 @@ function create_gui(obj)
 
         DeclareGlobals(obj, 'rw_args', {'use_light_guides', ...
             'punish_errors', 'punish_fixation_breaks'});
+
+        % Performance plot: P(right choice) per sound type
+        SoloParamHandle(obj, 'perf_axes', 'saveable', 0);
+        perf_axes.value = axes('Parent', value(myfig), ...
+            'Units', 'normalized', 'Position', [0.55 0.55 0.42 0.38]);
+        DeclareGlobals(obj, 'ro_args', {'perf_axes'});
 
         [x, y] = BonsaiCameraInterface(obj, 'init', x, y, mfilename, expmtr, rname);
         next_row(y);
@@ -523,6 +539,76 @@ function hit = outcome_from_parsed_events(states)
     end
     hit = NaN;  % violation or timeout — no choice was made
 end
+
+function update_perf_plot(obj)
+    GetSoloFunctionArgs(obj);
+
+    hh  = value(hit_history);           % 1=hit, 0=error, NaN=violation
+    ps  = value(previous_sides);        % 'l' or 'r' per trial (correct side)
+    tph = value(trial_params_history);
+
+    ax = value(perf_axes);
+    if ~ishandle(ax), return; end
+
+    labels = {'A', 'B', 'C', 'D'};
+    frac_right = nan(1, 4);
+    sem_right  = nan(1, 4);
+
+    if ~isempty(tph)
+        tph_arr   = [tph{:}];
+        snd_names = cellstr(vertcat(tph_arr.sound_name));  % cell of 'A','B',...
+        valid     = ~isnan(hh);
+
+        for i = 1:4
+            mask = valid & strcmp(snd_names, labels{i})';
+            if ~any(mask), continue; end
+            correct_is_right = ps(mask) == 'r';
+            chose_right = (hh(mask) == 1 &  correct_is_right) | ...
+                          (hh(mask) == 0 & ~correct_is_right);
+            n = sum(mask);
+            p = mean(chose_right);
+            frac_right(i) = p;
+            sem_right(i)  = sqrt(p * (1 - p) / n);
+        end
+    end
+
+    % Two-sided exact binomial test against p=0.5 for each sound
+    sig = false(1, 4);
+    if ~isempty(tph)
+        tph_arr   = [tph{:}];
+        snd_names = cellstr(vertcat(tph_arr.sound_name));
+        valid     = ~isnan(hh);
+        for i = 1:4
+            mask = valid & strcmp(snd_names, labels{i})';
+            if ~any(mask), continue; end
+            correct_is_right = ps(mask) == 'r';
+            chose_right = (hh(mask) == 1 &  correct_is_right) | ...
+                          (hh(mask) == 0 & ~correct_is_right);
+            n = sum(mask);
+            k = sum(chose_right);
+            p_val = 2 * min(binocdf(k, n, 0.5), 1 - binocdf(k - 1, n, 0.5));
+            sig(i) = p_val < 0.05;
+        end
+    end
+
+    cla(ax);
+    hold(ax, 'on');
+    plot(ax, [0.5 4.5], [0.5 0.5], 'k--');
+    errorbar(ax, 1:4, frac_right, sem_right, 'o', ...
+        'MarkerFaceColor', 'b', 'MarkerSize', 8, 'LineWidth', 1.5);
+    for i = 1:4
+        if sig(i) && ~isnan(frac_right(i))
+            text(ax, i, 0.95, '*', 'HorizontalAlignment', 'center', ...
+                'FontSize', 16, 'FontWeight', 'bold');
+        end
+    end
+    hold(ax, 'off');
+    set(ax, 'XTick', 1:4, 'XTickLabel', labels, 'YLim', [0 1], 'XLim', [0.5 4.5]);
+    ylabel(ax, 'P(right)');
+    xlabel(ax, 'Sound');
+    title(ax, 'Choice bias');
+end
+
 
 function sc = state_colors()
 % Returns a structure with RGB color triplets for each state in the protocol
