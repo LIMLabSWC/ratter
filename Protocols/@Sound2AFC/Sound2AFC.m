@@ -12,7 +12,7 @@ function [obj] = Sound2AFC(varargin)
 % This is old MATLAB oop syntax to create an instance of the class with the name from this file (mfilename) e.g., Sound2AFC
 % It can use methods available in all of the other referenced functions, e.g., pokesplot
 obj = class(struct, mfilename, pokesplot2, saveload, sessionmodel, soundmanager, soundui, antibias, ...
-  water, distribui, punishui, comments, soundtable, sqlsummary);
+  water, distribui, punishui, comments, soundtable, sqlsummary, bonsaicamera);
 
 % If there are no input arguments, return this empty instance of the class
 if nargin==0 || (nargin==1 && ischar(varargin{1}) && strcmp(varargin{1}, 'empty')), 
@@ -121,9 +121,13 @@ switch action
             end
             
         fprintf('\nTrial %i - %s trial: ',n_done_trials+1, side_name)
+    case 'start_recording'
+        BonsaiCameraInterface(obj, 'record_start');
+
     case 'trial_completed'
         Sound2AFC(obj, 'update');
         PokesPlotSection(obj, 'trial_completed');
+        BonsaiCameraInterface(obj, 'next_trial');
 
         
 
@@ -135,6 +139,7 @@ switch action
 
     case 'end_session'
         prot_title.value = [value(prot_title), '  End: ', datestr(now, 'HH:MM')];
+        BonsaiCameraInterface(obj, 'stop');
 
     case 'pre_saving_settings'
         pd.hits  = hit_history(:);
@@ -144,6 +149,7 @@ switch action
 
 
     case 'close'
+        BonsaiCameraInterface(obj, 'close');
         PokesPlotSection(obj, 'close');
         if exist('myfig', 'var') && isa(myfig, 'SoloParamHandle') && ishandle(value(myfig))
             delete(value(myfig));
@@ -221,6 +227,9 @@ function create_gui(obj)
 
         DeclareGlobals(obj, 'rw_args', {'use_light_guides', ...
             'punish_errors', 'punish_fixation_breaks'});
+
+        [x, y] = BonsaiCameraInterface(obj, 'init', x, y, mfilename, expmtr, rname);
+        next_row(y);
 
         SessionDefinition(obj, 'init', x, y, value(myfig));
 
