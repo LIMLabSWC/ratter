@@ -235,7 +235,7 @@ function create_gui(obj)
         next_row(y);
         next_row(y);
 
-        DeclareGlobals(obj, 'rw_args', {'use_light_guides', ...
+        DeclareGlobals(obj, 'rw_args', {'skip_to_reward', 'use_light_guides', ...
             'punish_errors', 'punish_fixation_breaks'});
 
         % Performance plot: P(right choice) per sound type
@@ -405,7 +405,7 @@ function [sma, prep_next_trial_states] = build_sma(obj, trial_params)
     % Determine if this is a random trial
     is_random = strcmp(port_mapping, 'random');
     
-    correct_side_led = '';
+    correct_side_led = 0;
     % Set up inputs and outputs based on correct side
     switch correct_side
         case 'left'
