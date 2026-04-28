@@ -152,12 +152,30 @@ switch action
         BonsaiCameraInterface(obj, 'stop');
 
     case 'pre_saving_settings'
-        pd.hits  = hit_history(:);
-        pd.sides = previous_sides(:);
-        pd.trial_params = trial_params_history(:);
-        sendsummary(obj, 'protocol_data', pd);
+        % Flatten trial_params from a cell array of structs to parallel char vectors
+        % so bdata's {S} placeholder never sees a struct payload.
+        tph = value(trial_params_history);
+        if isempty(tph)
+            sound_chars = '';
+            port_chars  = '';
+        else
+            tph_arr     = [tph{:}];
+            sound_chars = vertcat(tph_arr.sound_name);          % Nx1 char
+            port_chars  = char(cellfun(@(s) s(1), {tph_arr.port_mapping})); % Nx1 char ('l'/'r'/'?')
+        end
 
+        pd = struct();
+        pd.hits        = hit_history(:);
+        pd.sides       = previous_sides(:);
+        pd.sound_names = sound_chars(:)';   % char vector
+        pd.port_map    = port_chars(:)';    % char vector
 
+        try
+            sendsummary(obj, 'protocol_data', pd);
+        catch ME
+            warning('Sound2AFC:sendsummary_failed', ...
+                    'sendsummary threw: %s', ME.message);
+        end
     case 'close'
         BonsaiCameraInterface(obj, 'close');
         PokesPlotSection(obj, 'close');
