@@ -189,9 +189,9 @@ switch action,
             fcut = 110;
             filter_type = 'GAUS';
             A1_sigma = 0.0500;
-            A2_sigma = 0.0306 %0.1230;%0.0260;
-            A3_sigma = 0.0187 %0.0473;%0.0135;
-            A4_sigma = 0.0114 %0.0182;%0.0070;
+            A2_sigma = 0.0306; %0.1230;%0.0260;
+            A3_sigma = 0.0187; %0.0473;%0.0135;
+            A4_sigma = 0.0114; %0.0182;%0.0070;
             A5_sigma = 0.0070;
             [rawA1 rawA2 normA1 normA2]=noisestim(1,1,T,fcut,Fs,filter_type);
             modulator=singlenoise(1,T,[lfreq hfreq],Fs,'BUTTER');
@@ -236,24 +236,24 @@ switch action,
         MP = get(0,'MonitorPositions');
 
         % Calculate individual group width based on screen dimensions and number of groups
-        groupwidth = floor((MP(3)/2)/numel(linegroups));
+        groupwidth = floor((MP(1,3)/2)/numel(linegroups));
 
-        padding = 10 % padding around GUI elements
+        padding = 10; % padding around GUI elements
 
         % Calculate total width needed for all groups combined
         total_width = floor(numel(linegroups) * groupwidth+padding);
-        total_height = 400 % total height of GUI
+        total_height = 400; % total height of GUI
         
-        label_height = 140 % height of port label
-        button_height = 25
+        label_height = 140; % height of port label
+        button_height = 25;
 
         % Center the GUI horizontally on screen
-        left_pos = floor((MP(3) - total_width) / 2);
+        left_pos = floor((MP(1,3) - total_width) / 2);
 
         % Set figure position with centered alignment and fixed height of 400 pixels
         % position vector: [left-right, down-up, width, height], the origo is
         % the bottom left corner
-        set(value(myfig), 'Position', [left_pos, floor((MP(4)-total_height)/2), total_width, total_height]);
+        set(value(myfig), 'Position', [left_pos, floor((MP(1,4)-total_height)/2), total_width, total_height]);
 
         % Initialize array to store line names
         line_names = [];
