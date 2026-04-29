@@ -254,7 +254,7 @@ function create_gui(obj)
         next_row(y);
 
         DeclareGlobals(obj, 'rw_args', {'skip_to_reward', 'use_light_guides', ...
-            'punish_errors', 'punish_fixation_breaks'});
+            'punish_errors', 'punish_fixation_breaks', 'prot_title'});
 
         % Performance plot: P(right choice) per sound type
         SoloParamHandle(obj, 'perf_axes', 'saveable', 0);
