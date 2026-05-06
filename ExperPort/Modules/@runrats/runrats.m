@@ -108,7 +108,7 @@ switch action
         % The main RunRats window should appear in the center of the screen
         sr = get(0,'MonitorPositions');
         wh = [650 250];
-        pos = [(sr(3)-wh(1))/2,(sr(4)-wh(2))/2,wh(1),wh(2)];
+        pos = [(sr(1,3)-wh(1,1))/2,(sr(1,4)-wh(1,2))/2,wh(1,1),wh(1,2)];
 
         fig = figure('Position',pos,'MenuBar','none','ToolBar','none', ...
             'NumberTitle','off','Name','RunRats V2.2 ','Resize','off',...
