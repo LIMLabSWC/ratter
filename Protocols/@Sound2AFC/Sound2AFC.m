@@ -703,9 +703,9 @@ function update_perf_plot(obj)
     end
     hold(ax, 'off');
     set(ax, 'XTick', 1:4, 'XTickLabel', labels, 'YLim', [0 1], 'XLim', [0.5 4.5]);
-    ylabel(ax, 'P(right)');
+    ylabel(ax, 'P(chose right)');
     xlabel(ax, 'Sound');
-    title(ax, 'Choice bias');
+    title(ax, 'Pyschometrics');
 end
 
 
