@@ -244,7 +244,7 @@ function create_gui(obj)
 
         % Center the window on screen with good size
         screen_size = get(0, 'ScreenSize');
-        fig_width = 910;
+        fig_width = 450;
         fig_height = 700;
         fig_x = (screen_size(3) - fig_width) / 2;
         fig_y = (screen_size(4) - fig_height) / 2;
@@ -257,12 +257,6 @@ function create_gui(obj)
 
         next_row(y, 1);
         [x, y] = SoundConfigSection(obj, 'init', x, y);
-
-        % Column 1: PokesPlot
-        next_row(y, 1);
-        [x, y] = PokesPlotSection(obj, 'init', x, y, struct('states',  state_colors()));
-        PokesPlotSection(obj, 'set_alignon', 'cpoke_pre_stim(1,1)');
-        PokesPlotSection(obj, 'hide');
     
 
         [expmtr, rname] = SavingSection(obj, 'get_info');
@@ -307,10 +301,17 @@ function create_gui(obj)
         set_callback(show_perf_plot, {'Sound2AFC', 'toggle_perf_plot'});
         next_row(y);
 
-        DeclareGlobals(obj, 'rw_args', {'skip_to_reward', 'use_light_guides', ...
-            'punish_errors', 'punish_fixation_breaks', 'stim_volume', 'feedback_volume', ...
-            'cpoke_viol_state_dur', 'prot_title', 'show_perf_plot'});
+        % PokesPlot
+        [x, y] = PokesPlotSection(obj, 'init', x, y, struct('states',  state_colors()));
+        PokesPlotSection(obj, 'set_alignon', 'cpoke_pre_stim(1,1)');
+        PokesPlotSection(obj, 'hide');
+        next_row(y, 1);
 
+        [x, y] = BonsaiCameraInterface(obj, 'init', x, y, mfilename, expmtr, rname);
+        next_row(y);
+
+        SessionDefinition(obj, 'init', x, y, value(myfig));
+        next_row(y);
         % Performance plot lives in its own figure so uicontrols in myfig
         % don't render on top of it. Closing the X just hides it.
         SoloParamHandle(obj, 'perf_fig', 'saveable', 0);
@@ -319,17 +320,17 @@ function create_gui(obj)
             'NumberTitle', 'off', ...
             'MenuBar', 'none', ...
             'Tag', [mfilename '_perf_fig'], ...
-            'Position', [fig_x + fig_width + 20, fig_y + fig_height - 400, 500, 400], ...
+            'Position', [fig_x + fig_width - 20, fig_y + fig_height - 400, 300, 250], ...
             'CloseRequestFcn', [mfilename '(' class(obj) ', ''hide_perf_plot'');']);
         SoloParamHandle(obj, 'perf_axes', 'saveable', 0);
         perf_axes.value = axes('Parent', value(perf_fig), 'Units', 'normalized', ...
             'Position', [0.13 0.15 0.82 0.78]);
         DeclareGlobals(obj, 'ro_args', {'perf_axes', 'perf_fig'});
+        DeclareGlobals(obj, 'rw_args', {'skip_to_reward', 'use_light_guides', ...
+            'punish_errors', 'punish_fixation_breaks', 'stim_volume', 'feedback_volume', ...
+            'cpoke_viol_state_dur', 'prot_title', 'show_perf_plot'});
 
-        [x, y] = BonsaiCameraInterface(obj, 'init', x, y, mfilename, expmtr, rname);
-        next_row(y);
-
-        SessionDefinition(obj, 'init', x, y, value(myfig));
+        
 
         
 end
@@ -690,7 +691,10 @@ function update_perf_plot(obj)
     hold(ax, 'on');
     plot(ax, [0.5 4.5], [0.5 0.5], 'k--');
     errorbar(ax, 1:4, frac_right, sem_right, 'o', ...
-        'MarkerFaceColor', 'b', 'MarkerSize', 8, 'LineWidth', 1.5);
+        'MarkerEdgeColor', 'k',...
+        'Color','k',...
+        'MarkerFaceColor', 'k', 'MarkerSize', 6, 'LineWidth', 1.5, ...
+        'CapSize',0);
     for i = 1:4
         if sig(i) && ~isnan(frac_right(i))
             text(ax, i, 0.95, '*', 'HorizontalAlignment', 'center', ...
