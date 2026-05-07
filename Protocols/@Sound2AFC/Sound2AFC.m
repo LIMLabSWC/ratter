@@ -160,6 +160,26 @@ switch action
     case 'reload_sounds'
         obj = load_stim_sounds(obj);
 
+    case 'toggle_perf_plot'
+        if value(show_perf_plot)
+            if ishandle(value(perf_fig))
+                set(value(perf_fig), 'Visible', 'on');
+                figure(value(perf_fig));
+            end
+        else
+            if ishandle(value(perf_fig))
+                set(value(perf_fig), 'Visible', 'off');
+            end
+        end
+
+    case 'hide_perf_plot'
+        % Fired by the perf-fig close-request: keep the figure alive, just
+        % hide it, and sync the toggle so the GUI matches.
+        show_perf_plot.value = 0;
+        if ishandle(value(perf_fig))
+            set(value(perf_fig), 'Visible', 'off');
+        end
+
     case 'end_session'
         prot_title.value = [value(prot_title), '  End: ', datestr(now, 'HH:MM')];
         BonsaiCameraInterface(obj, 'stop');
@@ -190,8 +210,15 @@ switch action
                     'sendsummary threw: %s', ME.message);
         end
     case 'close'
-        BonsaiCameraInterface(obj, 'close');
-        PokesPlotSection(obj, 'close');
+        % Each step is best-effort so a single failure doesn't strand other
+        % windows or hardware connections.
+        try BonsaiCameraInterface(obj, 'close');  catch ME, warning('Sound2AFC:close', 'Bonsai close failed: %s', ME.message);  end
+        try PokesPlotSection(obj, 'close');       catch ME, warning('Sound2AFC:close', 'PokesPlot close failed: %s', ME.message); end
+        try WaterValvesSection(obj, 'close');     catch ME, warning('Sound2AFC:close', 'WaterValves close failed: %s', ME.message); end
+
+        if exist('perf_fig', 'var') && ishandle(value(perf_fig))
+            delete(value(perf_fig));
+        end
         if exist('myfig', 'var') && isa(myfig, 'SoloParamHandle') && ishandle(value(myfig))
             delete(value(myfig));
         end
@@ -274,16 +301,30 @@ function create_gui(obj)
             'OnString', 'Skip to rewards', ...
             'OffString', 'Full task');
         next_row(y);
+        ToggleParam(obj, 'show_perf_plot', 1, x, y, 'label', ...
+            'Performance plot window', ...
+            'OnString', 'Perf plot: shown', 'OffString', 'Perf plot: hidden');
+        set_callback(show_perf_plot, {'Sound2AFC', 'toggle_perf_plot'});
         next_row(y);
 
         DeclareGlobals(obj, 'rw_args', {'skip_to_reward', 'use_light_guides', ...
-            'punish_errors', 'punish_fixation_breaks', 'stim_volume', 'feedback_volume', 'cpoke_viol_state_dur','prot_title'});
+            'punish_errors', 'punish_fixation_breaks', 'stim_volume', 'feedback_volume', ...
+            'cpoke_viol_state_dur', 'prot_title', 'show_perf_plot'});
 
-        % Performance plot: P(right choice) per sound type
+        % Performance plot lives in its own figure so uicontrols in myfig
+        % don't render on top of it. Closing the X just hides it.
+        SoloParamHandle(obj, 'perf_fig', 'saveable', 0);
+        perf_fig.value = figure( ...
+            'Name', [mfilename ' performance'], ...
+            'NumberTitle', 'off', ...
+            'MenuBar', 'none', ...
+            'Tag', [mfilename '_perf_fig'], ...
+            'Position', [fig_x + fig_width + 20, fig_y + fig_height - 400, 500, 400], ...
+            'CloseRequestFcn', [mfilename '(' class(obj) ', ''hide_perf_plot'');']);
         SoloParamHandle(obj, 'perf_axes', 'saveable', 0);
-        perf_axes.value = axes('Parent', value(myfig), ...
-            'Units', 'normalized', 'Position', [0.55 0.55 0.42 0.38]);
-        DeclareGlobals(obj, 'ro_args', {'perf_axes'});
+        perf_axes.value = axes('Parent', value(perf_fig), 'Units', 'normalized', ...
+            'Position', [0.13 0.15 0.82 0.78]);
+        DeclareGlobals(obj, 'ro_args', {'perf_axes', 'perf_fig'});
 
         [x, y] = BonsaiCameraInterface(obj, 'init', x, y, mfilename, expmtr, rname);
         next_row(y);
