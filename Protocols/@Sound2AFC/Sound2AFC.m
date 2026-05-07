@@ -260,7 +260,7 @@ function create_gui(obj)
         next_row(y);
 
         DeclareGlobals(obj, 'rw_args', {'skip_to_reward', 'use_light_guides', ...
-            'punish_errors', 'punish_fixation_breaks', 'sound_volume', 'prot_title'});
+            'punish_errors', 'punish_fixation_breaks', 'sound_volume', 'cpoke_viol_state_dur','prot_title'});
 
         % Performance plot: P(right choice) per sound type
         SoloParamHandle(obj, 'perf_axes', 'saveable', 0);
@@ -512,7 +512,7 @@ function [sma, prep_next_trial_states] = build_sma(obj, trial_params)
     else
         post_cpoke_viol_state = 'wait_for_center_poke';
     end
-    sma = add_state(sma, 'name', 'cpoke_violation', 'self_timer', cpoke_viol_state_dur, ...
+    sma = add_state(sma, 'name', 'cpoke_violation', 'self_timer', value(cpoke_viol_state_dur), ...
         'input_to_statechange', {'Tup', post_cpoke_viol_state}, ...
         'output_actions', {'SoundOut', -stim_id});
     
