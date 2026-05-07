@@ -246,7 +246,7 @@ function create_gui(obj)
             'OnString', 'Punish fixation break', ...
             'OffString', 'Forgive fixation break');
         next_row(y);
-        NumeditParam(obj, 'cpoke_viol_state_dur', 4, x, y, 'label', 'Cpoke violation penalty duration', 'TooltipString', 'This fixed delay is added to every violation trial');
+        NumeditParam(obj, 'cpoke_viol_state_dur', .001, x, y, 'label', 'Cpoke violation penalty duration', 'TooltipString', 'This fixed delay is added to every violation trial');
 	    next_row(y);
         NumeditParam(obj, 'sound_volume', 0.1, x, y, 'label', 'Sound volume', ...
             'TooltipString', 'Stimulus sound amplitude scaling (0-1). Tune per rat.');
