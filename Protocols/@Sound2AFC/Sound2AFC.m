@@ -248,15 +248,19 @@ function create_gui(obj)
         next_row(y);
         NumeditParam(obj, 'cpoke_viol_state_dur', 4, x, y, 'label', 'Cpoke violation penalty duration', 'TooltipString', 'This fixed delay is added to every violation trial');
 	    next_row(y);
+        NumeditParam(obj, 'sound_volume', 0.1, x, y, 'label', 'Sound volume', ...
+            'TooltipString', 'Stimulus sound amplitude scaling (0-1). Tune per rat.');
+        set_callback(sound_volume, {'Sound2AFC', 'reload_sounds'});
+        next_row(y);
         ToggleParam(obj, 'skip_to_reward', 0, x, y, 'label', ...
             'Go to reward without center poke or sound', ...
             'OnString', 'Skip to rewards', ...
-            'OffString', 'Full task');        
+            'OffString', 'Full task');
         next_row(y);
         next_row(y);
 
         DeclareGlobals(obj, 'rw_args', {'skip_to_reward', 'use_light_guides', ...
-            'punish_errors', 'punish_fixation_breaks', 'prot_title'});
+            'punish_errors', 'punish_fixation_breaks', 'sound_volume', 'prot_title'});
 
         % Performance plot: P(right choice) per sound type
         SoloParamHandle(obj, 'perf_axes', 'saveable', 0);
@@ -306,14 +310,14 @@ function obj = load_stim_sounds(obj)
             audio_data = audio_data(:);
         end
 
-        stereo_waveform = .1*[audio_data'; audio_data'];
+        stereo_waveform = value(sound_volume)*[audio_data'; audio_data'];
         SoundManagerSection(obj, 'declare_new_sound', label, ...
             stereo_waveform, loop_flag);
     end
 
     % Correct feedback sound
     duration = .5;
-    volume = .1;
+    volume = value(sound_volume);
     t = (0:1/target_sample_rate:duration);
     t = t(1:end-1);
     carrier = sin(2*pi*12000*t);
@@ -322,10 +326,10 @@ function obj = load_stim_sounds(obj)
     waveform = [waveform; waveform];
     SoundManagerSection(obj, 'declare_new_sound', 'correct', waveform, loop_flag);
 
-    % Error sound
+    % Error sound (kept 10x quieter than stim/correct, matching original calibration)
     duration = 0.25;
     n_samples = round(target_sample_rate * duration);
-    waveform = 0.01 * randn(1, n_samples);
+    waveform = (value(sound_volume) * 0.1) * randn(1, n_samples);
     waveform = [waveform; waveform];
     SoundManagerSection(obj, 'declare_new_sound', 'error', waveform, loop_flag);
 
