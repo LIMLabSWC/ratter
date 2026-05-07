@@ -54,8 +54,9 @@ switch action
         SoloParamHandle(obj, 'previous_sides', 'value', []);   % 'l' or 'r' per trial
         SoloParamHandle(obj, 'trial_params_history', 'value', {});  % struct per trial: sound_name, correct_side, port_mapping
         SoloParamHandle(obj, 'current_trial_params', 'value', struct());
+        SoloParamHandle(obj, 'pending_sound_reload', 'value', 0, 'saveable', 0);
         DeclareGlobals(obj, 'rw_args', {'hit_history', 'previous_sides', ...
-            'trial_params_history', 'current_trial_params'});
+            'trial_params_history', 'current_trial_params', 'pending_sound_reload'});
 
         % Build the GUI and set up solo param handle variables
         create_gui(obj);
@@ -67,6 +68,12 @@ switch action
         Sound2AFC(obj, 'prepare_next_trial');
 
     case 'prepare_next_trial'
+        % Apply any volume changes queued during the previous trial.
+        if value(pending_sound_reload)
+            obj = load_stim_sounds(obj);
+            pending_sound_reload.value = 0;
+        end
+
         % Record trial params from this trial for accuracy analysis
         prev_trial_params = value(current_trial_params);
         if n_done_trials >= 1
@@ -143,6 +150,12 @@ switch action
     case 'update'
         PokesPlotSection(obj, 'update');
         update_perf_plot(obj);
+
+    case 'mark_sounds_dirty'
+        % Volume changed mid-trial — defer the reload so we don't reset the
+        % audio hardware while a state machine is using it. The flag is
+        % consumed at the top of 'prepare_next_trial'.
+        pending_sound_reload.value = 1;
 
     case 'reload_sounds'
         obj = load_stim_sounds(obj);
@@ -249,12 +262,12 @@ function create_gui(obj)
         NumeditParam(obj, 'cpoke_viol_state_dur', .001, x, y, 'label', 'Cpoke violation penalty duration', 'TooltipString', 'This fixed delay is added to every violation trial');
 	    next_row(y);
         NumeditParam(obj, 'stim_volume', 0.1, x, y, 'label', 'Stim volume', ...
-            'TooltipString', 'Task stimulus (A-D) amplitude scaling (0-1). Tune per rat.');
-        set_callback(stim_volume, {'Sound2AFC', 'reload_sounds'});
+            'TooltipString', 'Task stimulus (A-D) amplitude scaling (0-1). Tune per rat. Applied at next trial.');
+        set_callback(stim_volume, {'Sound2AFC', 'mark_sounds_dirty'});
         next_row(y);
         NumeditParam(obj, 'feedback_volume', 0.1, x, y, 'label', 'Feedback volume', ...
-            'TooltipString', 'Correct/error feedback amplitude scaling (0-1). Tune per rat.');
-        set_callback(feedback_volume, {'Sound2AFC', 'reload_sounds'});
+            'TooltipString', 'Correct/error feedback amplitude scaling (0-1). Tune per rat. Applied at next trial.');
+        set_callback(feedback_volume, {'Sound2AFC', 'mark_sounds_dirty'});
         next_row(y);
         ToggleParam(obj, 'skip_to_reward', 0, x, y, 'label', ...
             'Go to reward without center poke or sound', ...
@@ -288,8 +301,14 @@ end
 
 function obj = load_stim_sounds(obj)
     GetSoloFunctionArgs(obj);
-    
-    SoundManagerSection(obj, 'init');
+
+    % First-time setup declares fresh sounds; subsequent calls (e.g. volume
+    % changes) reuse existing IDs via 'set_sound' so the running SMA isn't
+    % invalidated mid-trial.
+    is_first_load = ~SoundManagerSection(obj, 'sound_exists', 'A');
+    if is_first_load
+        SoundManagerSection(obj, 'init');
+    end
 
     target_sample_rate = SoundManagerSection(obj, 'get_sample_rate');
 
@@ -299,7 +318,7 @@ function obj = load_stim_sounds(obj)
 
     for i = 1:length(labels)
         label = labels{i};
-        config = SoundConfigSection(obj, 'get_sound_config', label); 
+        config = SoundConfigSection(obj, 'get_sound_config', label);
 
         [audio_data, orig_rate] = audioread(config.file);
 
@@ -315,8 +334,7 @@ function obj = load_stim_sounds(obj)
         end
 
         stereo_waveform = value(stim_volume)*[audio_data'; audio_data'];
-        SoundManagerSection(obj, 'declare_new_sound', label, ...
-            stereo_waveform, loop_flag);
+        upload_sound(obj, label, stereo_waveform, loop_flag, is_first_load);
     end
 
     % Correct feedback sound
@@ -328,16 +346,24 @@ function obj = load_stim_sounds(obj)
     modulation = sin(2*pi*8*t);
     waveform = volume * modulation .* carrier;
     waveform = [waveform; waveform];
-    SoundManagerSection(obj, 'declare_new_sound', 'correct', waveform, loop_flag);
+    upload_sound(obj, 'correct', waveform, loop_flag, is_first_load);
 
     % Error sound (kept 10x quieter than correct feedback, matching original calibration)
     duration = 0.25;
     n_samples = round(target_sample_rate * duration);
     waveform = (value(feedback_volume) * 0.1) * randn(1, n_samples);
     waveform = [waveform; waveform];
-    SoundManagerSection(obj, 'declare_new_sound', 'error', waveform, loop_flag);
+    upload_sound(obj, 'error', waveform, loop_flag, is_first_load);
 
     SoundManagerSection(obj, 'send_not_yet_uploaded_sounds');
+end
+
+function upload_sound(obj, name, waveform, loop_flag, is_first_load)
+    if is_first_load
+        SoundManagerSection(obj, 'declare_new_sound', name, waveform, loop_flag);
+    else
+        SoundManagerSection(obj, 'set_sound', name, waveform, loop_flag);
+    end
 end
 
 
