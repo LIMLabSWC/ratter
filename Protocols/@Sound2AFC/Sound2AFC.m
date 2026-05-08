@@ -54,8 +54,9 @@ switch action
         SoloParamHandle(obj, 'previous_sides', 'value', []);   % 'l' or 'r' per trial
         SoloParamHandle(obj, 'trial_params_history', 'value', {});  % struct per trial: sound_name, correct_side, port_mapping
         SoloParamHandle(obj, 'current_trial_params', 'value', struct());
+        SoloParamHandle(obj, 'pending_sound_reload', 'value', 0, 'saveable', 0);
         DeclareGlobals(obj, 'rw_args', {'hit_history', 'previous_sides', ...
-            'trial_params_history', 'current_trial_params'});
+            'trial_params_history', 'current_trial_params', 'pending_sound_reload'});
 
         % Build the GUI and set up solo param handle variables
         create_gui(obj);
@@ -67,6 +68,12 @@ switch action
         Sound2AFC(obj, 'prepare_next_trial');
 
     case 'prepare_next_trial'
+        % Apply any volume changes queued during the previous trial.
+        if value(pending_sound_reload)
+            obj = load_stim_sounds(obj);
+            pending_sound_reload.value = 0;
+        end
+
         % Record trial params from this trial for accuracy analysis
         prev_trial_params = value(current_trial_params);
         if n_done_trials >= 1
@@ -144,8 +151,34 @@ switch action
         PokesPlotSection(obj, 'update');
         update_perf_plot(obj);
 
+    case 'mark_sounds_dirty'
+        % Volume changed mid-trial — defer the reload so we don't reset the
+        % audio hardware while a state machine is using it. The flag is
+        % consumed at the top of 'prepare_next_trial'.
+        pending_sound_reload.value = 1;
+
     case 'reload_sounds'
         obj = load_stim_sounds(obj);
+
+    case 'toggle_perf_plot'
+        if value(show_perf_plot)
+            if ishandle(value(perf_fig))
+                set(value(perf_fig), 'Visible', 'on');
+                figure(value(perf_fig));
+            end
+        else
+            if ishandle(value(perf_fig))
+                set(value(perf_fig), 'Visible', 'off');
+            end
+        end
+
+    case 'hide_perf_plot'
+        % Fired by the perf-fig close-request: keep the figure alive, just
+        % hide it, and sync the toggle so the GUI matches.
+        show_perf_plot.value = 0;
+        if ishandle(value(perf_fig))
+            set(value(perf_fig), 'Visible', 'off');
+        end
 
     case 'end_session'
         prot_title.value = [value(prot_title), '  End: ', datestr(now, 'HH:MM')];
@@ -177,8 +210,15 @@ switch action
                     'sendsummary threw: %s', ME.message);
         end
     case 'close'
-        BonsaiCameraInterface(obj, 'close');
-        PokesPlotSection(obj, 'close');
+        % Each step is best-effort so a single failure doesn't strand other
+        % windows or hardware connections.
+        try BonsaiCameraInterface(obj, 'close');  catch ME, warning('Sound2AFC:close', 'Bonsai close failed: %s', ME.message);  end
+        try PokesPlotSection(obj, 'close');       catch ME, warning('Sound2AFC:close', 'PokesPlot close failed: %s', ME.message); end
+        try WaterValvesSection(obj, 'close');     catch ME, warning('Sound2AFC:close', 'WaterValves close failed: %s', ME.message); end
+
+        if exist('perf_fig', 'var') && ishandle(value(perf_fig))
+            delete(value(perf_fig));
+        end
         if exist('myfig', 'var') && isa(myfig, 'SoloParamHandle') && ishandle(value(myfig))
             delete(value(myfig));
         end
@@ -204,7 +244,7 @@ function create_gui(obj)
 
         % Center the window on screen with good size
         screen_size = get(0, 'ScreenSize');
-        fig_width = 910;
+        fig_width = 450;
         fig_height = 700;
         fig_x = (screen_size(3) - fig_width) / 2;
         fig_y = (screen_size(4) - fig_height) / 2;
@@ -217,12 +257,6 @@ function create_gui(obj)
 
         next_row(y, 1);
         [x, y] = SoundConfigSection(obj, 'init', x, y);
-
-        % Column 1: PokesPlot
-        next_row(y, 1);
-        [x, y] = PokesPlotSection(obj, 'init', x, y, struct('states',  state_colors()));
-        PokesPlotSection(obj, 'set_alignon', 'cpoke_pre_stim(1,1)');
-        PokesPlotSection(obj, 'hide');
     
 
         [expmtr, rname] = SavingSection(obj, 'get_info');
@@ -246,26 +280,57 @@ function create_gui(obj)
             'OnString', 'Punish fixation break', ...
             'OffString', 'Forgive fixation break');
         next_row(y);
+        NumeditParam(obj, 'cpoke_viol_state_dur', .001, x, y, 'label', 'Cpoke violation penalty duration', 'TooltipString', 'This fixed delay is added to every violation trial');
+	    next_row(y);
+        NumeditParam(obj, 'stim_volume', 0.1, x, y, 'label', 'Stim volume', ...
+            'TooltipString', 'Task stimulus (A-D) amplitude scaling (0-1). Tune per rat. Applied at next trial.');
+        set_callback(stim_volume, {'Sound2AFC', 'mark_sounds_dirty'});
+        next_row(y);
+        NumeditParam(obj, 'feedback_volume', 0.1, x, y, 'label', 'Feedback volume', ...
+            'TooltipString', 'Correct/error feedback amplitude scaling (0-1). Tune per rat. Applied at next trial.');
+        set_callback(feedback_volume, {'Sound2AFC', 'mark_sounds_dirty'});
+        next_row(y);
         ToggleParam(obj, 'skip_to_reward', 0, x, y, 'label', ...
             'Go to reward without center poke or sound', ...
             'OnString', 'Skip to rewards', ...
-            'OffString', 'Full task');        
+            'OffString', 'Full task');
         next_row(y);
+        ToggleParam(obj, 'show_perf_plot', 1, x, y, 'label', ...
+            'Performance plot window', ...
+            'OnString', 'Perf plot: shown', 'OffString', 'Perf plot: hidden');
+        set_callback(show_perf_plot, {'Sound2AFC', 'toggle_perf_plot'});
         next_row(y);
 
-        DeclareGlobals(obj, 'rw_args', {'skip_to_reward', 'use_light_guides', ...
-            'punish_errors', 'punish_fixation_breaks', 'prot_title'});
-
-        % Performance plot: P(right choice) per sound type
-        SoloParamHandle(obj, 'perf_axes', 'saveable', 0);
-        perf_axes.value = axes('Parent', value(myfig), ...
-            'Units', 'normalized', 'Position', [0.55 0.55 0.42 0.38]);
-        DeclareGlobals(obj, 'ro_args', {'perf_axes'});
+        % PokesPlot
+        [x, y] = PokesPlotSection(obj, 'init', x, y, struct('states',  state_colors()));
+        PokesPlotSection(obj, 'set_alignon', 'cpoke_pre_stim(1,1)');
+        PokesPlotSection(obj, 'hide');
+        next_row(y, 1);
 
         [x, y] = BonsaiCameraInterface(obj, 'init', x, y, mfilename, expmtr, rname);
         next_row(y);
 
         SessionDefinition(obj, 'init', x, y, value(myfig));
+        next_row(y);
+        % Performance plot lives in its own figure so uicontrols in myfig
+        % don't render on top of it. Closing the X just hides it.
+        SoloParamHandle(obj, 'perf_fig', 'saveable', 0);
+        perf_fig.value = figure( ...
+            'Name', [mfilename ' performance'], ...
+            'NumberTitle', 'off', ...
+            'MenuBar', 'none', ...
+            'Tag', [mfilename '_perf_fig'], ...
+            'Position', [fig_x + fig_width - 20, fig_y + fig_height - 400, 300, 250], ...
+            'CloseRequestFcn', [mfilename '(' class(obj) ', ''hide_perf_plot'');']);
+        SoloParamHandle(obj, 'perf_axes', 'saveable', 0);
+        perf_axes.value = axes('Parent', value(perf_fig), 'Units', 'normalized', ...
+            'Position', [0.13 0.15 0.82 0.78]);
+        DeclareGlobals(obj, 'ro_args', {'perf_axes', 'perf_fig'});
+        DeclareGlobals(obj, 'rw_args', {'skip_to_reward', 'use_light_guides', ...
+            'punish_errors', 'punish_fixation_breaks', 'stim_volume', 'feedback_volume', ...
+            'cpoke_viol_state_dur', 'prot_title', 'show_perf_plot'});
+
+        
 
         
 end
@@ -278,8 +343,14 @@ end
 
 function obj = load_stim_sounds(obj)
     GetSoloFunctionArgs(obj);
-    
-    SoundManagerSection(obj, 'init');
+
+    % First-time setup declares fresh sounds; subsequent calls (e.g. volume
+    % changes) reuse existing IDs via 'set_sound' so the running SMA isn't
+    % invalidated mid-trial.
+    is_first_load = ~SoundManagerSection(obj, 'sound_exists', 'A');
+    if is_first_load
+        SoundManagerSection(obj, 'init');
+    end
 
     target_sample_rate = SoundManagerSection(obj, 'get_sample_rate');
 
@@ -289,7 +360,7 @@ function obj = load_stim_sounds(obj)
 
     for i = 1:length(labels)
         label = labels{i};
-        config = SoundConfigSection(obj, 'get_sound_config', label); 
+        config = SoundConfigSection(obj, 'get_sound_config', label);
 
         [audio_data, orig_rate] = audioread(config.file);
 
@@ -304,30 +375,37 @@ function obj = load_stim_sounds(obj)
             audio_data = audio_data(:);
         end
 
-        stereo_waveform = .1*[audio_data'; audio_data'];
-        SoundManagerSection(obj, 'declare_new_sound', label, ...
-            stereo_waveform, loop_flag);
+        stereo_waveform = value(stim_volume)*[audio_data'; audio_data'];
+        upload_sound(obj, label, stereo_waveform, loop_flag, is_first_load);
     end
 
     % Correct feedback sound
     duration = .5;
-    volume = .1;
+    volume = value(feedback_volume);
     t = (0:1/target_sample_rate:duration);
     t = t(1:end-1);
     carrier = sin(2*pi*12000*t);
     modulation = sin(2*pi*8*t);
     waveform = volume * modulation .* carrier;
     waveform = [waveform; waveform];
-    SoundManagerSection(obj, 'declare_new_sound', 'correct', waveform, loop_flag);
+    upload_sound(obj, 'correct', waveform, loop_flag, is_first_load);
 
-    % Error sound
+    % Error sound (kept 10x quieter than correct feedback, matching original calibration)
     duration = 0.25;
     n_samples = round(target_sample_rate * duration);
-    waveform = 0.01 * randn(1, n_samples);
+    waveform = (value(feedback_volume) * 0.1) * randn(1, n_samples);
     waveform = [waveform; waveform];
-    SoundManagerSection(obj, 'declare_new_sound', 'error', waveform, loop_flag);
+    upload_sound(obj, 'error', waveform, loop_flag, is_first_load);
 
     SoundManagerSection(obj, 'send_not_yet_uploaded_sounds');
+end
+
+function upload_sound(obj, name, waveform, loop_flag, is_first_load)
+    if is_first_load
+        SoundManagerSection(obj, 'declare_new_sound', name, waveform, loop_flag);
+    else
+        SoundManagerSection(obj, 'set_sound', name, waveform, loop_flag);
+    end
 end
 
 
@@ -506,7 +584,7 @@ function [sma, prep_next_trial_states] = build_sma(obj, trial_params)
     else
         post_cpoke_viol_state = 'wait_for_center_poke';
     end
-    sma = add_state(sma, 'name', 'cpoke_violation', 'self_timer', .001, ...
+    sma = add_state(sma, 'name', 'cpoke_violation', 'self_timer', value(cpoke_viol_state_dur), ...
         'input_to_statechange', {'Tup', post_cpoke_viol_state}, ...
         'output_actions', {'SoundOut', -stim_id});
     
@@ -613,7 +691,10 @@ function update_perf_plot(obj)
     hold(ax, 'on');
     plot(ax, [0.5 4.5], [0.5 0.5], 'k--');
     errorbar(ax, 1:4, frac_right, sem_right, 'o', ...
-        'MarkerFaceColor', 'b', 'MarkerSize', 8, 'LineWidth', 1.5);
+        'MarkerEdgeColor', 'k',...
+        'Color','k',...
+        'MarkerFaceColor', 'k', 'MarkerSize', 6, 'LineWidth', 1.5, ...
+        'CapSize',0);
     for i = 1:4
         if sig(i) && ~isnan(frac_right(i))
             text(ax, i, 0.95, '*', 'HorizontalAlignment', 'center', ...
@@ -622,9 +703,9 @@ function update_perf_plot(obj)
     end
     hold(ax, 'off');
     set(ax, 'XTick', 1:4, 'XTickLabel', labels, 'YLim', [0 1], 'XLim', [0.5 4.5]);
-    ylabel(ax, 'P(right)');
+    ylabel(ax, 'P(chose right)');
     xlabel(ax, 'Sound');
-    title(ax, 'Choice bias');
+    title(ax, 'Pyschometrics');
 end
 
 
