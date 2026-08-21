@@ -18,7 +18,7 @@ layout: default
    - `/docs/technical/` - Technical documentation
    - `/docs/hardware/` - Hardware-specific documentation
    - `/docs/architecture/` - System architecture documentation
-   - `/docs/recent-refactoring/` - Recent changes documentation
+   - `/docs/archive/may-2025-modernization/` - May 2025 modernization notes (now archived)
 
 ### Format Changes
 

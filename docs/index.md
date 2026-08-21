@@ -9,18 +9,6 @@ layout: default
     <p>For the original BControl documentation and resources, visit the <a href="https://brodylabwiki.princeton.edu/bcontrol/index.php?title=Main_Page" target="_blank">Brody Lab BControl Wiki</a>.</p>
 </div>
 
-<div class="warning-banner">
-    <h3>⚠️ Recent Changes (May 2025)</h3>
-    <p>We are undergoing a major modernization effort. Please see the <a href="{{ '/recent-refactoring/README' | relative_url }}">Recent Refactoring Overview</a> for details, including:</p>
-    <ul style="margin-top: 0.5rem; margin-left: 1.5rem;">
-        <li>Removal of legacy Perl scripts</li>
-        <li>Protocol directory restructuring</li>
-        <li>Documentation modernization</li>
-        <li>ExperPort cleanup and optimization</li>
-        <li>Current testing status and next steps</li>
-    </ul>
-</div>
-
 <div class="nav-grid">
     <div class="nav-card">
         <h3>📚 User Guides</h3>
@@ -37,6 +25,7 @@ layout: default
             <li><a href="{{ '/architecture/system-overview' | relative_url }}">System Overview</a></li>
             <li><a href="{{ '/architecture/system-architecture' | relative_url }}">System Architecture</a></li>
             <li><a href="{{ '/architecture/legacy-architecture' | relative_url }}">Legacy Architecture Notes</a></li>
+            <li><a href="{{ '/archive/may-2025-modernization/README' | relative_url }}">May 2025 Modernization (archive)</a></li>
         </ul>
     </div>
 
@@ -85,22 +74,6 @@ layout: default
     color: #555;
     line-height: 1.6;
     margin: 0;
-}
-
-.warning-banner {
-    background: #f8f9fa;
-    border: 1px solid #e9ecef;
-    border-left: 4px solid #f39c12;
-    border-radius: 4px;
-    padding: 1rem;
-    margin: 2rem 0;
-    color: #2c3e50;
-}
-
-.warning-banner h3 {
-    color: #e67e22;
-    margin-bottom: 0.5rem;
-    font-size: 1.1rem;
 }
 
 .nav-grid {
