@@ -1,12 +1,13 @@
 ---
-title: Documentation
+title: May 2025 Modernization (Archive)
 layout: default
 ---
 
+## May 2025 Modernization (completed)
 
-## Current Refactoring Efforts
+Historical notes from the May 2025 BControl modernization. Kept for reference; this work is no longer in progress.
 
-### May 2025 Cleanup
+### Topics
 
 1. [Perl Scripts Removal](perl-scripts-removal.md)
    - Removed legacy Perl scripts
@@ -28,22 +29,10 @@ layout: default
    - Documentation of file dependencies
    - Implementation of safe removal process
 
-## Testing Status
+### Status at archive time
 
 - [x] Perl scripts removal impact assessment
 - [x] Protocols directory changes verification
 - [x] Documentation structure validation
 - [x] System functionality verification
-- [ ] ExperPort cleanup verification
-
-## Next Steps
-
-1. Monitor system performance
-2. Verify all automated tasks
-3. Test protocol loading and execution
-4. Validate documentation accessibility
-5. Implement ExperPort cleanup plan
-
-## Contact
-
-For questions about these changes, contact the system administrator.
+- [ ] ExperPort cleanup verification (see cleanup notes; treated as deferred rather than active)

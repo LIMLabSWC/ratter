@@ -2,16 +2,6 @@
 
 **BControl** is a behavioral experimentation system that provides a flexible and extensible framework for running behavioral protocols. It is designed to support a variety of experiments with user-friendly configuration and robust MATLAB-based components.
 
-## ⚠️ Recent Changes (May 2025)
-
-We are undergoing a major modernization effort. Please see the [Recent Refactoring Overview](docs/recent-refactoring/README.md) for details, including:
-
-- Removal of legacy Perl scripts
-- Protocol directory restructuring
-- Documentation modernization
-- ExperPort cleanup and optimization
-- Current testing status and next steps
-
 ## Repository Structure
 
 ```text
@@ -24,8 +14,8 @@ BControl/
 │   ├── technical/         # Technical documentation
 │   ├── hardware/          # Hardware-related setup
 │   ├── architecture/      # System design and history
-│   ├── recent-refactoring/# Refactoring logs and plans
 │   ├── future_development/# Ideas and roadmap
+│   ├── archive/           # Completed modernization notes
 │   └── old_docs/          # Archived legacy documentation
 └── SoloData/              # Local data storage (excluded from version control)
 
@@ -105,4 +95,4 @@ See [future development plans](docs/future_development/README.md) for active pro
 
 **👉 [View Documentation](https://limlabswc.github.io/ratter/)**
 
-This includes all guides, technical references, hardware setup instructions, system architecture details, and refactoring information in an easy-to-navigate format.
+This includes all guides, technical references, hardware setup instructions, and system architecture details in an easy-to-navigate format.
