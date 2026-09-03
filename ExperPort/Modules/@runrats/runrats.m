@@ -16,16 +16,16 @@ function [obj, varargout]=runrats(varargin)
 %Argument handling
 obj = class(struct, mfilename, sqlsummary);
 varargout = {};
-if nargin==0 || nargin==1 && ischar(varargin{1}) && strcmp(varargin{1}, 'empty'),
+if nargin==0 || nargin==1 && ischar(varargin{1}) && strcmp(varargin{1}, 'empty')
     return;
-end;
+end
 
 % This line is required for the use of SoloParams
 GetSoloFunctionArgs;
 
 if nargin>=2 && isa(varargin{1}, class(obj)), action = varargin{2}; varargin = varargin(3:end);
 else                                          action = varargin{1}; varargin = varargin(2:end);
-end;
+end
 if ~ischar(action)
     error('Runrats expects to be called with a string as the first argument specifying the action to perform. E.g.: runrats(''init'');');
 end
@@ -45,11 +45,11 @@ switch action
         display('test');
         %If we are starting from a forced reboot from runrats itself we
         %need to make sure the do_on_reboot.bat file is set back to nothing
-        
+
         % try %#ok<TRYNC>
         %     p = pwd;
         %     cd('\ratter\Rigscripts')
-        % 
+        %
         %     !del do_on_reboot.bat
         %     !copy nothing.bat do_on_reboot.bat /Y
         %     cd(p);
@@ -114,17 +114,17 @@ switch action
             'NumberTitle','off','Name','RunRats V2.2 ','Resize','off',...
             'closerequestfcn', [mfilename '(''close'')']);
         SoloParamHandle(obj,'myfig', 'value',fig);
-        
+
         try
             set(value(myfig), 'WindowStyle', 'normal');
             pause(0.1);
-            
+
         catch %#ok<CTCH>
-        
+
             disp('WARNING: Failed to keep runrats on top');
         end
 
-     
+
         %Create the non-gui variables we will need
         SoloParamHandle(obj,'RigID',           'value',bSettings('get','RIGS','Rig_ID')); %The rig ID
         SoloParamHandle(obj,'RatSch',          'value',cell(10,1)); %The rats that run in this rig in session order
@@ -749,10 +749,10 @@ switch action
 
         %runrats(obj,'updatelog','update_exprat');
 
-%% SPECIAL CASE ADDED BY ARPIT FOR CLICK AND SELECT 
-% doesn't effect the running of the other cases/functions
+        %% SPECIAL CASE ADDED BY ARPIT FOR CLICK AND SELECT
+        % doesn't effect the running of the other cases/functions
     case 'update exp_rat_userclick'
-        
+
         ExpMenu.value = varargin{1};
         runrats(obj,'update_ratmenu',varargin{2});
         %If the rat has changed, let's update it.
@@ -762,15 +762,15 @@ switch action
             %Stay in the loop if we haven't changed anything
             InLiveLoop.value = 1;
         end
-        
+
         runrats(obj,'begin_load_protocol');
 
         % Added to send the details about the experimenter and rat
     case 'exp_rat_names'
         varargout{1} = value(ExpMenu);
         varargout{2} = value(RatMenu);
-        
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     case 'update_tech_instructions'
         %% update_tech_instructions
         %Posts the tech instructions for the active rat on the screen
@@ -1058,7 +1058,7 @@ switch action
 
     case 'update_schedule'
         %% update_schedule
-        
+
         %Here we grab the current schedule for this rig
 
         % if ~isnan(value(RigID));
@@ -1318,16 +1318,16 @@ switch action
 
         %%%%%%%%%%%% ARPIT %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-        % NOT REQUIRED AS INSTEAD OF SVN WE ARE USING GITHUB 
+        % NOT REQUIRED AS INSTEAD OF SVN WE ARE USING GITHUB
 
         %Let's also make sure we have the most up-to-date code
-        
+
         % CurrDir = pwd;
         % pname = bSettings('get','GENERAL','Main_Code_Directory');
         % if ~isempty(pname) && ischar(pname)
         %     update_folder(pname,'svn');
         % end
-        % 
+        %
         % %And finally we make sure the protocols are up-to-date
         % pname = bSettings('get','GENERAL','Protocols_Directory');
         % if ~isempty(pname) && ischar(pname)
@@ -1475,7 +1475,7 @@ switch action
         %         Camera_Image.value = im;
         %     else
         %         disp('No USB camera connected')
-        %     end            
+        %     end
         % catch
         %     disp('failed to connect to USB camera')
         % end
@@ -1491,7 +1491,7 @@ switch action
             set(get_ghandle(Multi),'enable','on');
             set(get_ghandle(Safety),'visible','off','string','');
         end
-        
+
         % Let start recording the videos by sending the command to protocol
         % itself instead of the plugin bonsaicamera
         protobj=eval(value(CurrProtocol));
@@ -1515,7 +1515,7 @@ switch action
         runrats(obj,'updatelog','runend');
         runrats(obj,'disable_all');
         set(get_ghandle(Multi),'String','Saving...','Fontsize',32);
-        
+
         %Stop raspberry pi_camera
         % try
         %     disp('stopping camera')
@@ -1563,7 +1563,7 @@ switch action
             catch ME  % full stack trace %#ok<CTCH>
                 disp('pre_saving_settings failed with error:');
                 disp(ME.message);
-                disp(ME.getReport()); 
+                disp(ME.getReport());
                 disp('Protocol does not appear to have a pre_saving_settings')
             end
 
@@ -1620,14 +1620,14 @@ switch action
             set(get_ghandle(UpdateMode),'String','Live Update On','BackgroundColor',[0.6 1 0.6],'ForegroundColor',[0 0 0]);
 
             %%%%%%%%%%%%%%Removing the part of full restart %%%%%%%%%%%%%%
-                    %%%%%%%%%%%%% ARPIT %%%%%%%%%%%%%%%%%%%%%
+            %%%%%%%%%%%%% ARPIT %%%%%%%%%%%%%%%%%%%%%
 
             do_full_restart.value = 0;
             p = bSettings('get','GENERAL','Main_Code_Directory');
             cd(p);
 
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-           
+
             %Another option is to now kill MatLab completely and restart
             %runrats.  This ensures windows don't pile up, and code can get
             %updated before each session
@@ -1727,14 +1727,14 @@ switch action
             message = cell(0);
             message{end+1} = ['Rig ',num2str(value(RigID)),' crashed while running ',value(RatMenu),' at ',datestr(now,13)]; %#ok<NODEF>
             message{end+1} = '';
-            message{end+1} = lsterr.identifier;            
+            message{end+1} = lsterr.identifier;
             message{end+1} = error_message;
             file_path = lsterr.stack(1).file;
             message{end+1} = strrep(file_path, '\', '\\');
             message{end+1} = lsterr.stack(1).name;
             message{end+1} = num2str(lsterr.stack(1).line);
             message{end+1} = '';
-            
+
             for i = 1:length(lsterr.stack)
                 message{end+1} = ['Line ' num2str(lsterr.stack(i).line) ', File ' lsterr.stack(i).file ', Function ' lsterr.stack(i).name]; %#ok<AGROW>
             end
@@ -1766,18 +1766,18 @@ switch action
         end
 
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        
+
         %% Modified/Added by Arpit
 
         %Let's update the MySQL table to indicate a crash has happened
-        %Since this sql table is missing, the same information can be 
-        % obtained from sess_started table where was_ended will stay 0. 
-        
+        %Since this sql table is missing, the same information can be
+        % obtained from sess_started table where was_ended will stay 0.
+
         % id = bdata(['select sessid from sess_started where ratname="',value(RatMenu),...
         %     '" and was_ended=0 and sessiondate="',datestr(now,'yyyy-mm-dd'),'"']);
         % if ~isempty(id)
         %     id = id(end);
-        %     bdata('call mark_crashed("{S}")',id);       
+        %     bdata('call mark_crashed("{S}")',id);
         % end
 
         %% Lets try and rerun the protocol and only do it if the animal is training
@@ -1788,11 +1788,11 @@ switch action
         end
 
         if value(Rerun_AfterCrash) == 1 && is_rat_training == 1
-                runrats(obj,'rerun');
+            runrats(obj,'rerun');
         end
 
 
-    case 'rerun' % called in 'crash' and made by combining 'begin_load_protocol' , 'load_protocol' and 'run' 
+    case 'rerun' % called in 'crash' and made by combining 'begin_load_protocol' , 'load_protocol' and 'run'
 
         InLiveLoop.value = 0;
         runrats(obj,'disable_all');
@@ -1907,7 +1907,7 @@ switch action
         end
 
         set(get_ghandle(Multi),'String',['Run: ',value(RatMenu)],'BackgroundColor',[0.3,1,0.3],'Fontsize',32);
-        
+
         if ~isempty(sfile)
             [pname, fname, ext] = fileparts(sfile);
             StatusBar.value = ['Using settings file: ', fname];
@@ -1932,7 +1932,7 @@ switch action
             set(get_ghandle(Safety),'visible','off','string','');
         end
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     case 'crash_cleanup'
         %% crash_cleanup
         %The tech has acknowledged the crash. Let's jump back in the loop
@@ -2036,7 +2036,7 @@ switch action
         else
             varargout{1} = '';
         end
-     
+
 
     case  'close'
         %% close
@@ -2209,71 +2209,73 @@ catch %#ok<CTCH>
 end
 
 
-    function config_path = find_config_file(filename)
-        % Start at this script's own location — works on any drive letter,
-        % since mfilename('fullpath') resolves to wherever the file actually is.
-        search_dir = fileparts(mfilename('fullpath'));
+function config_path = find_config_file(filename)
+try
+    % Start at this script's own location — works on any drive letter,
+    % since mfilename('fullpath') resolves to wherever the file actually is.
+    search_dir = fileparts(mfilename('fullpath'));
 
-        while true
-            candidate = fullfile(search_dir, filename);
-            if exist(candidate, 'file')
-                config_path = candidate;
-                return;
-            end
-            parent_dir = fileparts(search_dir);
-            if strcmp(parent_dir, search_dir)   % hit filesystem root, stop
-                error('gmail_SMTP:missingConfig', ...
-                    '%s not found in any parent directory of %s.', ...
-                    filename, mfilename('fullpath'));
-            end
-            search_dir = parent_dir;
+    while true
+        candidate = fullfile(search_dir, filename);
+        if exist(candidate, 'file')
+            config_path = candidate;
+            return;
         end
-    end
-
-
-    function gmail_SMTP(recipient_email, subject_line, email_body)
-
-        smtp_server = 'smtp.gmail.com';
-        smtp_port = '587'; % Use TLS
-
-        % --- Load credentials from SVN-tracked config (never in Git) ---
-        config_file = 'PASSWORD_CONFIG-DO_NOT_VERSIONCONTROL.mat';
-        config_path = find_config_file(config_file);
-        if isempty(config_path)
+        parent_dir = fileparts(search_dir);
+        if strcmp(parent_dir, search_dir)   % hit filesystem root, stop
             error('gmail_SMTP:missingConfig', ...
-                ['%s not found on the MATLAB path. Run svn_sparse_init.sh ' ...
-                'to fetch it, or svn update if you already have it.'], config_file);
+                '%s not found in any parent directory of %s.', ...
+                filename, mfilename('fullpath'));
         end
-
-        config = load(config_path);
-        required_fields = {'gmail_smtp_address', 'gmail_smtp_password'};
-        missing = required_fields(~isfield(config, required_fields));
-        if ~isempty(missing)
-            error('gmail_SMTP:missingField', ...
-                'Missing field(s) in %s: %s', config_file, strjoin(missing, ', '));
-        end
-        email_address  = config.gmail_smtp_address;
-        email_password = config.gmail_smtp_password;
-
-        % --- Set MATLAB Email Preferences ---
-        setpref('Internet','SMTP_Server',smtp_server);
-        setpref('Internet','E_mail',email_address);
-        setpref('Internet','SMTP_Username',email_address);
-        setpref('Internet','SMTP_Password',email_password);
-
-        % Set server properties
-        props = java.lang.System.getProperties;
-        props.setProperty('mail.smtp.auth','true');
-        props.setProperty('mail.smtp.starttls.enable','true');
-        props.setProperty('mail.smtp.port',smtp_port);
-
-        % --- Send the Email ---
-        try
-            sendmail(recipient_email, subject_line, email_body);
-            disp('Email sent successfully via Gmail SMTP.');
-        catch ME
-            disp(['Error sending email: ' ME.message]);
-        end
-
+        search_dir = parent_dir;
     end
+catch
+end
+
+
+function gmail_SMTP(recipient_email, subject_line, email_body)
+try
+    smtp_server = 'smtp.gmail.com';
+    smtp_port = '587'; % Use TLS
+
+    % --- Load credentials from SVN-tracked config (never in Git) ---
+    config_file = 'PASSWORD_CONFIG-DO_NOT_VERSIONCONTROL.mat';
+    config_path = find_config_file(config_file);
+    if isempty(config_path)
+        error('gmail_SMTP:missingConfig', ...
+            ['%s not found on the MATLAB path. Run svn_sparse_init.sh ' ...
+            'to fetch it, or svn update if you already have it.'], config_file);
+    end
+
+    config = load(config_path);
+    required_fields = {'gmail_smtp_address', 'gmail_smtp_password'};
+    missing = required_fields(~isfield(config, required_fields));
+    if ~isempty(missing)
+        error('gmail_SMTP:missingField', ...
+            'Missing field(s) in %s: %s', config_file, strjoin(missing, ', '));
+    end
+    email_address  = config.gmail_smtp_address;
+    email_password = config.gmail_smtp_password;
+
+    % --- Set MATLAB Email Preferences ---
+    setpref('Internet','SMTP_Server',smtp_server);
+    setpref('Internet','E_mail',email_address);
+    setpref('Internet','SMTP_Username',email_address);
+    setpref('Internet','SMTP_Password',email_password);
+
+    % Set server properties
+    props = java.lang.System.getProperties;
+    props.setProperty('mail.smtp.auth','true');
+    props.setProperty('mail.smtp.starttls.enable','true');
+    props.setProperty('mail.smtp.port',smtp_port);
+
+    % --- Send the Email ---
+    try
+        sendmail(recipient_email, subject_line, email_body);
+        disp('Email sent successfully via Gmail SMTP.');
+    catch ME
+        disp(['Error sending email: ' ME.message]);
+    end
+catch
+end
 
