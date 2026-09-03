@@ -194,7 +194,10 @@ switch action
             '\n''If its full all the stimuli will be presented, Fixed is a single sound \n',...
             '\n''and No is when no sound is presented']));
         set_callback(Stimuli_State,{mfilename,'stim_state_change'});
-        next_row(y);next_row(y);
+        next_row(y);
+        
+        [x, y] = TrainingProtocolSection(obj, 'init', x, y);
+        next_row(y);  
 
         SoloFunctionAddVars('StimulusSection', 'ro_args', ...
 			{'ThisTrial';'Stimuli_State';'A1_time';'time_bet_aud1_gocue' ; ...
@@ -303,10 +306,18 @@ switch action
             disable(antibias_LRprob);  disable(Switch_Distr); disable(antibias_wtr_mult);
             disable(random_PreStim_time); disable(random_A1_time); disable(random_prego_time);
             disable(warmup_on); disable(increase_CP_training);
+            disable(TrainingStage); disable(Stage2a_N);
+            disable(Stage3_SwitchTrialMin); disable(Stage3_SwitchTrialMax);
+            disable(Stage4_Include_Uniform); disable(Stage4_Include_SingleAsym); disable(Stage4_Include_SwitchAsym);
+            disable(Stage4_RunLength);
         else
             enable(antibias_LRprob);  enable(Switch_Distr); enable(antibias_wtr_mult);
             enable(random_PreStim_time); enable(random_A1_time); enable(random_prego_time);
             enable(warmup_on); enable(increase_CP_training);
+            enable(TrainingStage); enable(Stage2a_N);
+            enable(Stage3_SwitchTrialMin); enable(Stage3_SwitchTrialMax);
+            enable(Stage4_Include_Uniform); enable(Stage4_Include_SingleAsym); enable(Stage4_Include_SwitchAsym);
+            enable(Stage4_RunLength);
         end
 
 	case 'new_leftprob'
@@ -377,6 +388,8 @@ switch action
         end
 		        
 	case 'prepare_next_trial'
+
+        TrainingProtocolSection(obj, 'prepare_next_trial');
 
         %% Calculate the CP Params Time
 

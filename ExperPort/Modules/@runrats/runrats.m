@@ -2209,35 +2209,71 @@ catch %#ok<CTCH>
 end
 
 
+    function config_path = find_config_file(filename)
+        % Start at this script's own location — works on any drive letter,
+        % since mfilename('fullpath') resolves to wherever the file actually is.
+        search_dir = fileparts(mfilename('fullpath'));
 
-function gmail_SMTP(recipient_email,subject_line,email_body)
+        while true
+            candidate = fullfile(search_dir, filename);
+            if exist(candidate, 'file')
+                config_path = candidate;
+                return;
+            end
+            parent_dir = fileparts(search_dir);
+            if strcmp(parent_dir, search_dir)   % hit filesystem root, stop
+                error('gmail_SMTP:missingConfig', ...
+                    '%s not found in any parent directory of %s.', ...
+                    filename, mfilename('fullpath'));
+            end
+            search_dir = parent_dir;
+        end
+    end
 
-smtp_server = 'smtp.gmail.com';
-smtp_port = '587'; % Use TLS
-email_address = 'behav.akramilab@gmail.com';
-email_password = 'fakc mdbw woef lqmq'; % IMPORTANT: this is set in setting of gmail
 
-% recipient_email = 'arpit.agarwal@ucl.ac.uk';
-% subject_line = 'Test Email from MATLAB via Gmail';
-% email_body = 'This email was sent using Gmail SMTP from MATLAB.';
+    function gmail_SMTP(recipient_email, subject_line, email_body)
 
-% --- Set MATLAB Email Preferences ---
-setpref('Internet','SMTP_Server',smtp_server);
-setpref('Internet','E_mail',email_address);
-setpref('Internet','SMTP_Username',email_address);
-setpref('Internet','SMTP_Password',email_password);
+        smtp_server = 'smtp.gmail.com';
+        smtp_port = '587'; % Use TLS
 
-% Set server properties
-props = java.lang.System.getProperties;
-props.setProperty('mail.smtp.auth','true');
-props.setProperty('mail.smtp.starttls.enable','true');
-props.setProperty('mail.smtp.port',smtp_port);
+        % --- Load credentials from SVN-tracked config (never in Git) ---
+        config_file = 'PASSWORD_CONFIG-DO_NOT_VERSIONCONTROL.mat';
+        config_path = find_config_file(config_file);
+        if isempty(config_path)
+            error('gmail_SMTP:missingConfig', ...
+                ['%s not found on the MATLAB path. Run svn_sparse_init.sh ' ...
+                'to fetch it, or svn update if you already have it.'], config_file);
+        end
 
-% --- Send the Email ---
-try
-    sendmail(recipient_email, subject_line, email_body);
-    disp('Email sent successfully via Gmail SMTP.');
-catch ME
-    disp(['Error sending email: ' ME.message]);
-end
+        config = load(config_path);
+        required_fields = {'gmail_smtp_address', 'gmail_smtp_password'};
+        missing = required_fields(~isfield(config, required_fields));
+        if ~isempty(missing)
+            error('gmail_SMTP:missingField', ...
+                'Missing field(s) in %s: %s', config_file, strjoin(missing, ', '));
+        end
+        email_address  = config.gmail_smtp_address;
+        email_password = config.gmail_smtp_password;
+
+        % --- Set MATLAB Email Preferences ---
+        setpref('Internet','SMTP_Server',smtp_server);
+        setpref('Internet','E_mail',email_address);
+        setpref('Internet','SMTP_Username',email_address);
+        setpref('Internet','SMTP_Password',email_password);
+
+        % Set server properties
+        props = java.lang.System.getProperties;
+        props.setProperty('mail.smtp.auth','true');
+        props.setProperty('mail.smtp.starttls.enable','true');
+        props.setProperty('mail.smtp.port',smtp_port);
+
+        % --- Send the Email ---
+        try
+            sendmail(recipient_email, subject_line, email_body);
+            disp('Email sent successfully via Gmail SMTP.');
+        catch ME
+            disp(['Error sending email: ' ME.message]);
+        end
+
+    end
 

@@ -117,7 +117,7 @@ switch action
         next_row(y);
         DispParam(obj, 'A1_freq', 0.01, x,y,'label','A1_freq','TooltipString','Sigma value for the first stimulus');
     	next_row(y);
-    	DispParam(obj,'boundary',-3.9,x,y,'label','boundary(log)','TooltipString','decision boundary for categorisation (log)');
+    	DispParam(obj,'boundary',-3.9788,x,y,'label','boundary(log)','TooltipString','decision boundary for categorisation (log)');
         next_row(y);
         MenuParam(obj, 'mu_location', {'center', 'side'}, ...
             'center', x, y, 'labelfraction', 0.35, 'TooltipString', sprintf('\nLocation of boundary'));
@@ -208,11 +208,7 @@ switch action
             SoundManagerSection(obj, 'send_not_yet_uploaded_sounds');
 
             if n_done_trials > 0
-                if ~violation_history(n_done_trials) && ~timeout_history(n_done_trials)
-                    StimulusSection(obj,'update_stimulus_history');
-                else
-                    StimulusSection(obj,'update_stimulus_history_nan');
-                end
+               StimulusSection(obj,'update_stimulus_history');
             end
         end
 
@@ -672,11 +668,6 @@ switch action
     case 'update_stimulus_history'
         ps=value(stimulus_history);
         ps(n_done_trials)=value(thisstimlog(n_done_trials));
-        stimulus_history.value=ps;
-
-    case 'update_stimulus_history_nan'
-        ps=value(stimulus_history);
-        ps(n_done_trials)=value(thisstimlog(n_done_trials));%nan;
         stimulus_history.value=ps;
 
     %% Case hide

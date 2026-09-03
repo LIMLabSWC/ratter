@@ -136,7 +136,7 @@ switch action
         next_row(y);
         DispParam(obj, 'A1_freq', 0.01, x,y,'label','A1_freq','TooltipString','Sigma value for the first stimulus');
     	next_row(y);
-    	DispParam(obj,'boundary',-3.9,x,y,'label','boundary(log)','TooltipString','decision boundary for categorisation (log)');
+    	DispParam(obj,'boundary',-3.9788,x,y,'label','boundary(log)','TooltipString','decision boundary for categorisation (log)');
         next_row(y);
         MenuParam(obj, 'mu_location', {'center', 'side'}, ...
             'center', x, y, 'labelfraction', 0.35, 'TooltipString', sprintf('\nLocation of boundary'));

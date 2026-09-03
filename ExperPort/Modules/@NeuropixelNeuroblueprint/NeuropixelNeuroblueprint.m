@@ -59,6 +59,17 @@ switch action
         else, Bpod('COM5');newstartup;
         end
         
+        % Check if the neuropixel helper functions are also in the path
+        helperFolder = fullfile(pwd, 'Modules/NeuropixelHelper_Modules');
+        if isfolder(helperFolder)
+            % 3. Check if the folder is already in the MATLAB search path
+            recursivePath = genpath(helperFolder);
+            addpath(recursivePath);
+            fprintf('Successfully added "%s" and its subfolders to the path.\n', helperFolder);
+        else
+            warning('The folder "%s" was not found on the system.', helperFolder);
+        end
+
         % --- State Variables as SoloParamHandles ---
         SoloParamHandle(obj, 'currentState', 'value', 'Load');
         SoloParamHandle(obj, 'behavState', 'value', 'Run');
