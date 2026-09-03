@@ -3,6 +3,7 @@ SoloData/
 Bonsai/
 training_videos/
 ExperPort/Plugins/@bonsaicamera/.bonsai
+ ExperPort/Plugins/@bonsaicamera/.bonsai/Settings/Camera_Control.layout
 ExperPort/Settings/Settings_Custom_v0_789.conf
 ExperPort/Settings/Settings_Custom_v2_0.conf
 ExperPort/Settings/Settings_Custom.conf

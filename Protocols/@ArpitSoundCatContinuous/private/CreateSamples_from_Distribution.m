@@ -103,7 +103,7 @@ addParameter(p, 'range_percentage_left', 100, @(x) isscalar(x) && x >= 0 && x <=
 
 % Right Side Parameters
 addParameter(p, 'right_dist_type', 'Sinusoidal', @ischar);
-addParameter(p, 'decay_rate_magnitude_right', 5, @(x) isscalar(x) && x >= 0);
+addParameter(p, 'decay_rate_magnitude_right', 2.153, @(x) isscalar(x) && x >= 0);
 addParameter(p, 'normal_mean_right', 0.5, @isnumeric);
 addParameter(p, 'normal_std_dev_right', 0.15, @(x) isscalar(x) && x > 0);
 addParameter(p, 'half_normal_std_dev_right', 0.2, @(x) isscalar(x) && x > 0);
@@ -113,8 +113,8 @@ addParameter(p, 'sinusoidal_frequency_factor_right', 1, @(x) isscalar(x) && x >=
 addParameter(p, 'range_percentage_right', 100, @(x) isscalar(x) && x >= 0 && x <= 100);
 
 % Central Sampling Bias Parameters
-addParameter(p, 'P_central_region', 0.3, @(x) isscalar(x) && x >= 0 && x <= 1);
-addParameter(p, 'central_region_width', 0.2, @(x) isscalar(x) && x > 0);
+addParameter(p, 'P_central_region', 0.0, @(x) isscalar(x) && x >= 0 && x <= 1);
+addParameter(p, 'central_region_width', 0.1, @(x) isscalar(x) && x > 0);
 
 % Simulation Parameters
 addParameter(p, 'num_simulations', 200, @(x) isscalar(x) && x > 0 && mod(x,1)==0);

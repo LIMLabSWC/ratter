@@ -59,6 +59,17 @@ switch action
         else, Bpod('COM5');newstartup;
         end
         
+        % Check if the neuropixel helper functions are also in the path
+        helperFolder = fullfile(pwd, 'Modules/NeuropixelHelper_Modules');
+        if isfolder(helperFolder)
+            % 3. Check if the folder is already in the MATLAB search path
+            recursivePath = genpath(helperFolder);
+            addpath(recursivePath);
+            fprintf('Successfully added "%s" and its subfolders to the path.\n', helperFolder);
+        else
+            warning('The folder "%s" was not found on the system.', helperFolder);
+        end
+
         % --- State Variables as SoloParamHandles ---
         SoloParamHandle(obj, 'currentState', 'value', 'Load');
         SoloParamHandle(obj, 'behavState', 'value', 'Run');
@@ -102,7 +113,11 @@ switch action
         % Panel 1: Behavior
         p1 = uipanel('Title', '1. Behavior', 'FontSize', 12, 'FontWeight', 'bold', 'BorderType', 'etchedin', 'BorderWidth', 1, 'Units', 'normalized', 'Position', [0.02, 0.74, 0.6, 0.13]);
         uicontrol(p1, 'Style', 'text', 'String', 'Protocol Name:', 'Units', 'normalized', 'Position', [0.05, 0.7, 0.22, 0.25], 'HorizontalAlignment', 'right');
-        handles.protocol_edit = uicontrol(p1, 'Style', 'edit', 'String', 'ArpitSoundCatContinuous', 'Units', 'normalized', 'Position', [0.3, 0.7, 0.45, 0.25]);
+        dropdown_options = { 'ArpitSoundCategorization','ArpitSoundCatContinuous'};
+        % Create the dropdown menu
+        handles.protocol_edit = uicontrol(p1, ...
+            'Style', 'popupmenu','String', dropdown_options,'Units', 'normalized','Position', [0.3, 0.7, 0.45, 0.25]);
+
         handles.manual_test = uicontrol(p1, 'Style', 'checkbox', 'String', 'Manual Test', 'Value', 1, 'Units', 'normalized', 'Position', [0.78, 0.7, 0.2, 0.25]);
         uicontrol(p1, 'Style', 'text', 'String', 'Experimenter:', 'Units', 'normalized', 'Position', [0.02, 0.4, 0.2, 0.25], 'HorizontalAlignment', 'right');
         handles.exp_popup = uicontrol(p1, 'Style', 'popupmenu', 'String', {'-'}, 'Units', 'normalized', 'Position', [0.23, 0.4, 0.25, 0.25], 'Callback', {@(h,e) feval(mfilename, obj, 'populate_and_filter_lists', 'filter')});
@@ -1130,7 +1145,11 @@ return;
 %  PARAMETER AND VALIDATION FUNCTIONS
 %  =======================================================================
 function params = get_all_parameters(handles,software)
-    params.protocol_name = get(handles.protocol_edit, 'String');
+    
+    protocol_name_index = get(handles.protocol_edit, 'Value'); % Get the index of the selected item (e.g., 1, 2, or 3)
+    protocol_name_list = get(handles.protocol_edit, 'String'); % Get the full list of options
+    params.protocol_name = protocol_name_list{protocol_name_index};% Extract the specific name selected
+    % params.protocol_name = get(handles.protocol_edit, 'String');
     params.do_manual_test = get(handles.manual_test, 'Value');
     
     % Get values from popup menus

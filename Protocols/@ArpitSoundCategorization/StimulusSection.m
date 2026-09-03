@@ -153,7 +153,7 @@ switch action
         next_row(y);
         DispParam(obj, 'A1_freq', 0.01, x,y,'label','A1_freq','TooltipString','Sigma value for the first stimulus');
     	next_row(y);
-    	DispParam(obj,'boundary',-3.9,x,y,'label','boundary(log)','TooltipString','decision boundary for categorisation (log)');
+    	DispParam(obj,'boundary',-3.9788,x,y,'label','boundary(log)','TooltipString','decision boundary for categorisation (log)');
         next_row(y);
         MenuParam(obj, 'mu_location', {'center', 'side'}, ...
             'center', x, y, 'labelfraction', 0.35, 'TooltipString', sprintf('\nLocation of boundary'));
@@ -225,7 +225,7 @@ switch action
         x=oldx; y=oldy;
         figure(parentfig);
         
-        SoloFunctionAddVars('PsychometricSection', 'ro_args',{'Category_Dist';'Rule';'boundary'});
+        SoloFunctionAddVars('PsychometricSection', 'ro_args',{'Category_Dist';'Rule';'boundary';'n_discrete'});
             
         varargout{1} = x;
         varargout{2} = y;
@@ -238,7 +238,7 @@ switch action
                 StimulusSection(obj,'pick_current_continuous_stimulus');
              elseif strcmpi(Stimuli_State,'Discrete') % only run here if user selected discrete distribution
                 StimulusSection(obj,'pick_current_discrete_stimulus');
-             elseif strcmpi(Stimuli_State,'Fixed') % only run here if user selected fixed
+             elseif strcmpi(Stimuli_State,'Fixed Stimuli') % only run here if user selected fixed
                 StimulusSection(obj,'pick_current_fixed_stimulus');
              end
              
@@ -899,29 +899,43 @@ switch action
             'fullname', ['^' mfilename]);
 
     case 'update_stimulus_history'
-
         ps  = value(stimulus_history);
         ps1 = value(stimulus_distribution_history);
         ps2 = value(stimulus_right_distribution_history);
         ps3 = value(stimulus_left_distribution_history);
 
-        if strcmpi(Stimuli_State,'Full') % values when using full distribution
-            ps(n_done_trials)=value(thisstimlog(n_done_trials));
-            ps1{n_done_trials}=value(Category_Dist);
-            ps2{n_done_trials}=value(Prob_Dist_Right);
-            ps3{n_done_trials}=value(Prob_Dist_Left);
+        if strcmpi(Stimuli_State, 'Full')
+            ps(n_done_trials)  = value(thisstimlog(n_done_trials));
+            ps1{n_done_trials} = value(Category_Dist);
+            ps2{n_done_trials} = value(Prob_Dist_Right);
+            ps3{n_done_trials} = value(Prob_Dist_Left);
 
-        elseif strcmpi(Stimuli_State,'Fixed Stimuli')
-            ps(n_done_trials)=value(thisstimlog(n_done_trials));
-            ps1{n_done_trials}='Fixed Stimuli';
-            ps2{n_done_trials}='Fixed Stimuli';
-            ps3{n_done_trials}='Fixed Stimuli';
+        elseif strcmpi(Stimuli_State, 'Discrete')
+            ps(n_done_trials)  = value(thisstimlog(n_done_trials));
+            ps1{n_done_trials} = 'Uniform';
+            ps2{n_done_trials} = 'Uniform';
+            ps3{n_done_trials} = 'Uniform';
+
+        elseif strcmpi(Stimuli_State, 'Fixed Stimuli')
+            ps(n_done_trials)  = value(thisstimlog(n_done_trials));
+            ps1{n_done_trials} = 'Fixed Stimuli';
+            ps2{n_done_trials} = 'Fixed Stimuli';
+            ps3{n_done_trials} = 'Fixed Stimuli';
+
+        elseif strcmpi(Stimuli_State, 'No Sound')
+            % Write sentinel values so history arrays always grow with n_done_trials.
+            % NaN stim is filtered by ~isnan() guards throughout RealTimeAnalysis.
+            % 'No Sound' distribution string is handled by the is_str filter.
+            ps(n_done_trials)  = NaN;
+            ps1{n_done_trials} = 'No Sound';
+            ps2{n_done_trials} = 'No Sound';
+            ps3{n_done_trials} = 'No Sound';
         end
 
-        stimulus_history.value=ps;
-        stimulus_distribution_history.value = ps1;
+        stimulus_history.value                    = ps;
+        stimulus_distribution_history.value       = ps1;
         stimulus_right_distribution_history.value = ps2;
-        stimulus_left_distribution_history.value = ps3;
+        stimulus_left_distribution_history.value  = ps3;
 
     case 'Stimuli_State_change'
 

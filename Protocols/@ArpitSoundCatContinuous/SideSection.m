@@ -166,13 +166,6 @@ switch action
 		next_row(y);
 		DispParam(obj, 'Total_CP_duration', CP_duration+time_go_cue, x, y, 'TooltipString', 'Total nose in center port time, in secs. Sum of CP_duration and Go Cue duration'); %#ok<*NODEF>
 		next_row(y); next_row(y);
-
-        % Toggle Buttons To Control Parameters       
-        % ToggleParam(obj, 'stimuli_on', 1, x,y,...
-        % 'OnString', 'Stimuli ON',...
-        % 'OffString', 'Stimuli OFF',...
-        % 'TooltipString', sprintf('If on (black) then it enables training with stimuli else using a fixed sound from Stage 5'));
-        % next_row(y);
          
         MenuParam(obj, 'Stimuli_State', {'Full','Fixed Stimuli','No Sound'}, ...
             'Full', x, y, 'label','Stimuli State', 'labelfraction', 0.35, 'TooltipString', sprintf(['\n Different Options for Stimuli Sound.\n', ...
@@ -254,11 +247,11 @@ switch action
     case 'User_Control'
 
         if value(control_active) == 0
-            disable(antibias_LRprob); disable(stimuli_on);  disable(Switch_Distr); disable(antibias_wtr_mult);
+            disable(antibias_LRprob);  disable(Switch_Distr); disable(antibias_wtr_mult);
             disable(random_PreStim_time); disable(random_A1_time); disable(random_prego_time);
             disable(warmup_on); disable(increase_CP_training);
         else
-            enable(antibias_LRprob); enable(stimuli_on); enable(Switch_Distr); enable(antibias_wtr_mult);
+            enable(antibias_LRprob); enable(Switch_Distr); enable(antibias_wtr_mult);
             enable(random_PreStim_time); enable(random_A1_time); enable(random_prego_time);
             enable(warmup_on); enable(increase_CP_training);
         end
