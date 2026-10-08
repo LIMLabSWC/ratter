@@ -1,8 +1,8 @@
 # BControl Documentation
 
-This is the Jekyll-based documentation site for BControl, providing comprehensive documentation for the behavioral experimentation system.
+Jekyll-based documentation site for BControl.
 
-## 🎯 How Jekyll Works
+## How Jekyll Works
 
 **The Process:**
 ```
@@ -16,7 +16,7 @@ Your Markdown Files → Jekyll Processing → HTML Website
 
 **Key Concept:** You edit Markdown, Jekyll automatically creates a complete website with consistent navigation and styling.
 
-## 🛠️ Local Development Setup
+## Local Development Setup
 
 ### Prerequisites
 ```bash
@@ -54,7 +54,7 @@ bundle exec jekyll serve
 bundle exec jekyll build
 ```
 
-## ☁️ GitHub Pages Deployment
+## GitHub Pages Deployment
 
 **Automatic Deployment:**
 1. Push your changes to GitHub
@@ -64,7 +64,7 @@ bundle exec jekyll build
 
 **No manual deployment needed!** GitHub Pages handles everything automatically.
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 docs/
@@ -90,7 +90,7 @@ docs/
 └── README.md               # This file
 ```
 
-## 🧭 Navigation System
+## Navigation System
 
 **Features:**
 - **Sticky top navigation** - Always visible while scrolling
@@ -105,7 +105,7 @@ docs/
 - **Technical References** - FSM Documentation, Staircase Algorithms, SVN Process
 - **Protocols** - Protocols Overview, Training Protocols, Browse All Protocols
 
-## 🔄 Development Workflow
+## Development Workflow
 
 ```
 Edit Markdown Files → Test Locally → Push to GitHub → Live on GitHub Pages
@@ -122,7 +122,7 @@ Edit Markdown Files → Test Locally → Push to GitHub → Live on GitHub Pages
 - ✅ GitHub automatically builds and deploys
 - ✅ Site goes live with same navigation and styling
 
-## 📝 Adding New Content
+## Adding New Content
 
 **To add a new documentation page:**
 1. Create a new `.md` file in the appropriate directory
@@ -140,7 +140,7 @@ Edit Markdown Files → Test Locally → Push to GitHub → Live on GitHub Pages
 - Edit `_layouts/default.html` to add new menu items
 - Use `{{ '/path/to/page' | relative_url }}` for internal links
 
-## 🎨 Styling and Layout
+## Styling and Layout
 
 **Layout System:**
 - `_layouts/default.html` - Main template with navigation
@@ -152,7 +152,7 @@ Edit Markdown Files → Test Locally → Push to GitHub → Live on GitHub Pages
 - Responsive design with mobile support
 - Professional documentation styling
 
-## 🚀 Benefits
+## Benefits
 
 **For Content Creators:**
 - Write in simple Markdown
@@ -166,7 +166,7 @@ Edit Markdown Files → Test Locally → Push to GitHub → Live on GitHub Pages
 - Mobile-friendly design
 - Fast loading and reliable hosting
 
-## 🔧 Troubleshooting
+## Troubleshooting
 
 **Common Issues:**
 - **Links not working:** Make sure to use `{{ '/path' | relative_url }}` for internal links
