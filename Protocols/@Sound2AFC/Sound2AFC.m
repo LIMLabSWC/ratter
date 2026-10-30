@@ -111,6 +111,9 @@ switch action
     
             fprintf('Left trial accuracy: %.2f (%i/%i)\n', left_acc, n_left_hits, n_valid_left);
             fprintf('Right trial accuracy: %.2f (%i/%i)\n', right_acc, n_right_hits, n_valid_right);
+
+            % Every trial, save data with _ASV.mat suffix (non-interactive, no commit)
+            SavingSection(obj, 'autosave_data');
         end
         SessionDefinition(obj, 'next_trial');
         
@@ -257,6 +260,7 @@ function create_gui(obj)
 
         next_row(y, 1);
         [x, y] = SoundConfigSection(obj, 'init', x, y);
+        SavingSection(obj, 'set_autosave_frequency', 1);
     
 
         [expmtr, rname] = SavingSection(obj, 'get_info');
