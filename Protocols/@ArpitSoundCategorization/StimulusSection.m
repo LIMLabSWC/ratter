@@ -24,6 +24,7 @@ switch action
         SoundManagerSection(obj, 'declare_new_sound', 'StimAUD1')
         SoloParamHandle(obj, 'thisstim', 'value', []);
         SoloParamHandle(obj, 'thisstimlog', 'value', []);
+        SoloParamHandle(obj, 'stim_mode_log', 'value', {});   % Stimuli_State actually used on each trial
         
         %% Formatting graphics elements
         original_width = 0.45;
@@ -226,12 +227,28 @@ switch action
         figure(parentfig);
         
         SoloFunctionAddVars('PsychometricSection', 'ro_args',{'Category_Dist';'Rule';'boundary';'n_discrete'});
+        % TrainingProtocolSection reads the current distribution for the
+        % within-session switch (Stage 3 / Stage 4 switch sessions). Without
+        % this it could not see Category_Dist and the switch never fired.
+        SoloFunctionAddVars('TrainingProtocolSection', 'ro_args',{'Category_Dist'});
             
         varargout{1} = x;
         varargout{2} = y;
 
     case 'prepare_next_trial'
-        
+
+        % Record the trial that just finished, for every mode (before, this
+        % ran only when the current mode was not 'No Sound', so in No Sound
+        % sessions stimulus_history stopped growing).
+        if n_done_trials > 0
+            StimulusSection(obj,'update_stimulus_history');
+        end
+        % Remember which mode this coming trial uses
+        ml = value(stim_mode_log); ml{n_done_trials+1} = value(Stimuli_State); stim_mode_log.value = ml;
+        if strcmpi(Stimuli_State,'No Sound')
+            tl = value(thisstimlog); tl(n_done_trials+1) = NaN; thisstimlog.value = tl;
+        end
+
         if ~strcmpi(Stimuli_State,'No Sound') % either distribution or fixed sound
             
              if strcmpi(Stimuli_State,'Full') % only run here if user selected full distribution
@@ -279,8 +296,6 @@ switch action
             SoundManagerSection(obj, 'send_not_yet_uploaded_sounds');
 
             if n_done_trials > 0
-                
-                StimulusSection(obj,'update_stimulus_history');
                 
                 % Update the stim histogram and show chosen stimuli
 
@@ -899,37 +914,29 @@ switch action
             'fullname', ['^' mfilename]);
 
     case 'update_stimulus_history'
+        % Uses the mode that was actually used on trial n_done_trials
+        % (stim_mode_log), not the current menu value, which may have been
+        % changed since.
+        n   = n_done_trials;
         ps  = value(stimulus_history);
         ps1 = value(stimulus_distribution_history);
         ps2 = value(stimulus_right_distribution_history);
         ps3 = value(stimulus_left_distribution_history);
+        tl  = value(thisstimlog);
+        ml  = value(stim_mode_log);
+        if numel(ml) >= n && ~isempty(ml{n}), m = ml{n}; else, m = value(Stimuli_State); end
+        if numel(tl) >= n, sv = tl(n); else, sv = NaN; end
 
-        if strcmpi(Stimuli_State, 'Full')
-            ps(n_done_trials)  = value(thisstimlog(n_done_trials));
-            ps1{n_done_trials} = value(Category_Dist);
-            ps2{n_done_trials} = value(Prob_Dist_Right);
-            ps3{n_done_trials} = value(Prob_Dist_Left);
-
-        elseif strcmpi(Stimuli_State, 'Discrete')
-            ps(n_done_trials)  = value(thisstimlog(n_done_trials));
-            ps1{n_done_trials} = 'Uniform';
-            ps2{n_done_trials} = 'Uniform';
-            ps3{n_done_trials} = 'Uniform';
-
-        elseif strcmpi(Stimuli_State, 'Fixed Stimuli')
-            ps(n_done_trials)  = value(thisstimlog(n_done_trials));
-            ps1{n_done_trials} = 'Fixed Stimuli';
-            ps2{n_done_trials} = 'Fixed Stimuli';
-            ps3{n_done_trials} = 'Fixed Stimuli';
-
-        elseif strcmpi(Stimuli_State, 'No Sound')
-            % Write sentinel values so history arrays always grow with n_done_trials.
-            % NaN stim is filtered by ~isnan() guards throughout RealTimeAnalysis.
-            % 'No Sound' distribution string is handled by the is_str filter.
-            ps(n_done_trials)  = NaN;
-            ps1{n_done_trials} = 'No Sound';
-            ps2{n_done_trials} = 'No Sound';
-            ps3{n_done_trials} = 'No Sound';
+        if strcmpi(m, 'Full')
+            ps(n) = sv; ps1{n} = value(Category_Dist); ps2{n} = value(Prob_Dist_Right); ps3{n} = value(Prob_Dist_Left);
+        elseif strcmpi(m, 'Discrete')
+            ps(n) = sv; ps1{n} = 'Uniform'; ps2{n} = 'Uniform'; ps3{n} = 'Uniform';
+        elseif strcmpi(m, 'Fixed Stimuli')
+            ps(n) = sv; ps1{n} = 'Fixed Stimuli'; ps2{n} = 'Fixed Stimuli'; ps3{n} = 'Fixed Stimuli';
+        else
+            % NaN stim is filtered by the ~isnan() guards in RealTimeAnalysis;
+            % 'No Sound' is handled by its string filter.
+            ps(n) = NaN; ps1{n} = 'No Sound'; ps2{n} = 'No Sound'; ps3{n} = 'No Sound';
         end
 
         stimulus_history.value                    = ps;

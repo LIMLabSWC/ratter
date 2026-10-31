@@ -216,9 +216,10 @@ switch action
         next_column(x);
 		y=5;
 		
+        % 0 = locked (default at the start of every session), 1 = user can change
         ToggleParam(obj, 'control_active', 0, x,y,...
-			'OnString', 'Buttons Deative',...
-			'OffString', 'Buttons Active',...
+			'OnString', 'Buttons Active',...
+			'OffString', 'Buttons Locked',...
 			'TooltipString', sprintf(['If on (Yellow) then the user can change parameters.\n',...
             'This is to prevent any unwanted button press']));     
         set_callback(control_active, {mfilename, 'User_Control'});
@@ -242,9 +243,19 @@ switch action
         next_row(y);
         NumeditParam(obj, 'fraction_increase' ,0.001, x,y,'label','Frac_Increment','TooltipString','fraction CP added');
         next_row(y);
-        NumeditParam(obj, 'cp_reached' ,value(cp_start), x,y,'label','CPDur_Reached','TooltipString','CP dur reached in last session');
+        NumeditParam(obj, 'cp_reached' ,value(cp_start), x,y,'label','CPDur_Reached','TooltipString', ...
+            'CP reached at the end of the last session with CP training (updated automatically at end of session)');
+        next_row(y);
+        MenuParam(obj, 'cp_ramp_mode', {'Each session', 'Across sessions'}, 'Each session', x, y, ...
+            'label', 'CP ramp', 'labelfraction', 0.35, 'TooltipString', sprintf([ ...
+            '\nOnly used with Training Increasing CP.\n' ...
+            'Each session: every session starts again at CPDur_Start and ramps up to CPDur_End.\n' ...
+            'Across sessions: each session continues from CPDur_Reached (where the last session ended).\n' ...
+            'With Warmup ON, the 10 warm-up trials ramp to CPDur_Start (Each session)\n' ...
+            'or to CPDur_Reached (Across sessions).']));
         next_row(y);
         make_invisible(cp_start); make_invisible(cp_end); make_invisible(fraction_increase);make_invisible(cp_reached);
+        make_invisible(cp_ramp_mode);
 
 
 		SoloFunctionAddVars('ArpitSoundCategorizationSMA', 'ro_args', ...
@@ -306,18 +317,14 @@ switch action
             disable(antibias_LRprob);  disable(Switch_Distr); disable(antibias_wtr_mult);
             disable(random_PreStim_time); disable(random_A1_time); disable(random_prego_time);
             disable(warmup_on); disable(increase_CP_training);
-            disable(TrainingStage); disable(Stage2a_N);
-            disable(Stage3_SwitchTrialMin); disable(Stage3_SwitchTrialMax);
-            disable(Stage4_Include_Uniform); disable(Stage4_Include_SingleAsym); disable(Stage4_Include_SwitchAsym);
-            disable(Stage4_RunLength);
+            % Training-stage controls belong to TrainingProtocolSection, which
+            % SideSection cannot see, so that section (un)locks them itself.
+            TrainingProtocolSection(obj, 'enable_controls', 0);
         else
             enable(antibias_LRprob);  enable(Switch_Distr); enable(antibias_wtr_mult);
             enable(random_PreStim_time); enable(random_A1_time); enable(random_prego_time);
             enable(warmup_on); enable(increase_CP_training);
-            enable(TrainingStage); enable(Stage2a_N);
-            enable(Stage3_SwitchTrialMin); enable(Stage3_SwitchTrialMax);
-            enable(Stage4_Include_Uniform); enable(Stage4_Include_SingleAsym); enable(Stage4_Include_SwitchAsym);
-            enable(Stage4_RunLength);
+            TrainingProtocolSection(obj, 'enable_controls', 1);
         end
 
 	case 'new_leftprob'
@@ -370,8 +377,10 @@ switch action
 
         if increase_CP_training
              make_visible(cp_start); make_visible(cp_end); make_visible(fraction_increase);make_visible(cp_reached);
+             make_visible(cp_ramp_mode);
         else
              make_invisible(cp_start); make_invisible(cp_end); make_invisible(fraction_increase);make_invisible(cp_reached);
+             make_invisible(cp_ramp_mode);
         end
 
 	case 'new_time_go_cue'
@@ -389,6 +398,11 @@ switch action
 		        
 	case 'prepare_next_trial'
 
+        % Apply the lock state once the settings have loaded (start of session)
+        if n_done_trials == 0
+            SideSection(obj, 'User_Control');
+        end
+
         TrainingProtocolSection(obj, 'prepare_next_trial');
 
         %% Calculate the CP Params Time
@@ -396,7 +410,11 @@ switch action
         % Warm Up If starting a new session irrespective of training
         if warmup_on == 1 && n_done_trials <= 10 % warm up trials
             if increase_CP_training == 1 %% Training to increase CP
-                last_CP = value(cp_reached);
+                if strcmp(value(cp_ramp_mode), 'Across sessions')
+                    last_CP = max(value(cp_start), value(cp_reached));
+                else
+                    last_CP = value(cp_start);
+                end
             else
                 last_CP = 3;
             end
@@ -420,7 +438,17 @@ switch action
             cp_length = value(CP_duration) - value(SettlingIn_time);
 
         else % Non Warmup Trials with Increased CP Training
-            if increase_CP_training == 1 && value(CP_duration) <= value(cp_end)  %% Training to increase CP                
+            if increase_CP_training == 1 && n_done_trials == 0
+                % First trial of the session (no warm-up): starting point
+                if strcmp(value(cp_ramp_mode), 'Across sessions')
+                    CP_duration.value = min(max(value(cp_start), value(cp_reached)), value(cp_end));
+                else
+                    CP_duration.value = value(cp_start);
+                end
+                fixed_CP_length = 1;
+                cp_length = value(CP_duration) - value(SettlingIn_time);
+
+            elseif increase_CP_training == 1 && value(CP_duration) <= value(cp_end)  %% Training to increase CP
                 if ~violation_history(end) && ~timeout_history(end)
                     increment = value(CP_duration) * value(fraction_increase);
                     CP_duration.value = value(CP_duration) + increment;
@@ -657,6 +685,14 @@ switch action
             previous_sides.value=ps;
         end
 		
+	case 'end_of_session'
+        % Called from pre_saving_settings (before tomorrow's settings are
+        % saved): remember the CP reached today for 'Across sessions' ramps
+        % and for the warm-up target.
+        if increase_CP_training == 1
+            cp_reached.value = value(CP_duration);
+        end
+
 	case 'get_current_side'
         if strcmp(ThisTrial, 'LEFT')
             x = 'l'; %#ok<NODEF>

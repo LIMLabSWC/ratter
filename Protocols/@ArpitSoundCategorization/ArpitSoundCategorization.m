@@ -251,6 +251,7 @@ switch action
       %% pre_saving_settings
    case 'pre_saving_settings'
        
+    SideSection(obj, 'end_of_session');   % store CP reached today (cp_reached)
     StimulusSection(obj,'hide');
     PsychometricSection(obj,'hide');
     SessionDefinition(obj, 'run_eod_logic_without_saving');
@@ -259,8 +260,8 @@ switch action
     try
         perf = PsychometricSection(obj, 'evaluate');
     catch
-        perf{1,1}.start_trial = trial_start;
-        perf{1,1}.end_trial = trial_end;
+        perf{1,1}.start_trial = 1;
+        perf{1,1}.end_trial = n_done_trials;
         perf{1,1}.valid_trials = -1;
         perf{1,1}.distribution_type = '';
         perf{1,1}.calculated_boundary = nan;
