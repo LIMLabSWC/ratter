@@ -72,7 +72,7 @@ switch action
         NumeditParam(obj, 'strategy_frac', 0.9, x, y, 'labelfraction', LF, 'label', 'Strategy fraction'); next_row(y);
         NumeditParam(obj, 'viol_rate', 0.5, x, y, 'labelfraction', LF, 'label', 'Viol. rate (st 6-7)'); next_row(y);
         NumeditParam(obj, 'persist_trials', 100, x, y, 'labelfraction', LF, 'label', 'Flag if lasts (tr)'); next_row(y);
-        NumeditParam(obj, 'window', 60, x, y, 'labelfraction', LF, 'label', 'Window (trials)'); next_row(y);
+        NumeditParam(obj, 'mon_window', 60, x, y, 'labelfraction', LF, 'label', 'Window (trials)'); next_row(y);
         SubheaderParam(obj, 'title2b', 'Strategy / performance', x, y);
         next_column(x); y = 5;
         NumeditParam(obj, 'min_valid_trials', 80, x, y, 'labelfraction', LF, 'label', 'Min valid tr/session', 'TooltipString', ...
@@ -125,7 +125,7 @@ switch action
             cond = false(1, numel(TYPES)); msg = cell(1, numel(TYPES));
 
             if st >= value(email_from_stage)
-                w   = max(10, round(value(window)));
+                w   = max(10, round(value(mon_window)));
                 idx = max(1, n - w + 1):n;
                 hh = value(hit_history);       hh = hh(:);
                 vh = value(violation_history); vh = double(vh(:));

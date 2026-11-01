@@ -92,14 +92,16 @@ switch action
 
         x = 10; y = 5;
 
-        MenuParam(obj, 'Group', {'Stage 1','Stage 2a','Stage 2b','Stage 3','Stage 4'}, ...
+        % (named ExpGroup, not Group: ExperPort/Modules/Group.m is a function and
+        %  MATLAB would call it instead of reading the parameter)
+        MenuParam(obj, 'ExpGroup', {'Stage 1','Stage 2a','Stage 2b','Stage 3','Stage 4'}, ...
             'Stage 1', x, y, 'label', 'Group', 'labelfraction', 0.3, ...
             'TooltipString', sprintf(['\nStage 1: Uniform only, every session.\n', ...
             'Stage 2a: Alternating fixed blocks of RunLength_N sessions, Hard A / Hard B.\n', ...
             'Stage 2b: Random coin-flip Hard A/Hard B, every session.\n', ...
             'Stage 3: Stage 2b + automatic within-session switch.\n', ...
             'Stage 4: Random pool of Uniform / Single-Asym / Switch-Asym session modes.']));
-        set_callback(Group, {mfilename, 'Stage_Changed'});
+        set_callback(ExpGroup, {mfilename, 'Stage_Changed'});
         next_row(y); next_row(y);
 
         % ---- Shared run-length box: Stage 2a's block length, or Stage 4's
@@ -175,7 +177,7 @@ switch action
     % ------------------------------------------------------------------
     case 'Stage_Changed'
         try
-            switch value(Group)
+            switch value(ExpGroup)
                 case 'Stage 2a'
                     Stage2a_block_counter.value = 0;
                     Stage2a_current_dist.value  = '';
@@ -229,7 +231,7 @@ switch action
             Stage3_switch_fired.value = false;
 
             dist = '';
-            switch value(Group)
+            switch value(ExpGroup)
 
                 case 'Stage 1'
                     dist = 'Uniform';
@@ -376,15 +378,15 @@ switch action
     % ------------------------------------------------------------------
     case 'UpdateStatusDisplay'
         try
-            switch value(Group)   % short description for the main window
+            switch value(ExpGroup)   % short description for the main window
                 case 'Stage 1',  GroupNow.value = '1: Uniform only';
                 case 'Stage 2a', GroupNow.value = '2a: Hard A/B runs';
                 case 'Stage 2b', GroupNow.value = '2b: Hard A/B random';
                 case 'Stage 3',  GroupNow.value = '3: Switch sessions';
                 case 'Stage 4',  GroupNow.value = '4: Mixed pool';
-                otherwise,       GroupNow.value = value(Group);
+                otherwise,       GroupNow.value = value(ExpGroup);
             end
-            switch value(Group)
+            switch value(ExpGroup)
                 case 'Stage 2a'
                     cur = value(Stage2a_current_dist);
                     if isempty(cur), cur = '(not yet set)'; end
@@ -408,7 +410,7 @@ switch action
     % ------------------------------------------------------------------
     case 'RefreshVisibility'
         try
-            stage = value(Group);
+            stage = value(ExpGroup);
 
             % Run-length box + status: Stage 2a or Stage 4 only
             if strcmp(stage,'Stage 2a') || strcmp(stage,'Stage 4')
@@ -454,10 +456,10 @@ switch action
     %   (varargin{1} = 1 unlock, 0 lock)
     % ------------------------------------------------------------------
     case 'get_group'
-        varargout{1} = value(Group);
+        varargout{1} = value(ExpGroup);
 
     case 'enable_controls'
-        h = {Group, RunLength_N, Stage3_SwitchTrialMin, Stage3_SwitchTrialMax, ...
+        h = {ExpGroup, RunLength_N, Stage3_SwitchTrialMin, Stage3_SwitchTrialMax, ...
              Stage3_SwitchTrial_ThisSession, Stage4_Include_Uniform, Stage4_Include_SingleAsym, ...
              Stage4_Include_SwitchAsym};
         for i = 1:numel(h)

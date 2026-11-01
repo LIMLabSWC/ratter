@@ -59,16 +59,19 @@ function [obj, varargout] = VirtualRat(varargin)
 %   break a hold)  'rt_min' 0.15  'rt_mean' 0.2  'travel' 0.25
 %   'pause_prob' 0.03  'pause_mean' 5  'learn_tau' 1500  'seed' []
 %
-% EXAMPLE: Arpit2StepTraining through all stages in a few short sessions
+% EXAMPLE: Arpit2StepTraining through all 8 stages in a few short sessions
+%   (smaller thresholds so each stage / sound level passes quickly)
 %   fast = {'S1_trials',30; 'S1_switches',10; 'S1_go_start',10; 'S2_trials',30;
 %     'S2_switches',10; 'S2_RColl_max',20; 'S3_min_trials',20; 'S3_frac_increase',0.05;
 %     'S4_frac_increase',0.02; 'S4_min_session_trials',30; 'recent_window',20;
-%     'S5_window',60; 'S5_min_per_cell',8; 'BL_min_trials',15; 'BL_switch_n',4;
-%     'BL_cap',60; 'S6_window',60; 'S6_min_per_cell',8; 'S6_min_trials',40;
-%     'S7_min_trials',60; 'S7_sessions',2; 'persist_trials',30;
-%     'min_valid_trials',20; 'stall_sessions',3};
-%   VirtualRat('run', 'sessions', 12, 'trials', 250, 'params', fast);
-%
+%     'S5_min_trials',40; 'S6_min_trials',40; 'BL_min_trials',15; 'BL_switch_n',4;
+%     'BL_cap',60; 'SND_window',60; 'SND_min_per_cell',8; 'SND_min_trials',40;
+%     'S7_window',60; 'S7_min_per_cell',8; 'AB7_strong_trials',40; 'AB7_restrong',30;
+%     'AB7_probe_window',30; 'S8_min_sessions',3; 'S8_last_pass',2; 'S8_min_trials',60;
+%     'persist_trials',30; 'min_valid_trials',20; 'stall_sessions',3};
+%   VirtualRat('run', 'sessions', 15, 'trials', 250, 'params', fast);
+%   (a parameter name the protocol does not have is reported in red and skipped)
+
 % NOTES
 %   - Time spent waiting for dispatcher in check_next_trial_ready is
 %     stretched by the speed factor (dispatcher polls in real time), so
@@ -133,7 +136,9 @@ p = struct('experimenter', 'VirtualRat', 'ratname', 'VR01', 'speed', 10, ...
     'pause_prob', 0.03, 'pause_mean', 5, 'learn_tau', 1500, 'seed', [], 'custom', []);
 p = parse_pairs(p, varargin);
 if ~isempty(p.seed)
-    if exist('rng', 'file') || exist('rng', 'builtin'), rng(p.seed); else rand('twister', p.seed); end %#ok<RAND>
+    % legacy calls: dispatcher('init') switches MATLAB to the legacy generators,
+    % after which rng(seed) is an error
+    rand('twister', p.seed); randn('state', p.seed); %#ok<RAND>
 end
 
 S.active = 0;

@@ -26,8 +26,8 @@ switch action
         SoloParamHandle(obj, 'thisstimlog', 'value', []);
         SoloParamHandle(obj, 'stim_mode_log', 'value', {});   % mode actually used on each trial
         % Random seed used to generate this trial's noise, so the exact sound
-        % can be regenerated offline (rng(seed) then the same noisestim /
-        % singlenoise calls). NaN when no sound was played.
+        % can be regenerated offline: rand('twister',seed); randn('state',seed);
+        % then the same noisestim / singlenoise calls. NaN when no sound was played.
         SoloParamHandle(obj, 'stim_seed', 'value', NaN);
         
         %% Formatting graphics elements
@@ -306,15 +306,21 @@ switch action
                 A1_length = floor(T * srate);
                 A1_sigma.value = value(thisstim);
                 % Generate the noise from a stored seed, then restore the main
-                % random stream so trial selection is not affected.
-                rng_saved = rng;
-                seed = randi(2^31 - 2);
-                rng(seed);
+                % random state so trial selection is not affected.
+                % dispatcher('init') puts MATLAB into the LEGACY generators
+                % (rand('twister',..), randn('state',..)), and rng() cannot be
+                % used then, so the legacy calls are used here as well.
+                st_rand  = rand('twister');  %#ok<RAND>
+                st_randn = randn('state');   %#ok<RAND>
+                seed = floor(rand(1) * (2^31 - 2)) + 1;
+                rand('twister', seed);       %#ok<RAND>
+                randn('state', seed);        %#ok<RAND>
                 stim_seed.value = seed;
                 [rawA1, rawA2, normA1, normA2]=noisestim(1,1,T,value(fcut),Fs,value(filter_type)); %#ok<ASGLU>
                 modulator=singlenoise(1,T,[value(lfreq) value(hfreq)],Fs,'BUTTER');
                 AUD1=normA1(1:A1_length) .* modulator(1:A1_length).*A1_sigma;
-                rng(rng_saved);
+                rand('twister', st_rand);    %#ok<RAND>
+                randn('state', st_randn);    %#ok<RAND>
             end
 
             if ~isempty(AUD1)
@@ -352,7 +358,7 @@ switch action
             thisstim.value = NaN;
             stim_seed.value = NaN;
         end
-        if play_sound && frequency_categorization
+        if play_sound && value(frequency_categorization) == 1
             stim_seed.value = NaN;   % tones are deterministic
         end
 
