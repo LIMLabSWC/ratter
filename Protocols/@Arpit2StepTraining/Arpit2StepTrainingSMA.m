@@ -80,12 +80,7 @@ switch action
         play_sound = ti.centre_required && ~strcmpi(value(Stimuli_State), 'No Sound') && ...
                      ~strcmpi(ti.category, 'NONE');
 
-        % 'happenings' exist only on the real state machines (Bpod / RT Linux).
-        % The software emulator (fake_rp_box 3 or 4, SoftSMMarkII / softsm)
-        % has no SetHappeningSpec, so they are switched off there. Nothing
-        % changes on a rig.
-        use_happenings = ~ismember(bSettings('get', 'RIGS', 'fake_rp_box'), [3 4]);
-        sma = StateMachineAssembler('full_trial_structure', 'use_happenings', double(use_happenings));
+        sma = StateMachineAssembler('full_trial_structure', 'use_happenings', 1);
 
         %%%%%%%%%%%%%%%% SCHEDULED WAVES %%%%%%%%%%%%%%%%%%%%%%%
         if play_sound
