@@ -27,7 +27,7 @@ function [sm] = EnqueueEvent(varargin)
       end;
       
       evtId = 0;
-      ts = etime(clock, sm.T0);
+      ts = emu_time(sm);
     end;        
     
     if (sm.ReadyForTrialFlg & nextState == sm.ReadyForTrialJumpstate),

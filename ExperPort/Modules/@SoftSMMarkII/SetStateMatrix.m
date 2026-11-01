@@ -27,9 +27,32 @@
 %                   (2) that SetStateMatrix() should only be called
 %                   in between trials.
 %
-function [sm] = SetStateMatrix(sm, mat, set_on_state0_flag)
+%                Added 2026: also accepts the name/value form used by
+%                StateMachineAssembler/send.m (same as @RTLSM2/@BpodSM):
+%                  SetStateMatrix(sm, mat, 'pend_sm_swap_flg', 1, ...
+%                                 'use_happenings', happList_or_0)
+%                where happList is the per-state happening list.
+%
+function [sm] = SetStateMatrix(sm, mat, varargin)
 
-   if nargin < 3, set_on_state0_flag = 0; end;
+   set_on_state0_flag = 0;
+   happList           = [];
+   if numel(varargin) == 1,
+     set_on_state0_flag = varargin{1};
+   elseif numel(varargin) > 1,
+     if mod(numel(varargin), 2) ~= 0,
+       error('SetStateMatrix: optional arguments must be name/value pairs');
+     end;
+     for k = 1:2:numel(varargin),
+       switch varargin{k},
+         case 'pend_sm_swap_flg', set_on_state0_flag = varargin{k+1};
+         case 'use_happenings',
+           if iscell(varargin{k+1}), happList = varargin{k+1}; else happList = []; end;
+         otherwise,
+           error('SetStateMatrix: unknown option "%s"', varargin{k});
+       end;
+     end;
+   end;
    
     sm = get(sm.Fig, 'UserData');
 
@@ -41,6 +64,7 @@ function [sm] = SetStateMatrix(sm, mat, set_on_state0_flag)
     end;
 
     sm.NextStateMatrix = mat;
+    sm.NextHappList    = happList;
     sm.SetStateMatrixOnState0 = set_on_state0_flag;
 
     set(sm.Fig, 'USerData', sm);

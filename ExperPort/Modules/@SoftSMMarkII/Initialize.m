@@ -29,6 +29,17 @@ function [sm] = Initialize(sm)
     sm.NumContChans = 16;
     sm.TrigChanOffset = 0;
     sm.NumTrigChans = 0;
+    % Added 2026: reset happenings / scheduled inputs; the speed factor and
+    % the rat callback are kept, but the clock restarts from 0.
+    sm.UseHappenings = 0;
+    sm.HappSpec      = [];
+    sm.HappList      = {};
+    sm.NextHappSpec  = [];
+    sm.NextHappList  = [];
+    sm.EventIsHapp   = zeros(0,1);
+    sm.SpeedEmuT0    = 0;
+    sm.SpeedRealT0   = sm.T0;
+    sm.PendingInputs = zeros(0,3);
     
     set(sm.ToneTrigLabel, 'String', '(None)');
 

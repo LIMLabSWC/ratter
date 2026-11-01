@@ -7,7 +7,7 @@ function sm = UpdateCurrentTimeGUI(varargin)
     sm = varargin{1}; 
 
     if (nargin == 1),
-      ts = etime(clock, sm.T0);
+      ts = emu_time(sm);
     else
       ts = varargin{2};
     end;

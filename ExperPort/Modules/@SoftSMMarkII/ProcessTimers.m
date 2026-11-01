@@ -89,6 +89,10 @@ function [sm] = do_single_scheduled_wave(sm, id, in_or_out, ts),
             sm = EventColTriggered(sm, sw.inEvtCol+1, ts);
          end;
          if (sw.dioLine > -1), DIOWrite(sm, sw.dioLine, 1); end;          
+         if sm.UseHappenings, % added 2026: <wave>_In / _Hi happenings
+            sm.SchedWaves{id, 1} = sw;
+            sm = happ_wave_edge(sm, sw.id, 'in', ts);
+         end;
       
       case 'out',
         sw.didDOWN = 1;
@@ -97,6 +101,10 @@ function [sm] = do_single_scheduled_wave(sm, id, in_or_out, ts),
            sm = EventColTriggered(sm, sw.outEvtCol+1, ts);
         end;
         if (sw.dioLine > -1), DIOWrite(sm, sw.dioLine, 0); end;
+        if sm.UseHappenings, % added 2026: <wave>_Out / _Lo happenings
+           sm.SchedWaves{id, 1} = sw;
+           sm = happ_wave_edge(sm, sw.id, 'out', ts);
+        end;
           
       end;
       if ( ts >= sw.startTS + sw.preamble + sw.sustain + sw.refraction ),

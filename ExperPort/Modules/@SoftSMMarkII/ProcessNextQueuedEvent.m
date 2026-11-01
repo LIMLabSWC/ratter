@@ -21,6 +21,7 @@ function [sm] = ProcessNextQueuedEvent(sm)
     sm.EventCount = sm.EventCount + 1;    
     sm.EventList(sm.EventCount,1:4) = ...
         [ prevState  evtId ts newState ];
+    sm.EventIsHapp(sm.EventCount,1) = sm.UseHappenings; % added 2026, see GetEvents2.m
     sm.CurrentState = newState;
     
     if newState == 0, 
@@ -33,6 +34,15 @@ function [sm] = ProcessNextQueuedEvent(sm)
       sm.CurrentStateTS = ts;
       sm = UpdateStateUI(sm);
       sm = DoOutputs(sm, ts);
+      % Added 2026: line/wave "hi"/"lo" happenings that are already true
+      % when a state is entered fire at once (as on Bpod), and VirtualRat
+      % (if attached) is told about the new state.
+      if sm.UseHappenings && size(sm.EventQueue, 1) == 0,
+        sm = happ_check_levels(sm, newState, ts);
+      end;
+      if ~isempty(sm.RatCallback),
+        sm = notify_rat(sm, ts, 'state');
+      end;
     else % don't change start_time, jump to self, don't do outputs, 
 
        % Only change start time if we jumped to self and evtId was a timer

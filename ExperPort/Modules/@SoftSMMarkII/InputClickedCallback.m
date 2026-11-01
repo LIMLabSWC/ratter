@@ -38,8 +38,13 @@ function [sm] = InputClickedCallback(sender, event, sm, ioLine)
       sm.InputState
     end;
 
-    ts = etime(clock, sm.T0);
+    ts = emu_time(sm);
     
+    if sm.UseHappenings,
+      % Added 2026: this trial's matrix uses happenings (Cin, Chi, ...)
+      sm = happ_edge(sm, ioLine, newVal, ts);
+    else
+
     if (oldVal > newVal),
       % edge-down transition..
       [i, evtColPos, v] = find(sm.InputEvents == -ioLine);
@@ -55,6 +60,8 @@ function [sm] = InputClickedCallback(sender, event, sm, ioLine)
         sm = EventColTriggered(sm, evtColPos(1,i), ts);
       end;
     end;
+
+    end; % if sm.UseHappenings
 
     if (sm.debug),
       disp(sprintf('inputclicked time: %05.5f', ts));

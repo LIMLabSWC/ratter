@@ -122,11 +122,15 @@ switch action
         next_row(y);
 
         % ---- Saveable internal state (persists across day-to-day reload) ----
-        SoloParamHandle(obj, 'Stage2a_block_counter', 'value', 0);
-        SoloParamHandle(obj, 'Stage2a_current_dist',  'value', '');
-        SoloParamHandle(obj, 'Stage3_switch_fired',   'value', false); % internal only, not shown
-        SoloParamHandle(obj, 'Stage4_run_length_done','value', 0);
-        SoloParamHandle(obj, 'Stage4_current_mode',   'value', '');
+        % Plain (non-GUI) SoloParamHandles are only written to the settings
+        % file when 'save_with_settings' is 1. Without it these four restarted
+        % empty every session, so Stage 2a never completed a run of
+        % RunLength_N sessions and Stage 4 picked a new mode every session.
+        SoloParamHandle(obj, 'Stage2a_block_counter', 'value', 0,  'save_with_settings', 1);
+        SoloParamHandle(obj, 'Stage2a_current_dist',  'value', '', 'save_with_settings', 1);
+        SoloParamHandle(obj, 'Stage3_switch_fired',   'value', false); % per session, reset at trial 1, not saved
+        SoloParamHandle(obj, 'Stage4_run_length_done','value', 0,  'save_with_settings', 1);
+        SoloParamHandle(obj, 'Stage4_current_mode',   'value', '', 'save_with_settings', 1);
 
         % Set correct initial visibility/status for the default stage.
         TrainingProtocolSection(obj, 'RefreshVisibility');
@@ -413,6 +417,18 @@ switch action
     % ------------------------------------------------------------------
     %              FIGURE / VISIBILITY CASES
     % ------------------------------------------------------------------
+    % ------------------------------------------------------------------
+    %   ENABLE_CONTROLS: called from SideSection's lock button
+    %   (varargin{1} = 1 unlock, 0 lock)
+    % ------------------------------------------------------------------
+    case 'enable_controls'
+        h = {TrainingStage, RunLength_N, Stage3_SwitchTrialMin, Stage3_SwitchTrialMax, ...
+             Stage3_SwitchTrial_ThisSession, Stage4_Include_Uniform, Stage4_Include_SingleAsym, ...
+             Stage4_Include_SwitchAsym};
+        for i = 1:numel(h)
+            if varargin{1} == 1, enable(h{i}); else, disable(h{i}); end
+        end
+
     case 'close'
         set(value(myfig), 'visible', 'off');
         if exist('myfig', 'var') && isa(myfig, 'SoloParamHandle') && ishandle(value(myfig)) %#ok<NODEF>
