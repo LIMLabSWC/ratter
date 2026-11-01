@@ -1,9 +1,10 @@
 function varargout = TrainingStageSection(obj, action, varargin)
-% TrainingStageSection  -  automatic training stages for Arpit2StepTraining
+% TrainingStageSection  -  automatic training for Arpit2StepTraining
 %
-% Each stage sets the trial structure through SideSection('set_stage_params'),
-% StimulusSection and AntibiasSection, and is checked for completion after
-% every trial (stage 7: at the end of every session).
+% Two tracks run in parallel:
+%
+% A) TRAINING STAGES (what the rat has to do with its body: pokes, hold,
+%    and from stage 7 on, using the rule without being helped)
 %
 %   1 Side pokes (free)   No centre poke. Side LEDs both on or both off
 %                         (uninformative). Either port pays, unlimited time.
@@ -22,49 +23,71 @@ function varargout = TrainingStageSection(obj, action, varargin)
 %                         >= S4_min_session_trials this session, recent
 %                         violation / timeout rates below threshold, stage
 %                         violation rate below S4_stage_violation.
-%   5 Two-step (easy)     TwoStep trials: one side lit, one dark, sound
-%                         during the hold. The hold keeps growing from
-%                         S4_max_CP (1 s) to S5_target_CP (2.2 s); the
-%                         stimulus has a fixed length S_A1_time (0.4 s) and
-%                         its onset varies within the hold. CueRule is
-%                         locked from here on. (Discrete, S5_n_levels per
-%                         category, symmetric, <= max_dB_discrete). Second
-%                         chance after a wrong poke (reward_type Always).
-%                         4-cell antibias ON (Auto beta, floor S5_AB_floor).
-%                         Done: hold >= S5_target_CP and every cell >=
-%                         S5_cell_thresh over the last S5_window valid
-%                         2-step trials of the session (>= S5_min_per_cell
-%                         trials per cell).
-%   6 Expand              The hold is drawn every trial in [S6_cp_min,
-%                         S6_cp_max] (1.5-2.2 s), the stimulus (0.4 s) onset
-%                         varies within it (same in stage 7).
-%                         A ladder of sub-steps (S6_LADDER below). Each step
-%                         makes the task harder in one or two ways: more
-%                         stimulus levels -> full continuous distribution,
-%                         second chance -> delayed second chance -> no second
-%                         chance, antibias floor rising towards 0.25 (= off).
-%                         A step is passed when every cell >= the threshold
-%                         (S6_thresh_discrete or S6_thresh_full) over the
-%                         last S6_window valid 2-step trials since the step
-%                         started in this session (>= S6_min_per_cell per
-%                         cell, >= S6_min_trials in total). Passing the last
-%                         step moves the rat to stage 7.
-%   7 Probation           Test conditions: Full distribution, no second
-%                         chance, antibias OFF, MaxSame / MaxSameCat = Inf,
-%                         and a longer error time-out (S7_error_iti) so that
-%                         errors cost time and cannot be offset by doing more
-%                         trials in the fixed session.
-%                         Judged once per session (end of session): a session
-%                         passes when it has >= S7_min_trials valid trials,
-%                         every cell >= S7_cell_thresh, and a logistic fit
+%   5 Hold + sound        TwoStep trials (one side lit, one dark, sound during
+%                         the hold). The aim is the HOLD: the rat learns to
+%                         wait for the go cue instead of anticipating the
+%                         sound. The sound is there so that the rule is
+%                         learnt at the same time (conjunctively), but it is
+%                         NOT part of the exit criterion. The hold grows from
+%                         S4_max_CP to S5_target_CP; the stimulus has a fixed
+%                         length S_A1_time and its onset varies within the
+%                         hold. CueRule is locked from here on. Starts with
+%                         short blocks of one category (BL1-BL3). 4-cell
+%                         antibias (Standard, floor S5_AB_floor).
+%                         Done: hold >= S5_target_CP, >= S5_min_trials valid
+%                         trials in the stage, recent violation / timeout
+%                         below threshold, stage violation < S5_stage_violation.
+%   6 Random hold         The hold is drawn every trial in [S6_cp_min,
+%                         S6_cp_max] (same in stages 7-8), so the go cue
+%                         cannot be timed. Antibias as stage 5.
+%                         Done: >= S6_min_trials valid trials in the stage,
+%                         recent rates below threshold, stage violation
+%                         < S6_stage_violation.
+%   7 Rule & antibias     The rule must now be used. The antibias plays a
+%                         cycle so the rat learns that strategies do not pay:
+%                           STRONG for AB7_strong_trials valid trials, then
+%                           FREE (gentle antibias) - the rat is watched over
+%                           the last AB7_probe_window valid trials. If it
+%                           starts to exploit something (one side, the lit
+%                           port, one category, or one cell much worse than
+%                           another) the antibias goes STRONG again for
+%                           AB7_restrong trials, then FREE again, ...
+%                         Done (checked every trial, only in a FREE phase):
+%                         sound level 6 reached, no blocks, no exploitation,
+%                         and every cell >= S7_cell_thresh over the last
+%                         S7_window valid trials of the FREE phase
+%                         (>= S7_min_per_cell per cell).
+%   8 Test (no antibias)  Run like the experiment: Full distribution, no
+%                         second chance, antibias OFF, MaxSame = Inf, longer
+%                         error time-out S8_error_iti. Judged at the end of
+%                         each session by a logistic fit
 %                             P(responded loud) = f(b0 + b1*stim + b2*side)
-%                         gives a clear stimulus effect (b1/SE > 2) and no
-%                         category bias (b0) or side bias (b2): each must be
-%                         within +/- S7_max_bias (logit units) and not
-%                         significant (|b|/SE < 2). After S7_sessions passing
-%                         sessions in a row the rat is flagged READY FOR TEST.
-%                         A failing session resets the count.
+%                         A session passes with >= S8_min_trials valid trials,
+%                         every cell >= S8_cell_thresh, a clear stimulus effect
+%                         (b1/SE > 2) and no category (b0) or side (b2) bias
+%                         (|b| <= S8_max_bias and |b|/SE < 2).
+%                         A session with a CLEAR bias or no stimulus effect
+%                         sends the rat back to stage 7 (antibias again).
+%                         READY FOR TEST (and handover to Arpit2StepTask):
+%                         >= S8_min_sessions sessions in stage 8 AND the last
+%                         S8_last_pass sessions all passed. The rat cannot
+%                         come back from Arpit2StepTask, so this is strict.
 %   Manual                Nothing is changed automatically.
+%
+% B) SOUND LEVEL (what the rat has to learn about the sound), independent of
+%    the stages, with its own criterion. Used in stages 5-7 (stage 8 is
+%    always level 6):
+%      1 Discrete, 1 level per category, second chance (reward_type Always)
+%      2 Discrete, 2 levels,  second chance
+%      3 Discrete, 4 levels,  delayed second chance (1 s)
+%      4 Discrete, 4 levels,  delayed second chance (3 s)
+%      5 Full distribution,   delayed second chance (3 s)
+%      6 Full distribution,   no second chance (as in the experiment)
+%    Next level (checked every trial when Auto training is ON and the trials
+%    are in random order, i.e. not in blocks): every cell >= SND_thresh_discrete
+%    (levels 1-4) or SND_thresh_full (level 5) over the last SND_window valid
+%    2-step trials at this level in this session (>= SND_min_per_cell per
+%    cell, >= SND_min_trials in total). Can be set by hand (unlock first).
 %
 % Persistence: values that must survive between sessions are
 % SoloParamHandles with 'save_with_settings' = 1 (the same mechanism that
@@ -75,17 +98,36 @@ function varargout = TrainingStageSection(obj, action, varargin)
 GetSoloFunctionArgs(obj);
 
 STAGES = {'1 Side pokes (free)', '2 Side pokes (timed)', '3 Centre poke', ...
-          '4 Hold grows', '5 Two-step (easy)', '6 Expand', '7 Probation', 'Manual'};
-N_AUTO_STAGES = 7;
+          '4 Hold grows', '5 Hold + sound', '6 Random hold', '7 Rule & antibias', ...
+          '8 Test (no antibias)', 'Manual'};
+N_AUTO_STAGES = 8;
+% One-line description of each stage (tooltips on the stage menu, the
+% 'About' line in the main window, and the stage headers of the window)
+STAGE_DESC = { ...
+  'No centre poke. Side ports open, either side pays, lights say nothing. Go sound silent, then ramps in. Side antibias + MaxSame keep both sides used. Next: S1 valid trials and side switches.', ...
+  'As stage 1, but the choice window shrinks (S2 RColl max -> min); no poke in time = timeout. Next: S2 valid trials and side switches.', ...
+  'Trials start with a centre poke; the hold starts at S3 start CP and grows; then either side pays. Next: hold reaches the settling time and S3 min valid trials.', ...
+  'The hold grows to S4 max CP (violations now count). Next: hold = S4 max CP, enough trials today, recent and stage violation/timeout rates below limits.', ...
+  'Learn to hold through the sound and wait for the go cue (hold grows to S5 target CP). Sound is on so the rule is learnt alongside (sound level runs on its own). Blocks first, 4-cell antibias. Next: hold reached, S5 min trials, violation/timeout limits.', ...
+  'The hold is random every trial (S6 hold min-max), so the go cue cannot be timed. Next: S6 min trials, violation/timeout limits.', ...
+  'Use the rule. Antibias cycle: STRONG, then FREE (gentle) while the rat is watched for strategies; a strategy -> STRONG again. Next: sound level 6, in a FREE phase every cell >= S7 hit/cell, no strategy.', ...
+  'Test, run like the experiment (Full, no reward on errors, NO antibias). Each session is judged by a logistic fit. A clear bias -> back to stage 7. Handover after >= S8 min sessions with the last S8 passing all passed.', ...
+  'Manual: no automation; set everything by hand.'};
+% Short form for the 'About' line in the main window (fits 140 px)
+STAGE_SHORT = {'either side pays', 'choice time shrinks', 'centre poke, hold grows', ...
+  'hold grows to S4 max', 'hold + sound, blocks', 'random hold', 'rule, antibias cycle', ...
+  'test, no antibias', 'no automation'};
 
-% Stage 6 ladder: one row per sub-step
-%   Stimuli_State | levels per category (Discrete) | reward_type | second-chance delay (s) | antibias floor
-S6_LADDER = { ...
-    'Discrete', 2,   'Always',        0, 0.15; ...
-    'Discrete', 4,   'DelayedReward', 1, 0.18; ...   % 8 levels: psychometric becomes available
-    'Discrete', 4,   'DelayedReward', 3, 0.20; ...
-    'Full',     NaN, 'DelayedReward', 3, 0.20; ...
-    'Full',     NaN, 'NoReward',      0, 0.22};
+% Sound levels (track B): one row per level
+%   menu name | Stimuli_State | levels per category (Discrete) | reward_type | second-chance delay (s)
+SOUND_LEVELS = { ...
+    '1 Discr. 1, 2nd ch.',  'Discrete', 1,   'Always',        0; ...
+    '2 Discr. 2, 2nd ch.',  'Discrete', 2,   'Always',        0; ...
+    '3 Discr. 4, delay 1',  'Discrete', 4,   'DelayedReward', 1; ...   % 8 levels: psychometric available
+    '4 Discr. 4, delay 3',  'Discrete', 4,   'DelayedReward', 3; ...
+    '5 Full, delay 3',      'Full',     NaN, 'DelayedReward', 3; ...
+    '6 Full, no 2nd ch.',   'Full',     NaN, 'NoReward',      0};
+N_SND = size(SOUND_LEVELS, 1);
 
 switch action
 
@@ -95,152 +137,220 @@ switch action
     case 'init'
         x = varargin{1}; y = varargin{2};
 
+        % ---- Main window (top of column 4): current stage and how to change it ----
         ToggleParam(obj, 'TrainingStageShow', 0, x, y, ...
             'OnString', 'Training Stages Shown', 'OffString', 'Show Training Stages', ...
-            'TooltipString', 'Show/Hide the training stage panel');
+            'TooltipString', 'Show/Hide the window with the stage thresholds and per-stage summary');
         set_callback(TrainingStageShow, {mfilename, 'show_hide'});
         next_row(y);
-        DispParam(obj, 'StageStatus', '', x, y, 'label', 'Stage', 'labelfraction', 0.2, ...
-            'position', [x y 400 20]);
+        DispParam(obj, 'StageBrief', '', x, y, 'label', 'Progress', 'labelfraction', 0.3, 'TooltipString', ...
+            'Valid trials and sessions in this stage (details at the top of the Training Stages window)');
+        next_row(y);
+        DispParam(obj, 'StageAbout', STAGE_SHORT{1}, x, y, 'label', 'About', 'labelfraction', 0.3, 'TooltipString', ...
+            'What the current stage does (full text: hover over the Stage menu, or open Show Training Stages)');
+        set(get_ghandle(StageAbout), 'HorizontalAlignment', 'left');
+        next_row(y);
+        DispParam(obj, 'StageHit', '-', x, y, 'label', 'Stage hit', 'labelfraction', 0.3, 'TooltipString', ...
+            'Hit rate in this stage over all its sessions, and today (hits / valid trials)');
+        next_row(y);
+        ToggleParam(obj, 'use_auto_train', 1, x, y, 'OnString', 'Auto training ON', ...
+            'OffString', 'Auto training OFF', 'TooltipString', ...
+            'If OFF, the stage and sound-level parameters are still applied but the rat never moves on automatically');
+        next_row(y);
+        tip = sprintf(['Sound level, used in stages 5-7 (stage 8 always uses level 6).\n' ...
+            'It moves on by its own criterion (Training Stages window, "Sound level"),\n' ...
+            'independent of the stage. To change it by hand: unlock, then pick a level.\n']);
+        for k = 1:N_SND
+            if strcmp(SOUND_LEVELS{k, 2}, 'Full'), d = 'Full distribution'; else, d = sprintf('Discrete, %d per category', SOUND_LEVELS{k, 3}); end
+            switch SOUND_LEVELS{k, 4}
+                case 'Always',        r = 'second chance';
+                case 'DelayedReward', r = sprintf('second chance after %d s', SOUND_LEVELS{k, 5});
+                otherwise,            r = 'no second chance';
+            end
+            tip = sprintf('%s\n%d: %s, %s', tip, k, d, r);
+        end
+        MenuParam(obj, 'SoundLevel', SOUND_LEVELS(:, 1)', SOUND_LEVELS{1, 1}, x, y, 'label', 'Sound', ...
+            'labelfraction', 0.25, 'TooltipString', tip);
+        set_callback(SoundLevel, {mfilename, 'SoundLevel_Changed'});
+        next_row(y);
+        tip = sprintf('Current training stage (dropdown). To change it by hand: click the Locked button below, then pick a stage.\nChanging it restarts that stage''s progress counters.\n');
+        for k = 1:numel(STAGES), tip = sprintf('%s\n%s: %s', tip, STAGES{k}, STAGE_DESC{k}); end
+        MenuParam(obj, 'TrainingStage', STAGES, STAGES{1}, x, y, 'label', 'Stage', ...
+            'labelfraction', 0.25, 'TooltipString', tip);
+        set_callback(TrainingStage, {mfilename, 'Stage_Changed'});
+        next_row(y);
+        SubheaderParam(obj, 'stage_main_title', 'Training stage', x, y);
         next_row(y);
 
         oldx = x; oldy = y; parentfig = double(gcf);
 
         SoloParamHandle(obj, 'myfig', 'value', figure( ...
             'closerequestfcn', [mfilename '(' class(obj) ', ''hide'');'], ...
-            'MenuBar', 'none', 'Name', 'Training Stages', 'Units', 'normalized', ...
-            'Position', [0.15, 0.1, 0.7, 0.8], 'Visible', 'off'), 'saveable', false);
+            'MenuBar', 'none', 'Name', 'Training Stages', 'Units', 'pixels', ...
+            'Position', [60 80 1190 680], 'Visible', 'off'), 'saveable', false);
+        LF = 0.62;   % label fraction in this window: wider labels, numbers need little room
 
         x = 10; y = 5;
 
-        % ---- column 1: stages 6-7 ----
-        NumeditParam(obj, 'S7_error_iti', 7, x, y, 'label', 'S7 error time-out (s)', 'TooltipString', ...
-            'Stage 7: longer time-out after a wrong poke, so errors cost time and cannot be offset by doing more trials'); next_row(y);
+        % ---- column 1: stages 8 and 7 ----
         ToggleParam(obj, 'handover_on', 1, x, y, 'OnString', 'Hand over to Arpit2StepTask: ON', ...
             'OffString', 'Hand over to Arpit2StepTask: OFF', 'TooltipString', sprintf([ ...
             'When the rat is READY FOR TEST, write tomorrow''s Arpit2StepTask settings file\n' ...
             'with this rat''s values, so runrats loads the experiment protocol next session.'])); next_row(y);
-        NumeditParam(obj, 'S7_sessions', 3, x, y, 'label', 'S7 passing sessions'); next_row(y);
-        NumeditParam(obj, 'S7_max_bias', 0.5, x, y, 'label', 'S7 max |bias| (logit)'); next_row(y);
-        NumeditParam(obj, 'S7_cell_thresh', 0.65, x, y, 'label', 'S7 hit/cell'); next_row(y);
-        NumeditParam(obj, 'S7_min_trials', 200, x, y, 'label', 'S7 min valid trials'); next_row(y);
-        DispParam(obj, 'S7_last_result', '', x, y, 'label', 'S7 last session', 'labelfraction', 0.3, ...
-            'position', [x y 400 20]); next_row(y);
-        SubheaderParam(obj, 'sub7', 'Stage 7: Probation (end of session)', x, y); next_row(y, 1.5);
+        NumeditParam(obj, 'S8_error_iti', 7, x, y, 'labelfraction', LF, 'label', 'S8 error timeout (s)', 'TooltipString', ...
+            'Stage 8: longer time-out after a wrong poke, so errors cost time and cannot be offset by doing more trials'); next_row(y);
+        NumeditParam(obj, 'S8_max_bias', 0.5, x, y, 'labelfraction', LF, 'label', 'S8 max |bias| (logit)'); next_row(y);
+        NumeditParam(obj, 'S8_cell_thresh', 0.65, x, y, 'labelfraction', LF, 'label', 'S8 hit/cell'); next_row(y);
+        NumeditParam(obj, 'S8_min_trials', 200, x, y, 'labelfraction', LF, 'label', 'S8 min valid tr/sess'); next_row(y);
+        NumeditParam(obj, 'S8_last_pass', 5, x, y, 'labelfraction', LF, 'label', 'S8 last sess. passing', 'TooltipString', ...
+            'Handover needs this many passing sessions in a row, ending with the last one'); next_row(y);
+        NumeditParam(obj, 'S8_min_sessions', 7, x, y, 'labelfraction', LF, 'label', 'S8 min sessions', 'TooltipString', ...
+            'At least this many sessions in stage 8 (about one week) before the handover'); next_row(y);
+        SubheaderParam(obj, 'sub8', 'Stage 8: Test (no antibias)', x, y, 'TooltipString', STAGE_DESC{8}); next_row(y, 1.5);
 
-        NumeditParam(obj, 'S6_error_iti', 1, x, y, 'label', 'S5-6 error time-out (s)', 'TooltipString', ...
-            'Time-out after a wrong poke in stages 5-6 (used on the NoReward step)'); next_row(y);
-        NumeditParam(obj, 'S6_thresh_full', 0.65, x, y, 'label', 'S6 hit/cell (Full)'); next_row(y);
-        NumeditParam(obj, 'S6_thresh_discrete', 0.7, x, y, 'label', 'S6 hit/cell (Discrete)'); next_row(y);
-        NumeditParam(obj, 'S6_min_trials', 100, x, y, 'label', 'S6 min trials/step'); next_row(y);
-        NumeditParam(obj, 'S6_min_per_cell', 20, x, y, 'label', 'S6 min trials/cell'); next_row(y);
-        NumeditParam(obj, 'S6_window', 200, x, y, 'label', 'S6 window (valid tr)'); next_row(y);
-        NumeditParam(obj, 'S6_cp_max', 2.2, x, y, 'label', 'S6-7 hold max (s)'); next_row(y);
-        NumeditParam(obj, 'S6_cp_min', 1.5, x, y, 'label', 'S6-7 hold min (s)', 'TooltipString', ...
-            'Stages 6-7: the hold is drawn every trial between min and max; the stimulus onset varies within it'); next_row(y);
-        DispParam(obj, 'S6_step_disp', 1, x, y, 'label', 'S6 current step'); next_row(y);
-        SubheaderParam(obj, 'sub6', 'Stage 6: Expand (ladder of 5 steps)', x, y); next_row(y, 1.5);
+        NumeditParam(obj, 'AB7_cell_gap', 0.3, x, y, 'labelfraction', LF, 'label', 'Strategy: cell gap >=', 'TooltipString', ...
+            'FREE phase: best cell hit rate minus worst cell hit rate >= this counts as a strategy'); next_row(y);
+        NumeditParam(obj, 'AB7_frac', 0.7, x, y, 'labelfraction', LF, 'label', 'Strategy: frac >=', 'TooltipString', sprintf([ ...
+            'FREE phase: one side, the lit port, or one category ("loud") chosen\n' ...
+            'on >= this fraction (or <= 1-this) of the probe window counts as a strategy'])); next_row(y);
+        NumeditParam(obj, 'AB7_probe_window', 80, x, y, 'labelfraction', LF, 'label', 'Probe window (valid)', 'TooltipString', ...
+            'FREE phase: strategies are checked over the last this many valid trials of the phase'); next_row(y);
+        NumeditParam(obj, 'AB7_restrong', 150, x, y, 'labelfraction', LF, 'label', 'Re-strong (valid tr)', 'TooltipString', ...
+            'Length of a STRONG phase after a strategy was seen (or after coming back from stage 8)'); next_row(y);
+        NumeditParam(obj, 'AB7_strong_trials', 300, x, y, 'labelfraction', LF, 'label', 'First strong (valid)', 'TooltipString', ...
+            'Length of the first STRONG antibias phase when the rat enters stage 7'); next_row(y);
+        NumeditParam(obj, 'S7_min_per_cell', 20, x, y, 'labelfraction', LF, 'label', 'S7 min trials/cell'); next_row(y);
+        NumeditParam(obj, 'S7_window', 200, x, y, 'labelfraction', LF, 'label', 'S7 window (valid tr)'); next_row(y);
+        NumeditParam(obj, 'S7_cell_thresh', 0.7, x, y, 'labelfraction', LF, 'label', 'S7 hit/cell'); next_row(y);
+        DispParam(obj, 'AB7_phase_disp', '-', x, y, 'labelfraction', 0.4, 'label', 'Antibias phase'); next_row(y);
+        SubheaderParam(obj, 'sub7', 'Stage 7: Rule & antibias', x, y, 'TooltipString', STAGE_DESC{7}); next_row(y, 1.5);
 
-        % ---- column 2: stages 4-5 ----
+        % ---- column 2: stages 6 and 5, blocks ----
         next_column(x); y = 5;
-        NumeditParam(obj, 'S5_min_per_cell', 20, x, y, 'label', 'S5 min trials/cell'); next_row(y);
-        NumeditParam(obj, 'S5_window', 200, x, y, 'label', 'S5 window (valid tr)'); next_row(y);
-        NumeditParam(obj, 'S5_cell_thresh', 0.7, x, y, 'label', 'S5 hit/cell'); next_row(y);
-        NumeditParam(obj, 'S_A1_time', 0.4, x, y, 'label', 'S5-7 stimulus length (s)', 'TooltipString', ...
+        NumeditParam(obj, 'S6_stage_violation', 0.3, x, y, 'labelfraction', LF, 'label', 'S6 max stage viol'); next_row(y);
+        NumeditParam(obj, 'S6_min_trials', 300, x, y, 'labelfraction', LF, 'label', 'S6 min valid trials'); next_row(y);
+        NumeditParam(obj, 'S6_cp_max', 2.2, x, y, 'labelfraction', LF, 'label', 'S6-8 hold max (s)'); next_row(y);
+        NumeditParam(obj, 'S6_cp_min', 1.5, x, y, 'labelfraction', LF, 'label', 'S6-8 hold min (s)', 'TooltipString', ...
+            'Stages 6-8: the hold is drawn every trial between min and max; the stimulus onset varies within it'); next_row(y);
+        SubheaderParam(obj, 'sub6', 'Stage 6: Random hold', x, y, 'TooltipString', STAGE_DESC{6}); next_row(y, 1.5);
+
+        NumeditParam(obj, 'S5_stage_violation', 0.3, x, y, 'labelfraction', LF, 'label', 'S5 max stage viol'); next_row(y);
+        NumeditParam(obj, 'S5_min_trials', 300, x, y, 'labelfraction', LF, 'label', 'S5 min valid trials'); next_row(y);
+        NumeditParam(obj, 'S5_AB_floor', 0.15, x, y, 'labelfraction', LF, 'label', 'S5-6 antibias floor'); next_row(y);
+        NumeditParam(obj, 'S_error_iti', 1, x, y, 'labelfraction', LF, 'label', 'S5-7 error timeout (s)', 'TooltipString', ...
+            'Time-out after a wrong poke in stages 5-7 (matters on sound level 6, no second chance)'); next_row(y);
+        NumeditParam(obj, 'S_A1_time', 0.4, x, y, 'labelfraction', LF, 'label', 'S5-8 stim length (s)', 'TooltipString', ...
             'Fixed stimulus duration from stage 5 on'); next_row(y);
-        NumeditParam(obj, 'S5_target_CP', 2.2, x, y, 'label', 'S5 target CP', 'TooltipString', ...
+        NumeditParam(obj, 'S5_target_CP', 2.2, x, y, 'labelfraction', LF, 'label', 'S5 target CP', 'TooltipString', ...
             'Stage 5: the hold grows from S4 max CP to this value'); next_row(y);
-        NumeditParam(obj, 'S5_AB_floor', 0.15, x, y, 'label', 'S5 antibias floor'); next_row(y);
-        NumeditParam(obj, 'S5_n_levels', 1, x, y, 'label', 'S5 levels/category'); next_row(y);
-        SubheaderParam(obj, 'sub5', 'Stage 5: Two-step (easy)', x, y); next_row(y, 1.5);
+        SubheaderParam(obj, 'sub5', 'Stage 5: Hold + sound', x, y, 'TooltipString', STAGE_DESC{5}); next_row(y, 1.5);
         % ---- blocks ----
-        NumeditParam(obj, 'FB_bias', 0.8, x, y, 'label', 'Fallback if bias >=', 'TooltipString', ...
+        NumeditParam(obj, 'FB_bias', 0.8, x, y, 'labelfraction', LF, 'label', 'Fallback if bias >=', 'TooltipString', ...
             'End of session: lit-port or "loud" fraction >= this (or <= 1-this) puts the rat back into short blocks'); next_row(y);
-        NumeditParam(obj, 'FB_max', 2, x, y, 'label', 'Max fallbacks/stage'); next_row(y);
-        NumeditParam(obj, 'FB_level', 2, x, y, 'label', 'Fallback block level', 'TooltipString', ...
+        NumeditParam(obj, 'FB_max', 2, x, y, 'labelfraction', LF, 'label', 'Max fallbacks/stage'); next_row(y);
+        NumeditParam(obj, 'FB_level', 2, x, y, 'labelfraction', LF, 'label', 'Fallback block level', 'TooltipString', ...
             'Ladder level used for a fallback (2 = BL2 length), then it shrinks again'); next_row(y);
-        NumeditParam(obj, 'BL_cap', 300, x, y, 'label', 'Max valid trials/level', 'TooltipString', ...
+        NumeditParam(obj, 'BL_cap', 300, x, y, 'labelfraction', LF, 'label', 'Max valid tr/level', 'TooltipString', ...
             'A block level is left after this many valid trials even if the criterion is not met, so blocks never become a resting place'); next_row(y);
-        NumeditParam(obj, 'BL_min_trials', 40, x, y, 'label', 'Min valid trials/level'); next_row(y);
-        NumeditParam(obj, 'BL_acc', 0.7, x, y, 'label', 'Block hit rate >='); next_row(y);
-        NumeditParam(obj, 'BL_switch_acc', 0.6, x, y, 'label', 'Switch-trial hit >=', 'TooltipString', ...
+        NumeditParam(obj, 'BL_min_trials', 40, x, y, 'labelfraction', LF, 'label', 'Min valid tr/level'); next_row(y);
+        NumeditParam(obj, 'BL_acc', 0.7, x, y, 'labelfraction', LF, 'label', 'Block hit rate >='); next_row(y);
+        NumeditParam(obj, 'BL_switch_acc', 0.6, x, y, 'labelfraction', LF, 'label', 'Switch-trial hit >=', 'TooltipString', ...
             'Hit rate on the first valid trial of each block. Only the sound can tell the rat the rule changed, so this shows it is listening'); next_row(y);
-        NumeditParam(obj, 'BL_switch_n', 10, x, y, 'label', 'Switch trials needed'); next_row(y);
+        NumeditParam(obj, 'BL_switch_n', 10, x, y, 'labelfraction', LF, 'label', 'Switch trials needed'); next_row(y);
         NumeditParam(obj, 'BL1', 12, x, y, 'position', [x y 66 20], 'label', 'BL1', 'labelfraction', 0.45);
         NumeditParam(obj, 'BL2', 8,  x, y, 'position', [x+67 y 66 20], 'label', 'BL2', 'labelfraction', 0.45);
         NumeditParam(obj, 'BL3', 4,  x, y, 'position', [x+134 y 66 20], 'label', 'BL3', 'labelfraction', 0.45); next_row(y);
-        SubheaderParam(obj, 'subbl', 'Blocks (start of stage 5, fallback)', x, y); next_row(y, 1.5);
+        SubheaderParam(obj, 'subbl', 'Blocks (from stage 5, fallback)', x, y); next_row(y, 1.5);
 
-        NumeditParam(obj, 'recent_window', 50, x, y, 'label', 'Recent window (tr)'); next_row(y);
-        NumeditParam(obj, 'recent_timeout', 0.15, x, y, 'label', 'Max recent timeout'); next_row(y);
-        NumeditParam(obj, 'recent_violation', 0.15, x, y, 'label', 'Max recent violation'); next_row(y);
-        NumeditParam(obj, 'S4_stage_violation', 0.35, x, y, 'label', 'S4 max stage viol'); next_row(y);
-        NumeditParam(obj, 'S4_min_session_trials', 100, x, y, 'label', 'S4 min trials today'); next_row(y);
-        NumeditParam(obj, 'S4_frac_increase', 0.001, x, y, 'label', 'S4-7 CP frac increase'); next_row(y);
-        NumeditParam(obj, 'S4_max_CP', 1.0, x, y, 'label', 'S4 max CP', 'TooltipString', ...
-            'Stage 4 ends when the hold reaches this value; stage 5 (sound) starts from it'); next_row(y);
-        SubheaderParam(obj, 'sub4', 'Stage 4: Hold grows', x, y); next_row(y, 1.5);
-
-        % ---- column 3: stages 1-3 + stage selection ----
+        % ---- column 3: sound level, stages 4 and 3 ----
         next_column(x); y = 5;
-        NumeditParam(obj, 'S3_min_trials', 50, x, y, 'label', 'S3 min valid trials'); next_row(y);
-        NumeditParam(obj, 'S3_frac_increase', 0.002, x, y, 'label', 'S3 CP frac increase'); next_row(y);
-        NumeditParam(obj, 'S3_start_CP', 0.05, x, y, 'label', 'S3 start CP'); next_row(y);
-        SubheaderParam(obj, 'sub3', 'Stage 3: Centre poke', x, y); next_row(y, 1.5);
+        NumeditParam(obj, 'S4_stage_violation', 0.35, x, y, 'labelfraction', LF, 'label', 'S4 max stage viol'); next_row(y);
+        NumeditParam(obj, 'S4_min_session_trials', 100, x, y, 'labelfraction', LF, 'label', 'S4 min trials today'); next_row(y);
+        NumeditParam(obj, 'S4_frac_increase', 0.001, x, y, 'labelfraction', LF, 'label', 'S4-5 CP frac increase'); next_row(y);
+        NumeditParam(obj, 'S4_max_CP', 1.0, x, y, 'labelfraction', LF, 'label', 'S4 max CP', 'TooltipString', ...
+            'Stage 4 ends when the hold reaches this value; stage 5 (sound) starts from it'); next_row(y);
+        SubheaderParam(obj, 'sub4', 'Stage 4: Hold grows', x, y, 'TooltipString', STAGE_DESC{4}); next_row(y, 1.5);
 
-        NumeditParam(obj, 'S2_RColl_step', 10, x, y, 'label', 'S2 RColl step (s)'); next_row(y);
-        NumeditParam(obj, 'S2_RColl_min', 60, x, y, 'label', 'S2 RColl min (s)'); next_row(y);
-        NumeditParam(obj, 'S2_RColl_max', 200, x, y, 'label', 'S2 RColl max (s)'); next_row(y);
-        NumeditParam(obj, 'S2_switches', 200, x, y, 'label', 'S2 side switches'); next_row(y);
-        NumeditParam(obj, 'S2_trials', 400, x, y, 'label', 'S2 valid trials'); next_row(y);
-        SubheaderParam(obj, 'sub2', 'Stage 2: Side pokes (timed)', x, y); next_row(y, 1.5);
+        NumeditParam(obj, 'S3_min_trials', 50, x, y, 'labelfraction', LF, 'label', 'S3 min valid trials'); next_row(y);
+        NumeditParam(obj, 'S3_frac_increase', 0.002, x, y, 'labelfraction', LF, 'label', 'S3 CP frac increase'); next_row(y);
+        NumeditParam(obj, 'S3_start_CP', 0.05, x, y, 'labelfraction', LF, 'label', 'S3 start CP'); next_row(y);
+        SubheaderParam(obj, 'sub3', 'Stage 3: Centre poke', x, y, 'TooltipString', STAGE_DESC{3}); next_row(y, 1.5);
 
-        NumeditParam(obj, 'S1_go_vol_end', 0.01, x, y, 'label', 'S1 go vol end', 'TooltipString', ...
+        NumeditParam(obj, 'SND_thresh_full', 0.65, x, y, 'labelfraction', LF, 'label', 'Hit/cell (Full)'); next_row(y);
+        NumeditParam(obj, 'SND_thresh_discrete', 0.7, x, y, 'labelfraction', LF, 'label', 'Hit/cell (Discrete)'); next_row(y);
+        NumeditParam(obj, 'SND_min_trials', 100, x, y, 'labelfraction', LF, 'label', 'Min valid tr/level'); next_row(y);
+        NumeditParam(obj, 'SND_min_per_cell', 20, x, y, 'labelfraction', LF, 'label', 'Min trials/cell'); next_row(y);
+        NumeditParam(obj, 'SND_window', 200, x, y, 'labelfraction', LF, 'label', 'Window (valid tr)'); next_row(y);
+        DispParam(obj, 'SND_progress', '-', x, y, 'labelfraction', 0.3, 'label', 'Level'); next_row(y);
+        SubheaderParam(obj, 'subsnd', 'Sound level (stages 5-7)', x, y, 'TooltipString', sprintf([ ...
+            'Independent of the stage. Next level when, in random order (no blocks),\n' ...
+            'every cell >= Hit/cell over the last Window valid 2-step trials at this\n' ...
+            'level today (>= Min trials/cell, >= Min valid tr/level). Level 6 is needed\n' ...
+            'to leave stage 7.'])); next_row(y, 1.5);
+
+        % ---- column 4: stages 1-2, all stages ----
+        next_column(x); y = 5;
+        NumeditParam(obj, 'recent_window', 50, x, y, 'labelfraction', LF, 'label', 'Recent window (tr)'); next_row(y);
+        NumeditParam(obj, 'recent_timeout', 0.15, x, y, 'labelfraction', LF, 'label', 'Max recent timeout'); next_row(y);
+        NumeditParam(obj, 'recent_violation', 0.15, x, y, 'labelfraction', LF, 'label', 'Max recent violation', 'TooltipString', ...
+            'Stages 4-6: the recent violation / timeout rates must be below these to move on'); next_row(y);
+        MenuParam(obj, 'MaxSame_training', {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, Inf}, 4, x, y, 'labelfraction', LF, ...
+            'label', 'MaxSame (st 1-7)', 'TooltipString', ...
+            'MaxSame and MaxSameCat applied at the start of each session in stages 1-7 (stage 8 uses Inf)'); next_row(y);
+        SubheaderParam(obj, 'title', 'All stages', x, y); next_row(y, 1.5);
+
+        NumeditParam(obj, 'S2_RColl_step', 10, x, y, 'labelfraction', LF, 'label', 'S2 RColl step (s)'); next_row(y);
+        NumeditParam(obj, 'S2_RColl_min', 60, x, y, 'labelfraction', LF, 'label', 'S2 RColl min (s)'); next_row(y);
+        NumeditParam(obj, 'S2_RColl_max', 200, x, y, 'labelfraction', LF, 'label', 'S2 RColl max (s)'); next_row(y);
+        NumeditParam(obj, 'S2_switches', 200, x, y, 'labelfraction', LF, 'label', 'S2 side switches'); next_row(y);
+        NumeditParam(obj, 'S2_trials', 400, x, y, 'labelfraction', LF, 'label', 'S2 valid trials'); next_row(y);
+        SubheaderParam(obj, 'sub2', 'Stage 2: Side pokes (timed)', x, y, 'TooltipString', STAGE_DESC{2}); next_row(y, 1.5);
+
+        NumeditParam(obj, 'S1_go_vol_end', 0.01, x, y, 'labelfraction', LF, 'label', 'S1 go vol end', 'TooltipString', ...
             'Go sound volume reached at the end of stage 1 and used in all later stages'); next_row(y);
-        NumeditParam(obj, 'S1_go_vol_start', 0.001, x, y, 'label', 'S1 go vol start'); next_row(y);
-        NumeditParam(obj, 'S1_go_start', 200, x, y, 'label', 'S1 go sound from trial', 'TooltipString', sprintf([ ...
+        NumeditParam(obj, 'S1_go_vol_start', 0.001, x, y, 'labelfraction', LF, 'label', 'S1 go vol start'); next_row(y);
+        NumeditParam(obj, 'S1_go_start', 200, x, y, 'labelfraction', LF, 'label', 'S1 go sound from tr', 'TooltipString', sprintf([ ...
             'Stage 1: no go sound for the first S1_go_start valid trials, then the volume ramps\n' ...
             'linearly from S1_go_vol_start to S1_go_vol_end by S1_trials valid trials\n' ...
             '(as in ArpitCentrePokeTraining). Helps rats that are afraid of sounds.'])); next_row(y);
-        NumeditParam(obj, 'S1_switches', 200, x, y, 'label', 'S1 side switches'); next_row(y);
-        NumeditParam(obj, 'S1_trials', 400, x, y, 'label', 'S1 valid trials'); next_row(y);
-        SubheaderParam(obj, 'sub1', 'Stage 1: Side pokes (free)', x, y); next_row(y, 1.5);
+        NumeditParam(obj, 'S1_switches', 200, x, y, 'labelfraction', LF, 'label', 'S1 side switches'); next_row(y);
+        NumeditParam(obj, 'S1_trials', 400, x, y, 'labelfraction', LF, 'label', 'S1 valid trials'); next_row(y);
+        SubheaderParam(obj, 'sub1', 'Stage 1: Side pokes (free)', x, y, 'TooltipString', STAGE_DESC{1}); next_row(y, 1.5);
 
-        % (MaxSame_training, auto toggle and stage menu follow below)
-        MenuParam(obj, 'MaxSame_training', {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, Inf}, 4, x, y, ...
-            'label', 'MaxSame (st 1-6)', 'TooltipString', ...
-            'MaxSame and MaxSameCat applied at the start of each session in stages 1-6 (stage 7 uses Inf)'); next_row(y);
-        ToggleParam(obj, 'use_auto_train', 1, x, y, 'OnString', 'Auto training ON', ...
-            'OffString', 'Auto training OFF', 'TooltipString', ...
-            'If OFF, the stage parameters are still applied but the rat never moves to the next stage automatically'); next_row(y);
-        MenuParam(obj, 'TrainingStage', STAGES, STAGES{1}, x, y, 'label', 'Training Stage', ...
-            'labelfraction', 0.4, 'TooltipString', 'Current stage. Changing it by hand resets that stage''s counters.');
-        set_callback(TrainingStage, {mfilename, 'Stage_Changed'});
-        next_row(y);
-        SubheaderParam(obj, 'title', 'Training Stages', x, y);
-
-        % ---- column 4: performance per stage and this session ----
+        % ---- column 5: performance per stage and this session ----
         % Same information as PerformanceSummarySection / SessionPerformanceSection
         % in ArpitCentrePokeTraining. The per-stage rows are display-only but
         % saved with the settings, so they accumulate across sessions.
         next_column(x); y = 5;
-        DispParam(obj, 'Stage_viol',     NaN, x, y, 'label', 'Stage violation');  next_row(y);
-        DispParam(obj, 'Stage_timeout',  NaN, x, y, 'label', 'Stage timeout');    next_row(y);
-        DispParam(obj, 'Recent_viol',    NaN, x, y, 'label', 'Recent violation'); next_row(y);
-        DispParam(obj, 'Recent_timeout', NaN, x, y, 'label', 'Recent timeout');   next_row(y);
-        DispParam(obj, 'Session_viol',   NaN, x, y, 'label', 'Session violation'); next_row(y);
-        DispParam(obj, 'Session_timeout',NaN, x, y, 'label', 'Session timeout');   next_row(y);
-        SubheaderParam(obj, 'subperf', 'This session / current stage', x, y); next_row(y, 1.5);
+        DispParam(obj, 'Stage_viol',     NaN, x, y, 'labelfraction', 0.62, 'label', 'Stage violation');  next_row(y);
+        DispParam(obj, 'Stage_timeout',  NaN, x, y, 'labelfraction', 0.62, 'label', 'Stage timeout');    next_row(y);
+        DispParam(obj, 'Recent_viol',    NaN, x, y, 'labelfraction', 0.62, 'label', 'Recent violation'); next_row(y);
+        DispParam(obj, 'Recent_timeout', NaN, x, y, 'labelfraction', 0.62, 'label', 'Recent timeout');   next_row(y);
+        DispParam(obj, 'Session_viol',   NaN, x, y, 'labelfraction', 0.62, 'label', 'Session violation'); next_row(y);
+        DispParam(obj, 'Session_timeout',NaN, x, y, 'labelfraction', 0.62, 'label', 'Session timeout');   next_row(y);
+        SubheaderParam(obj, 'subperf', 'This session / stage', x, y); next_row(y, 1.5);
         for k = N_AUTO_STAGES:-1:1
             DispParam(obj, sprintf('StageSummary_%d', k), '-', x, y, 'label', sprintf('Stage %d', k), ...
-                'labelfraction', 0.18, 'position', [x y 330 20], 'save_with_settings', 1);
+                'labelfraction', 0.17, 'position', [x y 340 20], 'save_with_settings', 1);
             next_row(y);
         end
-        SubheaderParam(obj, 'subsum', 'Per stage: trials | today | valid | viol | timeout', x, y);
+        SubheaderParam(obj, 'subsum', 'Per stage: trials | today | valid | viol | tout | hit | hit today', x, y, ...
+            'position', [x y 340 20], 'TooltipString', sprintf(['Saved with the settings, so it adds up over sessions and over\n' ...
+            'return visits to a stage. viol / tout = fraction of trials; hit = hits / valid trials\n' ...
+            '(stages 1-4: either side pays, so hit is about 1 when the rat pokes)']));
+        next_row(y);
 
-        % Per-stage counts (saved): rows = stages 1-7,
-        % columns = [trials, trials today, valid trials, violations, timeouts]
-        SoloParamHandle(obj, 'stage_summary', 'value', zeros(N_AUTO_STAGES, 5), 'save_with_settings', 1);
+        % Full status lines across the top of the window
+        top = fit_window(value(myfig), 1190, 22);
+        DispParam(obj, 'S8_last_result', '', 10, top, 'label', 'Last test session', 'labelfraction', 0.1, ...
+            'position', [10 top 1170 20]);
+        DispParam(obj, 'StageStatus', '', 10, top + 22, 'label', 'Status', 'labelfraction', 0.1, ...
+            'position', [10 top+22 1170 20]);
+        set([get_ghandle(StageStatus) get_ghandle(S8_last_result)], 'HorizontalAlignment', 'left');
+
+        % Per-stage counts (saved): rows = stages 1-8, columns =
+        % [trials, trials today, valid, violations, timeouts, hits, valid today, hits today]
+        SoloParamHandle(obj, 'stage_summary', 'value', zeros(N_AUTO_STAGES, 8), 'save_with_settings', 1);
 
         % ---- Persistent counters (saved with settings) ----
         SoloParamHandle(obj, 'stage_valid_trials', 'value', 0,  'save_with_settings', 1);
@@ -249,20 +359,24 @@ switch action
         SoloParamHandle(obj, 'stage_switches',     'value', 0,  'save_with_settings', 1);
         SoloParamHandle(obj, 'stage_last_choice',  'value', '', 'save_with_settings', 1);
         SoloParamHandle(obj, 'stage_sessions',     'value', 0,  'save_with_settings', 1);
-        SoloParamHandle(obj, 's6_step',            'value', 1,  'save_with_settings', 1);
-        SoloParamHandle(obj, 's7_pass_streak',     'value', 0,  'save_with_settings', 1);
-        SoloParamHandle(obj, 's7_ready',           'value', 0,  'save_with_settings', 1);
+        SoloParamHandle(obj, 'snd_level_sessions', 'value', 0,  'save_with_settings', 1);   % sessions at the current sound level
+        SoloParamHandle(obj, 'ab_phase',           'value', 'strong', 'save_with_settings', 1); % stage 7: 'strong' | 'free'
+        SoloParamHandle(obj, 'ab_phase_trials',    'value', 0,  'save_with_settings', 1);   % valid 2-step trials in this phase
+        SoloParamHandle(obj, 'ab_phase_len',       'value', 300, 'save_with_settings', 1);  % length of the current STRONG phase
+        SoloParamHandle(obj, 'ab7_cycles',         'value', 0,  'save_with_settings', 1);   % strategies seen -> back to STRONG
+        SoloParamHandle(obj, 's8_results',         'value', [], 'save_with_settings', 1);   % [b0 b1 b2 se0 se1 se2 ntrials pass] per stage-8 session
+        SoloParamHandle(obj, 's8_returns',         'value', 0,  'save_with_settings', 1);   % stage 8 -> 7 because of a clear bias
+        SoloParamHandle(obj, 'ready_for_test',     'value', 0,  'save_with_settings', 1);
         SoloParamHandle(obj, 'handover_done',      'value', 0,  'save_with_settings', 1);
-        SoloParamHandle(obj, 's6_step_sessions',   'value', 0,  'save_with_settings', 1);   % sessions on the current stage 6 step
         SoloParamHandle(obj, 'cue_rule_locked',    'value', '', 'save_with_settings', 1);   % CueRule fixed from stage 5 on
         SoloParamHandle(obj, 'block_level',        'value', 0,  'save_with_settings', 1);   % 1-3 = BL1-BL3, 0 = random order
         SoloParamHandle(obj, 'block_level_trials', 'value', 0,  'save_with_settings', 1);   % valid 2-step trials at this level
         SoloParamHandle(obj, 'fallback_count',     'value', 0,  'save_with_settings', 1);   % fallbacks used in this stage
-        SoloParamHandle(obj, 'level_start',  'value', 1);   % (session) first trial at the current block level
-        SoloParamHandle(obj, 'random_since', 'value', 1);   % (session) first trial in random order
-        SoloParamHandle(obj, 's7_fit_history',     'value', [], 'save_with_settings', 1); % [b0 b1 b2 se0 se1 se2 ntrials pass] per session
-        % Not saved: first trial (this session) that counts for the current stage 6 step
-        SoloParamHandle(obj, 's6_step_start', 'value', 1);
+        % Not saved (this session only): first trial that counts for ...
+        SoloParamHandle(obj, 'level_start',     'value', 1);   % ... the current block level
+        SoloParamHandle(obj, 'random_since',    'value', 1);   % ... random order (no blocks)
+        SoloParamHandle(obj, 'snd_level_start', 'value', 1);   % ... the current sound level
+        SoloParamHandle(obj, 'ab_phase_start',  'value', 1);   % ... the current antibias phase (stage 7)
 
         x = oldx; y = oldy;
         figure(parentfig);
@@ -279,28 +393,54 @@ switch action
         end
         feval(mfilename, obj, 'update_status');
 
+    case 'SoundLevel_Changed'
+        % Changed by hand (or by the automatic criterion)
+        snd_level_sessions.value = 0;
+        snd_level_start.value = n_done_trials + 1;
+        st = feval(mfilename, obj, 'get_stage');
+        if st >= 5 && st <= 7
+            feval(mfilename, obj, 'apply_sound_level');
+        end
+        feval(mfilename, obj, 'update_status');
+
     case 'reset_counters'
+        % Called when the stage changes. The sound level is NOT reset: it is
+        % an independent track.
+        st = feval(mfilename, obj, 'get_stage');
+        n1 = n_done_trials + 1;
         stage_valid_trials.value = 0;
         stage_all_trials.value   = 0;
         stage_viol_trials.value  = 0;
         stage_switches.value     = 0;
         stage_last_choice.value  = '';
         stage_sessions.value     = 0;
-        s6_step.value            = 1;
-        s6_step_sessions.value   = 0;
-        s6_step_start.value      = n_done_trials + 1;
-        s7_pass_streak.value     = 0;
-        s7_ready.value           = 0;
-        % Stage 5 starts in blocks (BL1); every other stage starts in random order
-        block_level.value        = double(feval(mfilename, obj, 'get_stage') == 5);
-        block_level_trials.value = 0;
+        ready_for_test.value     = 0;
         fallback_count.value     = 0;
-        level_start.value        = n_done_trials + 1;
-        if value(block_level) > 0, random_since.value = Inf; else, random_since.value = n_done_trials + 1; end
+        % Stage 7 starts with a STRONG antibias phase
+        ab_phase.value        = 'strong';
+        ab_phase_trials.value = 0;
+        ab_phase_len.value    = value(AB7_strong_trials);
+        ab_phase_start.value  = n1;
+        % Blocks: stage 5 starts in BL1; stages 6-7 keep the current block
+        % level (blocks are left on their own criterion); 1-4 and 8: none.
+        if st == 5
+            block_level.value = 1;
+        elseif st < 5 || st == 8
+            block_level.value = 0;
+        end
+        block_level_trials.value = 0;
+        level_start.value = n1;
+        if value(block_level) > 0, random_since.value = Inf; else, random_since.value = n1; end
+        snd_level_start.value = n1;
 
     case 'get_stage'
         k = find(strcmp(STAGES, value(TrainingStage)), 1);
         if isempty(k) || k > N_AUTO_STAGES, k = 0; end   % 0 = Manual
+        varargout{1} = k;
+
+    case 'get_sound_level'
+        k = find(strcmp(SOUND_LEVELS(:, 1), value(SoundLevel)), 1);
+        if isempty(k), k = 1; end
         varargout{1} = k;
 
     case 'push_trial_history'
@@ -308,29 +448,31 @@ switch action
         % automatic per-trial history in BControl).
         push_history(stage_valid_trials); push_history(stage_all_trials);
         push_history(stage_viol_trials);  push_history(stage_switches);
-        push_history(s6_step);            push_history(s6_step_start);
-        push_history(s7_pass_streak);     push_history(s7_ready);
-        push_history(stage_summary);
+        push_history(ab_phase);           push_history(ab_phase_trials);
+        push_history(ready_for_test);     push_history(stage_summary);
         push_history(block_level); push_history(block_level_trials); push_history(fallback_count);
 
     case 'get_summary'
-        % For an SQL summary / analysis: stage number, name and per-stage counts
+        % For an SQL summary / analysis and the performance monitor
         st = feval(mfilename, obj, 'get_stage');
         out.stage_no = st;
         out.stage_name = value(TrainingStage);
-        out.stage_summary = value(stage_summary);   % [trials today valid viol timeout] per stage
-        out.s6_step = value(s6_step);
-        out.s7_pass_streak = value(s7_pass_streak);
-        out.s7_ready = value(s7_ready);
+        out.stage_summary = value(stage_summary);   % [trials today valid viol timeout hits valid_today hits_today] per stage
         out.stage_sessions = value(stage_sessions);
-        out.s6_step_sessions = value(s6_step_sessions);
+        out.sound_level = feval(mfilename, obj, 'get_sound_level');
+        out.sound_level_sessions = value(snd_level_sessions);
+        out.ab_phase = value(ab_phase);
+        out.ab7_cycles = value(ab7_cycles);
+        out.s8_results = value(s8_results);
+        out.s8_returns = value(s8_returns);
+        out.ready_for_test = value(ready_for_test);
         out.cue_rule = SideSection(obj, 'get_cue_rule');
         out.block_level = value(block_level);
         out.fallback_count = value(fallback_count);
         varargout{1} = out;
 
     case 'is_ready_for_test'
-        varargout{1} = value(s7_ready);
+        varargout{1} = value(ready_for_test);
 
     % ------------------------------------------------------------------
     %              PREPARE NEXT TRIAL (called from SideSection after scoring)
@@ -340,24 +482,34 @@ switch action
             st = feval(mfilename, obj, 'get_stage');
             n  = n_done_trials + 0;
             if n == 0
-                s6_step_start.value = 1;   % new session: stage 6 window starts again
+                % new session: the session-only windows start again
                 level_start.value = 1;
+                snd_level_start.value = 1;
+                ab_phase_start.value = 1;
                 if value(block_level) > 0, random_since.value = Inf; else, random_since.value = 1; end
-                ss = value(stage_summary); ss(:, 2) = 0; stage_summary.value = ss;
+                ss = value(stage_summary);
+                if size(ss, 2) < 8, ss(:, end+1:8) = 0; end                 % older settings: 5 columns
+                if size(ss, 1) < N_AUTO_STAGES, ss(end+1:N_AUTO_STAGES, :) = 0; end   % older settings: 7 stages
+                ss(:, [2 7 8]) = 0;                                          % today's counts
+                stage_summary.value = ss;
             end
 
             if st > 0 && n > 0
                 % Update stage counters with the trial that just finished
+                valid = ~isnan(hit_history(n));
                 stage_all_trials.value = value(stage_all_trials) + 1;
                 stage_viol_trials.value = value(stage_viol_trials) + double(violation_history(n));
                 ss = value(stage_summary);
                 ss(st, 1) = ss(st, 1) + 1;
                 ss(st, 2) = ss(st, 2) + 1;
-                ss(st, 3) = ss(st, 3) + double(~isnan(hit_history(n)));
+                ss(st, 3) = ss(st, 3) + double(valid);
                 ss(st, 4) = ss(st, 4) + double(violation_history(n));
                 ss(st, 5) = ss(st, 5) + double(timeout_history(n));
+                ss(st, 6) = ss(st, 6) + double(hit_history(n) == 1);
+                ss(st, 7) = ss(st, 7) + double(valid);
+                ss(st, 8) = ss(st, 8) + double(hit_history(n) == 1);
                 stage_summary.value = ss;
-                if ~isnan(hit_history(n))
+                if valid
                     stage_valid_trials.value = value(stage_valid_trials) + 1;
                     ch = choice_history(n);
                     if (ch == 'l' || ch == 'r')
@@ -368,27 +520,37 @@ switch action
                     end
                 end
 
-                % Block ladder (stages 5-6)
-                if (st == 5 || st == 6) && value(block_level) > 0
+                % Block ladder (stages 5-7)
+                if st >= 5 && st <= 7 && value(block_level) > 0
                     feval(mfilename, obj, 'block_progress', n);
                 end
 
-                % Completion test (stage 7 is judged in end_of_session)
-                if value(use_auto_train) == 1 && st < 7 && feval(mfilename, obj, 'completion_test', st)
-                    if st == 6 && value(s6_step) < size(S6_LADDER, 1)
-                        % next rung of the stage 6 ladder
-                        s6_step.value = value(s6_step) + 1;
-                        s6_step_sessions.value = 0;
-                        s6_step_start.value = n + 1;
-                        feval(mfilename, obj, 'apply_stage', 6, true);
-                        fprintf(1, 'Arpit2StepTraining: stage 6 step %d at trial %d\n', value(s6_step), n);
-                    else
-                        TrainingStage.value = STAGES{st + 1};
-                        feval(mfilename, obj, 'reset_counters');
-                        st = st + 1;
-                        feval(mfilename, obj, 'apply_stage', st, true);
-                        fprintf(1, 'Arpit2StepTraining: moved to stage "%s" at trial %d\n', STAGES{st}, n);
+                % Stage 7: antibias cycle (STRONG <-> FREE)
+                if st == 7
+                    feval(mfilename, obj, 'ab7_cycle', n, valid);
+                end
+
+                % Sound level (track B, stages 5-7, independent of the stage)
+                if value(use_auto_train) == 1 && st >= 5 && st <= 7 && value(block_level) == 0
+                    k = feval(mfilename, obj, 'get_sound_level');
+                    if k < N_SND && feval(mfilename, obj, 'sound_level_test', k)
+                        SoundLevel.value = SOUND_LEVELS{k + 1, 1};
+                        msg = sprintf('[trial %d] sound level %d -> %d (%s)', n, k, k + 1, SOUND_LEVELS{k + 1, 1});
+                        try CommentsSection(obj, 'append_line', msg); catch, end
+                        fprintf(1, 'Arpit2StepTraining %s\n', msg);
+                        feval(mfilename, obj, 'SoundLevel_Changed');
                     end
+                end
+
+                % Stage completion test (stage 8 is judged in end_of_session)
+                if value(use_auto_train) == 1 && st < 8 && feval(mfilename, obj, 'completion_test', st)
+                    TrainingStage.value = STAGES{st + 1};
+                    feval(mfilename, obj, 'reset_counters');
+                    st = st + 1;
+                    feval(mfilename, obj, 'apply_stage', st, true);
+                    msg = sprintf('[trial %d] moved to stage "%s"', n, STAGES{st});
+                    try CommentsSection(obj, 'append_line', msg); catch, end
+                    fprintf(1, 'Arpit2StepTraining %s\n', msg);
                 end
             end
 
@@ -401,12 +563,13 @@ switch action
         end
 
     % ------------------------------------------------------------------
-    %   COMPLETION TEST for stage st -> true / false   (stages 1-6)
+    %   COMPLETION TEST for stage st -> true / false   (stages 1-7)
     % ------------------------------------------------------------------
     case 'completion_test'
         st = varargin{1};
         n  = n_done_trials + 0;
         done = false;
+        stage_vr = value(stage_viol_trials) / max(1, value(stage_all_trials));
         switch st
             case 1
                 done = value(stage_valid_trials) >= value(S1_trials) && value(stage_switches) >= value(S1_switches);
@@ -418,25 +581,106 @@ switch action
             case 4
                 cp = SideSection(obj, 'get_cp');
                 [rv, rt] = feval(mfilename, obj, 'recent_rates');
-                stage_vr = value(stage_viol_trials) / max(1, value(stage_all_trials));
                 done = cp >= value(S4_max_CP) - 1e-6 && n >= value(S4_min_session_trials) && ...
                        rv < value(recent_violation) && rt < value(recent_timeout) && ...
                        stage_vr < value(S4_stage_violation);
             case 5
+                % Hold only: the sound / rule is not part of this criterion
                 cp = SideSection(obj, 'get_cp');
-                if value(block_level) == 0 && cp >= value(S5_target_CP) - 1e-6
-                    % only trials in random order count
-                    [hit_c, n_c] = feval(mfilename, obj, 'cell_performance', value(S5_window), value(random_since));
-                    done = all(n_c >= value(S5_min_per_cell)) && all(hit_c >= value(S5_cell_thresh));
-                end
+                [rv, rt] = feval(mfilename, obj, 'recent_rates');
+                done = cp >= value(S5_target_CP) - 1e-6 && value(stage_valid_trials) >= value(S5_min_trials) && ...
+                       rv < value(recent_violation) && rt < value(recent_timeout) && ...
+                       stage_vr < value(S5_stage_violation);
             case 6
-                k = min(value(s6_step), size(S6_LADDER, 1));
-                if strcmpi(S6_LADDER{k, 1}, 'Full'), thr = value(S6_thresh_full); else, thr = value(S6_thresh_discrete); end
-                [hit_c, n_c] = feval(mfilename, obj, 'cell_performance', value(S6_window), max(value(s6_step_start), value(random_since)));
-                done = value(block_level) == 0 && sum(n_c) >= value(S6_min_trials) && all(n_c >= value(S6_min_per_cell)) && all(hit_c >= thr);
+                [rv, rt] = feval(mfilename, obj, 'recent_rates');
+                done = value(stage_valid_trials) >= value(S6_min_trials) && ...
+                       rv < value(recent_violation) && rt < value(recent_timeout) && ...
+                       stage_vr < value(S6_stage_violation);
+            case 7
+                if feval(mfilename, obj, 'get_sound_level') == N_SND && value(block_level) == 0 && ...
+                        strcmp(value(ab_phase), 'free')
+                    first = max(value(ab_phase_start), value(random_since));
+                    [hit_c, n_c] = feval(mfilename, obj, 'cell_performance', value(S7_window), first);
+                    strat = feval(mfilename, obj, 'strategy_check', first);
+                    done = isempty(strat) && all(n_c >= value(S7_min_per_cell)) && all(hit_c >= value(S7_cell_thresh));
+                end
         end
         varargout{1} = done;
 
+    % ------------------------------------------------------------------
+    %   SOUND_LEVEL_TEST: is sound level k passed?
+    % ------------------------------------------------------------------
+    case 'sound_level_test'
+        k = varargin{1};
+        if strcmpi(SOUND_LEVELS{k, 2}, 'Full'), thr = value(SND_thresh_full); else, thr = value(SND_thresh_discrete); end
+        first = max(value(snd_level_start), value(random_since));
+        [hit_c, n_c] = feval(mfilename, obj, 'cell_performance', value(SND_window), first);
+        varargout{1} = sum(n_c) >= value(SND_min_trials) && all(n_c >= value(SND_min_per_cell)) && all(hit_c >= thr);
+
+    % ------------------------------------------------------------------
+    %   AB7_CYCLE (stage 7, every trial): STRONG for ab_phase_len valid
+    %   trials, then FREE (gentle) until a strategy shows, then STRONG again.
+    % ------------------------------------------------------------------
+    case 'ab7_cycle'
+        n = varargin{1}; valid = varargin{2};
+        if valid && ~isnan(cell_history(n))
+            ab_phase_trials.value = value(ab_phase_trials) + 1;
+        end
+        if strcmp(value(ab_phase), 'strong')
+            if value(ab_phase_trials) >= value(ab_phase_len)
+                feval(mfilename, obj, 'ab7_switch', 'free', n, ...
+                    sprintf('strong phase done (%d valid trials)', value(ab_phase_trials)));
+            end
+        else
+            strat = feval(mfilename, obj, 'strategy_check', value(ab_phase_start));
+            if ~isempty(strat)
+                ab7_cycles.value = value(ab7_cycles) + 1;
+                ab_phase_len.value = value(AB7_restrong);
+                feval(mfilename, obj, 'ab7_switch', 'strong', n, ['strategy: ' strat]);
+            end
+        end
+
+    case 'ab7_switch'
+        % ab7_switch, new phase, trial, reason
+        ph = varargin{1}; n = varargin{2};
+        ab_phase.value = ph;
+        ab_phase_trials.value = 0;
+        ab_phase_start.value = n + 1;
+        if strcmp(ph, 'strong'), pr = 'Strong'; else, pr = 'Gentle'; end
+        AntibiasSection(obj, 'configure', 1, 'cells', NaN, pr);
+        msg = sprintf('[trial %d] stage 7 antibias -> %s (%s)', n, upper(ph), varargin{3});
+        try CommentsSection(obj, 'append_line', msg); catch, end
+        fprintf(1, 'Arpit2StepTraining %s\n', msg);
+
+    case 'strategy_check'
+        % Returns '' or a description of the strategy seen over the last
+        % AB7_probe_window valid 2-step trials from trial <first> on.
+        % Empty while the window is not yet full.
+        first = max(1, varargin{1});
+        hh = value(hit_history); hh = hh(:);
+        ca = value(category_history); ca = ca(:);
+        ch = value(choice_history); ch = ch(:);
+        lh = value(light_history); lh = lh(:);
+        m = min([numel(hh) numel(ca) numel(ch) numel(lh)]);
+        idx = first:m;
+        v = idx(~isnan(hh(idx)) & ~isnan(ca(idx)) & (lh(idx) == 'l' | lh(idx) == 'r'));
+        w = round(value(AB7_probe_window));
+        s = '';
+        if numel(v) >= w
+            v = v(end-w+1:end);
+            f = value(AB7_frac);
+            fleft = mean(ch(v) == 'l');
+            flit  = mean(ch(v) == lh(v));
+            floud = mean((hh(v) == 1 & ca(v) == 1) | (hh(v) == 0 & ca(v) == 0));
+            [hit_c, n_c] = feval(mfilename, obj, 'cell_performance', w, first);
+            gap = max(hit_c(n_c >= 5)) - min(hit_c(n_c >= 5));
+            if fleft >= f || fleft <= 1 - f, s = sprintf('side (left %.2f)', fleft);
+            elseif flit >= f || flit <= 1 - f, s = sprintf('light (lit port %.2f)', flit);
+            elseif floud >= f || floud <= 1 - f, s = sprintf('category ("loud" %.2f)', floud);
+            elseif ~isempty(gap) && gap >= value(AB7_cell_gap), s = sprintf('cells %s', mat2str(round(hit_c*100)/100));
+            end
+        end
+        varargout{1} = s;
     % ------------------------------------------------------------------
     %   BLOCK_PROGRESS: move to shorter blocks (or random order) when the
     %   rat uses the sound, or when the level's trial cap is reached.
@@ -466,7 +710,6 @@ switch action
             level_start.value = n + 1;
             if value(block_level) == 0
                 random_since.value = n + 1;
-                if feval(mfilename, obj, 'get_stage') == 6, s6_step_start.value = n + 1; end
             end
             if capped && ~passed, why = 'trial cap reached'; else, why = 'criterion met'; end
             msg = sprintf('[trial %d] blocks: level %d -> %s (%s)', n, old, ...
@@ -519,7 +762,7 @@ switch action
         st = varargin{1};
         at_start = varargin{2};
         p = struct();
-        if at_start && st <= 6
+        if at_start && st <= 7
             p.MaxSame    = value(MaxSame_training);
             p.MaxSameCat = value(MaxSame_training);
         end
@@ -589,7 +832,7 @@ switch action
                     p.fraction_increase = value(S4_frac_increase);
                     if at_start, p.cp_start = SideSection(obj, 'get_settle_max'); end
                 end
-            case {5, 6, 7}
+            case {5, 6, 7, 8}
                 if at_start
                     p.go_sound_on = 1;
                     feval(mfilename, obj, 'set_go_volume', value(S1_go_vol_end));
@@ -609,14 +852,14 @@ switch action
                     p.fraction_increase = value(S4_frac_increase);
                     if at_start, p.cp_start = value(S4_max_CP); end
                 else
-                    % stages 6-7: hold drawn every trial in [S6_cp_min, S6_cp_max]
+                    % stages 6-8: hold drawn every trial in [S6_cp_min, S6_cp_max]
                     p.random_CP = 1;
                     p.increase_CP_training = 0;
                     p.cp_rand_min = value(S6_cp_min);
                     p.cp_rand_max = value(S6_cp_max);
                 end
-                % Blocks (stages 5-6 only)
-                if st <= 6 && value(block_level) > 0
+                % Blocks (stages 5-7 only)
+                if st <= 7 && value(block_level) > 0
                     L = [value(BL1) value(BL2) value(BL3)];
                     p.block_len = L(value(block_level));
                 else
@@ -633,41 +876,52 @@ switch action
                     try CommentsSection(obj, 'append_line', msg); catch, end
                     fprintf(2, '%s\n', msg);
                 end
-                if st <= 6 && at_start
-                    p.error_iti = value(S6_error_iti);
-                end
-                if st == 5
-                    p.Stimuli_State = 'Discrete';
-                    p.reward_type = 'Always';
-                    n_lev = value(S5_n_levels); ab_on = 1; ab_floor = value(S5_AB_floor);
-                elseif st == 6
-                    k = min(value(s6_step), size(S6_LADDER, 1));
-                    S6_step_disp.value = k;
-                    p.Stimuli_State = S6_LADDER{k, 1};
-                    p.reward_type   = S6_LADDER{k, 3};
-                    p.secondhit_delay = S6_LADDER{k, 4};
-                    n_lev = S6_LADDER{k, 2}; ab_on = 1; ab_floor = S6_LADDER{k, 5};
+                if st <= 7
+                    if at_start, p.error_iti = value(S_error_iti); end
+                    % Sound (track B): Stimuli_State, levels, second chance
+                    k = feval(mfilename, obj, 'get_sound_level');
                 else
-                    p.Stimuli_State = 'Full';
-                    p.reward_type = 'NoReward';
-                    p.error_iti = value(S7_error_iti);
+                    % Stage 8: as the experiment
+                    if at_start
+                        p.error_iti = value(S8_error_iti);
+                        if ~strcmp(value(SoundLevel), SOUND_LEVELS{N_SND, 1})
+                            SoundLevel.value = SOUND_LEVELS{N_SND, 1};
+                            snd_level_sessions.value = 0;
+                        end
+                    end
                     p.MaxSame = Inf; p.MaxSameCat = Inf;
-                    n_lev = NaN; ab_on = 0; ab_floor = 0.25;
+                    k = N_SND;
                 end
+                p.Stimuli_State   = SOUND_LEVELS{k, 2};
+                p.reward_type     = SOUND_LEVELS{k, 4};
+                p.secondhit_delay = SOUND_LEVELS{k, 5};
                 if at_start
-                    if ~isnan(n_lev), StimulusSection(obj, 'set_n_discrete', n_lev); end
-                    AntibiasSection(obj, 'set', 'AB_On', ab_on);
-                    AntibiasSection(obj, 'set', 'AB_BetaMode', 'Auto');
-                    AntibiasSection(obj, 'set', 'AB_Floor', ab_floor);
+                    if ~isnan(SOUND_LEVELS{k, 3}), StimulusSection(obj, 'set_n_discrete', SOUND_LEVELS{k, 3}); end
+                    switch st
+                        case {5, 6}
+                            AntibiasSection(obj, 'configure', 1, 'cells', value(S5_AB_floor), 'Standard');
+                        case 7
+                            if strcmp(value(ab_phase), 'strong'), pr = 'Strong'; else, pr = 'Gentle'; end
+                            AntibiasSection(obj, 'configure', 1, 'cells', NaN, pr);
+                        case 8
+                            AntibiasSection(obj, 'configure', 0, 'cells', NaN, 'Standard');
+                    end
                 end
         end
         if st <= 4 && at_start
-            AntibiasSection(obj, 'set', 'AB_On', 0);
+            AntibiasSection(obj, 'configure', 1, 'side', NaN, 'Standard');   % either side pays: act on the side
             p.random_CP = 0;
             p.block_len = 0;
         end
         SideSection(obj, 'set_stage_params', p);
 
+    case 'apply_sound_level'
+        % New sound level during a session (stages 5-7)
+        k = feval(mfilename, obj, 'get_sound_level');
+        p = struct('Stimuli_State', SOUND_LEVELS{k, 2}, 'reward_type', SOUND_LEVELS{k, 4}, ...
+                   'secondhit_delay', SOUND_LEVELS{k, 5});
+        if ~isnan(SOUND_LEVELS{k, 3}), StimulusSection(obj, 'set_n_discrete', SOUND_LEVELS{k, 3}); end
+        SideSection(obj, 'set_stage_params', p);
     case 'set_go_volume'
         % Change the GoSound volume only if it differs (regenerates the sound)
         v = varargin{1};
@@ -683,21 +937,21 @@ switch action
     % ------------------------------------------------------------------
     case 'end_of_session'
         try
+            st = feval(mfilename, obj, 'get_stage');
             stage_sessions.value = value(stage_sessions) + 1;
-            if feval(mfilename, obj, 'get_stage') == 6, s6_step_sessions.value = value(s6_step_sessions) + 1; end
+            if st >= 5 && st <= 7, snd_level_sessions.value = value(snd_level_sessions) + 1; end
             SideSection(obj, 'end_of_session');
-            if feval(mfilename, obj, 'get_stage') == 7
-                feval(mfilename, obj, 'evaluate_probation_session');
+            if st == 8
+                feval(mfilename, obj, 'evaluate_test_session');
             end
             feval(mfilename, obj, 'check_fallback');
-            if value(s7_ready) == 1 && value(handover_done) == 0 && value(handover_on) == 1
+            if value(ready_for_test) == 1 && value(handover_done) == 0 && value(handover_on) == 1
                 feval(mfilename, obj, 'handover');
             end
             feval(mfilename, obj, 'update_status');
         catch ME
             warning('TrainingStageSection:end_of_session', '%s', ME.message);
         end
-
     % ------------------------------------------------------------------
     %   HANDOVER: write tomorrow's settings file for Arpit2StepTask.
     %   The two protocols use the same section / parameter names, so the
@@ -756,7 +1010,7 @@ switch action
     % ------------------------------------------------------------------
     case 'check_fallback'
         st = feval(mfilename, obj, 'get_stage');
-        if ~(st == 5 || st == 6) || value(block_level) > 0 || value(fallback_count) >= value(FB_max), return; end
+        if st < 5 || st > 7 || value(block_level) > 0 || value(fallback_count) >= value(FB_max), return; end
         hh = value(hit_history); hh = hh(:);
         ca = value(category_history); ca = ca(:);
         ch = value(choice_history); ch = ch(:);
@@ -779,11 +1033,13 @@ switch action
         end
 
     % ------------------------------------------------------------------
-    %   STAGE 7: judge today's session
+    %   STAGE 8: judge today's session (called from end_of_session, after
+    %   stage_sessions has counted it)
     % ------------------------------------------------------------------
-    case 'evaluate_probation_session'
+    case 'evaluate_test_session'
         [fit, msg] = feval(mfilename, obj, 'session_bias_fit');
         hit_c = feval(mfilename, obj, 'cell_performance', Inf, 1);
+        clear_bias = false;
         if isempty(fit)
             pass = false;
             res = ['FAIL: ' msg];
@@ -791,13 +1047,18 @@ switch action
         else
             b = fit(1:3); se = fit(4:6); ntr = fit(7);
             reasons = {};
-            if ntr < value(S7_min_trials),            reasons{end+1} = sprintf('%d trials', ntr); end
-            if any(isnan(hit_c)) || any(hit_c < value(S7_cell_thresh))
+            if ntr < value(S8_min_trials),            reasons{end+1} = sprintf('%d trials', ntr); end
+            if any(isnan(hit_c)) || any(hit_c < value(S8_cell_thresh))
                 reasons{end+1} = sprintf('cells %s', mat2str(round(hit_c*100)/100));
             end
-            if ~(b(2) / se(2) > 2),                   reasons{end+1} = 'no stimulus effect'; end
-            if abs(b(1)) > value(S7_max_bias) || abs(b(1)) / se(1) >= 2, reasons{end+1} = sprintf('category bias %.2f', b(1)); end
-            if abs(b(3)) > value(S7_max_bias) || abs(b(3)) / se(3) >= 2, reasons{end+1} = sprintf('side bias %.2f', b(3)); end
+            % A CLEAR bias (or no use of the sound) sends the rat back to stage 7
+            if ~(b(2) / se(2) > 2),                   reasons{end+1} = 'no stimulus effect'; clear_bias = true; end
+            if abs(b(1)) > value(S8_max_bias) && abs(b(1)) / se(1) >= 2, reasons{end+1} = sprintf('category bias %.2f', b(1)); clear_bias = true;
+            elseif abs(b(1)) > value(S8_max_bias) || abs(b(1)) / se(1) >= 2, reasons{end+1} = sprintf('weak category bias %.2f', b(1)); end
+            if abs(b(3)) > value(S8_max_bias) && abs(b(3)) / se(3) >= 2, reasons{end+1} = sprintf('side bias %.2f', b(3)); clear_bias = true;
+            elseif abs(b(3)) > value(S8_max_bias) || abs(b(3)) / se(3) >= 2, reasons{end+1} = sprintf('weak side bias %.2f', b(3)); end
+            % too few trials: the fit is not trusted for sending the rat back
+            if ntr < value(S8_min_trials), clear_bias = false; end
             pass = isempty(reasons);
             if pass
                 res = sprintf('PASS (b0=%.2f b1=%.2f b2=%.2f, n=%d)', b(1), b(2), b(3), ntr);
@@ -805,19 +1066,29 @@ switch action
                 res = ['FAIL: ' strjoin(reasons, ', ')];
             end
         end
-        h = value(s7_fit_history);
-        s7_fit_history.value = [h; fit(:)' double(pass)];
-        if pass
-            s7_pass_streak.value = value(s7_pass_streak) + 1;
-        else
-            s7_pass_streak.value = 0;
+        h = value(s8_results);
+        s8_results.value = [h; fit(:)' double(pass)];
+        r = value(s8_results);
+        nlast = round(value(S8_last_pass));
+        npass = 0;   % passing sessions in a row, ending with today
+        for i = size(r, 1):-1:1
+            if r(i, end) == 1, npass = npass + 1; else, break; end
         end
-        if value(s7_pass_streak) >= value(S7_sessions)
-            s7_ready.value = 1;
+        res = sprintf('Session %d in stage 8: %s | passing in a row %d/%d', value(stage_sessions), res, npass, nlast);
+        if clear_bias
+            % back to stage 7, with a (shorter) STRONG antibias phase first
+            s8_returns.value = value(s8_returns) + 1;
+            TrainingStage.value = STAGES{7};
+            feval(mfilename, obj, 'reset_counters');
+            ab_phase_len.value = value(AB7_restrong);
+            res = sprintf('%s -> BACK TO STAGE 7 (antibias), return #%d', res, value(s8_returns));
+        elseif value(stage_sessions) >= value(S8_min_sessions) && npass >= nlast
+            ready_for_test.value = 1;
+            res = [res ' -> READY FOR TEST'];
         end
-        S7_last_result.value = res;
-        fprintf(1, 'Arpit2StepTraining probation: %s | streak %d/%d\n', res, value(s7_pass_streak), value(S7_sessions));
-
+        S8_last_result.value = res;
+        try CommentsSection(obj, 'append_line', ['Test: ' res]); catch, end
+        fprintf(1, 'Arpit2StepTraining test: %s\n', res);
     case 'session_bias_fit'
         % Logistic fit on today's valid 2-step trials with a stimulus:
         %   y  = 1 if the rat responded "loud" (went to the port a loud sound points to)
@@ -859,53 +1130,107 @@ switch action
             Session_timeout.value = round(mean(double(value(timeout_history)))*100)/100;
         end
         ss = value(stage_summary);
+        if size(ss, 2) < 8, ss(:, end+1:8) = 0; end
+        if size(ss, 1) < N_AUTO_STAGES, ss(end+1:N_AUTO_STAGES, :) = 0; end
+        hr = @(h, v) iff_str(v > 0, sprintf('%.2f', h / max(v, 1)), '-');
         for k = 1:N_AUTO_STAGES
             if ss(k, 1) > 0
-                str = sprintf('%d | %d | %d | %.2f | %.2f', ss(k,1), ss(k,2), ss(k,3), ss(k,4)/ss(k,1), ss(k,5)/ss(k,1));
+                str = sprintf('%d | %d | %d | %.2f | %.2f | %s | %s', ss(k,1), ss(k,2), ss(k,3), ss(k,4)/ss(k,1), ss(k,5)/ss(k,1), ...
+                    hr(ss(k,6), ss(k,3)), hr(ss(k,8), ss(k,7)));
             else
                 str = '-';
             end
             eval(sprintf('StageSummary_%d.value = str;', k));
         end
+        if st > 0
+            StageHit.value = sprintf('%s (today %s)', hr(ss(st,6), ss(st,3)), hr(ss(st,8), ss(st,7)));
+        else
+            StageHit.value = '-';
+        end
         if st > 0 && ss(st, 1) > 0
             Stage_viol.value    = round(ss(st,4)/ss(st,1)*100)/100;
             Stage_timeout.value = round(ss(st,5)/ss(st,1)*100)/100;
         end
+        % Sound level progress
+        kl = feval(mfilename, obj, 'get_sound_level');
+        if st >= 5 && st <= 7
+            first = max(value(snd_level_start), value(random_since));
+            [hit_c, n_c] = feval(mfilename, obj, 'cell_performance', value(SND_window), first);
+            snd = sprintf('%d/%d, %d sess, cells %s (n %d)', kl, N_SND, value(snd_level_sessions), ...
+                mat2str(round(hit_c*100)/100), sum(n_c));
+            if value(block_level) > 0, snd = sprintf('%d/%d, %d sess, waits for blocks to end', kl, N_SND, value(snd_level_sessions)); end
+        elseif st == 8
+            snd = sprintf('%d/%d (fixed in stage 8)', N_SND, N_SND);
+        else
+            snd = sprintf('%d/%d (used from stage 5)', kl, N_SND);
+        end
+        SND_progress.value = snd;
+        % Stage 7 antibias phase
+        if st == 7
+            if strcmp(value(ab_phase), 'strong')
+                ph = sprintf('STRONG %d/%d', value(ab_phase_trials), value(ab_phase_len));
+            else
+                ph = sprintf('FREE, %d valid', value(ab_phase_trials));
+            end
+            AB7_phase_disp.value = sprintf('%s (cycles %d)', ph, value(ab7_cycles));
+        else
+            AB7_phase_disp.value = '-';
+        end
+        npass = 0; r = value(s8_results);
+        for i = size(r, 1):-1:1
+            if r(i, end) == 1, npass = npass + 1; else, break; end
+        end
         if st == 0
             s = 'Manual (no automation)';
+            brief = 'Manual';
         else
+            brief = sprintf('%d valid, %d sess.', value(stage_valid_trials), value(stage_sessions));
+            if st == 7
+                if strcmp(value(ab_phase), 'strong'), brief = sprintf('%s, AB strong', brief);
+                else, brief = sprintf('%s, AB free', brief); end
+            elseif st == 8
+                brief = sprintf('%d sess., pass %d/%d', value(stage_sessions), npass, round(value(S8_last_pass)));
+                if value(ready_for_test) == 1, brief = 'READY FOR TEST'; end
+            end
             s = sprintf('%s | valid %d | switches %d | sessions %d', value(TrainingStage), ...
                 value(stage_valid_trials), value(stage_switches), value(stage_sessions));
             if n > 0
                 s = sprintf('%s | recent viol %.2f to %.2f', s, rv, rt);
             end
-            s = sprintf('%s | rule %s', s, SideSection(obj, 'get_cue_rule'));
-            if st == 5 || st == 6
+            if st >= 5
+                s = sprintf('%s | rule %s | sound %s', s, SideSection(obj, 'get_cue_rule'), snd);
+            end
+            if st >= 5 && st <= 7
                 s = sprintf('%s | %s', s, feval(mfilename, obj, 'block_name', value(block_level)));
             end
-            if st == 6
-                s = sprintf('%s | step %d/%d', s, value(s6_step), size(S6_LADDER, 1));
-            elseif st == 7
-                s = sprintf('%s | passing streak %d/%d', s, value(s7_pass_streak), value(S7_sessions));
-                if value(s7_ready) == 1, s = [s ' | READY FOR TEST']; end
+            if st == 7
+                s = sprintf('%s | antibias %s', s, value(AB7_phase_disp));
+            elseif st == 8
+                s = sprintf('%s | sessions %d/%d, passing in a row %d/%d', s, value(stage_sessions), ...
+                    round(value(S8_min_sessions)), npass, round(value(S8_last_pass)));
+                if value(ready_for_test) == 1, s = [s ' | READY FOR TEST']; end
                 if value(handover_done) == 1, s = [s ' | handed over to Arpit2StepTask']; end
             end
         end
         StageStatus.value = s;
+        StageBrief.value  = brief;
+        k = find(strcmp(STAGES, value(TrainingStage)), 1); if isempty(k), k = numel(STAGES); end
+        StageAbout.value  = STAGE_SHORT{k};
 
     case 'enable_controls'
-        h = {TrainingStage, use_auto_train, MaxSame_training, S1_trials, S1_switches, S2_trials, S2_switches, ...
+        h = {TrainingStage, SoundLevel, use_auto_train, MaxSame_training, S1_trials, S1_switches, S2_trials, S2_switches, ...
             S2_RColl_max, S2_RColl_min, S2_RColl_step, S3_start_CP, S3_frac_increase, S3_min_trials, ...
             S4_max_CP, S4_frac_increase, S4_min_session_trials, S4_stage_violation, recent_violation, ...
-            recent_timeout, recent_window, S5_n_levels, S5_AB_floor, S5_target_CP, S5_cell_thresh, ...
-            S5_window, S5_min_per_cell, S6_window, S6_min_per_cell, S6_min_trials, S6_thresh_discrete, ...
-            S6_thresh_full, S7_min_trials, S7_cell_thresh, S7_max_bias, S7_sessions, S7_error_iti, S6_error_iti, S1_go_start, S1_go_vol_start, S1_go_vol_end, ...
-            S6_cp_min, S6_cp_max, S_A1_time, ...
+            recent_timeout, recent_window, S5_AB_floor, S5_target_CP, S5_min_trials, S5_stage_violation, ...
+            S_A1_time, S_error_iti, S6_cp_min, S6_cp_max, S6_min_trials, S6_stage_violation, ...
+            SND_window, SND_min_per_cell, SND_min_trials, SND_thresh_discrete, SND_thresh_full, ...
+            S7_cell_thresh, S7_window, S7_min_per_cell, AB7_strong_trials, AB7_restrong, AB7_probe_window, ...
+            AB7_frac, AB7_cell_gap, S8_min_sessions, S8_last_pass, S8_min_trials, S8_cell_thresh, ...
+            S8_max_bias, S8_error_iti, S1_go_start, S1_go_vol_start, S1_go_vol_end, ...
             BL1, BL2, BL3, BL_switch_n, BL_switch_acc, BL_acc, BL_min_trials, BL_cap, FB_level, FB_max, FB_bias, handover_on};
         for i = 1:numel(h)
             if varargin{1} == 1, enable(h{i}); else, disable(h{i}); end
         end
-
     % ------------------------------------------------------------------
     case 'close'
         if exist('myfig', 'var') && isa(myfig, 'SoloParamHandle') && ishandle(value(myfig)) %#ok<NODEF>
@@ -956,3 +1281,23 @@ p = 1 ./ (1 + exp(-X * b));
 w = max(p .* (1 - p), 1e-9);
 H = X' * (X .* repmat(w, 1, k)) + ridge;
 se = sqrt(diag(inv(H)));
+
+
+% -----------------------------------------------------------------------
+% Size a pop-up window to its controls (BControl places them in pixels
+% from the bottom-left). Returns the y of the free row above them.
+function top = fit_window(fig, width, extra)
+if nargin < 3, extra = 0; end
+h = findall(fig, 'type', 'uicontrol');
+top = 0;
+for k = 1:numel(h)
+    p = get(h(k), 'Position');
+    if strcmp(get(h(k), 'Units'), 'pixels'), top = max(top, p(2) + p(4)); end
+end
+top = top + 8;
+pos = get(fig, 'Position');
+set(fig, 'Units', 'pixels', 'Position', [pos(1) pos(2) width top + 30 + extra]);
+
+
+function s = iff_str(c, a, b)
+if c, s = a; else, s = b; end

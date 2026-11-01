@@ -13,32 +13,24 @@ switch action
         end
         x = varargin{1}; y = varargin{2};
 
-        % Context display widgets (3 max)
+        % Context display widgets. Training uses one uniform distribution, so
+        % they are kept (other code updates them) but hidden and take no space.
         DispParam(obj, 'Context3_trialStart', 1,x,y, 'position', [x, y, 100 20],'label','t_start','TooltipString','3rd context started at this trial');
         DispParam(obj, 'Context3_trialEnd', 1,x,y, 'position', [x + 101, y, 100 20],'label','t_end','TooltipString','3rd context ended at this trial');
-        next_row(y);
         DispParam(obj, 'Context3_Dist', Category_Dist, x,y,'label','Context3_Distr','TooltipString','stim distribution/mode for 3rd context');
-        make_invisible(Context3_Dist); make_invisible(Context3_trialStart); make_invisible(Context3_trialEnd);
-        next_row(y);
-
         DispParam(obj, 'Context2_trialStart', 1,x,y, 'position', [x, y, 100 20],'label','t_start','TooltipString','2nd context started at this trial');
         DispParam(obj, 'Context2_trialEnd', 1,x,y, 'position', [x + 101, y, 100 20],'label','t_end','TooltipString','2nd context ended at this trial');
-        next_row(y);
         DispParam(obj, 'Context2_Dist', Category_Dist, x,y,'label','Context2_Distr','TooltipString','stim distribution/mode for 2nd context');
-        make_invisible(Context2_Dist); make_invisible(Context2_trialStart); make_invisible(Context2_trialEnd);
-        next_row(y);
-
         DispParam(obj, 'Context1_trialStart', 1,x,y, 'position', [x, y, 100 20],'label','Trial_start','TooltipString','1st context started at this trial');
         DispParam(obj, 'Context1_trialEnd', 1,x,y, 'position', [x + 101, y, 100 20],'label','Trial_end','TooltipString','1st context ended at this trial');
-        next_row(y);
         DispParam(obj, 'Context1_Dist', Category_Dist, x,y,'label','Context1_Distr','TooltipString','stim distribution/mode for 1st context');
-        next_row(y);
-
         PushbuttonParam(obj, 'Switch_Distr', x, y, 'label', 'Change Stim Distribution', ...
             'TooltipString', 'Change the context by switching distribution (Full mode only)');
         set_callback(Switch_Distr, {mfilename, 'PushButton_Distribution_Switch'});
+        make_invisible(Context3_Dist); make_invisible(Context3_trialStart); make_invisible(Context3_trialEnd);
+        make_invisible(Context2_Dist); make_invisible(Context2_trialStart); make_invisible(Context2_trialEnd);
+        make_invisible(Context1_Dist); make_invisible(Context1_trialStart); make_invisible(Context1_trialEnd);
         make_invisible(Switch_Distr);   % training is uniform only; switching is in Arpit2StepTask
-        next_row(y,2);
         NumeditParam(obj,'trial_plot',30,x,y,'label','Trials 2 Plot','TooltipString','Update plots after these many valid trials');
         next_row(y);
         ToggleParam(obj, 'PsychometricShow', 0, x, y, 'OnString', 'Psychometric Show', ...
@@ -300,9 +292,9 @@ switch action
                 eval(sprintf('Context%i_Dist.value = ''%s'';',      ctx, new_mode));
                 eval(sprintf('Context%i_trialStart.value = %d;',    ctx, n_done_trials + 1));
                 eval(sprintf('Context%i_trialEnd.value   = %d;',    ctx, n_done_trials + 1));
-                eval(sprintf('make_visible(Context%i_Dist);',       ctx));
-                eval(sprintf('make_visible(Context%i_trialStart);', ctx));
-                eval(sprintf('make_visible(Context%i_trialEnd);',   ctx));
+                % eval(sprintf('make_visible(Context%i_Dist);',       ctx));   % context rows are hidden in training (no room, one distribution)
+                % eval(sprintf('make_visible(Context%i_trialStart);', ctx));   % context rows are hidden in training (no room, one distribution)
+                % eval(sprintf('make_visible(Context%i_trialEnd);',   ctx));   % context rows are hidden in training (no room, one distribution)
 
                 disable(Switch_Distr);  % block distribution switch while mode switch is pending
                 enable(PsychometricShow);
@@ -376,9 +368,9 @@ switch action
                     eval(sprintf('Context%i_Dist.value = ''%s'';',      ctx, new_mode));
                     eval(sprintf('Context%i_trialStart.value = %d;',    ctx, n_done_trials + 1));
                     eval(sprintf('Context%i_trialEnd.value   = %d;',    ctx, n_done_trials + 1));
-                    eval(sprintf('make_visible(Context%i_Dist);',       ctx));
-                    eval(sprintf('make_visible(Context%i_trialStart);', ctx));
-                    eval(sprintf('make_visible(Context%i_trialEnd);',   ctx));
+                    % eval(sprintf('make_visible(Context%i_Dist);',       ctx));   % context rows are hidden in training (no room, one distribution)
+                    % eval(sprintf('make_visible(Context%i_trialStart);', ctx));   % context rows are hidden in training (no room, one distribution)
+                    % eval(sprintf('make_visible(Context%i_trialEnd);',   ctx));   % context rows are hidden in training (no room, one distribution)
 
                     disable(Switch_Distr);
                     enable(PsychometricShow);
@@ -419,9 +411,9 @@ switch action
                             eval(sprintf('Context%i_Dist.value = Category_Dist;',             value(thiscontext)));
                             eval(sprintf('Context%i_trialStart.value = n_done_trials + 1;',   value(thiscontext)));
                             eval(sprintf('Context%i_trialEnd.value   = n_done_trials + 1;',   value(thiscontext)));
-                            eval(sprintf('make_visible(Context%i_Dist);',                      value(thiscontext)));
-                            eval(sprintf('make_visible(Context%i_trialStart);',                value(thiscontext)));
-                            eval(sprintf('make_visible(Context%i_trialEnd);',                  value(thiscontext)));
+                            % eval(sprintf('make_visible(Context%i_Dist);',                      value(thiscontext)));   % context rows are hidden in training (no room, one distribution)
+                            % eval(sprintf('make_visible(Context%i_trialStart);',                value(thiscontext)));   % context rows are hidden in training (no room, one distribution)
+                            % eval(sprintf('make_visible(Context%i_trialEnd);',                  value(thiscontext)));   % context rows are hidden in training (no room, one distribution)
                         end
                         if strcmpi(Category_Dist, 'Hard A')
                             StimulusSection(obj, 'Pushbutton_SwitchDistribution', 'Hard B');
@@ -456,9 +448,9 @@ switch action
                         eval(sprintf('Context%i_Dist.value = Category_Dist;',           value(thiscontext)));
                         eval(sprintf('Context%i_trialStart.value = n_done_trials + 1;', value(thiscontext)));
                         eval(sprintf('Context%i_trialEnd.value   = n_done_trials + 1;', value(thiscontext)));
-                        eval(sprintf('make_visible(Context%i_Dist);',                    value(thiscontext)));
-                        eval(sprintf('make_visible(Context%i_trialStart);',              value(thiscontext)));
-                        eval(sprintf('make_visible(Context%i_trialEnd);',                value(thiscontext)));
+                        % eval(sprintf('make_visible(Context%i_Dist);',                    value(thiscontext)));   % context rows are hidden in training (no room, one distribution)
+                        % eval(sprintf('make_visible(Context%i_trialStart);',              value(thiscontext)));   % context rows are hidden in training (no room, one distribution)
+                        % eval(sprintf('make_visible(Context%i_trialEnd);',                value(thiscontext)));   % context rows are hidden in training (no room, one distribution)
 
                         if present_context_end - present_context_start >= 20
                             [state, data, handles, config, flags] = PsychometricSection(obj, 'Calculate_Params');
@@ -527,9 +519,9 @@ switch action
         try
             % Make all used context widgets visible
             for n_contexts = 1:value(thiscontext)
-                eval(sprintf('make_visible(Context%i_Dist);',        n_contexts));
-                eval(sprintf('make_visible(Context%i_trialStart);',  n_contexts));
-                eval(sprintf('make_visible(Context%i_trialEnd);',    n_contexts));
+                % eval(sprintf('make_visible(Context%i_Dist);',        n_contexts));   % context rows are hidden in training (no room, one distribution)
+                % eval(sprintf('make_visible(Context%i_trialStart);',  n_contexts));   % context rows are hidden in training (no room, one distribution)
+                % eval(sprintf('make_visible(Context%i_trialEnd);',    n_contexts));   % context rows are hidden in training (no room, one distribution)
             end
 
             % Restore and upgrade state struct
@@ -540,9 +532,9 @@ switch action
             if state.pending_switch.active
                 ctx = value(thiscontext);
                 if ctx >= 1 && ctx <= 3
-                    eval(sprintf('make_visible(Context%i_Dist);',       ctx));
-                    eval(sprintf('make_visible(Context%i_trialStart);', ctx));
-                    eval(sprintf('make_visible(Context%i_trialEnd);',   ctx));
+                    % eval(sprintf('make_visible(Context%i_Dist);',       ctx));   % context rows are hidden in training (no room, one distribution)
+                    % eval(sprintf('make_visible(Context%i_trialStart);', ctx));   % context rows are hidden in training (no room, one distribution)
+                    % eval(sprintf('make_visible(Context%i_trialEnd);',   ctx));   % context rows are hidden in training (no room, one distribution)
                 end
             end
             states_value.value = state;

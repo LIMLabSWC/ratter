@@ -81,15 +81,6 @@ switch action
         SoloParamHandle(obj, 'CentrePokeRequired', 'value', 1);
         SoloParamHandle(obj, 'ChoiceTimeLimited', 'value', 1);
         SoloParamHandle(obj, 'ShapingLights', 'value', 'Both dark');
-        MenuParam(obj, 'CueRule', {'Loud->Lit', 'Loud->Dark'}, 'Loud->Lit', x, y, 'label', 'Cue rule', ...
-            'labelfraction', 0.35, 'TooltipString', sprintf(['\nLoud->Lit: loud = go to the lit port, quiet = go to the dark port.\n' ...
-            'Loud->Dark: loud = go to the dark port, quiet = go to the lit port.'])); next_row(y);
-        MenuParam(obj, 'CueMode', {'Light/Dark', 'Color'}, 'Light/Dark', x, y, 'label', 'Cue mode', ...
-            'labelfraction', 0.35, 'TooltipString', sprintf(['\nLight/Dark: target side LED on, other off.\n' ...
-            'Color: lit side shows the port LED, other side shows the alternative colour\n' ...
-            '(needs DIOLINES left1led_alt / right1led_alt in Settings_Custom.conf; untested).'])); next_row(y);
-        next_row(y, 0.5);
-
         % ---- Reward ----
         MenuParam(obj, 'reward_type', {'Always', 'DelayedReward', 'NoReward'}, 'NoReward', x, y, 'labelfraction', 0.35, ...
             'TooltipString', sprintf(['\nWhat happens after a wrong first poke (TwoStep / forced shaping trials):\n' ...
@@ -140,7 +131,7 @@ switch action
         NumeditParam(obj, 'A1_time_Max', 0.4, x, y, 'label', 'Max time AUD1', 'TooltipString', 'Max stimulus duration');
         set_callback(A1_time_Max, {mfilename, 'new_CP_duration'}); next_row(y);
         % Time between stimulus and go cue
-        NumeditParam(obj, 'time_bet_aud1_gocue_Min', 0.2, x, y, 'label', 'Min A1-GoCue time', 'TooltipString', 'Min time between stimulus end and go cue');
+        NumeditParam(obj, 'time_bet_aud1_gocue_Min', 0.2, x, y, 'label', 'Min A1-Go time', 'TooltipString', 'Min time between stimulus end and go cue');
         set_callback(time_bet_aud1_gocue_Min, {mfilename, 'new_CP_duration'}); next_row(y);
         NumeditParam(obj, 'time_bet_aud1_gocue', 0.4, x, y, 'position', [x, y, 175 20], 'label', 'A1-GoCue time', 'TooltipString', 'Actual time between stimulus end and go cue');
         set_callback(time_bet_aud1_gocue, {mfilename, 'new_CP_duration'});
@@ -148,7 +139,7 @@ switch action
             'OnString', 'random prego_time ON', 'OffString', 'random prego_time OFF', ...
             'TooltipString', 'If on (black) then it enables the random sampling of the stimulus-go cue time');
         set_callback(random_prego_time, {mfilename, 'new_CP_duration'}); next_row(y);
-        NumeditParam(obj, 'time_bet_aud1_gocue_Max', 1, x, y, 'label', 'Max A1-GoCue time', 'TooltipString', 'Max time between stimulus end and go cue');
+        NumeditParam(obj, 'time_bet_aud1_gocue_Max', 1, x, y, 'label', 'Max A1-Go time', 'TooltipString', 'Max time between stimulus end and go cue');
         set_callback(time_bet_aud1_gocue_Max, {mfilename, 'new_CP_duration'}); next_row(y);
 
         DispParam(obj, 'init_CP_duration', 0.01, x, y, 'label', 'init_CP duration', 'TooltipString', 'CP duration on the first trial of a session when warmup is on'); next_row(y);
@@ -156,46 +147,57 @@ switch action
         NumeditParam(obj, 'time_go_cue', 0.2, x, y, 'label', 'Go Cue Duration', 'TooltipString', 'duration of go cue');
         set_callback(time_go_cue, {mfilename, 'new_time_go_cue'}); next_row(y);
         DispParam(obj, 'Total_CP_duration', CP_duration + time_go_cue, x, y, 'TooltipString', 'CP_duration + go cue duration'); %#ok<*NODEF>
-        next_row(y); next_row(y);
+        next_row(y, 1.5);
 
         MenuParam(obj, 'Stimuli_State', {'Full', 'Discrete', 'Fixed Stimuli', 'No Sound'}, 'Full', x, y, ...
             'label', 'Stimuli State', 'labelfraction', 0.35, 'TooltipString', sprintf(['\nFull: continuous distribution\n' ...
             'Discrete: n levels per category\nFixed Stimuli: one sound (control)\nNo Sound: control / shaping']));
         set_callback(Stimuli_State, {mfilename, 'stim_state_change'});
         next_row(y);
-
-        [x, y] = ExperimentGroupSection(obj, 'init', x, y);
-        next_row(y);
+        SubheaderParam(obj, 'timing_title', 'Trial timing & sound', x, y);
 
         SoloFunctionAddVars('StimulusSection', 'ro_args', ...
             {'ThisTrial'; 'ThisCategory'; 'Stimuli_State'; 'A1_time'; 'time_bet_aud1_gocue'; 'PreStim_time'});
 
-        next_row(y, 1);
-        x_pre = x; y_pre = y;
-
         [x, y] = SoundSection(obj, 'init', x_now, y_now);
-        [x, y] = StimulusSection(obj, 'init', x, y); next_row(y);
-        [x, y] = StimulatorSection(obj, 'init', x_pre, y_pre);   % opto / ephys
+        [x, y] = StimulusSection(obj, 'init', x, y); next_row(y, 0.5);
+        x_col2 = x; y_col2 = y;     % returned: the main file continues column 2 here
 
-        next_column(x); y = 5;
+        SoloFunctionAddVars('PsychometricSection', 'ro_args', {'Stimuli_State'});
+        SoloFunctionAddVars('StimulatorSection', 'ro_args', ...
+            {'A1_time'; 'time_bet_aud1_gocue'; 'time_go_cue'; 'PreStim_time'; 'CP_duration'; 'Total_CP_duration'});
+        feval(mfilename, obj, 'new_reward_type');
+        x = x_col2; y = y_col2;
 
-        ToggleParam(obj, 'control_active', 0, x, y, 'OnString', 'Buttons Active', 'OffString', 'Buttons Locked', ...
-            'TooltipString', 'If on, the user can change the training/automation parameters. Prevents accidental clicks.');
-        set_callback(control_active, {mfilename, 'User_Control'}); next_row(y);
-
-        ToggleParam(obj, 'warmup_on', 1, x, y, 'OnString', 'Warmup ON', 'OffString', 'Warmup OFF', ...
-            'TooltipString', 'At session start CP_duration starts small and grows to cp_reached over 10 trials'); next_row(y);
-
+    % ------------------------------------------------------------------
+    %   INIT_CONTROLS: column 4 of the main window (names unchanged,
+    %   only where they are drawn moved)
+    % ------------------------------------------------------------------
+    case 'init_controls'
+        % ---- Centre poke (hold) ----
         % No CP growth in the experiment (fixed values for the shared code)
         SoloParamHandle(obj, 'increase_CP_training', 'value', 0);
         SoloParamHandle(obj, 'cp_start', 'value', 1.5);
         SoloParamHandle(obj, 'cp_end', 'value', 2.2);
         SoloParamHandle(obj, 'fraction_increase', 'value', 0);
-        ToggleParam(obj, 'random_CP', 1, x, y, 'OnString', 'Random hold ON', 'OffString', 'Random hold OFF', ...
-            'TooltipString', 'If on, the hold is drawn every trial uniformly in [CP min, CP max]; if off, it is the sum of the PreStim / A1 / A1-GoCue times'); next_row(y);
+        NumeditParam(obj, 'cp_reached', 1.5, x, y, 'label', 'CP reached', 'TooltipString', 'CP reached at the end of the last session (updated automatically at end of session)'); next_row(y);
         NumeditParam(obj, 'cp_rand_min', 1.5, x, y, 'position', [x y 100 20], 'label', 'CP min');
         NumeditParam(obj, 'cp_rand_max', 2.2, x, y, 'position', [x+100 y 100 20], 'label', 'CP max'); next_row(y);
-        NumeditParam(obj, 'cp_reached', 1.5, x, y, 'label', 'CPDur_Reached', 'TooltipString', 'CP reached at the end of the last session (updated automatically at end of session)'); next_row(y);
+        ToggleParam(obj, 'random_CP', 1, x, y, 'OnString', 'Random hold ON', 'OffString', 'Random hold OFF', ...
+            'TooltipString', 'If on, the hold is drawn every trial uniformly in [CP min, CP max]; if off, it is the sum of the PreStim / A1 / A1-GoCue times'); next_row(y);
+        ToggleParam(obj, 'warmup_on', 1, x, y, 'OnString', 'Warmup ON', 'OffString', 'Warmup OFF', ...
+            'TooltipString', 'At session start CP_duration starts small and grows to cp_reached over 10 trials'); next_row(y);
+        SubheaderParam(obj, 'cp_title', 'Centre poke (hold)', x, y); next_row(y, 1.2);
+
+        % ---- Trial structure ----
+        MenuParam(obj, 'CueRule', {'Loud->Lit', 'Loud->Dark'}, 'Loud->Lit', x, y, 'label', 'Cue rule', ...
+            'labelfraction', 0.35, 'TooltipString', sprintf(['\nLoud->Lit: loud = go to the lit port, quiet = go to the dark port.\n' ...
+            'Loud->Dark: loud = go to the dark port, quiet = go to the lit port.'])); next_row(y);
+        MenuParam(obj, 'CueMode', {'Light/Dark', 'Color'}, 'Light/Dark', x, y, 'label', 'Cue mode', ...
+            'labelfraction', 0.35, 'TooltipString', sprintf(['\nLight/Dark: target side LED on, other off.\n' ...
+            'Color: lit side shows the port LED, other side shows the alternative colour\n' ...
+            '(needs DIOLINES left1led_alt / right1led_alt in Settings_Custom.conf; untested).'])); next_row(y);
+        SubheaderParam(obj, 'trial_title', 'Trial structure', x, y); next_row(y, 1.2);
 
         SoloFunctionAddVars('Arpit2StepTaskSMA', 'ro_args', ...
             {'CP_duration'; 'CenterLed_duration'; 'RewardCollection_duration'; ...
@@ -204,12 +206,13 @@ switch action
             'drink_time'; 'reward_delay'; 'reward_type'; 'secondhit_delay'; 'error_iti'; 'violation_iti'; 'CueMode'; ...
             'go_sound_on'});
 
-        SoloFunctionAddVars('PsychometricSection', 'ro_args', {'Stimuli_State'});
-        SoloFunctionAddVars('StimulatorSection', 'ro_args', ...
-            {'A1_time'; 'time_bet_aud1_gocue'; 'time_go_cue'; 'PreStim_time'; 'CP_duration'; 'Total_CP_duration'});
+        % (the main file calls 'init_lock' and then 'User_Control')
 
-        feval(mfilename, obj, 'User_Control');
-        feval(mfilename, obj, 'new_reward_type');
+    case 'init_lock'
+        ToggleParam(obj, 'control_active', 0, x, y, 'OnString', 'Unlocked: click to lock', ...
+            'OffString', 'Locked: click to edit', 'TooltipString', ...
+            'Unlock to change the cue rule, the CP settings or the experiment group. Prevents accidental clicks.');
+        set_callback(control_active, {mfilename, 'User_Control'}); next_row(y, 1.2);
 
     % ------------------------------------------------------------------
     %              CALLBACKS

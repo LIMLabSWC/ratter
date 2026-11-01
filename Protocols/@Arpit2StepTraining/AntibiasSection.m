@@ -26,6 +26,25 @@
 %     sequence never becomes predictable. p = floor + (1 - 4*floor) * p.
 % With AB_On = 0 all cells have probability 0.25.
 %
+% Training (2026): the antibias is fully automatic. The training stage
+% switches it on/off and picks what it acts on ('configure', called by
+% TrainingStageSection at the start of each session and on a stage change):
+%   stages 1-4  'side'  : either side pays, so it acts on the side. When the
+%                         rat over-uses one side, a trial is more often
+%                         rewarded only on the other side ('side_force').
+%   stages 5-6  'cells' : the 4-cell antibias above, Standard (only with sound).
+%   stage 7     'cells' : a cycle STRONG -> FREE (Gentle) -> STRONG when the
+%                         rat starts to use a strategy -> ... (see
+%                         TrainingStageSection, 'ab7_cycle').
+%   stage 8     off (the test is run like the experiment).
+% The only control is AB_Strength (how hard it pushes):
+%   Auto by stage | Gentle | Standard | Strong | Off
+% which sets the floor, beta range and memory (AB_Floor, AB_BetaMin/Max,
+% AB_Tau). 'Auto by stage' = the preset the stage asks for (Standard in
+% stages 1-6, Strong / Gentle in stage 7), with the stage's own floor if set.
+% Any other choice overrides the stage's preset (but not its on/off).
+% Beta is always adaptive (grows with how unequal the cells/sides are).
+%
 % ACTIONS
 %   'init', x, y                 build GUI
 %   'update', hit_hist, cell_hist  recompute cell probabilities.
@@ -34,6 +53,9 @@
 %   'get_probs'                  returns 1x4 vector of cell probabilities
 %   'get_beta'                   returns the beta used in the last update
 %   'set', name, value           set AB_On / AB_BetaMode / AB_Floor / AB_Beta
+%   'configure', on, kind, floor, preset   on 0/1, kind 'cells' | 'side', stage floor
+%                                (NaN = preset's), preset 'Gentle' | 'Standard' | 'Strong'
+%   'side_force', hit_hist, choice_hist   'l' / 'r' = only that side pays this trial, '' = either
 %   'reinit', 'close'
 
 function [x, y, w, h] = AntibiasSection(obj, action, varargin)
@@ -46,35 +68,46 @@ switch action
         x = varargin{1}; y = varargin{2}; y0 = y;
         SoloParamHandle(obj, 'my_gui_info', 'value', [x y double(gcf)], 'saveable', 0);
 
-        DispParam(obj, 'AB_P_RLoud',  0.25, x, y, 'label', 'P R-Loud');  next_row(y);
-        DispParam(obj, 'AB_P_RQuiet', 0.25, x, y, 'label', 'P R-Quiet'); next_row(y);
-        DispParam(obj, 'AB_P_LLoud',  0.25, x, y, 'label', 'P L-Loud');  next_row(y);
-        DispParam(obj, 'AB_P_LQuiet', 0.25, x, y, 'label', 'P L-Quiet'); next_row(y);
-        next_row(y, 0.5);
-        DispParam(obj, 'AB_Hit_RLoud',  NaN, x, y, 'label', 'Hit R-Loud');  next_row(y);
-        DispParam(obj, 'AB_Hit_RQuiet', NaN, x, y, 'label', 'Hit R-Quiet'); next_row(y);
-        DispParam(obj, 'AB_Hit_LLoud',  NaN, x, y, 'label', 'Hit L-Loud');  next_row(y);
-        DispParam(obj, 'AB_Hit_LQuiet', NaN, x, y, 'label', 'Hit L-Quiet'); next_row(y);
-        next_row(y, 0.5);
-        DispParam(obj, 'AB_BetaUsed', 0, x, y, 'label', 'beta used'); next_row(y);
-        NumeditParam(obj, 'AB_Beta', 0, x, y, 'label', 'beta (manual)', ...
-            'TooltipString', 'Used only when AB_BetaMode = Manual. 0 = no antibias.'); next_row(y);
-        NumeditParam(obj, 'AB_BetaMin', 2, x, y, 'position', [x y 100 20], 'label', 'βmin', ...
-            'TooltipString', 'Auto mode: beta when all cells perform equally');
-        NumeditParam(obj, 'AB_BetaMax', 5, x, y, 'position', [x+100 y 100 20], 'label', 'βmax', ...
-            'TooltipString', 'Auto mode: beta when the gap between best and worst cell is 1'); next_row(y);
-        MenuParam(obj, 'AB_BetaMode', {'Auto', 'Manual'}, 'Auto', x, y, 'label', 'beta mode'); next_row(y);
-        NumeditParam(obj, 'AB_Floor', 0.15, x, y, 'label', 'min P/cell', ...
-            'TooltipString', 'Each cell keeps at least this probability (max 0.25)'); next_row(y);
-        LogsliderParam(obj, 'AB_Tau', 30, 10, 400, x, y, 'label', 'antibias tau', ...
-            'TooltipString', 'Number of trials back over which the per-cell hit fraction is computed'); next_row(y);
-        ToggleParam(obj, 'AB_On', 0, x, y, 'OnString', 'Antibias 4-cell ON', 'OffString', 'Antibias 4-cell OFF', ...
-            'TooltipString', 'If OFF, all four trial cells have probability 0.25'); next_row(y);
+        MenuParam(obj, 'AB_Strength', {'Auto by stage', 'Gentle', 'Standard', 'Strong', 'Off'}, 'Auto by stage', ...
+            x, y, 'label', 'Strength', 'labelfraction', 0.35, 'TooltipString', sprintf([ ...
+            'How hard the antibias pushes. On/off and what it acts on are set by the stage.\n' ...
+            'Auto by stage: what the stage asks for (Standard; stage 7: Strong / Gentle cycle)\n' ...
+            'Gentle:   min P/cell 0.20, beta 1-3, memory 50 trials\n' ...
+            'Standard: min P/cell 0.15, beta 2-5, memory 30 trials\n' ...
+            'Strong:   min P/cell 0.10, beta 3-8, memory 20 trials\n' ...
+            'Off:      no antibias in any stage']));
+        set_callback(AB_Strength, {mfilename, 'strength_changed'}); next_row(y);
+        DispParam(obj, 'AB_Status', 'off', x, y, 'label', 'Now', 'labelfraction', 0.2, 'TooltipString', ...
+            'What the antibias is doing now (set by the training stage)'); next_row(y);
+        next_row(y, 0.3);
+        DispParam(obj, 'AB_Hit_RLoud',  NaN, x, y, 'label', 'Recent R-Loud', 'TooltipString', 'Recent hit rate in this cell (the last ~AB_Tau valid trials count most). This is what the antibias balances.');  next_row(y);
+        DispParam(obj, 'AB_Hit_RQuiet', NaN, x, y, 'label', 'Recent R-Quiet', 'TooltipString', 'Recent hit rate in this cell'); next_row(y);
+        DispParam(obj, 'AB_Hit_LLoud',  NaN, x, y, 'label', 'Recent L-Loud', 'TooltipString', 'Recent hit rate in this cell');  next_row(y);
+        DispParam(obj, 'AB_Hit_LQuiet', NaN, x, y, 'label', 'Recent L-Quiet', 'TooltipString', 'Recent hit rate in this cell'); next_row(y);
+        next_row(y, 0.3);
+        DispParam(obj, 'AB_P_RLoud',  0.25, x, y, 'label', 'P next R-Loud', 'TooltipString', 'Probability that the next 2-step trial is of this kind');  next_row(y);
+        DispParam(obj, 'AB_P_RQuiet', 0.25, x, y, 'label', 'P next R-Quiet'); next_row(y);
+        DispParam(obj, 'AB_P_LLoud',  0.25, x, y, 'label', 'P next L-Loud');  next_row(y);
+        DispParam(obj, 'AB_P_LQuiet', 0.25, x, y, 'label', 'P next L-Quiet'); next_row(y);
 
+        % Set by 'configure' / AB_Strength (no manual controls)
+        SoloParamHandle(obj, 'AB_On',       'value', 0);
+        SoloParamHandle(obj, 'AB_Kind',     'value', 'cells');   % 'cells' or 'side'
+        SoloParamHandle(obj, 'AB_StageFloor', 'value', NaN);
+        SoloParamHandle(obj, 'AB_StagePreset', 'value', 'Standard');   % preset asked for by the stage
+        SoloParamHandle(obj, 'AB_BetaMode', 'value', 'Auto');
+        SoloParamHandle(obj, 'AB_Beta',     'value', 0);
+        SoloParamHandle(obj, 'AB_BetaMin',  'value', 2);
+        SoloParamHandle(obj, 'AB_BetaMax',  'value', 5);
+        SoloParamHandle(obj, 'AB_Floor',    'value', 0.15);
+        SoloParamHandle(obj, 'AB_Tau',      'value', 30);
+        SoloParamHandle(obj, 'AB_BetaUsed', 'value', 0);
         SoloParamHandle(obj, 'AB_cell_probs', 'value', [0.25 0.25 0.25 0.25]);
         SoloParamHandle(obj, 'AB_beta_exact', 'value', 0);
+        SoloParamHandle(obj, 'AB_side_force_p', 'value', 0);
 
-        SubheaderParam(obj, 'title', 'Antibias (4 cells)', x, y);
+        SubheaderParam(obj, 'title', 'Antibias (automatic)', x, y, 'TooltipString', ...
+            'On/off and what it acts on are set by the training stage; only the strength can be chosen.');
         next_row(y, 1.5);
         w = gui_position('get_width');
         h = y - y0;
@@ -111,7 +144,7 @@ switch action
             frac(isnan(frac)) = mean(frac(~isnan(frac)));
         end
 
-        if value(AB_On) == 0
+        if value(AB_On) == 0 || strcmp(value(AB_Strength), 'Off')
             beta = 0;
         elseif strcmpi(value(AB_BetaMode), 'Auto')
             gap  = max(frac) - min(frac);
@@ -121,6 +154,9 @@ switch action
         end
         AB_BetaUsed.value = round(beta*100)/100;
         AB_beta_exact.value = beta;
+        if value(AB_On) == 1 && strcmp(value(AB_Kind), 'cells')
+            AB_Status.value = sprintf('4-cell, beta %.1f', beta);
+        end
 
         p = probabilistic_trial_selector(frac, [0.25 0.25 0.25 0.25], beta);
         p = p(:)';
@@ -149,6 +185,70 @@ switch action
             otherwise
                 warning('AntibiasSection:set', 'Unknown parameter %s', varargin{1});
         end
+
+    case 'configure'
+        % on (0/1), kind ('cells' | 'side'), stage floor (NaN = use the preset),
+        % preset ('Gentle' | 'Standard' | 'Strong', used with 'Auto by stage')
+        AB_On.value = varargin{1};
+        AB_Kind.value = varargin{2};
+        if numel(varargin) >= 3, AB_StageFloor.value = varargin{3}; end
+        if numel(varargin) >= 4, AB_StagePreset.value = varargin{4}; end
+        feval(mfilename, obj, 'strength_changed');
+
+    case 'strength_changed'
+        % Presets: [floor, beta min, beta max, memory (trials)]
+        sname = value(AB_Strength);
+        if strcmp(sname, 'Auto by stage'), sname = value(AB_StagePreset); end
+        switch sname
+            case 'Gentle',   pr = [0.20 1 3 50];
+            case 'Strong',   pr = [0.10 3 8 20];
+            otherwise,       pr = [0.15 2 5 30];   % Standard / Auto by stage
+        end
+        if strcmp(value(AB_Strength), 'Auto by stage') && ~isnan(value(AB_StageFloor))
+            pr(1) = value(AB_StageFloor);
+        end
+        AB_Floor.value = pr(1); AB_BetaMin.value = pr(2); AB_BetaMax.value = pr(3); AB_Tau.value = pr(4);
+        AB_BetaMode.value = 'Auto';
+        if strcmp(value(AB_Strength), 'Off') || value(AB_On) == 0
+            AB_Status.value = 'off';
+            AB_cell_probs.value = [0.25 0.25 0.25 0.25];
+            AB_P_LQuiet.value = 0.25; AB_P_LLoud.value = 0.25; AB_P_RQuiet.value = 0.25; AB_P_RLoud.value = 0.25;
+        elseif strcmp(value(AB_Kind), 'side')
+            AB_Status.value = 'side (either side pays)';
+        else
+            AB_Status.value = ['4-cell, ' lower(sname)];
+        end
+
+    case 'is_on'
+        x = value(AB_On) == 1 && ~strcmp(value(AB_Strength), 'Off');
+
+    case 'side_force'
+        % Stages 1-4 (either side pays). Recent fraction of rewarded pokes on
+        % the left, with the same memory as the 4-cell antibias. The more
+        % unequal, the more often only the under-used side pays:
+        %   gap  = |2*fracL - 1|              (0 = balanced, 1 = one side only)
+        %   beta = beta_min + gap * (beta_max - beta_min)
+        %   P(force) = min(1 - 2*floor, 2 * gap * beta / 10)
+        % e.g. Standard, 70% left: gap 0.4, beta 3.2, P(force right) = 0.26.
+        x = '';
+        AB_side_force_p.value = 0;
+        if ~(value(AB_On) == 1 && strcmp(value(AB_Kind), 'side') && ~strcmp(value(AB_Strength), 'Off'))
+            return;
+        end
+        hh = varargin{1}; hh = hh(:); ch = varargin{2}; ch = ch(:);
+        m = min(numel(hh), numel(ch)); hh = hh(1:m); ch = ch(1:m);
+        u = find(hh == 1 & (ch == 'l' | ch == 'r'));
+        if numel(u) < 5, AB_Status.value = 'side: waiting for 5 rewards'; return; end
+        k = exp(-((numel(u)-1):-1:0)' / value(AB_Tau));
+        fl = sum(k .* (ch(u) == 'l')) / sum(k);
+        gap = abs(2*fl - 1);
+        beta = value(AB_BetaMin) + gap * (value(AB_BetaMax) - value(AB_BetaMin));
+        p = min(1 - 2*min(max(value(AB_Floor), 0), 0.5), 2 * gap * beta / 10);
+        AB_side_force_p.value = p;
+        AB_beta_exact.value = beta;
+        if fl > 0.5, under = 'r'; else, under = 'l'; end
+        AB_Status.value = sprintf('side: %.0f%% L, P(force %s) %.2f', 100*fl, upper(under), p);
+        if rand(1) < p, x = under; end
 
     case 'close'
         delete_sphandle('owner', ['^@' class(obj) '$'], 'fullname', ['^' mfilename]);

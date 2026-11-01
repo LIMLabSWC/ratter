@@ -47,28 +47,30 @@ switch action
 		
 		SoloParamHandle(obj, 'my_gui_info', 'value', [x y double(gcf)], 'saveable', 0);
 
-		DispParam(obj, 'ntrials', 0, x, y); next_row(y);
-        DispParam(obj, 'ntrials_valid', 0, x, y); next_row(y);
-		DispParam(obj, 'violation_percent', 0, x, y, 'TooltipString', ...
-			'Fraction of trials with a center poke violation'); next_row(y);
-        DispParam(obj, 'timeout_percent', 0, x, y, 'TooltipString', ...
+		% Two values per row (100 px each) so the section fits column 4
+		DispParam(obj, 'ntrials', 0, x, y, 'position', [x y 100 20], 'label', 'trials', 'TooltipString', 'Trials done');
+		DispParam(obj, 'ntrials_valid', 0, x, y, 'position', [x+100 y 100 20], 'label', 'valid', ...
+			'TooltipString', 'Valid trials (not a violation, not a timeout)'); next_row(y);
+		DispParam(obj, 'violation_percent', 0, x, y, 'position', [x y 100 20], 'label', 'viol', 'TooltipString', ...
+			'Fraction of trials with a center poke violation');
+		DispParam(obj, 'timeout_percent', 0, x, y, 'position', [x+100 y 100 20], 'label', 'timeout', 'TooltipString', ...
 			'Fraction of trials with timeout'); next_row(y);
-		DispParam(obj, 'Left_hit_frac', 0, x, y, 'TooltipString', ...
-			'Fraction of correct Left trials'); next_row(y);
-		DispParam(obj, 'Right_hit_frac', 0, x, y, 'TooltipString', ...
+		DispParam(obj, 'Left_hit_frac', 0, x, y, 'position', [x y 100 20], 'label', 'Left hit', 'TooltipString', ...
+			'Fraction of correct Left trials');
+		DispParam(obj, 'Right_hit_frac', 0, x, y, 'position', [x+100 y 100 20], 'label', 'Right hit', 'TooltipString', ...
 			'Fraction of correct Right trials'); next_row(y);
-		DispParam(obj, 'hit_frac', 0, x, y, 'TooltipString', ...
+		DispParam(obj, 'hit_frac', 0, x, y, 'label', 'Hit fraction', 'TooltipString', ...
 			'Fraction of correct trials'); next_row(y);
-		
+
 		% 2-step: session hit fraction in each trial cell (reward side x category)
-		DispParam(obj, 'Hit_R_Loud',  NaN, x, y, 'label', 'Hit R-Loud');  next_row(y);
-		DispParam(obj, 'Hit_R_Quiet', NaN, x, y, 'label', 'Hit R-Quiet'); next_row(y);
-		DispParam(obj, 'Hit_L_Loud',  NaN, x, y, 'label', 'Hit L-Loud');  next_row(y);
-		DispParam(obj, 'Hit_L_Quiet', NaN, x, y, 'label', 'Hit L-Quiet'); next_row(y);
+		DispParam(obj, 'Hit_R_Loud',  NaN, x, y, 'position', [x y 100 20], 'label', 'R-Loud', 'TooltipString', 'Session hit fraction, reward right, loud');
+		DispParam(obj, 'Hit_R_Quiet', NaN, x, y, 'position', [x+100 y 100 20], 'label', 'R-Quiet', 'TooltipString', 'Session hit fraction, reward right, quiet'); next_row(y);
+		DispParam(obj, 'Hit_L_Loud',  NaN, x, y, 'position', [x y 100 20], 'label', 'L-Loud', 'TooltipString', 'Session hit fraction, reward left, loud');
+		DispParam(obj, 'Hit_L_Quiet', NaN, x, y, 'position', [x+100 y 100 20], 'label', 'L-Quiet', 'TooltipString', 'Session hit fraction, reward left, quiet'); next_row(y);
 		DispParam(obj, 'Chose_Lit', NaN, x, y, 'label', 'Chose lit port', 'TooltipString', ...
 			'2-step trials: fraction of first pokes to the lit port. 0.5 = no light bias.'); next_row(y);
 		SubheaderParam(obj, 'title', 'Overall Performance', x, y);
-		next_row(y, 1.5);
+		next_row(y, 1.2);
 		% SoloParamHandle(obj, 'previous_parameters', 'value', []);
         
 		
@@ -83,17 +85,17 @@ switch action
             try
                 ntrials.value        = n_done_trials;
                 ntrials_valid.value = numel(find(~isnan(hit_history)));
-                violation_percent.value = numel(find(violation_history))/n_done_trials;
-                timeout_percent.value = numel(find(timeout_history))/n_done_trials;
+                violation_percent.value = round(numel(find(violation_history))/n_done_trials*100)/100;
+                timeout_percent.value = round(numel(find(timeout_history))/n_done_trials*100)/100;
                 goods  = ~isnan(hit_history(1:n_done_trials));
                 lefts  = previous_sides(1:n_done_trials)=='l';
                 rights = previous_sides(1:n_done_trials)=='r';
                 goods = goods(:);
                 lefts = lefts(:);
                 rights = rights(:);
-                Left_hit_frac.value  = mean(hit_history(goods & lefts));
-                Right_hit_frac.value = mean(hit_history(goods & rights));
-                hit_frac.value       = mean(hit_history(goods));
+                Left_hit_frac.value  = round(mean(hit_history(goods & lefts))*100)/100;   % 2 decimals: fits the half-width boxes
+                Right_hit_frac.value = round(mean(hit_history(goods & rights))*100)/100;
+                hit_frac.value       = round(mean(hit_history(goods))*100)/100;
             catch
             end
             try

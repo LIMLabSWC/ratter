@@ -150,9 +150,9 @@ switch action
         next_row(y);
     	NumeditParam(obj,'fcut',110,x,y,'label','fcut','TooltipString','Cut off frequency on the original white noise');
         next_row(y);
-    	NumeditParam(obj,'lfreq',2000,x,y,'label','Modulator_LowFreq','TooltipString','Lower bound for the frequency modulator');
+    	NumeditParam(obj,'lfreq',2000,x,y,'label','Mod. low freq','TooltipString','Lower bound for the frequency modulator');
     	next_row(y);
-    	NumeditParam(obj,'hfreq',20000,x,y,'label','Modulator_HighFreq','TooltipString','Upper bound for the frequency modulator');
+    	NumeditParam(obj,'hfreq',20000,x,y,'label','Mod. high freq','TooltipString','Upper bound for the frequency modulator');
         next_row(y);
         NumeditParam(obj,'minS1',0.007,x,y,'label','minS1','TooltipString','min sigma value for AUD1');
         set_callback(minS1, {mfilename, 'Cal_Boundary'});
@@ -186,14 +186,23 @@ switch action
         make_invisible(maxF1);make_invisible(minF1);make_invisible(A1_freq);make_invisible(volumeF1);
         next_row(y);
         
-        % Axes for Plotting
-        hndl_uipanelplotaxes = uipanel('Units', 'normalized');
+        % Axes for Plotting: placed in pixels above the parameter columns, and
+        % the window sized to fit (so the plot never covers the parameters)
+        params_top = 0;
+        hh = findall(value(myfig), 'type', 'uicontrol');
+        for k = 1:numel(hh)
+            if strcmp(get(hh(k), 'Units'), 'pixels'), p = get(hh(k), 'Position'); params_top = max(params_top, p(2) + p(4)); end
+        end
+        set(value(myfig), 'Units', 'pixels');
+        fpos_px = get(value(myfig), 'Position');
+        set(value(myfig), 'Position', [fpos_px(1) fpos_px(2) 640 params_top + 330]);
+        hndl_uipanelplotaxes = uipanel('Units', 'pixels');
         set(hndl_uipanelplotaxes, ...
-                'Units', 'normalized', ...
+                'Units', 'pixels', ...
                 'Parent', value(myfig), ...
                 'Title', 'Stimuli Distribution', ...
                 'Tag', 'uipanelstimplot', ...
-                'Position', [0.06,0.52,0.8,0.42]);
+                'Position', [10, params_top + 10, 620, 310]);
 
         SoloParamHandle(obj, 'axstimplot', 'value', axes(hndl_uipanelplotaxes,'Units', 'normalized','Position', [0.07,0.07, ...
             0.8,0.85]), 'saveable', false);
@@ -235,11 +244,10 @@ switch action
 
         StimulusSection(obj,'Stimuli_State_change');
 
-        % Plot the Distribution
-        if strcmpi(Stimuli_State,'Full')
-            StimulusSection(obj,'plot_stim_distribution');
-            set(value(myfig), 'visible', 'off');
-        end
+        set_callback({n_discrete; max_dB_discrete; dB_at_maxS1; FixedStim}, {mfilename, 'plot_stim_distribution'});
+        % Plot the distribution (or the discrete levels / fixed sound / a note, by mode)
+        StimulusSection(obj,'plot_stim_distribution');
+        set(value(myfig), 'visible', 'off');
 
         x=oldx; y=oldy;
         figure(parentfig);
@@ -395,6 +403,7 @@ switch action
         % Called by TrainingStageSection
         if value(n_discrete) ~= varargin{1}
             n_discrete.value = varargin{1};
+            StimulusSection(obj, 'plot_stim_distribution');
         end
 
     case 'fixed_stim_default'
@@ -499,6 +508,63 @@ switch action
 
         %% Case plot stimuli distribution
     case 'plot_stim_distribution'
+        % What the plot shows depends on the stimulus mode:
+        %   Full     - the continuous distribution of each category
+        %   Discrete - the levels actually used, either side of the boundary
+        %   Fixed    - the one control sound
+        %   No Sound - a note
+        ax = value(axstimplot);
+        delete(findobj(ax, 'Tag', 'stim_mode_overlay'));
+        % items of the Full plot that we hid for another mode (restored for Full)
+        was_hidden = getappdata(ax, 'hidden_by_mode');
+        if ~isempty(was_hidden), set(was_hidden(ishandle(was_hidden)), 'Visible', 'on'); end
+        setappdata(ax, 'hidden_by_mode', []);
+        if strcmpi(value(Stimuli_State), 'Full')
+            StimulusSection(obj, 'plot_full_distribution');
+            return;
+        end
+        full_items = findobj(ax, '-depth', 1, '-not', 'Type', 'axes', 'Visible', 'on');
+        set(full_items, 'Visible', 'off');
+        setappdata(ax, 'hidden_by_mode', full_items);
+        if strcmpi(value(Stimuli_State), 'Discrete') && ~value(frequency_categorization)
+            lev  = StimulusSection(obj, 'discrete_levels');
+            b    = value(boundary);
+            n    = numel(lev);
+            hgt  = 0.5 / n;                       % each category is drawn half the time
+            q    = b - lev;  l = b + lev;          % quiet / loud levels (log sigma)
+            hold(ax, 'on');
+            for k = 1:n
+                plot(ax, [q(k) q(k)], [0 hgt], '-', 'Color', [0.2 0.4 0.9], 'LineWidth', 3, 'Tag', 'stim_mode_overlay');
+                plot(ax, [l(k) l(k)], [0 hgt], '-', 'Color', [0.9 0.3 0.2], 'LineWidth', 3, 'Tag', 'stim_mode_overlay');
+                db_q = value(dB_at_maxS1) + 20 * log10(exp(q(k)) / value(maxS1));
+                db_l = value(dB_at_maxS1) + 20 * log10(exp(l(k)) / value(maxS1));
+                text(ax, q(k), hgt * 1.08, sprintf('%.0f dB', db_q), 'HorizontalAlignment', 'center', 'Tag', 'stim_mode_overlay');
+                text(ax, l(k), hgt * 1.08, sprintf('%.0f dB', db_l), 'HorizontalAlignment', 'center', 'Tag', 'stim_mode_overlay');
+            end
+            plot(ax, [b b], [0 0.6], '--k', 'Tag', 'stim_mode_overlay');
+            text(ax, b, 0.62, 'boundary', 'HorizontalAlignment', 'center', 'Tag', 'stim_mode_overlay');
+            set(ax, 'XLim', [log(value(minS1)) log(value(maxS1))], 'YLim', [0 0.7]);
+            title(ax, sprintf('Discrete: %d level(s) per category  (blue quiet, red loud)', n), 'Tag', 'stim_mode_overlay');
+            xlabel(ax, 'log sigma (noise amplitude)');
+            ylabel(ax, 'P(stimulus)');
+        elseif strcmpi(value(Stimuli_State), 'Fixed Stimuli') && ~value(frequency_categorization)
+            fs = log(value(FixedStim)); b = value(boundary);
+            hold(ax, 'on');
+            plot(ax, [fs fs], [0 1], '-', 'Color', [0.9 0.3 0.2], 'LineWidth', 3, 'Tag', 'stim_mode_overlay');
+            text(ax, fs, 1.05, sprintf('%.0f dB', value(dB_at_maxS1) + 20 * log10(value(FixedStim) / value(maxS1))), ...
+                'HorizontalAlignment', 'center', 'Tag', 'stim_mode_overlay');
+            plot(ax, [b b], [0 1.15], '--k', 'Tag', 'stim_mode_overlay');
+            set(ax, 'XLim', [log(value(minS1)) log(value(maxS1))], 'YLim', [0 1.2]);
+            title(ax, 'Fixed: one control sound on every trial', 'Tag', 'stim_mode_overlay');
+            xlabel(ax, 'log sigma (noise amplitude)');
+        else
+            set(ax, 'XLim', [0 1], 'YLim', [0 1]);
+            text(ax, 0.5, 0.5, sprintf('No sound in this mode (%s).', value(Stimuli_State)), ...
+                'HorizontalAlignment', 'center', 'Tag', 'stim_mode_overlay');
+        end
+        drawnow;
+
+    case 'plot_full_distribution'
 
          if frequency_categorization
             stim_min_log = log(value(minF1));
@@ -964,11 +1030,8 @@ switch action
         end
 
         % 3. Handle Plot Visibility
-        if strcmpi(Stimuli_State,'Fixed Stimuli')
-            make_invisible(plot_h);
-        else
-            make_visible(plot_h);
-        end
+        make_visible(plot_h);
+        StimulusSection(obj, 'plot_stim_distribution');
 
     %% Case hide
     case 'hide'

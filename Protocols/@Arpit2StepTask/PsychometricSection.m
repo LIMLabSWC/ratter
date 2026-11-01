@@ -28,17 +28,20 @@ switch action
         make_invisible(Context2_Dist); make_invisible(Context2_trialStart); make_invisible(Context2_trialEnd);
         next_row(y);
 
-        DispParam(obj, 'Context1_trialStart', 1,x,y, 'position', [x, y, 100 20],'label','Trial_start','TooltipString','1st context started at this trial');
-        DispParam(obj, 'Context1_trialEnd', 1,x,y, 'position', [x + 101, y, 100 20],'label','Trial_end','TooltipString','1st context ended at this trial');
+        DispParam(obj, 'Context1_trialStart', 1,x,y, 'position', [x, y, 100 20],'label','t_start','TooltipString','1st context started at this trial');
+        DispParam(obj, 'Context1_trialEnd', 1,x,y, 'position', [x + 101, y, 100 20],'label','t_end','TooltipString','1st context ended at this trial');
         next_row(y);
         DispParam(obj, 'Context1_Dist', Category_Dist, x,y,'label','Context1_Distr','TooltipString','stim distribution/mode for 1st context');
         next_row(y);
 
-        PushbuttonParam(obj, 'Switch_Distr', x, y, 'label', 'Change Stim Distribution', ...
-            'TooltipString', 'Change the context by switching distribution (Full mode only)');
-        set_callback(Switch_Distr, {mfilename, 'PushButton_Distribution_Switch'});
-        next_row(y,2);
         NumeditParam(obj,'trial_plot',30,x,y,'label','Trials 2 Plot','TooltipString','Update plots after these many valid trials');
+        next_row(y, 1.5);
+        % Quick access, at the top of the section: switch Hard A <-> Hard B
+        PushbuttonParam(obj, 'Switch_Distr', x, y, 'label', 'Switch Distribution', ...
+            'TooltipString', sprintf(['Switch the stimulus distribution now (Hard A <-> Hard B) and start a new context.\n' ...
+            'Full mode only. The same switch the Experiment schedule uses for switch sessions.']));
+        set_callback(Switch_Distr, {mfilename, 'PushButton_Distribution_Switch'});
+        try set(get_ghandle(Switch_Distr), 'BackgroundColor', [0.75 0.88 1], 'FontWeight', 'bold'); catch, end
         next_row(y);
         ToggleParam(obj, 'PsychometricShow', 0, x, y, 'OnString', 'Psychometric Show', ...
             'OffString', 'Psychometric Hidden', 'TooltipString', 'Show/Hide analysis panel');

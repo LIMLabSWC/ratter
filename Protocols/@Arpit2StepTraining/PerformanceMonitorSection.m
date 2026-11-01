@@ -15,18 +15,19 @@ function varargout = PerformanceMonitorSection(obj, action, varargin)
 %   -----------    -------------------------------------------------  --------------------
 %   low_trials     fewer than min_valid_trials VALID trials (not       from low_trials_from_stage
 %                  violations / timeouts) in the session               (default 2)
-%   stalled        stage 5 for >= stall_sessions sessions, or the      stages 5-6 (end of session)
-%                  same stage 6 step for >= stall_sessions sessions
+%   stalled        stage 5, 6 or 7 for >= stall_sessions sessions, or  stages 5-7 (end of session)
+%                  the same sound level for >= stall_sessions sessions
 %   (the checks below start at email_from_stage, default 5)
-%   violations     violation rate >= viol_rate over the last window    stage 6 and 7 (and Arpit2StepTask)
+%   violations     violation rate >= viol_rate over the last window    stages 6-8 (and Arpit2StepTask)
 %   side_bias      >= strategy_frac of recent first pokes to one side  expert phase
 %   light_rule     lit-port choices >= strategy_frac or <= 1-frac      expert phase
 %   category       "loud" responses >= strategy_frac or <= 1-frac      expert phase
 %   perf_drop      recent hit rate >= drop_size below this rat's       expert phase
 %                  usual (mean of its last 3 expert-phase sessions)
 %
-% Expert phase (MonitorExpertMode 'Auto by stage'): stage 6 from step 4
-% (full distribution) and stage 7. Earlier, strategies are normal learning.
+% Expert phase (MonitorExpertMode 'Auto by stage'): stage 7 at sound level 6
+% (full distribution, no second chance) and stage 8. Earlier, strategies are
+% normal learning.
 % An episode is FLAGGED (goes into the e-mail) if it lasted at least
 % persist_trials trials; shorter episodes are listed as brief remarks only.
 % low_trials is always flagged.
@@ -54,32 +55,45 @@ switch action
         next_row(y);
 
         oldx = x; oldy = y; parentfig = double(gcf);
+        % Window in pixels: thresholds in two columns at the bottom, remarks above
         SoloParamHandle(obj, 'myfig', 'value', figure( ...
             'closerequestfcn', [mfilename '(' class(obj) ', ''hide'');'], ...
-            'MenuBar', 'none', 'Name', 'Performance Monitor', 'Units', 'normalized', ...
-            'Position', [0.3, 0.15, 0.4, 0.7], 'Visible', 'off'), 'saveable', false);
+            'MenuBar', 'none', 'Name', 'Performance Monitor', 'Units', 'pixels', ...
+            'Position', [200 150 540 420], 'Visible', 'off'), 'saveable', false);
         % Remarks text (top half of the window)
-        SoloParamHandle(obj, 'remarks_box', 'value', uicontrol(value(myfig), 'Style', 'listbox', ...
-            'Units', 'normalized', 'Position', [0.02 0.5 0.96 0.48], 'String', {'No remarks yet'}, ...
-            'FontName', 'Courier', 'Max', 2, 'Min', 0), 'saveable', false);
-
+        LF = 0.66;   % wider labels
         x = 10; y = 5;
-        NumeditParam(obj, 'drop_size', 0.2, x, y, 'label', 'Perf drop (hit frac)'); next_row(y);
-        NumeditParam(obj, 'strategy_frac', 0.9, x, y, 'label', 'Strategy fraction'); next_row(y);
-        NumeditParam(obj, 'viol_rate', 0.5, x, y, 'label', 'Violation rate (st 6-7)'); next_row(y);
-        NumeditParam(obj, 'persist_trials', 100, x, y, 'label', 'Flag if lasts (trials)'); next_row(y);
-        NumeditParam(obj, 'window', 60, x, y, 'label', 'Window (trials)'); next_row(y);
-        NumeditParam(obj, 'min_valid_trials', 80, x, y, 'label', 'Min valid trials/session', 'TooltipString', ...
+        NumeditParam(obj, 'drop_size', 0.2, x, y, 'labelfraction', LF, 'label', 'Perf drop (hit frac)'); next_row(y);
+        NumeditParam(obj, 'strategy_frac', 0.9, x, y, 'labelfraction', LF, 'label', 'Strategy fraction'); next_row(y);
+        NumeditParam(obj, 'viol_rate', 0.5, x, y, 'labelfraction', LF, 'label', 'Viol. rate (st 6-7)'); next_row(y);
+        NumeditParam(obj, 'persist_trials', 100, x, y, 'labelfraction', LF, 'label', 'Flag if lasts (tr)'); next_row(y);
+        NumeditParam(obj, 'window', 60, x, y, 'labelfraction', LF, 'label', 'Window (trials)'); next_row(y);
+        SubheaderParam(obj, 'title2b', 'Strategy / performance', x, y);
+        next_column(x); y = 5;
+        NumeditParam(obj, 'min_valid_trials', 80, x, y, 'labelfraction', LF, 'label', 'Min valid tr/session', 'TooltipString', ...
             'Valid = not a violation and not a timeout'); next_row(y);
-        NumeditParam(obj, 'low_trials_from_stage', 2, x, y, 'label', 'Valid-trial check from stage'); next_row(y);
-        NumeditParam(obj, 'stall_sessions', 6, x, y, 'label', 'Stalled after (sessions)', 'TooltipString', ...
-            'Flag a rat that has been in stage 5, or on the same stage 6 step, for this many sessions'); next_row(y);
-        NumeditParam(obj, 'email_from_stage', 5, x, y, 'label', 'Other checks from stage'); next_row(y);
+        NumeditParam(obj, 'low_trials_from_stage', 2, x, y, 'labelfraction', LF, 'label', 'Valid check from st.'); next_row(y);
+        NumeditParam(obj, 'stall_sessions', 6, x, y, 'labelfraction', LF, 'label', 'Stalled after (sess)', 'TooltipString', ...
+            'Flag a rat that has been in stage 5, 6 or 7, or at the same sound level, for this many sessions'); next_row(y);
+        NumeditParam(obj, 'email_from_stage', 5, x, y, 'labelfraction', LF, 'label', 'Other checks from st.'); next_row(y);
         MenuParam(obj, 'MonitorExpertMode', {'Auto by stage', 'Always expert', 'Never expert'}, 'Auto by stage', ...
             x, y, 'label', 'Expert phase', 'labelfraction', 0.4, 'TooltipString', ...
             'When strategy / performance checks are active'); next_row(y);
         ToggleParam(obj, 'email_alerts', 1, x, y, 'OnString', 'Summary e-mail ON', 'OffString', 'Summary e-mail OFF'); next_row(y);
-        SubheaderParam(obj, 'title2', 'Monitor thresholds', x, y);
+        SubheaderParam(obj, 'title2', 'Session checks', x, y);
+
+        % Remarks list. BControl draws its parameters on a full-window panel
+        % ('ContainerPanel'); anything put directly on the figure ends up hidden
+        % behind it, so the list goes on that panel too.
+        panel = findobj(value(myfig), 'Tag', 'ContainerPanel');
+        if isempty(panel), panel = value(myfig); end
+        SoloParamHandle(obj, 'remarks_box', 'value', uicontrol(panel, 'Style', 'listbox', ...
+            'Units', 'pixels', 'Position', [10 160 520 228], 'String', {'No remarks yet'}, ...
+            'FontName', 'Courier', 'Max', 2, 'Min', 0), 'saveable', false);
+        uicontrol(panel, 'Style', 'text', 'Units', 'pixels', 'Position', [10 390 520 20], ...
+            'String', 'Remarks this session', ...
+            'HorizontalAlignment', 'left', 'FontWeight', 'bold');
+
 
         % Per-session state
         SoloParamHandle(obj, 'ep_active', 'value', false(1, numel(TYPES)));
@@ -237,12 +251,14 @@ switch action
                 monitor_log.value = lg;
             end
             sm0 = feval(mfilename, obj, 'summary');
-            if sm0.stage_no == 5 && sm0.stage_sessions >= value(stall_sessions)
-                lg(end+1, :) = {'stalled', 1, n, sprintf('%d sessions in stage 5 without passing', sm0.stage_sessions)};
-                monitor_log.value = lg;
-            elseif sm0.stage_no == 6 && sm0.s6_step_sessions >= value(stall_sessions)
-                lg(end+1, :) = {'stalled', 1, n, sprintf('%d sessions on stage 6 step %d', sm0.s6_step_sessions, sm0.s6_step)};
-                monitor_log.value = lg;
+            if isfield(sm0, 'sound_level') && sm0.stage_no >= 5 && sm0.stage_no <= 7
+                if sm0.stage_sessions >= value(stall_sessions)
+                    lg(end+1, :) = {'stalled', 1, n, sprintf('%d sessions in stage %d without passing', sm0.stage_sessions, sm0.stage_no)};
+                    monitor_log.value = lg;
+                elseif sm0.sound_level < 6 && sm0.sound_level_sessions >= value(stall_sessions)
+                    lg(end+1, :) = {'stalled', 1, n, sprintf('%d sessions at sound level %d', sm0.sound_level_sessions, sm0.sound_level)};
+                    monitor_log.value = lg;
+                end
             end
             [lines, flagged] = feval(mfilename, obj, 'remarks');
             feval(mfilename, obj, 'refresh');

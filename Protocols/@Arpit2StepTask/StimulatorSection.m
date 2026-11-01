@@ -85,58 +85,81 @@ switch action
   %     varargout{1} = x;
   %     varargout{2} = y;
   case 'init'
-        % 1. Create StimLine menu FIRST so it stays at the very bottom
-        dionames = {'none','Opto','Ephys'};
-        MenuParam(obj,'StimLine',dionames,1,x,y,'labelfraction',0.30); next_row(y);
-        set_callback(StimLine, {mfilename, 'StimSelected'});
-        
-        % Save Y position so we know where to drop the title when collapsed
-        SoloParamHandle(obj, 'y_title_collapsed', 'value', y); 
-        
-        % 2. Create the rest of the parameters (Opto Params)
-        NumeditParam(obj,'StimStates', 1,x,y,'position',[x     y 100 20],'labelfraction',0.60);
-        NumeditParam(obj,'StimLines',  1,x,y,'position',[x+100 y 100 20],'labelfraction',0.60); next_row(y);
-        
-        NumeditParam(obj,'StartDelay', 0,x,y,'position',[x     y 100 20],'labelfraction',0.60);
-        NumeditParam(obj,'StimFreq',  20,x,y,'position',[x+100 y 100 20],'labelfraction',0.60); next_row(y);
-        NumeditParam(obj,'PulseWidth',15,x,y,'position',[x     y 100 20],'labelfraction',0.60); 
-        NumeditParam(obj,'NumPulses', 1,x,y,'position',[x+100 y 100 20],'labelfraction',0.60); next_row(y);
-        
-        DispParam(obj,'SD',0 ,x,y,'position',[x     y 50 20],'labelfraction',0.4);
-        DispParam(obj,'SF',20,x,y,'position',[x+50  y 50 20],'labelfraction',0.4);
-        DispParam(obj,'PW',15,x,y,'position',[x+100 y 50 20],'labelfraction',0.4);
-        DispParam(obj,'NP',1,x,y,'position',[x+150 y 50 20],'labelfraction',0.4); next_row(y);  
-        
-        MenuParam(obj,'StimInterval',{'WholeCP_Duration','CP_DurationAfterPrestim','Prestim','S1','DelayDur','GoCue'},1,x,y,'labelfraction',0.30); next_row(y);
-        set_callback(StimInterval, {mfilename, 'StimInterval'});
-        
-        MenuParam(obj,'StimOnSide',{'both','left','right'},1,x,y,'labelfraction',0.3); next_row(y);
-        
+        % Layout (bottom to top): the opto parameters, then the StimLine menu,
+        % then the title. The opto parameters are shown only when StimLine is
+        % 'Opto'; 'none' (no experiment / training) and 'Ephys' have no
+        % settings here, so only the menu and the title are visible and the
+        % hidden rows leave empty space at the bottom of the column.
+
+        % 1. Opto parameters (bottom)
+        NumeditParam(obj,'StimProb',     0,x,y,'position',[x     y 100 20],'labelfraction',0.65);
+        ToggleParam( obj,'ShuffleValues',0,x,y,'position',[x+100 y 100 20],'OnString','Shuffle','OffString','Lock');  next_row(y);
+
         SC = state_colors(obj);
-        WC = wave_colors(obj); 
+        WC = wave_colors(obj);
         states = fieldnames(SC);
         waves  = fieldnames(WC);
         states(2:end+1) = states;
         states{1} = 'cp';
         states(end+1:end+length(waves)) = waves;
-        
         MenuParam(obj,'StimState',states,1,x,y,'labelfraction',0.30); next_row(y);
-        NumeditParam(obj,'StimProb',     0,x,y,'position',[x     y 100 20],'labelfraction',0.65);
-        ToggleParam( obj,'ShuffleValues',0,x,y,'position',[x+100 y 100 20],'OnString','Shuffle','OffString','Lock');  next_row(y);
-        
-        % Save Y position for the Title when expanded
-        SoloParamHandle(obj, 'y_title_expanded', 'value', y); 
-        
-        % 3. Create Title LAST so it sits at the top
-        SubheaderParam(obj, 'StimTitle', 'Stimulator Section', x, y); next_row(y);
-        
+
+        MenuParam(obj,'StimOnSide',{'both','left','right'},1,x,y,'labelfraction',0.3); next_row(y);
+
+        MenuParam(obj,'StimInterval',{'WholeCP_Duration','CP_DurationAfterPrestim','Prestim','S1','DelayDur','GoCue'},1,x,y,'labelfraction',0.30); next_row(y);
+        set_callback(StimInterval, {mfilename, 'StimInterval'});
+
+        DispParam(obj,'SD',0 ,x,y,'position',[x     y 50 20],'labelfraction',0.4);
+        DispParam(obj,'SF',20,x,y,'position',[x+50  y 50 20],'labelfraction',0.4);
+        DispParam(obj,'PW',15,x,y,'position',[x+100 y 50 20],'labelfraction',0.4);
+        DispParam(obj,'NP',1,x,y,'position',[x+150 y 50 20],'labelfraction',0.4); next_row(y);
+
+        NumeditParam(obj,'PulseWidth',15,x,y,'position',[x     y 100 20],'labelfraction',0.60);
+        NumeditParam(obj,'NumPulses', 1,x,y,'position',[x+100 y 100 20],'labelfraction',0.60); next_row(y);
+        NumeditParam(obj,'StartDelay', 0,x,y,'position',[x     y 100 20],'labelfraction',0.60);
+        NumeditParam(obj,'StimFreq',  20,x,y,'position',[x+100 y 100 20],'labelfraction',0.60); next_row(y);
+        NumeditParam(obj,'StimStates', 1,x,y,'position',[x     y 100 20],'labelfraction',0.60);
+        NumeditParam(obj,'StimLines',  1,x,y,'position',[x+100 y 100 20],'labelfraction',0.60); next_row(y);
+
+        % 2. StimLine menu and title (top, always visible)
+        dionames = {'none','Opto','Ephys'};
+        MenuParam(obj,'StimLine',dionames,1,x,y,'labelfraction',0.30, 'TooltipString', sprintf([ ...
+            'none:  no experiment (behaviour / training). The performance monitor runs.\n' ...
+            'Opto:  optogenetic stimulation; its settings are shown below.\n' ...
+            'Ephys: recording (trial-number TTL to the acquisition system); no settings here.\n' ...
+            'With Opto or Ephys the performance monitor is switched off, so it does not slow the trials.']));
+        set_callback(StimLine, {mfilename, 'StimSelected'});
+        set_callback_on_load(StimLine, 1);   % also re-apply after loading settings
+        next_row(y);
+        SubheaderParam(obj, 'StimTitle', 'Stimulator (experiment)', x, y); next_row(y);
+
         SoloParamHandle(obj, 'stimulator_history',   'value', []);
         SoloFunctionAddVars('Arpit2StepTaskSMA', 'ro_args',{'StimLine'});
         varargout{1} = x;
-        varargout{2} = y; % Return the max y so other sections don't draw over this space!
-        
-        % 4. Call the switch logic to format the GUI on load
+        varargout{2} = y;
+
+        % 3. Show / hide the opto parameters for the current choice
         feval(mfilename, obj, 'StimSelected');
+
+
+%% StimSelected
+% -----------------------------------------------------------------------
+%
+%         STIMSELECTED: show the opto parameters only for 'Opto'; switch
+%         the performance monitor off for 'Opto' and 'Ephys'
+%
+% -----------------------------------------------------------------------
+
+  case 'StimSelected'
+        opto = {StimStates, StimLines, StartDelay, StimFreq, PulseWidth, NumPulses, SD, SF, ...
+                PW, NP, StimInterval, StimOnSide, StimState, StimProb, ShuffleValues};
+        for i = 1:numel(opto)
+            if strcmp(value(StimLine), 'Opto'), make_visible(opto{i}); else, make_invisible(opto{i}); end
+        end
+        try
+            PerformanceMonitorSection(obj, 'set_active', strcmp(value(StimLine), 'none'));
+        catch
+        end
 
 
 %% update_values
@@ -145,36 +168,6 @@ switch action
 %         UPDATE_VALUES
 %
 % -----------------------------------------------------------------------
-
-  case 'StimSelected'
-        if strcmp(value(StimLine), 'Opto')
-            % 1. Show all Opto boxes
-            make_visible(StimStates); make_visible(StimLines); make_visible(StartDelay); make_visible(StimFreq);
-            make_visible(PulseWidth); make_visible(NumPulses); make_visible(SD); make_visible(SF);
-            make_visible(PW); make_visible(NP); make_visible(StimInterval); make_visible(StimOnSide);
-            make_visible(StimState); make_visible(StimProb); make_visible(ShuffleValues);
-            
-            % 2. Move Title UP to the expanded position
-            gh = get_ghandle(StimTitle);
-            for i = 1:length(gh)
-                pos = get(gh(i), 'Position');
-                set(gh(i), 'Position', [pos(1), value(y_title_expanded), pos(3), pos(4)]);
-            end
-        else
-            % 1. Hide all Opto boxes
-            make_invisible(StimStates); make_invisible(StimLines); make_invisible(StartDelay); make_invisible(StimFreq);
-            make_invisible(PulseWidth); make_invisible(NumPulses); make_invisible(SD); make_invisible(SF);
-            make_invisible(PW); make_invisible(NP); make_invisible(StimInterval); make_invisible(StimOnSide);
-            make_invisible(StimState); make_invisible(StimProb); make_invisible(ShuffleValues);
-            
-            % 2. Move Title DOWN (so it sits directly above the StimLine menu)
-            gh = get_ghandle(StimTitle);
-            for i = 1:length(gh)
-                pos = get(gh(i), 'Position');
-                set(gh(i), 'Position', [pos(1), value(y_title_collapsed), pos(3), pos(4)]);
-            end
-        end
-
 
   case 'update_values'
        
