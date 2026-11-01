@@ -60,7 +60,7 @@ switch action
             'TwoStep: max consecutive trials with the same category (loud/quiet). Overrides antibias.'); next_row(y);
         NumeditParam(obj, 'block_jitter', 0.25, x, y, 'position', [x y 100 20], 'label', 'jitter', ...
             'TooltipString', 'Each block length is drawn in block_len * [1-jitter, 1+jitter]');
-        NumeditParam(obj, 'block_len', 0, x, y, 'position', [x+100 y 100 20], 'label', 'Block len', ...
+        NumeditParam(obj, 'block_len', 0, x, y, 'position', [x+100 y 100 20], 'label', 'Blk len', ...
             'TooltipString', sprintf(['TwoStep: number of valid trials of the same category in a row\n' ...
             '(0 = random order). Set automatically by the training stages.'])); next_row(y);
         NumeditParam(obj, 'left_wtr_mult', 1, x, y, 'TooltipString', 'all left reward times are multiplied by this number'); next_row(y);
@@ -98,27 +98,6 @@ switch action
         DeclareGlobals(obj, 'ro_args', {'block_history'});
 
         next_column(x); y = 5;
-
-        % ---- Trial structure ----
-        MenuParam(obj, 'TrialMode', {'Shaping', 'TwoStep'}, 'Shaping', x, y, 'label', 'Trial mode', ...
-            'labelfraction', 0.35, 'TooltipString', sprintf(['\nShaping: side lights uninformative, either side pays.\n' ...
-            'TwoStep: sound category x lit side decides the rewarded port.\n' ...
-            'Set automatically unless TrainingStage = Manual.'])); next_row(y);
-        ToggleParam(obj, 'CentrePokeRequired', 0, x, y, 'OnString', 'Centre poke required', ...
-            'OffString', 'No centre poke', 'TooltipString', 'If off, the trial starts directly with the side ports open (shaping stages 1-2)'); next_row(y);
-        ToggleParam(obj, 'ChoiceTimeLimited', 0, x, y, 'OnString', 'Choice time limited', ...
-            'OffString', 'Choice time unlimited', 'TooltipString', 'If on, no side poke within RColl_dur is a timeout'); next_row(y);
-        MenuParam(obj, 'ShapingLights', {'Random both/none', 'Both lit', 'Both dark'}, 'Random both/none', x, y, ...
-            'label', 'Shaping lights', 'labelfraction', 0.35, 'TooltipString', ...
-            'Side LEDs during Shaping trials. They never indicate the rewarded side.'); next_row(y);
-        MenuParam(obj, 'CueRule', {'Loud->Lit', 'Loud->Dark'}, 'Loud->Lit', x, y, 'label', 'Cue rule', ...
-            'labelfraction', 0.35, 'TooltipString', sprintf(['\nLoud->Lit: loud = go to the lit port, quiet = go to the dark port.\n' ...
-            'Loud->Dark: loud = go to the dark port, quiet = go to the lit port.'])); next_row(y);
-        MenuParam(obj, 'CueMode', {'Light/Dark', 'Color'}, 'Light/Dark', x, y, 'label', 'Cue mode', ...
-            'labelfraction', 0.35, 'TooltipString', sprintf(['\nLight/Dark: target side LED on, other off.\n' ...
-            'Color: lit side shows the port LED, other side shows the alternative colour\n' ...
-            '(needs DIOLINES left1led_alt / right1led_alt in Settings_Custom.conf; untested).'])); next_row(y);
-        next_row(y, 0.5);
 
         % ---- Reward ----
         MenuParam(obj, 'reward_type', {'Always', 'DelayedReward', 'NoReward'}, 'Always', x, y, 'labelfraction', 0.35, ...
@@ -171,7 +150,7 @@ switch action
         NumeditParam(obj, 'A1_time_Max', 0.4, x, y, 'label', 'Max time AUD1', 'TooltipString', 'Max stimulus duration');
         set_callback(A1_time_Max, {mfilename, 'new_CP_duration'}); next_row(y);
         % Time between stimulus and go cue
-        NumeditParam(obj, 'time_bet_aud1_gocue_Min', 0.2, x, y, 'label', 'Min A1-GoCue time', 'TooltipString', 'Min time between stimulus end and go cue');
+        NumeditParam(obj, 'time_bet_aud1_gocue_Min', 0.2, x, y, 'label', 'Min A1-Go time', 'TooltipString', 'Min time between stimulus end and go cue');
         set_callback(time_bet_aud1_gocue_Min, {mfilename, 'new_CP_duration'}); next_row(y);
         NumeditParam(obj, 'time_bet_aud1_gocue', 0.4, x, y, 'position', [x, y, 175 20], 'label', 'A1-GoCue time', 'TooltipString', 'Actual time between stimulus end and go cue');
         set_callback(time_bet_aud1_gocue, {mfilename, 'new_CP_duration'});
@@ -179,7 +158,7 @@ switch action
             'OnString', 'random prego_time ON', 'OffString', 'random prego_time OFF', ...
             'TooltipString', 'If on (black) then it enables the random sampling of the stimulus-go cue time');
         set_callback(random_prego_time, {mfilename, 'new_CP_duration'}); next_row(y);
-        NumeditParam(obj, 'time_bet_aud1_gocue_Max', 1, x, y, 'label', 'Max A1-GoCue time', 'TooltipString', 'Max time between stimulus end and go cue');
+        NumeditParam(obj, 'time_bet_aud1_gocue_Max', 1, x, y, 'label', 'Max A1-Go time', 'TooltipString', 'Max time between stimulus end and go cue');
         set_callback(time_bet_aud1_gocue_Max, {mfilename, 'new_CP_duration'}); next_row(y);
 
         DispParam(obj, 'init_CP_duration', 0.01, x, y, 'label', 'init_CP duration', 'TooltipString', 'CP duration on the first trial of a session when warmup is on'); next_row(y);
@@ -187,7 +166,7 @@ switch action
         NumeditParam(obj, 'time_go_cue', 0.2, x, y, 'label', 'Go Cue Duration', 'TooltipString', 'duration of go cue');
         set_callback(time_go_cue, {mfilename, 'new_time_go_cue'}); next_row(y);
         DispParam(obj, 'Total_CP_duration', CP_duration + time_go_cue, x, y, 'TooltipString', 'CP_duration + go cue duration'); %#ok<*NODEF>
-        next_row(y); next_row(y);
+        next_row(y, 1.5);
 
         MenuParam(obj, 'Stimuli_State', {'Full', 'Discrete', 'No Sound'}, 'No Sound', x, y, ...
             'label', 'Stimuli State', 'labelfraction', 0.35, 'TooltipString', sprintf(['\nFull: continuous distribution\n' ...
@@ -196,39 +175,62 @@ switch action
             'controls for experiments are in Arpit2StepTask.']));
         set_callback(Stimuli_State, {mfilename, 'stim_state_change'});
         next_row(y);
-
-        [x, y] = TrainingStageSection(obj, 'init', x, y);
-        next_row(y);
+        SubheaderParam(obj, 'timing_title', 'Trial timing & sound', x, y);
 
         SoloFunctionAddVars('StimulusSection', 'ro_args', ...
             {'ThisTrial'; 'ThisCategory'; 'Stimuli_State'; 'A1_time'; 'time_bet_aud1_gocue'; 'PreStim_time'});
 
-        next_row(y, 1);
-        x_pre = x; y_pre = y;
-
         [x, y] = SoundSection(obj, 'init', x_now, y_now);
-        [x, y] = StimulusSection(obj, 'init', x, y); next_row(y);
+        [x, y] = StimulusSection(obj, 'init', x, y); next_row(y, 0.5);
+        x_col2 = x; y_col2 = y;     % returned: the main file continues column 2 here
 
-        next_column(x); y = 5;
+        feval(mfilename, obj, 'new_reward_type');
+        SoloFunctionAddVars('PsychometricSection', 'ro_args', {'Stimuli_State'});
+        x = x_col2; y = y_col2;
 
-        ToggleParam(obj, 'control_active', 0, x, y, 'OnString', 'Buttons Active', 'OffString', 'Buttons Locked', ...
-            'TooltipString', 'If on, the user can change the training/automation parameters. Prevents accidental clicks.');
-        set_callback(control_active, {mfilename, 'User_Control'}); next_row(y);
-
-        ToggleParam(obj, 'warmup_on', 0, x, y, 'OnString', 'Warmup ON', 'OffString', 'Warmup OFF', ...
-            'TooltipString', 'At session start CP_duration starts small and grows to cp_reached over 10 trials'); next_row(y);
-
-        ToggleParam(obj, 'increase_CP_training', 0, x, y, 'OnString', 'Training Increasing CP', 'OffString', 'No Training');
-        set_callback(increase_CP_training, {mfilename, 'CP_training'}); next_row(y);
-        NumeditParam(obj, 'cp_start', 0.5, x, y, 'label', 'CPDur_Start', 'TooltipString', 'Minimum CP during CP training'); next_row(y);
-        NumeditParam(obj, 'cp_end', 2, x, y, 'label', 'CPDur_End', 'TooltipString', 'CP stops growing at this value'); next_row(y);
-        NumeditParam(obj, 'fraction_increase', 0.001, x, y, 'label', 'Frac_Increment', 'TooltipString', 'CP grows by this fraction after each valid trial'); next_row(y);
-        ToggleParam(obj, 'random_CP', 0, x, y, 'OnString', 'Random hold ON', 'OffString', 'Random hold OFF', ...
-            'TooltipString', 'If on, the hold is drawn every trial uniformly in [CP rand min, CP rand max] (stages 6-7)'); next_row(y);
+    % ------------------------------------------------------------------
+    %   INIT_CONTROLS: training controls in column 4 of the main window
+    %   (called by the main file after 'init'; the parameter names are
+    %   unchanged, only where they are drawn moved)
+    % ------------------------------------------------------------------
+    case 'init_controls'
+        % ---- Centre poke (hold) ----
+        NumeditParam(obj, 'cp_start', 0.5, x, y, 'label', 'CPDur_Start', 'TooltipString', 'Minimum CP during CP training');
+        NumeditParam(obj, 'cp_end', 2, x, y, 'label', 'CPDur_End', 'TooltipString', 'CP stops growing at this value');
+        NumeditParam(obj, 'fraction_increase', 0.001, x, y, 'label', 'Frac_Increment', 'TooltipString', 'CP grows by this fraction after each valid trial');
+        make_invisible(cp_start); make_invisible(cp_end); make_invisible(fraction_increase);   % set by the stages; not shown
+        NumeditParam(obj, 'cp_reached', value(cp_start), x, y, 'label', 'CP reached', 'TooltipString', 'CP reached at the end of the last session (updated automatically at end of session)'); next_row(y);
         NumeditParam(obj, 'cp_rand_min', 1.5, x, y, 'position', [x y 100 20], 'label', 'CP min');
         NumeditParam(obj, 'cp_rand_max', 2.2, x, y, 'position', [x+100 y 100 20], 'label', 'CP max'); next_row(y);
-        NumeditParam(obj, 'cp_reached', value(cp_start), x, y, 'label', 'CPDur_Reached', 'TooltipString', 'CP reached at the end of the last session (updated automatically at end of session)'); next_row(y);
-        make_invisible(cp_start); make_invisible(cp_end); make_invisible(fraction_increase);
+        ToggleParam(obj, 'random_CP', 0, x, y, 'OnString', 'Random hold ON', 'OffString', 'Random hold OFF', ...
+            'TooltipString', 'If on, the hold is drawn every trial uniformly in [CP min, CP max] (stages 6-7)'); next_row(y);
+        ToggleParam(obj, 'increase_CP_training', 0, x, y, 'OnString', 'CP grows each trial', 'OffString', 'CP fixed (no growth)', ...
+            'TooltipString', 'If on, the hold grows a little after every valid trial (stages 3-5)');
+        set_callback(increase_CP_training, {mfilename, 'CP_training'}); next_row(y);
+        ToggleParam(obj, 'warmup_on', 0, x, y, 'OnString', 'Warmup ON', 'OffString', 'Warmup OFF', ...
+            'TooltipString', 'At session start CP_duration starts small and grows to cp_reached over 10 trials'); next_row(y);
+        SubheaderParam(obj, 'cp_title', 'Centre poke (hold)', x, y); next_row(y, 1.2);
+
+        % ---- Trial structure ----
+        MenuParam(obj, 'TrialMode', {'Shaping', 'TwoStep'}, 'Shaping', x, y, 'label', 'Trial mode', ...
+            'labelfraction', 0.35, 'TooltipString', sprintf(['\nShaping: side lights uninformative, either side pays.\n' ...
+            'TwoStep: sound category x lit side decides the rewarded port.\n' ...
+            'Set automatically unless TrainingStage = Manual.'])); next_row(y);
+        ToggleParam(obj, 'CentrePokeRequired', 0, x, y, 'OnString', 'Centre poke required', ...
+            'OffString', 'No centre poke', 'TooltipString', 'If off, the trial starts directly with the side ports open (shaping stages 1-2)'); next_row(y);
+        ToggleParam(obj, 'ChoiceTimeLimited', 0, x, y, 'OnString', 'Choice time limited', ...
+            'OffString', 'Choice time unlimited', 'TooltipString', 'If on, no side poke within RColl_dur is a timeout'); next_row(y);
+        MenuParam(obj, 'ShapingLights', {'Random both/none', 'Both lit', 'Both dark'}, 'Random both/none', x, y, ...
+            'label', 'Side LEDs', 'labelfraction', 0.35, 'TooltipString', ...
+            'Side LEDs during Shaping trials. They never indicate the rewarded side.'); next_row(y);
+        MenuParam(obj, 'CueRule', {'Loud->Lit', 'Loud->Dark'}, 'Loud->Lit', x, y, 'label', 'Cue rule', ...
+            'labelfraction', 0.35, 'TooltipString', sprintf(['\nLoud->Lit: loud = go to the lit port, quiet = go to the dark port.\n' ...
+            'Loud->Dark: loud = go to the dark port, quiet = go to the lit port.'])); next_row(y);
+        MenuParam(obj, 'CueMode', {'Light/Dark', 'Color'}, 'Light/Dark', x, y, 'label', 'Cue mode', ...
+            'labelfraction', 0.35, 'TooltipString', sprintf(['\nLight/Dark: target side LED on, other off.\n' ...
+            'Color: lit side shows the port LED, other side shows the alternative colour\n' ...
+            '(needs DIOLINES left1led_alt / right1led_alt in Settings_Custom.conf; untested).'])); next_row(y);
+        SubheaderParam(obj, 'trial_title', 'Trial structure', x, y); next_row(y, 1.2);
 
         SoloFunctionAddVars('Arpit2StepTrainingSMA', 'ro_args', ...
             {'CP_duration'; 'CenterLed_duration'; 'RewardCollection_duration'; ...
@@ -237,10 +239,17 @@ switch action
             'drink_time'; 'reward_delay'; 'reward_type'; 'secondhit_delay'; 'error_iti'; 'violation_iti'; 'CueMode'; ...
             'go_sound_on'});
 
-        SoloFunctionAddVars('PsychometricSection', 'ro_args', {'Stimuli_State'});
+        % (the main file calls 'init_lock' and then 'User_Control' once
+        %  TrainingStageSection exists)
 
-        feval(mfilename, obj, 'User_Control');
-        feval(mfilename, obj, 'new_reward_type');
+    case 'init_lock'
+        % One lock for the stage menu, auto training, trial structure and CP
+        % controls (prevents accidental clicks). Drawn between the
+        % training-stage block and the trial-structure block.
+        ToggleParam(obj, 'control_active', 0, x, y, 'OnString', 'Unlocked: click to lock', ...
+            'OffString', 'Locked: click to edit', 'TooltipString', ...
+            'Unlock to change the stage by hand, auto training, the trial structure or the CP settings.');
+        set_callback(control_active, {mfilename, 'User_Control'}); next_row(y, 1.2);
 
     % ------------------------------------------------------------------
     %              CALLBACKS
@@ -547,6 +556,13 @@ switch action
                 end
             end
         end
+        % Side antibias (stages 1-4): if the rat over-uses one side, this trial
+        % is more often rewarded only on the other side (AntibiasSection).
+        if strcmp(value(ThisTrial), 'EITHER') && n_done_trials > 0
+            f = AntibiasSection(obj, 'side_force', value(hit_history), value(choice_history));
+            if strcmp(f, 'l'), ThisTrial.value = 'LEFT'; elseif strcmp(f, 'r'), ThisTrial.value = 'RIGHT'; end
+        end
+        this_beta.value = AntibiasSection(obj, 'get_beta');
 
     % ------------------------------------------------------------------
     case 'draw_twostep_trial'

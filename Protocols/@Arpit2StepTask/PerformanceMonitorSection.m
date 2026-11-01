@@ -9,6 +9,11 @@ function varargout = PerformanceMonitorSection(obj, action, varargin)
 %   * writes the remarks summary into the Comments box (saved with the data)
 %   * sends ONE e-mail to the rat's contacts, only if something is FLAGGED.
 %
+% Arpit2StepTask: the monitor runs only when StimulatorSection's StimLine is
+% 'none' (behaviour / centre-poke retraining). With 'Opto' or 'Ephys' it is
+% switched off ('set_active', 0): nothing is checked during the trials and
+% nothing is written or sent at the end, so it costs no time in experiments.
+%
 % What is checked:
 %
 %   Flag           Condition                                          Stages
@@ -52,34 +57,48 @@ switch action
         set_callback(MonitorButton, {mfilename, 'show'});
         try set(get_ghandle(MonitorButton), 'BackgroundColor', [0.75 1 0.75]); catch, end
         next_row(y);
+        SoloParamHandle(obj, 'MonitorActive', 'value', 1);   % 0 during Opto / Ephys experiments
 
         oldx = x; oldy = y; parentfig = double(gcf);
+        % Window in pixels: thresholds in two columns at the bottom, remarks above
         SoloParamHandle(obj, 'myfig', 'value', figure( ...
             'closerequestfcn', [mfilename '(' class(obj) ', ''hide'');'], ...
-            'MenuBar', 'none', 'Name', 'Performance Monitor', 'Units', 'normalized', ...
-            'Position', [0.3, 0.15, 0.4, 0.7], 'Visible', 'off'), 'saveable', false);
+            'MenuBar', 'none', 'Name', 'Performance Monitor', 'Units', 'pixels', ...
+            'Position', [200 150 540 420], 'Visible', 'off'), 'saveable', false);
         % Remarks text (top half of the window)
-        SoloParamHandle(obj, 'remarks_box', 'value', uicontrol(value(myfig), 'Style', 'listbox', ...
-            'Units', 'normalized', 'Position', [0.02 0.5 0.96 0.48], 'String', {'No remarks yet'}, ...
-            'FontName', 'Courier', 'Max', 2, 'Min', 0), 'saveable', false);
-
+        LF = 0.66;   % wider labels
         x = 10; y = 5;
-        NumeditParam(obj, 'drop_size', 0.2, x, y, 'label', 'Perf drop (hit frac)'); next_row(y);
-        NumeditParam(obj, 'strategy_frac', 0.9, x, y, 'label', 'Strategy fraction'); next_row(y);
-        NumeditParam(obj, 'viol_rate', 0.5, x, y, 'label', 'Violation rate (st 6-7)'); next_row(y);
-        NumeditParam(obj, 'persist_trials', 100, x, y, 'label', 'Flag if lasts (trials)'); next_row(y);
-        NumeditParam(obj, 'window', 60, x, y, 'label', 'Window (trials)'); next_row(y);
-        NumeditParam(obj, 'min_valid_trials', 80, x, y, 'label', 'Min valid trials/session', 'TooltipString', ...
+        NumeditParam(obj, 'drop_size', 0.2, x, y, 'labelfraction', LF, 'label', 'Perf drop (hit frac)'); next_row(y);
+        NumeditParam(obj, 'strategy_frac', 0.9, x, y, 'labelfraction', LF, 'label', 'Strategy fraction'); next_row(y);
+        NumeditParam(obj, 'viol_rate', 0.5, x, y, 'labelfraction', LF, 'label', 'Viol. rate (st 6-7)'); next_row(y);
+        NumeditParam(obj, 'persist_trials', 100, x, y, 'labelfraction', LF, 'label', 'Flag if lasts (tr)'); next_row(y);
+        NumeditParam(obj, 'window', 60, x, y, 'labelfraction', LF, 'label', 'Window (trials)'); next_row(y);
+        SubheaderParam(obj, 'title2b', 'Strategy / performance', x, y);
+        next_column(x); y = 5;
+        NumeditParam(obj, 'min_valid_trials', 80, x, y, 'labelfraction', LF, 'label', 'Min valid tr/session', 'TooltipString', ...
             'Valid = not a violation and not a timeout'); next_row(y);
-        NumeditParam(obj, 'low_trials_from_stage', 2, x, y, 'label', 'Valid-trial check from stage'); next_row(y);
-        NumeditParam(obj, 'stall_sessions', 6, x, y, 'label', 'Stalled after (sessions)', 'TooltipString', ...
+        NumeditParam(obj, 'low_trials_from_stage', 2, x, y, 'labelfraction', LF, 'label', 'Valid check from st.'); next_row(y);
+        NumeditParam(obj, 'stall_sessions', 6, x, y, 'labelfraction', LF, 'label', 'Stalled after (sess)', 'TooltipString', ...
             'Flag a rat that has been in stage 5, or on the same stage 6 step, for this many sessions'); next_row(y);
-        NumeditParam(obj, 'email_from_stage', 5, x, y, 'label', 'Other checks from stage'); next_row(y);
+        NumeditParam(obj, 'email_from_stage', 5, x, y, 'labelfraction', LF, 'label', 'Other checks from st.'); next_row(y);
         MenuParam(obj, 'MonitorExpertMode', {'Auto by stage', 'Always expert', 'Never expert'}, 'Auto by stage', ...
             x, y, 'label', 'Expert phase', 'labelfraction', 0.4, 'TooltipString', ...
             'When strategy / performance checks are active'); next_row(y);
         ToggleParam(obj, 'email_alerts', 1, x, y, 'OnString', 'Summary e-mail ON', 'OffString', 'Summary e-mail OFF'); next_row(y);
-        SubheaderParam(obj, 'title2', 'Monitor thresholds', x, y);
+        SubheaderParam(obj, 'title2', 'Session checks', x, y);
+
+        % Remarks list. BControl draws its parameters on a full-window panel
+        % ('ContainerPanel'); anything put directly on the figure ends up hidden
+        % behind it, so the list goes on that panel too.
+        panel = findobj(value(myfig), 'Tag', 'ContainerPanel');
+        if isempty(panel), panel = value(myfig); end
+        SoloParamHandle(obj, 'remarks_box', 'value', uicontrol(panel, 'Style', 'listbox', ...
+            'Units', 'pixels', 'Position', [10 160 520 228], 'String', {'No remarks yet'}, ...
+            'FontName', 'Courier', 'Max', 2, 'Min', 0), 'saveable', false);
+        uicontrol(panel, 'Style', 'text', 'Units', 'pixels', 'Position', [10 390 520 20], ...
+            'String', 'Remarks this session', ...
+            'HorizontalAlignment', 'left', 'FontWeight', 'bold');
+
 
         % Per-session state
         SoloParamHandle(obj, 'ep_active', 'value', false(1, numel(TYPES)));
@@ -101,7 +120,7 @@ switch action
     case 'trial'
         try
             n = n_done_trials + 0;
-            if n < 1, return; end
+            if n < 1 || value(MonitorActive) == 0, return; end
             [st, expert] = feval(mfilename, obj, 'phase');
             cond = false(1, numel(TYPES)); msg = cell(1, numel(TYPES));
 
@@ -219,6 +238,9 @@ switch action
                 set(value(remarks_box), 'String', lines);
                 set(get_ghandle(MonitorButton), 'String', sprintf('Monitor: %d FLAGGED', numel(flagged)), 'BackgroundColor', [1 0.5 0.5]);
             end
+            if value(MonitorActive) == 0
+                set(get_ghandle(MonitorButton), 'String', 'Monitor: off (experiment)', 'BackgroundColor', [0.85 0.85 0.85]);
+            end
         catch
         end
 
@@ -226,6 +248,7 @@ switch action
     %   END OF SESSION (pre_saving_settings: the protocol has stopped)
     % ------------------------------------------------------------------
     case 'end_of_session'
+        if value(MonitorActive) == 0, return; end
         try
             n = n_done_trials + 0;
             [st, expert] = feval(mfilename, obj, 'phase');
@@ -291,6 +314,22 @@ switch action
             delete(value(myfig));
         end
         delete_sphandle('owner', ['^@' class(obj) '$'], 'fullname', ['^' mfilename]);
+
+    % ------------------------------------------------------------------
+    %   SET_ACTIVE, 0/1: off during Opto / Ephys experiments (StimulatorSection)
+    % ------------------------------------------------------------------
+    case 'set_active'
+        on = double(logical(varargin{1}));
+        if on == value(MonitorActive), return; end
+        MonitorActive.value = on;
+        if on
+            feval(mfilename, obj, 'refresh');
+        else
+            try
+                set(get_ghandle(MonitorButton), 'String', 'Monitor: off (experiment)', 'BackgroundColor', [0.85 0.85 0.85]);
+            catch
+            end
+        end
 
     case 'show'
         feval(mfilename, obj, 'refresh');

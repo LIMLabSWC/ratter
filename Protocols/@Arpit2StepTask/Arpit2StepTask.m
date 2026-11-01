@@ -1,9 +1,21 @@
 % Arpit2StepTask
 %
-% EXPERIMENT protocol for the 2-step auditory categorization task. Used once
-% a rat has passed Arpit2StepTraining (stage 7, READY FOR TEST); the
-% training protocol hands the rat over automatically (it writes the first
-% Arpit2StepTask settings file with the rat's values).
+% EXPERIMENT protocol (ephys / opto) for the 2-step auditory categorization
+% task. Used once a rat has passed Arpit2StepTraining (stage 8, READY FOR
+% TEST); the training protocol hands the rat over automatically (it writes
+% the first Arpit2StepTask settings file with the rat's values).
+%
+% This is not a training protocol. The main experiments are switch sessions
+% (Hard A <-> Hard B); performance is followed with the psychometric section,
+% and 'Switch Distribution' (top of column 5) switches by hand.
+% The experiment "groups" (ExperimentGroupSection, labelled Stage 1/2a/2b/3/4)
+% are cohorts: the user decides, before the experiment, how much exposure to
+% asymmetric distributions a rat gets (cohort 1: none). They are a session
+% schedule, not training stages.
+% The centre-poke controls (warm-up, hold growth, random hold) are only for
+% re-training the hold, e.g. after surgery.
+% StimulatorSection: StimLine 'none' = no experiment, 'Opto' (settings shown),
+% 'Ephys' (no settings). The performance monitor runs only with 'none'.
 %
 % Task: the rat holds its nose in the centre port (hold drawn every trial in
 % [cp_rand_min, cp_rand_max]) while a 0.4 s noise / tone stimulus plays. At
@@ -17,7 +29,7 @@
 %     (group 1 uniform only / group 2 single asymmetric / group 3 switch)
 %   * controls: Stimuli_State 'Fixed Stimuli' and 'No Sound' (matched trial
 %     statistics, 50% reward), for comparing neural activity
-%   * antibias is set by the user (default OFF)
+%   * antibias is set by the user (default OFF), e.g. to fix a bias before experiments
 %   * StimulatorSection (opto / ephys) and the ephys trial-number TTL
 %
 % Main files
@@ -72,7 +84,7 @@ switch action
     name = mfilename;
     set(value(myfig), 'Name', name, 'Tag', name, ...
       'closerequestfcn', 'dispatcher(''close_protocol'')', 'MenuBar', 'none');
-    set(value(myfig), 'Position', [485   144   850   680]);
+    set(value(myfig), 'Position', [380   144   1060   680]);   % five columns
 
     SoloParamHandle(obj, 'hit_history', 'value', []);
     DeclareGlobals(obj, 'ro_args', {'hit_history'});
@@ -139,14 +151,31 @@ switch action
     [x, y] = BonsaiCameraInterface(obj, 'init', x, y, name, expmtr, rname); next_row(y);
 
     oldx = x; oldy = y;
-    next_column(x); y = 5;
 
-    [x, y] = SideSection(obj, 'init', x, y); %#ok<NASGU>
-    next_row(y, 1.3);
+    % Main window, five columns:
+    %   1 saving, water, comments, camera (above)
+    %   2 sides + antibias, stimulus / sound buttons
+    %   3 trial timing and sound mode
+    %   4 performance, monitor, centre-poke and trial-structure controls, lock
+    %   5 (top to bottom) psychometric with Switch Distribution, session
+    %     schedule (cohort), stimulator (opto settings only for Opto)
+    next_column(x); y = 5;
+    [x, y] = SideSection(obj, 'init', x, y);             % columns 2 and 3
+    figure(value(myfig));
+    next_column(x); next_column(x); y = 5;               % column 4
     [x, y] = PerformanceSection(obj, 'init', x, y);
-    next_row(y, 1.3);
-    [x, y] = PerformanceMonitorSection(obj, 'init', x, y);
-    [x, y] = PsychometricSection(obj, 'init', x, y);
+    [x, y] = PerformanceMonitorSection(obj, 'init', x, y); next_row(y, 0.5);
+    [x, y] = SideSection(obj, 'init_controls', x, y);
+    [x, y] = SideSection(obj, 'init_lock', x, y); %#ok<ASGLU>
+    next_column(x); y = 5;                               % column 5
+    [x, y] = StimulatorSection(obj, 'init', x, y);       % none / opto / ephys (bottom)
+    next_row(y, 0.5);
+    [x, y] = ExperimentGroupSection(obj, 'init', x, y);
+    figure(value(myfig));
+    next_row(y, 0.5);
+    [x, y] = PsychometricSection(obj, 'init', x, y); %#ok<ASGLU>
+    figure(value(myfig));                                % (the psychometric windows took the focus)
+    SideSection(obj, 'User_Control');
     x = oldx; y = oldy;
     SessionDefinition(obj, 'init', x, y, value(myfig)); next_row(y, 2); %#ok<NASGU>
 
@@ -196,7 +225,7 @@ switch action
        % SideSection scores the last trial, runs ExperimentGroupSection and
        % draws the next trial (reward side, category, lit side).
        SideSection(obj, 'prepare_next_trial');
-       PerformanceMonitorSection(obj, 'trial');   % remarks only; nothing is sent during the session
+       PerformanceMonitorSection(obj, 'trial');   % remarks only; off with Opto / Ephys (StimulatorSection)
        StimulatorSection(obj, 'update_values');
        StimulusSection(obj, 'prepare_next_trial');
        SoundManagerSection(obj, 'send_not_yet_uploaded_sounds');
@@ -281,7 +310,7 @@ switch action
 
    %% used by PerformanceMonitorSection (same call in both 2-step protocols)
    case 'monitor_summary'
-      out.stage_no = 8;   % after training stage 7: all session checks apply
+      out.stage_no = 9;   % after training stage 8: all session checks apply
       out.stage_name = ['Experiment, schedule ' ExperimentGroupSection(obj, 'get_group')];
       out.s6_step = NaN; out.stage_sessions = 0; out.s6_step_sessions = 0;
       out.expert = true;  % all strategy / performance checks are active

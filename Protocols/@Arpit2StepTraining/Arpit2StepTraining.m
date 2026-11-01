@@ -133,14 +133,24 @@ switch action
     [x, y] = BonsaiCameraInterface(obj, 'init', x, y, name, expmtr, rname); next_row(y);
 
     oldx = x; oldy = y;
-    next_column(x); y = 5;
 
-    [x, y] = SideSection(obj, 'init', x, y); %#ok<NASGU>
-    next_row(y, 1.3);
+    % Main window, four columns:
+    %   1 saving, water, comments, camera (above)
+    %   2 sides + antibias, then the Psychometric controls on top
+    %   3 trial timing and sound mode
+    %   4 performance, monitor, centre-poke and trial-structure controls,
+    %     training stage (current stage, auto on/off, manual change)
+    next_column(x); y = 5;
+    [x, y] = SideSection(obj, 'init', x, y);             % columns 2 and 3
+    [x, y] = PsychometricSection(obj, 'init', x, y);     % top of column 2
+    figure(value(myfig));                                % (the psychometric windows took the focus)
+    next_column(x); next_column(x); y = 5;               % column 4
     [x, y] = PerformanceSection(obj, 'init', x, y);
-    next_row(y, 1.3);
-    [x, y] = PerformanceMonitorSection(obj, 'init', x, y);
-    [x, y] = PsychometricSection(obj, 'init', x, y);
+    [x, y] = PerformanceMonitorSection(obj, 'init', x, y); next_row(y, 0.5);
+    [x, y] = SideSection(obj, 'init_controls', x, y);
+    [x, y] = SideSection(obj, 'init_lock', x, y);
+    [x, y] = TrainingStageSection(obj, 'init', x, y); %#ok<ASGLU>
+    SideSection(obj, 'User_Control');
     x = oldx; y = oldy;
     SessionDefinition(obj, 'init', x, y, value(myfig)); next_row(y, 2); %#ok<NASGU>
 
@@ -266,7 +276,7 @@ switch action
    %% used by PerformanceMonitorSection (same call in both 2-step protocols)
    case 'monitor_summary'
       out = TrainingStageSection(obj, 'get_summary');
-      out.expert = (out.stage_no == 7) || (out.stage_no == 6 && out.s6_step >= 4);
+      out.expert = (out.stage_no == 8) || (out.stage_no == 7 && out.sound_level == 6);
       varargout{1} = out;
 
    otherwise
