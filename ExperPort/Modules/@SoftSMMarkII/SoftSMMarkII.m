@@ -61,6 +61,20 @@ if nargin==0,
   sm.NumContChans = 16;
   sm.TrigChanOffset = 0;
   sm.NumTrigChans = 0;
+  % --- Added 2026 (happenings, speed factor, scheduled inputs). None of
+  %     these change anything unless a protocol sends happenings, or
+  %     SetSpeed / ScheduleInput / SetRatCallback are used (VirtualRat).
+  sm.UseHappenings = 0;        % 1 while the current matrix uses happenings
+  sm.HappSpec      = [];       % happening spec of the current matrix
+  sm.HappList      = {};       % per-state {name, dest, ...} of the current matrix
+  sm.NextHappSpec  = [];       % set by SetHappeningSpec, applied with the matrix
+  sm.NextHappList  = [];       % set by SetStateMatrix,  applied with the matrix
+  sm.EventIsHapp   = zeros(0,1); % per recorded event: 1 if a happening-mode event
+  sm.Speed         = 1;        % emulator time runs Speed x faster than real time
+  sm.SpeedEmuT0    = 0;        % emulator time when Speed was last changed
+  sm.SpeedRealT0   = sm.T0;    % real clock when Speed was last changed
+  sm.PendingInputs = zeros(0,3); % [emulator_time line value], applied in time order
+  sm.RatCallback   = {};       % {fhandle, extra args...}; see SetRatCallback.m
                    
   set(sm.Fig, 'Units', 'pixels'); 
   screen_size = get(0, 'ScreenSize');

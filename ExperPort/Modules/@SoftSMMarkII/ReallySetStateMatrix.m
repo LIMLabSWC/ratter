@@ -7,6 +7,18 @@ function [sm] = ReallySetStateMatrix(sm)
 
     sm.StateMatrix = sm.NextStateMatrix;
     sm.NextStateMatrix = [];
+
+    % Added 2026: the happening list/spec switch together with the matrix
+    if iscell(sm.NextHappList),
+      sm.UseHappenings = 1;
+      sm.HappList      = sm.NextHappList;
+      sm.HappSpec      = sm.NextHappSpec;
+    else
+      sm.UseHappenings = 0;
+      sm.HappList      = {};
+      sm.HappSpec      = [];
+    end;
+    sm.NextHappList = [];
         
     % ------
 

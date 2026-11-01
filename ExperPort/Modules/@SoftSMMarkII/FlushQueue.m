@@ -6,16 +6,24 @@ function [sm] = FlushQueue(sm)
                                                   1)));
     end;
 
+    % Added 2026: when inputs are scheduled ahead (VirtualRat) they are
+    % applied in emulator-time order with the timers; see private/advance_to.m.
+    % Without scheduled inputs the original loop below runs unchanged.
+    if ~isempty(sm.RatCallback) || ~isempty(sm.PendingInputs),
+      sm = flush_with_scheduled_inputs(sm);
+      return;
+    end;
+
     haveEvents = 1;
 
     while haveEvents,
        while(size(sm.EventQueue, 1)),
         sm = ProcessNextQueuedEvent(sm);
-        now = etime(clock, sm.T0);      
+        now = emu_time(sm);      
         sm = ProcessTimers(sm, now);      
       end;
 
-      now = etime(clock, sm.T0);      
+      now = emu_time(sm);      
       sm = ProcessTimers(sm, now);
       
       % below code is necessary because drawnow might cause an
@@ -44,4 +52,21 @@ function [sm] = FlushQueue(sm)
     set(sm.Fig, 'UserData', sm);
 
     
+    return;
+
+
+% -----------------------------------------------------------------------
+function [sm] = flush_with_scheduled_inputs(sm)
+    now = emu_time(sm);
+    sm  = advance_to(sm, now);
+    set(sm.Fig, 'UserData', sm);
+    drawnow;                              % let GUI clicks through, as above
+    sm  = get(sm.Fig, 'UserData');
+    if size(sm.EventQueue, 1),
+      now = emu_time(sm);
+      sm  = advance_to(sm, now);
+    end;
+    sm = UpdateRunningSchedWavesGUI(sm);
+    sm = UpdateCurrentTimeGUI(sm, now);
+    set(sm.Fig, 'UserData', sm);
     return;
