@@ -61,13 +61,34 @@ switch action
         % Build the GUI and set up solo param handle variables
         create_gui(obj);
 
-        % Define the sounds to use in this task
-        obj = create_sounds(obj);
+        % Look up this rat's sound assignment (A-D) in the Google Sheet.
+        % If the rat isn't known yet (e.g. protocol opened by hand), wait
+        % until a ratname is set and settings are loaded; prepare_next_trial
+        % will pick it up then.
+        if SoundConfigSection(obj, 'load_assignment')
+            % Define the sounds to use in this task
+            obj = create_sounds(obj);
 
-        % Need to prepare the first trial to present
-        Sound2AFC(obj, 'prepare_next_trial');
+            % Need to prepare the first trial to present
+            Sound2AFC(obj, 'prepare_next_trial');
+        end
 
     case 'prepare_next_trial'
+        % Re-read the sound assignment if the ratname changed (runrats and
+        % Load Settings set ratname after init). Errors if the rat has no
+        % row in the sheet, so a rat never runs with wrong sounds.
+        [~, rname] = SavingSection(obj, 'get_info');
+        if ~strcmp(strtrim(rname), SoundConfigSection(obj, 'get_assignment_ratname'))
+            SoundConfigSection(obj, 'load_assignment', 'error');
+            pending_sound_reload.value = 1;
+        end
+        if n_done_trials == 0
+            % Settings may have just been loaded; re-normalize weights and
+            % flag a correct-left/right sound that can never play.
+            SoundConfigSection(obj, 'normalize_probs');
+            SoundConfigSection(obj, 'check_weights');
+        end
+
         % Apply any volume changes queued during the previous trial.
         if value(pending_sound_reload)
             obj = load_stim_sounds(obj);
@@ -159,9 +180,6 @@ switch action
         % audio hardware while a state machine is using it. The flag is
         % consumed at the top of 'prepare_next_trial'.
         pending_sound_reload.value = 1;
-
-    case 'reload_sounds'
-        obj = load_stim_sounds(obj);
 
     case 'toggle_perf_plot'
         if value(show_perf_plot)
@@ -358,7 +376,7 @@ function obj = load_stim_sounds(obj)
 
     target_sample_rate = SoundManagerSection(obj, 'get_sample_rate');
 
-    % Reload stimulus sounds A, B, C, D from current GUI config
+    % Reload stimulus sounds A, B, C, D from the rat's sound assignment
     labels = {'A', 'B', 'C', 'D'};
     loop_flag = 0;
 
