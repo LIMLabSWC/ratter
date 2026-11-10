@@ -1725,8 +1725,13 @@ switch action
 
         %Sound2AFC keeps a per-rat log of crashes (before dispatcher is
         %cleared, so the trial count is still available)
+        s2afc_trials = '';
         if strcmp(value(CurrProtocol), 'Sound2AFC') %#ok<NODEF>
             Sound2AFC_log_problem(value(ExpMenu), value(RatMenu), 'crash', '', lsterr); %#ok<NODEF>
+            try %#ok<TRYNC>
+                h = get_sphandle('name', '^n_done_trials$', 'owner', 'Sound2AFC');
+                s2afc_trials = num2str(value(h{1}));
+            end
         end
 
         %Let's stop dispatcher and clean it up
@@ -1776,6 +1781,34 @@ switch action
                     % sendmail([exp,'@ucl.ac.uk'],[value(RatMenu),' Crashed'],message);
                     gmail_SMTP([exp,'@ucl.ac.uk'],[value(RatMenu),' Crashed'],message);
                 end
+            end
+        end
+
+        %Sound2AFC also emails the people listed for this experimenter in
+        %the Sound2AFC crash email sheet. Failures go to the problem log.
+        if strcmp(value(CurrProtocol), 'Sound2AFC')
+            try
+                recipients = Sound2AFC_crash_recipients(value(ExpMenu), value(RatMenu));
+                if ~isempty(recipients)
+                    if exist('message', 'var') && ~isempty(message)
+                        body = message;
+                    else
+                        body = {['Rig ',num2str(value(RigID)),' crashed while running ',value(RatMenu),' at ',datestr(now,13)], ...
+                            '', lsterr.message};
+                    end
+                    body = [body(1), {['Sound2AFC, experimenter ',value(ExpMenu),', trials completed: ',s2afc_trials]}, body(2:end)];
+                    subject = [value(RatMenu),' Crashed (Sound2AFC, rig ',num2str(value(RigID)),')'];
+                    for i = 1:numel(recipients)
+                        [sent, send_err] = gmail_SMTP(recipients{i}, subject, body);
+                        if ~sent
+                            Sound2AFC_log_problem(value(ExpMenu), value(RatMenu), 'warning', ...
+                                ['Crash email to ',recipients{i},' failed: ',send_err]);
+                        end
+                    end
+                end
+            catch email_ME
+                Sound2AFC_log_problem(value(ExpMenu), value(RatMenu), 'warning', ...
+                    'Could not send crash email', email_ME);
             end
         end
 
@@ -2256,10 +2289,15 @@ try
         search_dir = parent_dir;
     end
 catch
+    config_path = '';  % caller reports the missing file
 end
 
 
-function gmail_SMTP(recipient_email, subject_line, email_body)
+function [ok, err_msg] = gmail_SMTP(recipient_email, subject_line, email_body)
+% ok is true if the email was sent; otherwise err_msg says why. Callers
+% that don't ask for these outputs behave as before.
+ok = false;
+err_msg = '';
 try
     smtp_server = 'smtp.gmail.com';
     smtp_port = '587'; % Use TLS
@@ -2299,9 +2337,12 @@ try
     try
         sendmail(recipient_email, subject_line, email_body);
         disp('Email sent successfully via Gmail SMTP.');
+        ok = true;
     catch ME
+        err_msg = ME.message;
         disp(['Error sending email: ' ME.message]);
     end
-catch
+catch ME
+    err_msg = ME.message;
 end
 
