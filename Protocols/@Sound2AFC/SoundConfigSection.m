@@ -4,16 +4,18 @@
 %
 % Manages 4 sound labels (A, B, C, D), each with:
 %   - Sound assignment (read-only; pulled per rat from a Google Sheet)
-%   - Correct port (read-only; pulled per rat from the same sheet)
-%   - Probability weight (auto-normalized)
+%   - Correct port (read-only; set by the rat's phase and sheet row)
+%   - Fraction of trials (read-only; set by the rat's phase)
 %
-% Which sound plays as A/B/C/D, and which labels are correct-left and
-% correct-right, are NOT editable from the GUI. They are looked up by
-% ratname in the "Generalization Task Sound Orderings" Google Sheet
-% (columns ratname,A,B,C,D,correct left,correct right; see
-% fetch_assignment_table below). The two labels that are neither
-% correct-left nor correct-right reward a random side. A rat with no row in
-% that sheet cannot run.
+% Nothing here is editable from the GUI. Each rat's row in the
+% "Generalization Task Sound Orderings" Google Sheet (see
+% fetch_assignment_table below) gives its A-D sounds, its Current Phase,
+% and its ports:
+%   Train A/C     A, C 50% each at Correct Left/Right; no B/D trials
+%   Probe Trials  A, C 45% each at Correct Left/Right; B, D 5% each,
+%                 rewarded on a random side
+%   B/D Remap     B, D 50% each at Remap Correct Left/Right; no A/C trials
+% A rat with no row in that sheet, or an unknown phase, cannot run.
 
 function [x, y] = SoundConfigSection(obj, action, x, y)
 
@@ -36,7 +38,7 @@ switch action
         SoloParamHandle(obj, 'sound_labels', 'value', {'A', 'B', 'C', 'D'}, 'save_with_settings', 0);
 
         % Per-rat sound assignment, filled by 'load_assignment'. Saved with
-        % data (so each session records what A-D and the ports were) but
+        % data (so each session records its sounds, phase and ports) but
         % never with settings, so a settings file can't override the sheet.
         SoloParamHandle(obj, 'sound_assignment', 'value', struct(), 'save_with_settings', 0);
         SoloParamHandle(obj, 'sound_assignment_ratname', 'value', '', 'save_with_settings', 0);
@@ -45,20 +47,11 @@ switch action
         SubheaderParam(obj, 'soundconfig_title', 'Sound Configuration', x, y);
         next_row(y, 1.5);
 
-        % Create GUI elements for each sound label. Weights start at 0 and
-        % are set by 'load_assignment' once the rat's ports are known.
+        % Create GUI elements for each sound label
         labels = value(sound_labels);
 
         for i = length(labels):-1:1
             label = labels{i};
-
-            % Probability weight
-            NumeditParam(obj, sprintf('sound_%s_prob', label), ...
-                0, x, y, ...
-                'label', 'Weight');
-            set_callback(eval(sprintf('sound_%s_prob', label)), ...
-                {mfilename, 'normalize_probs'});
-            next_row(y);
 
             % Correct port (display only; set from the Google Sheet)
             DispParam(obj, sprintf('sound_%s_port', label), ...
@@ -78,6 +71,11 @@ switch action
             next_row(y, 0.5);  % Extra space between sounds
         end
 
+        % Task phase (display only; set from the Google Sheet)
+        DispParam(obj, 'task_phase', '(unassigned)', x, y, ...
+            'label', 'Phase', 'save_with_settings', 0);
+        next_row(y, 1.5);
+
         % Add normalized probability display
         DispParam(obj, 'normalized_probs_display', ...
             'A:0.25 B:0.25 C:0.25 D:0.25', x, y, ...
@@ -85,54 +83,24 @@ switch action
             'position', [x, y, 200, 40]);
         next_row(y, 1.5);
 
-        % Initialize normalized probabilities
+        % Fraction of trials per label; set from the phase by 'load_assignment'
         SoloParamHandle(obj, 'normalized_probs', 'value', [0.25 0.25 0.25 0.25], ...
             'save_with_settings', 0);
 
-        % Normalize on init
-        SoundConfigSection(obj, 'normalize_probs');
-
         % Make all sound parameters globally accessible
-        global_vars = {'normalized_probs', 'sound_name_to_file_map'};
+        global_vars = {'normalized_probs', 'sound_name_to_file_map', 'task_phase'};
         for i = 1:length(labels)
             label = labels{i};
             global_vars{end+1} = sprintf('sound_%s_name', label);
             global_vars{end+1} = sprintf('sound_%s_port', label);
-            global_vars{end+1} = sprintf('sound_%s_prob', label);
         end
         DeclareGlobals(obj, 'ro_args', global_vars);
 
-    case 'normalize_probs'
-        % Collect raw probability weights
-        sound_labels = value(sound_labels);
-        raw_probs = zeros(1, length(sound_labels));
-
-        for i = 1:length(sound_labels)
-            label = sound_labels{i};
-            prob_param = sprintf('sound_%s_prob', label);
-            raw_probs(i) = value(eval(prob_param));
-        end
-
-        % Normalize
-        total = sum(raw_probs);
-        if total > 0
-            norm_probs = raw_probs / total;
-        else
-            norm_probs = ones(1, length(sound_labels)) / length(sound_labels);
-        end
-
-        normalized_probs.value = norm_probs;
-
-        % Update display
-        display_str = sprintf('A:%.2f  B:%.2f  C:%.2f  D:%.2f', ...
-            norm_probs(1), norm_probs(2), norm_probs(3), norm_probs(4));
-        normalized_probs_display.value = display_str;
-
     case 'load_assignment'
         % Look up the current ratname in the sound assignment Google Sheet
-        % and store its A-D sound names and correct ports. Resets weights to
-        % 0.5 for the correct-left and correct-right labels and 0 for the
-        % other two. Returns x = true if the rat was found.
+        % and store its A-D sound names, phase and ports. Sets the fraction
+        % of trials per label from the phase. Returns x = true if the rat
+        % was found.
         % Pass x = 'error' to error out (instead of warn) when not found.
         error_if_missing = nargin >= 3 && ischar(x) && strcmp(x, 'error');
 
@@ -146,6 +114,7 @@ switch action
         if isempty(assignment)
             sound_assignment.value = struct();
             sound_assignment_ratname.value = '';
+            task_phase.value = '(unassigned)';
             for i = 1:length(labels)
                 name_disp = eval(sprintf('sound_%s_name', labels{i}));
                 name_disp.value = '(unassigned)';
@@ -162,40 +131,26 @@ switch action
         else
             sound_assignment.value = assignment;
             sound_assignment_ratname.value = rname;
+            task_phase.value = assignment.phase_name;
+            probs = phase_probs(assignment.phase);
+            desc = '';
             for i = 1:length(labels)
                 label = labels{i};
                 name_disp = eval(sprintf('sound_%s_name', label));
                 name_disp.value = assignment.(label);
                 port_disp = eval(sprintf('sound_%s_port', label));
-                port_disp.value = label_port(assignment, label);
-                prob = eval(sprintf('sound_%s_prob', label));
-                if strcmp(label_port(assignment, label), 'random')
-                    prob.value = 0;
+                if probs(i) == 0
+                    port_disp.value = '(not used)';
                 else
-                    prob.value = 0.5;
+                    port_disp.value = label_port(assignment, label);
                 end
+                desc = [desc sprintf(' %s=%s(%s, %.0f%%)', label, ...
+                    assignment.(label), value(port_disp), 100*probs(i))]; %#ok<AGROW>
             end
-            SoundConfigSection(obj, 'normalize_probs');
-            fprintf('Sound assignment for %s: A=%s B=%s C=%s D=%s, correct left=%s, correct right=%s\n', ...
-                rname, assignment.A, assignment.B, assignment.C, assignment.D, ...
-                assignment.correct_left, assignment.correct_right);
+            normalized_probs.value = probs;
+            normalized_probs_display.value = sprintf('A:%.2f  B:%.2f  C:%.2f  D:%.2f', probs);
+            fprintf('Sound2AFC %s, phase %s:%s\n', rname, assignment.phase_name, desc);
             x = true;
-        end
-
-    case 'check_weights'
-        % Warn if the correct-left or correct-right sound has weight 0, e.g.
-        % because a settings file saved weights for different labels.
-        assignment = value(sound_assignment);
-        if isfield(assignment, 'correct_left')
-            sides = {'correct left', assignment.correct_left; ...
-                     'correct right', assignment.correct_right};
-            for i = 1:size(sides, 1)
-                if value(eval(sprintf('sound_%s_prob', sides{i, 2}))) == 0
-                    warning('Sound2AFC:zero_weight', ...
-                        'Sound %s is the %s sound but its weight is 0, so it will never play.', ...
-                        sides{i, 2}, sides{i, 1});
-                end
-            end
         end
 
     case 'get_assignment_ratname'
@@ -244,11 +199,28 @@ end
 end
 
 
+function probs = phase_probs(phase)
+% Fraction of trials for A, B, C, D in each phase
+switch phase
+    case 'train_ac', probs = [0.50 0    0.50 0   ];
+    case 'probe',    probs = [0.45 0.05 0.45 0.05];
+    case 'bd_remap', probs = [0    0.50 0    0.50];
+end
+end
+
+
 function port = label_port(assignment, label)
-% 'left', 'right', or 'random' for a label, per the rat's sheet row
-if strcmp(label, assignment.correct_left)
+% 'left', 'right', or 'random' for a label, per the rat's phase and sheet row
+if strcmp(assignment.phase, 'bd_remap')
+    left = assignment.remap_correct_left;
+    right = assignment.remap_correct_right;
+else
+    left = assignment.correct_left;
+    right = assignment.correct_right;
+end
+if strcmp(label, left)
     port = 'left';
-elseif strcmp(label, assignment.correct_right)
+elseif strcmp(label, right)
     port = 'right';
 else
     port = 'random';
@@ -292,46 +264,43 @@ end
 
 
 function assignment = read_sound_assignment(table_text, source, rname, valid_names)
-% Returns struct with fields A-D (sound names) plus correct_left and
-% correct_right (labels A-D) for rname, or [] if the rat has no row.
-% Format: header 'ratname,A,B,C,D,correct left,correct right', one row per
-% rat, '#' starts a comment. Ratname matching is case-insensitive.
+% Returns the rat's row as a struct (fields A-D = sound names, phase,
+% phase_name, correct_left/right, remap_correct_left/right), or [] if the
+% rat has no row. Columns are found by header name, so their order in the
+% sheet doesn't matter. Blank rows are skipped; ratname and phase matching
+% ignore case and spaces.
 assignment = [];
 labels = {'A', 'B', 'C', 'D'};
-header = {'ratname', 'a', 'b', 'c', 'd', 'correct left', 'correct right'};
-n_cols = numel(header);
-header_seen = false;
+col_names = {'ratname', 'currentphase', 'a', 'b', 'c', 'd', ...
+    'correctleft', 'correctright', 'remapcorrectleft', 'remapcorrectright'};
+col_idx = [];
 lines = regexp(table_text, '\r?\n', 'split');
 for line_num = 1:numel(lines)
-    ln = lines{line_num};
-    hash = strfind(ln, '#');
-    if ~isempty(hash), ln = ln(1:hash(1)-1); end
-    ln = strtrim(ln);
-    if isempty(ln), continue; end
+    cols = strtrim(strsplit(lines{line_num}, ','));
+    if all(cellfun(@isempty, cols)), continue; end   % blank row
 
-    cols = strtrim(strsplit(ln, ','));
-    % Sheets can export trailing empty columns; skip blank rows entirely
-    last = find(~cellfun(@isempty, cols), 1, 'last');
-    if isempty(last), continue; end
-    cols = cols(1:max(last, min(n_cols, numel(cols))));
-    if ~header_seen
-        header_seen = true;
-        if ~isequal(lower(regexprep(cols, '[\s_]+', ' ')), header)
-            error('Sound2AFC:bad_assignment_table', ...
-                '%s: header must be "ratname,A,B,C,D,correct left,correct right"', source);
+    if isempty(col_idx)
+        % First non-blank row is the header
+        keys = lower(regexprep(cols, '[^A-Za-z0-9]', ''));
+        [found, col_idx] = ismember(col_names, keys);
+        if ~all(found)
+            error('Sound2AFC:bad_assignment_table', '%s: missing column(s): %s', ...
+                source, strjoin(col_names(~found), ', '));
         end
         continue;
     end
+
     % Only this rat's row is validated, so a half-filled row for another
     % rat doesn't block everyone
-    if ~strcmpi(cols{1}, rname), continue; end
-    if numel(cols) ~= n_cols
+    cols(end+1:max(col_idx)) = {''};
+    if ~strcmpi(cols{col_idx(1)}, rname), continue; end
+    if ~isempty(assignment)
         error('Sound2AFC:bad_assignment_table', ...
-            '%s row %d: expected %d columns (ratname,A,B,C,D,correct left,correct right)', ...
-            source, line_num, n_cols);
+            '%s: rat "%s" appears more than once', source, rname);
     end
+    row = cols(col_idx);   % in col_names order
 
-    names = lower(cols(2:5));
+    names = lower(row(3:6));
     bad = names(~ismember(names, valid_names));
     if ~isempty(bad)
         error('Sound2AFC:bad_assignment_table', ...
@@ -342,21 +311,34 @@ for line_num = 1:numel(lines)
         error('Sound2AFC:bad_assignment_table', ...
             '%s row %d: each sound may only be used once per rat', source, line_num);
     end
-    ports = upper(cols(6:7));
-    if ~all(ismember(ports, labels))
-        error('Sound2AFC:bad_assignment_table', ...
-            '%s row %d: correct left/right must each be one of A, B, C, D', source, line_num);
+
+    phase_name = row{2};
+    switch lower(regexprep(phase_name, '[^A-Za-z0-9]', ''))
+        case 'trainac',     phase = 'train_ac';
+        case 'probetrials', phase = 'probe';
+        case 'bdremap',     phase = 'bd_remap';
+        otherwise
+            error('Sound2AFC:bad_assignment_table', ...
+                '%s row %d: unknown phase "%s". Use Train A/C, Probe Trials, or B/D Remap', ...
+                source, line_num, phase_name);
     end
-    if strcmp(ports{1}, ports{2})
+
+    ports = upper(row(7:10));
+    if ~strcmp(phase, 'bd_remap') && ~isequal(sort(ports(1:2)), {'A', 'C'})
         error('Sound2AFC:bad_assignment_table', ...
-            '%s row %d: correct left and correct right must be different labels', source, line_num);
+            '%s row %d: Correct Left/Right must be A and C (one each)', source, line_num);
     end
-    if ~isempty(assignment)
+    if strcmp(phase, 'bd_remap') && ~isequal(sort(ports(3:4)), {'B', 'D'})
         error('Sound2AFC:bad_assignment_table', ...
-            '%s: rat "%s" appears more than once', source, rname);
+            '%s row %d: Remap Correct Left/Right must be B and D (one each)', source, line_num);
     end
+
     assignment = cell2struct(names(:), labels(:), 1);
+    assignment.phase = phase;
+    assignment.phase_name = phase_name;
     assignment.correct_left = ports{1};
     assignment.correct_right = ports{2};
+    assignment.remap_correct_left = ports{3};
+    assignment.remap_correct_right = ports{4};
 end
 end

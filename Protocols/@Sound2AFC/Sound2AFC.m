@@ -82,12 +82,6 @@ switch action
             SoundConfigSection(obj, 'load_assignment', 'error');
             pending_sound_reload.value = 1;
         end
-        if n_done_trials == 0
-            % Settings may have just been loaded; re-normalize weights and
-            % flag a correct-left/right sound that can never play.
-            SoundConfigSection(obj, 'normalize_probs');
-            SoundConfigSection(obj, 'check_weights');
-        end
 
         % Apply any volume changes queued during the previous trial.
         if value(pending_sound_reload)
