@@ -1358,7 +1358,11 @@ switch action
 
         try
             dispatcher(value(dispobj),'set_protocol',value(CurrProtocol)); %#ok<NODEF>
-        catch %#ok<CTCH>
+        catch load_ME
+            if strcmp(value(CurrProtocol), 'Sound2AFC')
+                Sound2AFC_log_problem(value(ExpMenu), value(RatMenu), 'load_failed', ...
+                    'Failed to load protocol', load_ME);
+            end
             StatusBar.value = ['Failed to load ',value(CurrProtocol),' for ',value(RatMenu)];
             runrats(obj,'enable_all');
             set(get_ghandle(Multi),'string','Load Protocol','BackgroundColor',[1,1,0.4],'FontSize',24);
@@ -1391,7 +1395,11 @@ switch action
                 pop_history(class(protobj), 'include_non_gui', 1);
                 feval(value(CurrProtocol), protobj, 'prepare_next_trial');
             end
-        catch %#ok<CTCH>
+        catch load_ME
+            if strcmp(value(CurrProtocol), 'Sound2AFC')
+                Sound2AFC_log_problem(value(ExpMenu), value(RatMenu), 'load_failed', ...
+                    'Failed to load settings', load_ME);
+            end
             StatusBar.value = 'Failed to load Settings file.';
             runrats(obj,'enable_all');
             set(get_ghandle(Multi),'string','Load Protocol','BackgroundColor',[1,1,0.4],'FontSize',24);
@@ -1715,6 +1723,12 @@ switch action
             lsterr = lasterror; %#ok<LERR>
         end
 
+        %Sound2AFC keeps a per-rat log of crashes (before dispatcher is
+        %cleared, so the trial count is still available)
+        if strcmp(value(CurrProtocol), 'Sound2AFC') %#ok<NODEF>
+            Sound2AFC_log_problem(value(ExpMenu), value(RatMenu), 'crash', '', lsterr); %#ok<NODEF>
+        end
+
         %Let's stop dispatcher and clean it up
         RunningSection(value(dispobj),'RunStop'); %#ok<NODEF>
         dispatcher('set_protocol','');
@@ -1837,7 +1851,11 @@ switch action
         CurrProtocol.value = getProtocol(value(ExpMenu),value(RatMenu)); %#ok<NODEF>
         try
             dispatcher(value(dispobj),'set_protocol',value(CurrProtocol)); %#ok<NODEF>
-        catch %#ok<CTCH>
+        catch load_ME
+            if strcmp(value(CurrProtocol), 'Sound2AFC')
+                Sound2AFC_log_problem(value(ExpMenu), value(RatMenu), 'load_failed', ...
+                    'Failed to load protocol', load_ME);
+            end
             StatusBar.value = ['Failed to load ',value(CurrProtocol),' for ',value(RatMenu)];
             runrats(obj,'enable_all');
             set(get_ghandle(Multi),'string','Load Protocol','BackgroundColor',[1,1,0.4],'FontSize',24);
@@ -1879,6 +1897,10 @@ switch action
             catch ME_inner
                 fprintf('=== Data Load failed, trying to load settings ===\n');
                 disp(ME_inner.getReport());  % <-- shows real error from ASV load block
+                if strcmp(value(CurrProtocol), 'Sound2AFC')
+                    Sound2AFC_log_problem(value(ExpMenu), value(RatMenu), 'warning', ...
+                        'Restart could not load autosave, used settings file instead', ME_inner);
+                end
 
                 [out, sfile] = load_solouiparamvalues(value(RatMenu), 'experimenter', value(ExpMenu), ...
                     'owner', class(protobj), 'interactive', 0);
@@ -1894,6 +1916,10 @@ switch action
         catch ME_outer
             fprintf('=== Loading Failed ===\n');
             disp(ME_outer.getReport());  % <-- shows real error from settings load or prepare_next_trial
+            if strcmp(value(CurrProtocol), 'Sound2AFC')
+                Sound2AFC_log_problem(value(ExpMenu), value(RatMenu), 'load_failed', ...
+                    'Restart failed to load settings', ME_outer);
+            end
 
             StatusBar.value = 'Failed to load Settings file.';
             runrats(obj, 'enable_all');
