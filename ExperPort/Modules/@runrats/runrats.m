@@ -1784,8 +1784,8 @@ switch action
             end
         end
 
-        %Sound2AFC also emails the people listed for this experimenter in
-        %the Sound2AFC crash email sheet. Failures go to the problem log.
+        %Sound2AFC also emails everyone listed in the Sound2AFC crash email
+        %sheet. Failures go to the problem log.
         if strcmp(value(CurrProtocol), 'Sound2AFC')
             try
                 recipients = Sound2AFC_crash_recipients(value(ExpMenu), value(RatMenu));

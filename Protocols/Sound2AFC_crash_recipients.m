@@ -1,16 +1,16 @@
 function recipients = Sound2AFC_crash_recipients(experimenter, ratname)
 % recipients = Sound2AFC_crash_recipients(experimenter, ratname)
 %
-% Email addresses to notify when a Sound2AFC session run by experimenter
-% crashes, read from the Sound2AFC crash email Google Sheet (columns
-% Person, Email). experimenter is matched against Person, ignoring case and
-% spaces. An Email cell may hold several addresses separated by commas or
-% semicolons. Returns {} if nobody is listed.
+% Email addresses to notify when any Sound2AFC session crashes: every
+% address in the Email column of the Sound2AFC crash email Google Sheet
+% (the Person column is just a label). An Email cell may hold several
+% addresses separated by commas or semicolons; duplicates are sent once.
+% Returns {} if nobody is listed.
 %
 % Each successful download is cached next to this file (the cache holds
 % email addresses and is git-ignored); if the download fails the cached copy
 % is used. Problems are logged to the rat's Sound2AFC_problem_log.csv
-% (ratname is only used for that).
+% (experimenter and ratname are only used for that).
 
 recipients = {};
 sheet_url = ['https://docs.google.com/spreadsheets/d/' ...
@@ -35,35 +35,35 @@ catch ME
     table_text = fileread(cache_file);
 end
 
-person_col = [];
 email_col = [];
 lines = regexp(table_text, '\r?\n', 'split');
 for i = 1:numel(lines)
     cells = csv_split(lines{i});
     if all(cellfun(@isempty, cells)), continue; end   % blank row
 
-    if isempty(person_col)
+    if isempty(email_col)
         % First non-blank row is the header
         keys = lower(regexprep(cells, '[^A-Za-z0-9]', ''));
-        person_col = find(strcmp(keys, 'person'), 1);
         email_col = find(strcmp(keys, 'email'), 1);
-        if isempty(person_col) || isempty(email_col)
+        if isempty(email_col)
             Sound2AFC_log_problem(experimenter, ratname, 'warning', ...
-                'Crash email sheet needs "Person" and "Email" columns; no crash email sent');
+                'Crash email sheet needs an "Email" column; no crash email sent');
             return;
         end
         continue;
     end
 
-    if numel(cells) < max(person_col, email_col), continue; end
-    if strcmpi(regexprep(cells{person_col}, '\s', ''), regexprep(experimenter, '\s', ''))
-        recipients = [recipients, regexp(cells{email_col}, '[^\s,;]+@[^\s,;]+', 'match')]; %#ok<AGROW>
-    end
+    if numel(cells) < email_col, continue; end
+    recipients = [recipients, regexp(cells{email_col}, '[^\s,;]+@[^\s,;]+', 'match')]; %#ok<AGROW>
 end
+
+% Send each address once, keeping sheet order
+[~, first] = unique(lower(recipients), 'stable');
+recipients = recipients(first);
 
 if isempty(recipients)
     Sound2AFC_log_problem(experimenter, ratname, 'warning', ...
-        sprintf('No email for "%s" in crash email sheet; no crash email sent', experimenter));
+        'No addresses in crash email sheet; no crash email sent');
 end
 end
 
