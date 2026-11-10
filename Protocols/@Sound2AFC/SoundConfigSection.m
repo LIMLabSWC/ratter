@@ -104,9 +104,12 @@ switch action
         % Pass x = 'error' to error out (instead of warn) when not found.
         error_if_missing = nargin >= 3 && ischar(x) && strcmp(x, 'error');
 
-        [~, rname] = SavingSection(obj, 'get_info');
+        [expmtr, rname] = SavingSection(obj, 'get_info');
         rname = strtrim(rname);
-        [table_text, source] = fetch_assignment_table();
+        [table_text, source, fetch_problem] = fetch_assignment_table();
+        if ~isempty(fetch_problem)
+            Sound2AFC_log_problem(expmtr, rname, 'warning', fetch_problem);
+        end
         assignment = read_sound_assignment(table_text, source, rname, ...
             fieldnames(value(sound_name_to_file_map)));
 
@@ -124,9 +127,11 @@ switch action
             msg = sprintf('No sound assignment for rat "%s" in %s. Add a row for this rat before running.', ...
                 rname, source);
             if error_if_missing
+                % runrats logs this as a crash or failed load
                 error('Sound2AFC:no_sound_assignment', '%s', msg);
             end
             warning('Sound2AFC:no_sound_assignment', '%s', msg);
+            Sound2AFC_log_problem(expmtr, rname, 'warning', msg);
             x = false;
         else
             sound_assignment.value = assignment;
@@ -228,14 +233,16 @@ end
 end
 
 
-function [table_text, source] = fetch_assignment_table()
+function [table_text, source, problem] = fetch_assignment_table()
 % Downloads the "Generalization Task Sound Orderings" Google Sheet as CSV.
 % The sheet must be viewable by anyone with the link. Each successful
 % download is cached locally; if the download fails (no internet, Google
-% down) the cached copy is used with a warning.
+% down) the cached copy is used with a warning. problem is the warning
+% text ('' if none), so the caller can log it.
 sheet_url = ['https://docs.google.com/spreadsheets/d/' ...
     '1C7BHR3yfgxGvL0hvvexWOQ-3oneIaqPQ92uaDs1Sf40/export?format=csv'];
 cache_file = fullfile(fileparts(mfilename('fullpath')), 'sound_assignments_cache.csv');
+problem = '';
 
 try
     table_text = webread(sheet_url, weboptions('ContentType', 'text', 'Timeout', 15));
@@ -245,7 +252,8 @@ try
         fwrite(fid, table_text, 'char');
         fclose(fid);
     catch ME
-        warning('Sound2AFC:assignment_cache', 'Could not write cache %s: %s', cache_file, ME.message);
+        problem = sprintf('Could not write cache %s: %s', cache_file, ME.message);
+        warning('Sound2AFC:assignment_cache', '%s', problem);
     end
 catch ME
     if ~exist(cache_file, 'file')
@@ -254,9 +262,9 @@ catch ME
             ME.message, cache_file);
     end
     d = dir(cache_file);
-    warning('Sound2AFC:assignment_offline', ...
-        'Could not download the sound assignment sheet (%s). Using cached copy from %s.', ...
+    problem = sprintf('Could not download the sound assignment sheet (%s). Using cached copy from %s.', ...
         ME.message, d.date);
+    warning('Sound2AFC:assignment_offline', '%s', problem);
     table_text = fileread(cache_file);
     source = sprintf('cached sheet %s', cache_file);
 end
