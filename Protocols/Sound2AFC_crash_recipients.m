@@ -2,38 +2,22 @@ function recipients = Sound2AFC_crash_recipients(experimenter, ratname)
 % recipients = Sound2AFC_crash_recipients(experimenter, ratname)
 %
 % Email addresses to notify when any Sound2AFC session crashes: every
-% address in the Email column of the Sound2AFC crash email Google Sheet
+% address in the Email column of @Sound2AFC/Sound2AFC_crash_emails.csv
 % (the Person column is just a label). An Email cell may hold several
 % addresses separated by commas or semicolons; duplicates are sent once.
 % Returns {} if nobody is listed.
 %
-% Each successful download is cached next to this file (the cache holds
-% email addresses and is git-ignored); if the download fails the cached copy
-% is used. Problems are logged to the rat's Sound2AFC_problem_log.csv
-% (experimenter and ratname are only used for that).
+% Problems are logged to the rat's Sound2AFC_problem_log.csv (experimenter
+% and ratname are only used for that).
 
 recipients = {};
-sheet_url = ['https://docs.google.com/spreadsheets/d/' ...
-    '1JZAlK6hL8q-O9vNhAjwugU1gPW15vXzWDEvMS6bpvBg/export?format=csv'];
-cache_file = fullfile(fileparts(mfilename('fullpath')), 'Sound2AFC_crash_emails_cache.csv');
-
-try
-    table_text = webread(sheet_url, weboptions('ContentType', 'text', 'Timeout', 15));
-    try %#ok<TRYNC>
-        fid = fopen(cache_file, 'w');
-        fwrite(fid, table_text, 'char');
-        fclose(fid);
-    end
-catch ME
-    if ~exist(cache_file, 'file')
-        Sound2AFC_log_problem(experimenter, ratname, 'warning', ...
-            'Could not download crash email sheet and no cached copy exists; no crash email sent', ME);
-        return;
-    end
+email_file = fullfile(fileparts(mfilename('fullpath')), '@Sound2AFC', 'Sound2AFC_crash_emails.csv');
+if ~exist(email_file, 'file')
     Sound2AFC_log_problem(experimenter, ratname, 'warning', ...
-        'Could not download crash email sheet; used cached copy', ME);
-    table_text = fileread(cache_file);
+        sprintf('Crash email file not found (%s); no crash email sent', email_file));
+    return;
 end
+table_text = fileread(email_file);
 
 email_col = [];
 lines = regexp(table_text, '\r?\n', 'split');
