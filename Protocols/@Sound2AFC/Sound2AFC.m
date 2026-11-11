@@ -61,7 +61,7 @@ switch action
         % Build the GUI and set up solo param handle variables
         create_gui(obj);
 
-        % Look up this rat's sound assignment (A-D) in the Google Sheet.
+        % Look up this rat's sound assignment (A-D) in sound_assignments.csv.
         % If the rat isn't known yet (e.g. protocol opened by hand), wait
         % until a ratname is set and settings are loaded; prepare_next_trial
         % will pick it up then.
@@ -69,19 +69,26 @@ switch action
             % Define the sounds to use in this task
             obj = create_sounds(obj);
 
-            % Need to prepare the first trial to present
-            Sound2AFC(obj, 'prepare_next_trial');
+            % Prepare the first trial only if a phase is already chosen.
+            % Normally it isn't yet: runrats (or Load Settings) loads the
+            % rat's saved phase and then calls prepare_next_trial itself.
+            if SoundConfigSection(obj, 'phase_is_set')
+                Sound2AFC(obj, 'prepare_next_trial');
+            end
         end
 
     case 'prepare_next_trial'
         % Re-read the sound assignment if the ratname changed (runrats and
         % Load Settings set ratname after init). Errors if the rat has no
-        % row in the sheet, so a rat never runs with wrong sounds.
+        % row in the CSV, so a rat never runs with wrong sounds.
         [~, rname] = SavingSection(obj, 'get_info');
         if ~strcmp(strtrim(rname), SoundConfigSection(obj, 'get_assignment_ratname'))
             SoundConfigSection(obj, 'load_assignment', 'error');
             pending_sound_reload.value = 1;
         end
+        % Fraction of trials per sound from the Phase menu. Errors if no
+        % phase is chosen (e.g. settings didn't load), so the rat doesn't run.
+        SoundConfigSection(obj, 'apply_phase');
 
         % Apply any volume changes queued during the previous trial.
         if value(pending_sound_reload)

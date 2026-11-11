@@ -1,0 +1,4 @@
+Rat Name,A,B,C,D,Correct Left,Correct Right,Remap Correct Left,Remap Correct Right
+TB09,Bus,Leafblower,Storm,Crowd,A,C,B,D
+TB10,Bus,Crowd,Leafblower,Storm,A,C,D,B
+TB11,Bus,Leafblower,Storm,Crowd,A,C,B,D

@@ -3,19 +3,19 @@
 % Section for configuring sound files, port mappings, and probabilities
 %
 % Manages 4 sound labels (A, B, C, D), each with:
-%   - Sound assignment (read-only; pulled per rat from a Google Sheet)
-%   - Correct port (read-only; set by the rat's phase and sheet row)
-%   - Fraction of trials (read-only; set by the rat's phase)
+%   - Sound assignment (read-only; pulled per rat from sound_assignments.csv)
+%   - Correct port (read-only; set by the phase and the rat's CSV row)
+%   - Fraction of trials (read-only; set by the phase)
 %
-% Nothing here is editable from the GUI. Each rat's row in the
-% "Generalization Task Sound Orderings" Google Sheet (see
-% fetch_assignment_table below) gives its A-D sounds, its Current Phase,
-% and its ports:
+% Each rat's row in sound_assignments.csv (next to this file) gives its A-D
+% sounds and its ports. The phase is chosen on the GUI and saved with the
+% rat's settings:
 %   Train A/C     A, C 50% each at Correct Left/Right; no B/D trials
 %   Probe Trials  A, C 45% each at Correct Left/Right; B, D 5% each,
 %                 rewarded on a random side
 %   B/D Remap     B, D 50% each at Remap Correct Left/Right; no A/C trials
-% A rat with no row in that sheet, or an unknown phase, cannot run.
+% There is no default phase: a rat with no row in the CSV, or with no phase
+% chosen (e.g. a new rat, or settings that failed to load), cannot run.
 
 function [x, y] = SoundConfigSection(obj, action, x, y)
 
@@ -38,8 +38,8 @@ switch action
         SoloParamHandle(obj, 'sound_labels', 'value', {'A', 'B', 'C', 'D'}, 'save_with_settings', 0);
 
         % Per-rat sound assignment, filled by 'load_assignment'. Saved with
-        % data (so each session records its sounds, phase and ports) but
-        % never with settings, so a settings file can't override the sheet.
+        % data (so each session records its sounds and ports) but never
+        % with settings, so a settings file can't override the CSV.
         SoloParamHandle(obj, 'sound_assignment', 'value', struct(), 'save_with_settings', 0);
         SoloParamHandle(obj, 'sound_assignment_ratname', 'value', '', 'save_with_settings', 0);
 
@@ -53,12 +53,12 @@ switch action
         for i = length(labels):-1:1
             label = labels{i};
 
-            % Correct port (display only; set from the Google Sheet)
+            % Correct port (display only; set from the phase and the CSV)
             DispParam(obj, sprintf('sound_%s_port', label), ...
                 '(unassigned)', x, y, 'label', 'Port', 'save_with_settings', 0);
             next_row(y);
 
-            % Assigned sound (display only; set from the Google Sheet)
+            % Assigned sound (display only; set from the CSV)
             DispParam(obj, sprintf('sound_%s_name', label), ...
                 '(unassigned)', x, y, 'label', 'Name', 'save_with_settings', 0);
             next_row(y);
@@ -71,24 +71,30 @@ switch action
             next_row(y, 0.5);  % Extra space between sounds
         end
 
-        % Task phase (display only; set from the Google Sheet)
-        DispParam(obj, 'task_phase', '(unassigned)', x, y, ...
-            'label', 'Phase', 'save_with_settings', 0);
+        % Task phase, saved with the rat's settings. No default on purpose:
+        % '(choose phase)' blocks trials, so a rat whose settings didn't load
+        % never silently runs the wrong phase.
+        MenuParam(obj, 'sound_phase', [{'(choose phase)'}, phase_names()], ...
+            '(choose phase)', x, y, 'label', 'Phase', ...
+            'TooltipString', 'Applies from the next trial. Save settings to keep it for this rat.');
+        set_callback(sound_phase, {mfilename, 'phase_changed'});
         next_row(y, 1.5);
+        % Last phase that passed checks, to undo an invalid menu choice
+        SoloParamHandle(obj, 'applied_phase', 'value', '', 'save_with_settings', 0, 'saveable', 0);
 
         % Add normalized probability display
         DispParam(obj, 'normalized_probs_display', ...
-            'A:0.25 B:0.25 C:0.25 D:0.25', x, y, ...
+            '(choose phase)', x, y, ...
             'label', 'Normalized', 'labelpos', 'top', ...
             'position', [x, y, 200, 40]);
         next_row(y, 1.5);
 
-        % Fraction of trials per label; set from the phase by 'load_assignment'
-        SoloParamHandle(obj, 'normalized_probs', 'value', [0.25 0.25 0.25 0.25], ...
+        % Fraction of trials per label; set from the phase by 'apply_phase'
+        SoloParamHandle(obj, 'normalized_probs', 'value', [0 0 0 0], ...
             'save_with_settings', 0);
 
         % Make all sound parameters globally accessible
-        global_vars = {'normalized_probs', 'sound_name_to_file_map', 'task_phase'};
+        global_vars = {'normalized_probs', 'sound_name_to_file_map', 'sound_phase'};
         for i = 1:length(labels)
             label = labels{i};
             global_vars{end+1} = sprintf('sound_%s_name', label);
@@ -97,10 +103,8 @@ switch action
         DeclareGlobals(obj, 'ro_args', global_vars);
 
     case 'load_assignment'
-        % Look up the current ratname in the sound assignment Google Sheet
-        % and store its A-D sound names, phase and ports. Sets the fraction
-        % of trials per label from the phase. Returns x = true if the rat
-        % was found.
+        % Look up the current ratname in sound_assignments.csv and store its
+        % A-D sound names and ports. Returns x = true if the rat was found.
         % Pass x = 'error' to error out (instead of warn) when not found.
         error_if_missing = nargin >= 3 && ischar(x) && strcmp(x, 'error');
 
@@ -117,7 +121,6 @@ switch action
         if isempty(assignment)
             sound_assignment.value = struct();
             sound_assignment_ratname.value = '';
-            task_phase.value = '(unassigned)';
             for i = 1:length(labels)
                 name_disp = eval(sprintf('sound_%s_name', labels{i}));
                 name_disp.value = '(unassigned)';
@@ -136,27 +139,86 @@ switch action
         else
             sound_assignment.value = assignment;
             sound_assignment_ratname.value = rname;
-            task_phase.value = assignment.phase_name;
-            probs = phase_probs(assignment.phase);
-            desc = '';
             for i = 1:length(labels)
-                label = labels{i};
-                name_disp = eval(sprintf('sound_%s_name', label));
-                name_disp.value = assignment.(label);
-                port_disp = eval(sprintf('sound_%s_port', label));
-                if probs(i) == 0
-                    port_disp.value = '(not used)';
-                else
-                    port_disp.value = label_port(assignment, label);
-                end
-                desc = [desc sprintf(' %s=%s(%s, %.0f%%)', label, ...
-                    assignment.(label), value(port_disp), 100*probs(i))]; %#ok<AGROW>
+                name_disp = eval(sprintf('sound_%s_name', labels{i}));
+                name_disp.value = assignment.(labels{i});
             end
-            normalized_probs.value = probs;
-            normalized_probs_display.value = sprintf('A:%.2f  B:%.2f  C:%.2f  D:%.2f', probs);
-            fprintf('Sound2AFC %s, phase %s:%s\n', rname, assignment.phase_name, desc);
+            fprintf(['Sound2AFC %s sounds: A=%s B=%s C=%s D=%s (Correct L/R %s/%s, ' ...
+                'Remap Correct L/R %s/%s)\n'], rname, assignment.A, assignment.B, ...
+                assignment.C, assignment.D, assignment.correct_left, ...
+                assignment.correct_right, assignment.remap_correct_left, ...
+                assignment.remap_correct_right);
             x = true;
         end
+        SoundConfigSection(obj, 'update_display');
+
+    case 'phase_changed'
+        % Phase menu callback (also run when settings load). Mid-session,
+        % an invalid choice is undone so the running session isn't stopped;
+        % otherwise prepare_next_trial ('apply_phase') refuses to run it.
+        [~, problem] = check_phase(value(sound_assignment), value(sound_phase));
+        if ~isempty(problem)
+            if dispatcher('is_running') && ~isempty(value(applied_phase))
+                sound_phase.value = value(applied_phase);
+                problem = sprintf('%s Kept phase %s.', problem, value(applied_phase));
+            end
+            warning('Sound2AFC:bad_phase', '%s', problem);
+            [expmtr, rname] = SavingSection(obj, 'get_info');
+            Sound2AFC_log_problem(expmtr, rname, 'warning', problem);
+        end
+        SoundConfigSection(obj, 'update_display');
+
+    case 'apply_phase'
+        % Called by prepare_next_trial before each trial: sets the fraction
+        % of trials per label from the phase menu. Errors if no valid phase
+        % is chosen, so a rat never runs a phase nobody picked.
+        [phase, problem] = check_phase(value(sound_assignment), value(sound_phase));
+        if ~isempty(problem)
+            error('Sound2AFC:bad_phase', '%s', problem);
+        end
+        normalized_probs.value = phase_probs(phase);
+        SoundConfigSection(obj, 'update_display');
+        if ~strcmp(value(applied_phase), value(sound_phase))
+            applied_phase.value = value(sound_phase);
+            [~, rname] = SavingSection(obj, 'get_info');
+            labels = value(sound_labels);
+            desc = '';
+            for i = 1:length(labels)
+                port_disp = eval(sprintf('sound_%s_port', labels{i}));
+                desc = [desc sprintf(' %s(%s, %.0f%%)', labels{i}, ...
+                    value(port_disp), 100*normalized_probs(i))]; %#ok<AGROW>
+            end
+            fprintf('Sound2AFC %s, phase %s:%s\n', rname, value(sound_phase), desc);
+        end
+
+    case 'update_display'
+        % Refresh the port and fraction-of-trials displays from the phase
+        % menu and the rat's CSV row
+        assignment = value(sound_assignment);
+        labels = value(sound_labels);
+        [phase, problem] = check_phase(assignment, value(sound_phase));
+        if isempty(problem), probs = phase_probs(phase); end
+        for i = 1:length(labels)
+            port_disp = eval(sprintf('sound_%s_port', labels{i}));
+            if ~isfield(assignment, labels{i})
+                port_disp.value = '(unassigned)';
+            elseif ~isempty(problem)
+                port_disp.value = '(choose phase)';
+            elseif probs(i) == 0
+                port_disp.value = '(not used)';
+            else
+                port_disp.value = label_port(assignment, labels{i}, phase);
+            end
+        end
+        if isempty(problem)
+            normalized_probs_display.value = sprintf('A:%.2f  B:%.2f  C:%.2f  D:%.2f', probs);
+        else
+            normalized_probs_display.value = '(choose phase)';
+        end
+
+    case 'phase_is_set'
+        % True if the phase menu holds a real phase (not '(choose phase)')
+        x = ~isempty(phase_key(value(sound_phase)));
 
     case 'get_assignment_ratname'
         % Ratname the current sound assignment was loaded for ('' if none)
@@ -172,7 +234,7 @@ switch action
         assignment = value(sound_assignment);
         if ~isfield(assignment, label)
             error('Sound2AFC:no_sound_assignment', ...
-                'No sound assignment loaded. Add this rat to the "Generalization Task Sound Orderings" sheet.');
+                'No sound assignment loaded. Add this rat to sound_assignments.csv.');
         end
         sound_name = assignment.(label);
         file_map = value(sound_name_to_file_map);
@@ -181,7 +243,7 @@ switch action
         config = struct();
         config.name = sound_name;
         config.file = sound_file;
-        config.port = label_port(assignment, label);
+        config.port = label_port(assignment, label, phase_key(value(sound_phase)));
         config.label = label;
 
         x = config;
@@ -214,9 +276,47 @@ end
 end
 
 
-function port = label_port(assignment, label)
-% 'left', 'right', or 'random' for a label, per the rat's phase and sheet row
-if strcmp(assignment.phase, 'bd_remap')
+function names = phase_names()
+% Phase menu choices, in order (see phase_key)
+names = {'Train A/C', 'Probe Trials', 'B/D Remap'};
+end
+
+
+function phase = phase_key(phase_name)
+% Internal key for a phase menu choice; '' for '(choose phase)'
+switch phase_name
+    case 'Train A/C',    phase = 'train_ac';
+    case 'Probe Trials', phase = 'probe';
+    case 'B/D Remap',    phase = 'bd_remap';
+    otherwise,           phase = '';
+end
+end
+
+
+function [phase, problem] = check_phase(assignment, phase_name)
+% phase key for the menu choice, and why it can't run ('' if it can).
+% The ports are only checked once the rat's CSV row is loaded.
+phase = phase_key(phase_name);
+problem = '';
+if isempty(phase)
+    problem = 'No phase chosen. Choose one in the Phase menu on the Sound2AFC window, then save settings.';
+elseif ~isfield(assignment, 'correct_left')
+    return;
+elseif strcmp(phase, 'bd_remap')
+    if ~isequal(sort({assignment.remap_correct_left, assignment.remap_correct_right}), {'B', 'D'})
+        problem = ['B/D Remap needs Remap Correct Left/Right to be B and D (one each) ' ...
+            'in this rat''s row of sound_assignments.csv.'];
+    end
+elseif ~isequal(sort({assignment.correct_left, assignment.correct_right}), {'A', 'C'})
+    problem = [phase_name ' needs Correct Left/Right to be A and C (one each) ' ...
+        'in this rat''s row of sound_assignments.csv.'];
+end
+end
+
+
+function port = label_port(assignment, label, phase)
+% 'left', 'right', or 'random' for a label, per the phase and the rat's CSV row
+if strcmp(phase, 'bd_remap')
     left = assignment.remap_correct_left;
     right = assignment.remap_correct_right;
 else
@@ -234,52 +334,28 @@ end
 
 
 function [table_text, source, problem] = fetch_assignment_table()
-% Downloads the "Generalization Task Sound Orderings" Google Sheet as CSV.
-% The sheet must be viewable by anyone with the link. Each successful
-% download is cached locally; if the download fails (no internet, Google
-% down) the cached copy is used with a warning. problem is the warning
-% text ('' if none), so the caller can log it.
-sheet_url = ['https://docs.google.com/spreadsheets/d/' ...
-    '1C7BHR3yfgxGvL0hvvexWOQ-3oneIaqPQ92uaDs1Sf40/export?format=csv'];
-cache_file = fullfile(fileparts(mfilename('fullpath')), 'sound_assignments_cache.csv');
+% Reads sound_assignments.csv (next to this file, version controlled).
+% problem is always '' now; kept so the caller doesn't change.
+assignment_file = fullfile(fileparts(mfilename('fullpath')), 'sound_assignments.csv');
 problem = '';
-
-try
-    table_text = webread(sheet_url, weboptions('ContentType', 'text', 'Timeout', 15));
-    source = 'Google Sheet "Generalization Task Sound Orderings"';
-    try
-        fid = fopen(cache_file, 'w');
-        fwrite(fid, table_text, 'char');
-        fclose(fid);
-    catch ME
-        problem = sprintf('Could not write cache %s: %s', cache_file, ME.message);
-        warning('Sound2AFC:assignment_cache', '%s', problem);
-    end
-catch ME
-    if ~exist(cache_file, 'file')
-        error('Sound2AFC:no_assignment_table', ...
-            'Could not download the sound assignment sheet (%s) and no cached copy exists at %s', ...
-            ME.message, cache_file);
-    end
-    d = dir(cache_file);
-    problem = sprintf('Could not download the sound assignment sheet (%s). Using cached copy from %s.', ...
-        ME.message, d.date);
-    warning('Sound2AFC:assignment_offline', '%s', problem);
-    table_text = fileread(cache_file);
-    source = sprintf('cached sheet %s', cache_file);
+if ~exist(assignment_file, 'file')
+    error('Sound2AFC:no_assignment_table', ...
+        'Sound assignment file not found: %s', assignment_file);
 end
+table_text = fileread(assignment_file);
+source = assignment_file;
 end
 
 
 function assignment = read_sound_assignment(table_text, source, rname, valid_names)
-% Returns the rat's row as a struct (fields A-D = sound names, phase,
-% phase_name, correct_left/right, remap_correct_left/right), or [] if the
-% rat has no row. Columns are found by header name, so their order in the
-% sheet doesn't matter. Blank rows are skipped; ratname and phase matching
-% ignore case and spaces.
+% Returns the rat's row as a struct (fields A-D = sound names,
+% correct_left/right, remap_correct_left/right), or [] if the rat has no
+% row. Columns are found by header name, so their order in the CSV doesn't
+% matter. Blank rows are skipped; ratname matching ignores case. The ports
+% are checked against the phase in check_phase.
 assignment = [];
 labels = {'A', 'B', 'C', 'D'};
-col_names = {'ratname', 'currentphase', 'a', 'b', 'c', 'd', ...
+col_names = {'ratname', 'a', 'b', 'c', 'd', ...
     'correctleft', 'correctright', 'remapcorrectleft', 'remapcorrectright'};
 col_idx = [];
 lines = regexp(table_text, '\r?\n', 'split');
@@ -308,7 +384,7 @@ for line_num = 1:numel(lines)
     end
     row = cols(col_idx);   % in col_names order
 
-    names = lower(row(3:6));
+    names = lower(row(2:5));
     bad = names(~ismember(names, valid_names));
     if ~isempty(bad)
         error('Sound2AFC:bad_assignment_table', ...
@@ -320,30 +396,8 @@ for line_num = 1:numel(lines)
             '%s row %d: each sound may only be used once per rat', source, line_num);
     end
 
-    phase_name = row{2};
-    switch lower(regexprep(phase_name, '[^A-Za-z0-9]', ''))
-        case 'trainac',     phase = 'train_ac';
-        case 'probetrials', phase = 'probe';
-        case 'bdremap',     phase = 'bd_remap';
-        otherwise
-            error('Sound2AFC:bad_assignment_table', ...
-                '%s row %d: unknown phase "%s". Use Train A/C, Probe Trials, or B/D Remap', ...
-                source, line_num, phase_name);
-    end
-
-    ports = upper(row(7:10));
-    if ~strcmp(phase, 'bd_remap') && ~isequal(sort(ports(1:2)), {'A', 'C'})
-        error('Sound2AFC:bad_assignment_table', ...
-            '%s row %d: Correct Left/Right must be A and C (one each)', source, line_num);
-    end
-    if strcmp(phase, 'bd_remap') && ~isequal(sort(ports(3:4)), {'B', 'D'})
-        error('Sound2AFC:bad_assignment_table', ...
-            '%s row %d: Remap Correct Left/Right must be B and D (one each)', source, line_num);
-    end
-
+    ports = upper(row(6:9));
     assignment = cell2struct(names(:), labels(:), 1);
-    assignment.phase = phase;
-    assignment.phase_name = phase_name;
     assignment.correct_left = ports{1};
     assignment.correct_right = ports{2};
     assignment.remap_correct_left = ports{3};
