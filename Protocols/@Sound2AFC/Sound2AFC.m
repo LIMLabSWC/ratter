@@ -679,7 +679,17 @@ function update_perf_plot(obj)
     tph = value(trial_params_history);
 
     ax = value(perf_axes);
-    if ~ishandle(ax), return; end
+    if ~ishandle(ax)
+        % Something deleted the axes (the window shows an empty gray box):
+        % recreate them, and log it so the cause can be tracked down
+        if ~ishandle(value(perf_fig)), return; end
+        ax = axes('Parent', value(perf_fig), 'Units', 'normalized', ...
+            'Position', [0.13 0.15 0.82 0.78]);
+        perf_axes.value = ax;
+        [expmtr, rname] = SavingSection(obj, 'get_info');
+        Sound2AFC_log_problem(expmtr, rname, 'warning', ...
+            'Performance plot axes were missing and have been recreated');
+    end
 
     labels = {'A', 'B', 'C', 'D'};
     frac_right = nan(1, 4);
