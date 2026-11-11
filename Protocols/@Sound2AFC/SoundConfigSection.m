@@ -168,6 +168,15 @@ switch action
         end
         SoundConfigSection(obj, 'update_display');
 
+        % When not running (e.g. before Run), the next trial is already
+        % built with the old phase: rebuild it so the change applies to it.
+        % Skipped while settings for a different rat are still loading.
+        [~, rname] = SavingSection(obj, 'get_info');
+        if isempty(problem) && ~dispatcher('is_running') && ...
+                strcmp(strtrim(rname), value(sound_assignment_ratname))
+            feval(class(obj), obj, 'rebuild_next_trial');
+        end
+
     case 'apply_phase'
         % Called by prepare_next_trial before each trial: sets the fraction
         % of trials per label from the phase menu. Errors if no valid phase

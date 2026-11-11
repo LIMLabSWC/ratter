@@ -153,6 +153,18 @@ switch action
             end
             
         fprintf('\nTrial %i - %s trial: ',n_done_trials+1, side_name)
+    case 'rebuild_next_trial'
+        % Rebuild the trial waiting to run (e.g. phase changed before Run)
+        % without recording anything; prepare_next_trial does the
+        % bookkeeping once a trial has actually run.
+        SoundConfigSection(obj, 'apply_phase');
+        trial_params = get_trial_params(obj);
+        current_trial_params.value = trial_params;
+        [sma, prep_next_trial_states] = build_sma(obj, trial_params);
+        dispatcher('send_assembler', sma, prep_next_trial_states);
+        fprintf('\nTrial %i - %s trial (rebuilt for phase %s): ', n_done_trials+1, ...
+            upper(trial_params.correct_side), value(sound_phase));
+
     case 'start_recording'
         BonsaiCameraInterface(obj, 'record_start');
     
