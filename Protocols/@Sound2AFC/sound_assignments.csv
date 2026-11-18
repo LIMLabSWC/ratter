@@ -2,6 +2,6 @@ Rat Name,A,B,C,D,Correct Left,Correct Right,Remap Correct Left,Remap Correct Rig
 TB09,Bus,Leafblower,Storm,Crowd,A,C,B,D
 TB10,Bus,Crowd,Leafblower,Storm,A,C,D,B
 TB11,Bus,Crowd,Leafblower,Storm,A,C,B,D
-SLG12,Bus,Crowd,Leafblower,Storm,A,C,B,D
-SGL13,Bus,Crowd,Leafblower,Storm,A,C,D,B
-SGL16,Storm,Bus,Crowd,Leafblower,A,C,B,D
+SLG12,Crowd,Leafblower,Storm,Bus,A,C,B,D
+SLG13,Crowd,Storm,Leafblower,Bus,A,C,D,B
+SLG16,Crowd,Leafblower,Storm,Bus,A,C,B,D
