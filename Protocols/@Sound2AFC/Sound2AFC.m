@@ -587,7 +587,7 @@ function [sma, prep_next_trial_states] = build_sma(obj, trial_params)
 
     
     % Initialize a state machine with some default states: including check_next_trial_ready
-    prep_next_trial_states = {'check_next_trial_ready'};
+    prep_next_trial_states = {'ITI', 'check_next_trial_ready'};
 
     sma = StateMachineAssembler('full_trial_structure');
 
