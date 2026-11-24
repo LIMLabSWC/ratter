@@ -517,8 +517,8 @@ function [sma, prep_next_trial_states] = build_sma(obj, trial_params)
     left1led   = bSettings('get', 'DIOLINES', 'left1led');
 
     light_correct_port = value(use_light_guides);
-    iti_min = 3;
-    iti_max = 8;
+    iti_min = 3.5;
+    iti_max = 8.5;
     iti_dur = iti_min + rand()*(iti_max-iti_min);
     pre_stim_cpoke_dur = .1;
     post_stim_cpoke_dur = .3;
