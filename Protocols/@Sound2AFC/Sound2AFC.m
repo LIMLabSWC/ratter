@@ -96,9 +96,12 @@ switch action
             pending_sound_reload.value = 0;
         end
 
-        % Record trial params from this trial for accuracy analysis
+        % Record trial params from this trial for accuracy analysis.
+        % Skipped if this trial is already in the history: after a crash
+        % runrats reloads the autosave, which already includes the last
+        % trial, and calls prepare_next_trial again.
         prev_trial_params = value(current_trial_params);
-        if n_done_trials >= 1
+        if n_done_trials >= 1 && numel(value(hit_history)) < value(n_done_trials)
             hit = outcome_from_parsed_events(parsed_events.states);
     
             hit_history.value        = [value(hit_history),    hit];
@@ -237,8 +240,10 @@ switch action
         pd.sound_names = sound_chars(:)';   % char vector
         pd.port_map    = port_chars(:)';    % char vector
 
+        % Trial count is passed explicitly because sendsummary's default,
+        % n_completed_trials, restarts from 0 after a crash restart.
         try
-            sendsummary(obj, 'protocol_data', pd);
+            sendsummary(obj, 'n_done_trials', numel(value(hit_history)), 'protocol_data', pd);
         catch ME
             warning('Sound2AFC:sendsummary_failed', ...
                     'sendsummary threw: %s', ME.message);
